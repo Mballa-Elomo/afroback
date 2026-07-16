@@ -55,6 +55,15 @@ Ce choix n'est pas cosmétique : au-delà de toucher le public local et la diasp
 - Contraste texte/fond toujours suffisant, même sur les zones sombres et dorées
 - Le CTA d'inscription doit rester visible et engageant à chaque section, sans casser l'immersion narrative
 
+## Responsive : exigence non négociable
+
+Le site doit être entièrement responsive et pleinement utilisable sur mobile, tablette et desktop, pas seulement "adapté visuellement". En particulier :
+- **Navigation mobile complète** : sous le seuil desktop, la navigation ne doit jamais simplement disparaître. Un vrai menu mobile (bouton burger qui ouvre un panneau ou une liste avec tous les liens de navigation et le CTA principal) est obligatoire
+- Le **carousel 3D d'objets** doit rester manipulable au doigt (swipe/drag tactile) sur mobile, avec une taille de cartes qui reste lisible sur petit écran
+- La **grille de la galerie Découverte** doit se réorganiser proprement en une ou deux colonnes sur mobile, sans chevauchement ni débordement horizontal
+- Les **effets de parallaxe** peuvent être réduits en intensité sur mobile pour préserver la fluidité, mais jamais désactivés au point de casser la mise en page
+- Tester mentalement le rendu à 3 largeurs au minimum : mobile (~375px), tablette (~768px), desktop (~1280px et plus)
+
 ---
 
 ## Notes pour Yannick (pas à inclure dans le prompt Claude Design)

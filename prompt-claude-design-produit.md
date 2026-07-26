@@ -81,20 +81,16 @@ Détail complet de ce module (les 7 catégories, chaque type de fiche, la versio
 
 ### 5. Marketplace
 
-- **Catalogue produits** : grille avec filtres (catégorie, région d'origine, fourchette de prix, artisan/créateur)
-- **Fiche produit** : photos, description, histoire/origine du produit et de son artisan, prix, avis clients, produits similaires
-- **Fiche artisan/créateur** : mini-profil de l'artisan derrière le produit (photo, région, savoir-faire, autres produits) — cohérent avec l'ADN storytelling d'AFROBACK, pas une fiche e-commerce anonyme
-- **Panier**
-- **Tunnel de paiement** (adresse de livraison, mode de paiement, récapitulatif, confirmation)
-- **Suivi de commande** (historique des commandes, statut de livraison)
+- **Catalogue produits** : grille avec filtres (catégorie, région d'origine, fourchette de prix, artisan/créateur), fiche produit et fiche artisan cohérentes avec l'ADN storytelling d'AFROBACK (pas une fiche e-commerce anonyme)
+- **Parcours d'achat complet** : panier, tunnel de paiement (Mobile Money en priorité), suivi de commande, avis & notation, retours/réclamations, favoris
+
+Détail complet de ce module, côté acheteur ET côté vendeur, dans `prompt-claude-design-marketplace.md`.
 
 ### 6. Communauté & Abonnement
 
-- **Fil communautaire** : publications des membres (texte, photo, réaction), possibilité de commenter
-- **Profil d'un membre** (public)
+- **Fil communautaire, profils, signalement/modération, espace membre premium** : détail complet dans `prompt-claude-design-communaute.md`
 - **Page des formules d'abonnement** : 3 paliers (« Découverte » gratuit, « Racines » et « Héritage » payants — noms à considérer comme des suggestions modifiables), avec bascule mensuel/annuel et un prix qui varie par palier selon le nombre d'enfants rattachés au compte. Détail complet de cette logique de tarification dans `prompt-claude-design-onboarding.md`
 - **Tunnel de paiement abonnement** (choix du palier, moyen de paiement, confirmation)
-- **Espace membre premium** : mise en avant des contenus exclusifs réservés aux abonnés
 
 ### 7. Apprentissage des langues
 
@@ -132,13 +128,9 @@ Accessible depuis le profil adulte dès qu'un profil enfant existe :
 
 ### 11. Espace Vendeur / Artisan
 
-Activable depuis le profil adulte grand public (« Devenir vendeur sur AFROBACK »), en plus de son usage normal de l'app :
+Activable depuis le profil adulte grand public (« Devenir vendeur sur AFROBACK »), en plus de son usage normal de l'app : activation du forfait (tarification détaillée dans `prompt-claude-design-onboarding.md`), tableau de bord, gestion des produits et des commandes, avis reçus, revenus & paiements, changement de forfait, outils de publicité (Premium).
 
-- **Écran d'activation** : présentation du fonctionnement, choix d'un forfait vendeur parmi 3 paliers (Gratuit : 2 articles max, commission 30% ; Standard : articles illimités, commission 5% ; Premium : articles illimités, commission réduite, mise en avant catalogue, accès aux outils de publicité — détail complet dans `prompt-claude-design-onboarding.md`), puis formulaire de profil artisan (nom, région, savoir-faire, photo/bio — c'est ce qui alimente la fiche artisan vue côté acheteur)
-- **Tableau de bord vendeur** : ventes du mois, commandes en attente, produits en ligne, produits en rupture
-- **Gestion des produits** : liste de mes produits, ajout/édition d'un produit (photos, description, origine/histoire du produit, prix, stock)
-- **Gestion des commandes** : liste des commandes reçues, détail d'une commande, marquage « expédiée »
-- **Revenus & paiements** : historique des versements, solde en attente, coordonnées de paiement
+Détail complet de ce module dans `prompt-claude-design-marketplace.md`, avec le parcours acheteur.
 
 ## Système de navigation
 

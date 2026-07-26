@@ -73,10 +73,11 @@ Le compte AFROBACK repose sur un **compte principal (adulte)** qui peut ensuite 
 
 ### 4. Découverte
 
-- **Carte interactive du continent** : navigation par pays/région pour explorer villages, traditions, artisanat, objets sacrés
-- **Catalogue par catégorie** (villages, traditions & rites, artisanat & savoir-faire, objets sacrés)
-- **Fiche détail** (un village, une tradition, un objet) : galerie photo/vidéo, récit contextuel, localisation sur la carte, contenus liés
-- **Teaser « Visite virtuelle des musées »** : écran d'annonce d'une future fonctionnalité de visite virtuelle à 360°, présenté comme un module à venir mais déjà intégré dans la navigation de Découverte (pas juste une mention en bas de page)
+- **Carte interactive du continent** : navigation par pays/région pour explorer les 7 catégories du module (peuples & cultures, traditions & rites, mythes & légendes, gastronomie, objets sacrés, artisanat & savoir-faire, villages & lieux)
+- **Catalogue par catégorie**, avec une fiche détail dédiée à chaque type de contenu (une fiche peuple, une fiche tradition, une fiche mythe en mode lecture immersive, une fiche recette pas-à-pas, une fiche objet sacré, une fiche artisanat, une fiche village)
+- **Module Visite virtuelle des musées** : expérience immersive à 360° avec points d'intérêt cliquables vers les fiches Objets sacrés, marquée « Bientôt disponible » tant que la techno n'est pas développée mais déjà intégrée dans la navigation de Découverte
+
+Détail complet de ce module (les 7 catégories, chaque type de fiche, la version enfant) dans `prompt-claude-design-decouverte.md`.
 
 ### 5. Marketplace
 

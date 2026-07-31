@@ -1,16 +1,16 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { HeroHeader } from '../../../src/components/HeroHeader';
-import { WarningBanner } from '../../../src/components/WarningBanner';
-import { TimelineList } from '../../../src/components/TimelineList';
-import { CitationsSection, LegendesSection } from '../../../src/components/FactVsLegendCallout';
-import { RelatedHeroes } from '../../../src/components/RelatedHeroes';
-import { SourcesList } from '../../../src/components/SourcesList';
-import { GoldButton, OutlineButton } from '../../../src/components/Buttons';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
-import { useHero, useRelatedHeroes } from '../../../src/data/useHeroesData';
-import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { HeroHeader } from '../../../../../src/components/HeroHeader';
+import { WarningBanner } from '../../../../../src/components/WarningBanner';
+import { TimelineList } from '../../../../../src/components/TimelineList';
+import { CitationsSection, LegendesSection } from '../../../../../src/components/FactVsLegendCallout';
+import { RelatedHeroes } from '../../../../../src/components/RelatedHeroes';
+import { SourcesList } from '../../../../../src/components/SourcesList';
+import { GoldButton, OutlineButton } from '../../../../../src/components/Buttons';
+import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
+import { useHero, useRelatedHeroes } from '../../../../../src/data/useHeroesData';
+import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 
 export default function FicheHerosScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -47,15 +47,15 @@ export default function FicheHerosScreen() {
 
           <View style={styles.actions}>
             <View style={styles.goldFlex}>
-              <GoldButton label="Lire le récit" onPress={() => router.push(`/heros/${heros.slug}/recit`)} />
+              <GoldButton label="Lire le récit" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
             </View>
             <OutlineButton
               label={heros.statut_narration_audio === 'pret' ? '▶ Écouter' : '▶ Écouter'}
-              onPress={() => router.push(`/heros/${heros.slug}/audio`)}
+              onPress={() => router.push(`/accueil/heros/${heros.slug}/audio`)}
             />
             <OutlineButton
               label={heros.statut_video === 'pret' ? '▷ Regarder' : '▷ Regarder'}
-              onPress={() => router.push(`/heros/${heros.slug}/video`)}
+              onPress={() => router.push(`/accueil/heros/${heros.slug}/video`)}
             />
           </View>
 

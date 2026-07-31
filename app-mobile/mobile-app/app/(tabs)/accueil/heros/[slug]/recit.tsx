@@ -10,17 +10,29 @@ import {
 } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GhostButton } from '../../../src/components/Buttons';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
-import { useHero } from '../../../src/data/useHeroesData';
-import { saveReadingProgress } from '../../../src/data/readingProgress';
-import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { GhostButton } from '../../../../../src/components/Buttons';
+import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
+import { useHero } from '../../../../../src/data/useHeroesData';
+import { saveReadingProgress } from '../../../../../src/data/readingProgress';
+import type { RecitChapitre } from '../../../../../src/data/types';
+import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 
 type Langue = 'fr' | 'en';
 type TailleTexte = 'S' | 'M' | 'L';
 
 const WORDS_PER_MINUTE = 180;
+const NB_CHAPITRES = 4;
 
+/**
+ * Lecteur paginé par chapitre — remplace l'ancien scroll continu unique
+ * (retour de test Yannick du 2026-07-31). Les 4 chapitres viennent de
+ * `recit_chapitres_fr` / `recit_chapitres_en`, calés sur les vrais chapitres
+ * du storyboard vidéo (mêmes titres), pas une coupe arbitraire du texte —
+ * voir `CHAPITRE_ANCHORS` dans `scripts/build-heroes-data.mjs`. La barre de
+ * progression reste globale sur les 4 chapitres (chapitre courant + avancée
+ * du scroll dans ce chapitre), pour que `saveReadingProgress` continue de
+ * représenter une progression 0-1 sur tout le récit, comme avant.
+ */
 export default function LecteurDeRecitScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
@@ -28,19 +40,33 @@ export default function LecteurDeRecitScreen() {
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
   const [langue, setLangue] = useState<Langue>('fr');
   const [taille, setTaille] = useState<TailleTexte>('M');
-  const [progress, setProgress] = useState(0);
+  const [chapitreIdx, setChapitreIdx] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const progressRef = useRef(progress);
-  progressRef.current = progress;
+  const scrollRef = useRef<ScrollView>(null);
+  const globalProgressRef = useRef(0);
+
+  const chapitres: RecitChapitre[] | undefined =
+    langue === 'en' && heros?.recit_chapitres_en?.length ? heros.recit_chapitres_en : heros?.recit_chapitres_fr;
+  const hasEn = Boolean(heros?.recit_chapitres_en?.length);
+  const chapitreActuel = chapitres?.[chapitreIdx];
+
+  const globalProgress = (chapitreIdx + scrollProgress) / NB_CHAPITRES;
+  globalProgressRef.current = globalProgress;
 
   useEffect(() => {
     // Sauvegarde à la sortie de l'écran (retour, fermeture), en plus du
-    // scroll actif géré par onScroll ci-dessous — pas de flush récupérable
-    // autrement, contrairement au web il n'y a pas de beforeunload fiable en RN.
+    // scroll actif géré par onScroll ci-dessous.
     return () => {
-      if (heros) saveReadingProgress(heros.slug, progressRef.current);
+      if (heros) saveReadingProgress(heros.slug, globalProgressRef.current);
     };
   }, [heros]);
+
+  // Remonte en haut et réinitialise la progression de scroll à chaque changement de chapitre.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+    setScrollProgress(0);
+  }, [chapitreIdx, langue]);
 
   if (herosState.status === 'loading') {
     return (
@@ -58,18 +84,26 @@ export default function LecteurDeRecitScreen() {
     );
   }
 
-  if (!heros) return <Redirect href="/accueil" />;
+  if (!heros || !chapitreActuel) return <Redirect href="/accueil" />;
 
-  const hasEn = Boolean(heros.recit_en_texte);
-  const texte = langue === 'en' && heros.recit_en_texte ? heros.recit_en_texte : heros.recit_fr_texte;
-  const minutes = Math.max(1, Math.round(texte.split(/\s+/).length / WORDS_PER_MINUTE));
-  const dropCap = texte.charAt(0);
-  const rest = texte.slice(1);
+  const totalMots = (chapitres ?? []).reduce((sum, c) => sum + c.texte.split(/\s+/).length, 0);
+  const minutesTotal = Math.max(1, Math.round(totalMots / WORDS_PER_MINUTE));
+  const dropCap = chapitreActuel.texte.charAt(0);
+  const rest = chapitreActuel.texte.slice(1);
+  const estDernierChapitre = chapitreIdx === NB_CHAPITRES - 1;
+  const estPremierChapitre = chapitreIdx === 0;
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
     const scrollable = contentSize.height - layoutMeasurement.height;
-    setProgress(scrollable > 0 ? Math.min(1, Math.max(0, contentOffset.y / scrollable)) : 0);
+    setScrollProgress(scrollable > 0 ? Math.min(1, Math.max(0, contentOffset.y / scrollable)) : 1);
+  };
+
+  const allerAuChapitreSuivant = () => {
+    if (!estDernierChapitre) setChapitreIdx((i) => i + 1);
+  };
+  const allerAuChapitrePrecedent = () => {
+    if (!estPremierChapitre) setChapitreIdx((i) => i - 1);
   };
 
   const bodySize = taille === 'S' ? 14.5 : taille === 'L' ? 18 : 16;
@@ -87,7 +121,7 @@ export default function LecteurDeRecitScreen() {
               {heros.nom_affiche}
             </Text>
             <Text style={styles.headerSub}>
-              {Math.round(progress * 100)}% · {minutes} min
+              Chapitre {chapitreIdx + 1}/{NB_CHAPITRES} · {minutesTotal} min au total
             </Text>
           </View>
           <Pressable onPress={() => setSettingsOpen((v) => !v)} hitSlop={10} style={styles.headerBtn}>
@@ -95,7 +129,7 @@ export default function LecteurDeRecitScreen() {
           </Pressable>
         </View>
         <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+          <View style={[styles.progressFill, { width: `${globalProgress * 100}%` }]} />
         </View>
       </View>
 
@@ -129,10 +163,11 @@ export default function LecteurDeRecitScreen() {
       )}
 
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         onScroll={onScroll}
-        onMomentumScrollEnd={() => saveReadingProgress(heros.slug, progressRef.current)}
+        onMomentumScrollEnd={() => saveReadingProgress(heros.slug, globalProgressRef.current)}
         scrollEventThrottle={32}
         showsVerticalScrollIndicator={false}
       >
@@ -140,6 +175,9 @@ export default function LecteurDeRecitScreen() {
           {heros.epoque.split(/[,(]/)[0].trim().toUpperCase()} · {heros.region.toUpperCase()}
         </Text>
         <Text style={styles.name}>{heros.nom_affiche}</Text>
+        <Text style={styles.chapitreTitre}>
+          Chapitre {chapitreActuel.numero}/{NB_CHAPITRES} — {chapitreActuel.titre}
+        </Text>
 
         <Text style={[styles.body, { fontSize: bodySize, lineHeight: bodyLineHeight }]}>
           <Text style={styles.dropCap}>{dropCap}</Text>
@@ -151,10 +189,40 @@ export default function LecteurDeRecitScreen() {
           <Text style={styles.dividerStar}>✦</Text>
           <View style={styles.dividerLine} />
         </View>
-        <Text style={styles.endLabel}>Fin du récit · {minutes} min</Text>
 
-        <GhostButton label="Retour à la fiche" onPress={() => router.back()} />
+        {estDernierChapitre ? (
+          <>
+            <Text style={styles.endLabel}>Fin du récit</Text>
+            <GhostButton label="Retour à la fiche" onPress={() => router.back()} />
+          </>
+        ) : (
+          <Text style={styles.endLabel}>Fin du chapitre {chapitreActuel.numero}</Text>
+        )}
       </ScrollView>
+
+      <View style={styles.pager}>
+        <Pressable
+          onPress={allerAuChapitrePrecedent}
+          disabled={estPremierChapitre}
+          style={[styles.pagerBtn, estPremierChapitre && styles.pagerBtnDisabled]}
+        >
+          <Text style={[styles.pagerBtnLabel, estPremierChapitre && styles.pagerBtnLabelDisabled]}>‹ Chapitre précédent</Text>
+        </Pressable>
+        <View style={styles.pagerDots}>
+          {(chapitres ?? []).map((c, i) => (
+            <View key={c.numero} style={[styles.pagerDot, i === chapitreIdx && styles.pagerDotActive]} />
+          ))}
+        </View>
+        {estDernierChapitre ? (
+          <Pressable onPress={() => router.back()} style={styles.pagerBtn}>
+            <Text style={styles.pagerBtnLabel}>Terminer ›</Text>
+          </Pressable>
+        ) : (
+          <Pressable onPress={allerAuChapitreSuivant} style={styles.pagerBtn}>
+            <Text style={styles.pagerBtnLabel}>Chapitre suivant ›</Text>
+          </Pressable>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
@@ -294,7 +362,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 26,
     paddingTop: 26,
-    paddingBottom: 60,
+    paddingBottom: 40,
     maxWidth: 640,
     alignSelf: 'center',
     width: '100%',
@@ -311,6 +379,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: colors.textHeading,
     lineHeight: 35,
+    marginBottom: 8,
+  },
+  chapitreTitre: {
+    fontFamily: typography.displaySemiBold,
+    fontSize: 15,
+    color: colors.accentGold,
     marginBottom: 24,
   },
   body: {
@@ -346,5 +420,46 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: 'center',
     marginBottom: 24,
+  },
+  pager: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderHairline,
+    backgroundColor: colors.headerScrim,
+  },
+  pagerBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  pagerBtnDisabled: {
+    opacity: 0.3,
+  },
+  pagerBtnLabel: {
+    fontFamily: typography.bodySemiBold,
+    fontSize: 12.5,
+    color: colors.accentGold,
+  },
+  pagerBtnLabelDisabled: {
+    color: colors.textMuted,
+  },
+  pagerDots: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  pagerDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.borderStrong,
+  },
+  pagerDotActive: {
+    backgroundColor: colors.accentGoldBright,
+    width: 16,
   },
 });

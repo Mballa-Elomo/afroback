@@ -120,11 +120,27 @@ create trigger trg_marketplace_products_statut
 -- Lecture publique des produits d'un vendeur actif, ou de ses propres
 -- produits même si sa boutique est désactivée (pour qu'il continue à les
 -- gérer depuis son espace vendeur).
+--
+-- BUG corrigé le 2026-07-31 (produit ajouté invisible dans /marche) : la
+-- première version de cette policy faisait `select id from
+-- public.marketplace_vendors where is_active` — une sous-requête sur la
+-- TABLE de base, qui est elle-même protégée par RLS (seule policy :
+-- `user_id = auth.uid()`). Résultat : cette sous-requête ne renvoyait
+-- JAMAIS aucune ligne pour qui que ce soit d'autre que le vendeur
+-- lui-même (vérifié : `select ... from marketplace_vendors` en anon
+-- renvoie `[]`), donc la clause "produit d'un vendeur actif" ne
+-- fonctionnait pour personne — seul le second membre de la clause OU
+-- (ses propres produits) permettait de voir quoi que ce soit, et
+-- seulement au vendeur connecté sur son propre compte. Corrigé en
+-- interrogeant la VUE `marketplace_vendors_public` : une vue s'exécute
+-- avec les droits de son propriétaire (qui contourne la RLS de la table
+-- de base), exactement le même mécanisme qui permet déjà à cette vue
+-- d'être lisible publiquement.
 drop policy if exists "Read products public or own" on public.marketplace_products;
 create policy "Read products public or own" on public.marketplace_products
   for select
   using (
-    vendor_id in (select id from public.marketplace_vendors where is_active)
+    vendor_id in (select id from public.marketplace_vendors_public)
     or vendor_id in (select id from public.marketplace_vendors where user_id = auth.uid())
   );
 

@@ -1,6 +1,10 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../src/auth/AuthProvider';
+import { useActiveProfile } from '../../src/profils/ActiveProfileProvider';
+import { PinGate } from '../../src/profils/PinGate';
 import { GhostButton } from '../../src/components/Buttons';
 import { HeroPlaceholder } from '../../src/components/HeroVisual';
 import { colors, spacing, typography } from '../../src/theme/tokens';
@@ -19,7 +23,10 @@ const USAGE_LABELS: Record<string, string> = {
 
 /** Profil — vraies données du compte (Supabase Auth), pas une maquette figée. */
 export default function ProfilScreen() {
+  const router = useRouter();
   const { session, signOut } = useAuth();
+  const { children, returnToSelector } = useActiveProfile();
+  const [pinVisible, setPinVisible] = useState(false);
   const meta = session?.user?.user_metadata ?? {};
   const prenom = (meta.prenom as string | undefined) ?? '';
   const pays = (meta.pays as string | undefined) ?? '—';
@@ -50,10 +57,35 @@ export default function ProfilScreen() {
           />
         </View>
 
+        <View style={styles.card}>
+          <Pressable style={styles.menuRow} onPress={() => setPinVisible(true)}>
+            <Text style={styles.menuLabel}>Espace Parent</Text>
+            <Text style={styles.menuChevron}>›</Text>
+          </Pressable>
+          {children.length > 0 && (
+            <>
+              <Separator />
+              <Pressable style={styles.menuRow} onPress={returnToSelector}>
+                <Text style={styles.menuLabel}>Changer de profil</Text>
+                <Text style={styles.menuChevron}>›</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+
         <View style={styles.cta}>
           <GhostButton label="Déconnexion" onPress={() => signOut()} />
         </View>
       </ScrollView>
+
+      <PinGate
+        visible={pinVisible}
+        onCancel={() => setPinVisible(false)}
+        onSuccess={() => {
+          setPinVisible(false);
+          router.push('/profils/parent');
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -128,6 +160,21 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: colors.borderHairline,
+  },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+  },
+  menuLabel: {
+    fontFamily: typography.bodySemiBold,
+    fontSize: 14,
+    color: colors.textPrimary,
+  },
+  menuChevron: {
+    fontSize: 18,
+    color: colors.accentGold,
   },
   cta: {},
 });

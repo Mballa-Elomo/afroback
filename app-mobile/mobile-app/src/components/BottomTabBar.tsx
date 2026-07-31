@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, typography } from '../theme/tokens';
 
@@ -12,7 +13,22 @@ const TAB_META: Record<string, { letter: string; label: string }> = {
   profil: { letter: 'P', label: 'Profil' },
 };
 
-export function BottomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+/**
+ * Écrans où la barre reste volontairement masquée : lecteurs plein écran
+ * immersifs (retour de test Yannick du 2026-07-31 : "visible partout sauf
+ * contre-indication évidente" — un lecteur audio/vidéo plein écran en est
+ * une, une fiche héros ou un récit n'en sont pas). Nom de route tel
+ * qu'enregistré dans `app/(tabs)/accueil/_layout.tsx`.
+ */
+const ROUTES_SANS_BARRE = new Set(['heros/[slug]/audio', 'heros/[slug]/video']);
+
+export function BottomTabBar(props: BottomTabBarProps) {
+  const { state, descriptors, navigation } = props;
+  const focusedTabRoute = state.routes[state.index];
+  const focusedRouteName = getFocusedRouteNameFromRoute(focusedTabRoute);
+  if (focusedRouteName && ROUTES_SANS_BARRE.has(focusedRouteName)) {
+    return null;
+  }
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <View style={styles.bar}>

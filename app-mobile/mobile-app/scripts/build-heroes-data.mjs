@@ -196,6 +196,163 @@ function parseChapitre(numero, slug) {
   };
 }
 
+/**
+ * Ancrages de découpage en chapitres du récit texte (pilier lecture), calés
+ * sur les 4 vrais chapitres du storyboard vidéo (mêmes titres, voir
+ * `chapitres_storyboard`) plutôt que sur une coupe arbitraire à volume de
+ * mots égal. Chaque ancre est le tout début (verbatim) du paragraphe où
+ * démarre, dans le récit, le chapitre 2, 3 ou 4 — déterminé par lecture du
+ * texte en le confrontant au titre et aux planches d'ouverture de chaque
+ * chapitre du storyboard (2026-07-31). Le chapitre 1 n'a pas besoin d'ancre :
+ * il commence au tout début du récit.
+ */
+const CHAPITRE_ANCHORS = {
+  'charles-atangana': {
+    fr: [
+      "En 1902, l'administration allemande fait de lui son représentant officiel",
+      "En 1914, l'histoire le frôle une seconde fois par le chemin de la résistance",
+      "Sous les Français, le pouvoir des chefs traditionnels est bien plus étroit",
+    ],
+    en: [
+      'In 1902, the German administration made him its official representative',
+      'In 1914, history brushed past him a second time on the path of resistance',
+      'Under the French, the power of traditional chiefs was far narrower',
+    ],
+  },
+  'martin-paul-samba': {
+    fr: [
+      "Car c'est bien ce qui arrive. En 1902, Samba quitte l'armée.",
+      "L'été 1914 arrive, et avec lui, l'Europe entière glisse vers la guerre.",
+      "Ce que l'on raconte à Ebolowa depuis, la tradition populaire l'a gardé précieusement",
+    ],
+    en: [
+      'Because that is exactly what happens. In 1902, Samba leaves the army.',
+      'Summer 1914 arrives, and with it, all of Europe slides toward war.',
+      'What has been told in Ebolowa ever since, popular tradition has carefully kept',
+    ],
+  },
+  'rudolf-douala-manga-bell': {
+    fr: [
+      'Le 2 septembre 1908, à la mort de son père, Rudolf devient à son tour roi du clan Bell',
+      "L'Europe, cet été-là, bascule dans la guerre. Le 10 mai 1914, Manga Bell et Ngoso Din sont arrêtés",
+      'On raconte, dans la mémoire populaire et dans une pièce de théâtre camerounaise consacrée à sa vie',
+    ],
+    en: [
+      "On 2 September 1908, upon his father's death, Rudolf in turn becomes king of the Bell clan",
+      'That summer, Europe slides into war. On 10 May 1914, Manga Bell and Ngoso Din are arrested',
+      'It is told, in popular memory and in a Cameroonian play devoted to his life',
+    ],
+  },
+  'sultan-njoya': {
+    fr: [
+      'Cela ne suffit pas à asseoir son trône. Entre 1892 et 1895, une guerre civile déchire le royaume.',
+      "Et Njoya ne s'arrête pas là. Il ouvre des écoles au palais dès 1898",
+      "Car le vent a tourné. Après la Première Guerre mondiale, l'Allemagne perd le Cameroun",
+    ],
+    en: [
+      'That alone does not secure his throne. Between 1892 and 1895, civil war tears the kingdom apart.',
+      'And Njoya does not stop there. He opens schools at the palace as early as 1898',
+      'For the wind has turned. After the First World War, Germany loses Cameroon',
+    ],
+  },
+  'ruben-um-nyobe': {
+    fr: [
+      "Il faut te dire une première fois, ici, une vérité qu'on oublie souvent de raconter",
+      "Mais parler à l'ONU ne suffit pas à faire plier un empire colonial. En mai 1955",
+      'Le 13 septembre 1958, après des mois de traque menée par le capitaine Agostini',
+    ],
+    en: [
+      'I must tell you something here, a truth too often left out',
+      'But speaking at the UN is not enough to bend a colonial empire. In May 1955',
+      'On 13 September 1958, after months of tracking led by Captain Agostini',
+    ],
+  },
+  'felix-moumie': {
+    fr: [
+      'Sa progression est rapide. En avril 1950, au congrès de Dschang',
+      "Puis vient mai 1955. Le 22, l'UPC adopte son emblème",
+      'Qui a commandité ce meurtre ? Les archives, les enquêtes journalistiques',
+    ],
+    en: [
+      'His rise is swift. In April 1950, at the Dschang congress',
+      'Then comes May 1955. On the 22nd, the UPC adopts its emblem',
+      'Who ordered this murder? The archives, the journalistic investigations',
+    ],
+  },
+  'ernest-ouandie': {
+    fr: [
+      "Mais écoute ce qui arrive ensuite, car c'est là que bascule l'histoire du Cameroun tout entier. Le 13 juillet 1955",
+      'Comprends bien ce moment. Deux dirigeants fondateurs assassinés en deux ans',
+      'Entre 1965 et 1970, Mgr Albert Ndongmo, évêque bamiléké comme lui',
+    ],
+    en: [
+      'But listen to what happens next, for this is where the history of the whole of Cameroon turns. On 13 July 1955',
+      'Understand this moment well. Two founding leaders assassinated within two years',
+      'Between 1965 and 1970, Bishop Albert Ndongmo, a Bamiléké bishop like him',
+    ],
+  },
+  'manu-dibango': {
+    fr: [
+      "En 1949, il a quinze ans. Ses parents décident de l'envoyer étudier en France",
+      'En 1965, il retourne en France, presque recommencer à zéro.',
+      "Le succès américain aurait pu suffire à toute une vie. Pour Dibango, il n'est qu'un chapitre parmi d'autres. En 1975",
+    ],
+    en: [
+      'In 1949, he is fifteen years old. His parents decide to send him to study in France',
+      'In 1965, he returns to France, almost starting from zero.',
+      'American success alone could have filled a lifetime. For Dibango, it is only one chapter among many. In 1975',
+    ],
+  },
+  'reine-nzinga': {
+    fr: [
+      'En 1621, Njinga se rend à Luanda, la place forte portugaise',
+      'Face à elle, les Portugais choisissent un rival, refusent de la reconnaître, et en mars 1626',
+      'Avec l\'appui hollandais, elle reprend une grande partie de Ndongo entre 1641 et 1644',
+    ],
+    en: [
+      'In 1621, Njinga travels to Luanda, the Portuguese stronghold',
+      'Facing her, the Portuguese choose a rival, refuse to recognize her, and in March 1626',
+      'With Dutch support, she retakes much of Ndongo between 1641 and 1644',
+    ],
+  },
+};
+
+/**
+ * Découpe un texte de récit en 4 chapitres à partir de 3 ancres (début
+ * verbatim des paragraphes où commencent les chapitres 2, 3 et 4). Coupe
+ * toujours sur une frontière de paragraphe (jamais en plein milieu d'une
+ * phrase) : chaque paragraphe est cherché par correspondance exacte de
+ * préfixe, et l'échec est fatal (erreur de build) plutôt que silencieux —
+ * si le texte source change, l'ancre doit être mise à jour à la main pour
+ * ne jamais produire un découpage arbitraire ou faux.
+ */
+function splitIntoChapters(texte, anchors, titres, slug, langue) {
+  const paragraphs = texte.split(/\n\n+/);
+  const starts = [0];
+  for (const anchor of anchors) {
+    const idx = paragraphs.findIndex((p) => p.trim().startsWith(anchor.trim()));
+    if (idx === -1) {
+      throw new Error(
+        `Ancre de chapitre introuvable (${langue}, ${slug}) : "${anchor.slice(0, 60)}..." — le texte source a peut-être changé, mettre à jour CHAPITRE_ANCHORS dans scripts/build-heroes-data.mjs.`
+      );
+    }
+    if (idx <= starts[starts.length - 1]) {
+      throw new Error(`Ancre de chapitre hors-séquence (${langue}, ${slug}) : "${anchor.slice(0, 60)}..."`);
+    }
+    starts.push(idx);
+  }
+  starts.push(paragraphs.length);
+  const chapitres = [];
+  for (let i = 0; i < 4; i++) {
+    chapitres.push({
+      numero: i + 1,
+      titre: titres[i],
+      texte: paragraphs.slice(starts[i], starts[i + 1]).join('\n\n'),
+    });
+  }
+  return chapitres;
+}
+
 function buildOne({ slug }) {
   const frFile = join(RECITS_DIR, `${slug}.md`);
   const enFile = join(RECITS_DIR, `${slug}-EN.md`);
@@ -213,16 +370,25 @@ function buildOne({ slug }) {
     throw new Error(`Section "## The griot's tale" introuvable dans ${enFile}`);
   }
 
+  const chapitres_storyboard = [1, 2, 3, 4].map((n) => parseChapitre(n, slug));
+  const titres = chapitres_storyboard.map((c) => c.titre_chapitre);
+  const anchors = CHAPITRE_ANCHORS[slug];
+  if (!anchors) {
+    throw new Error(`Aucune ancre de chapitre définie pour "${slug}" dans CHAPITRE_ANCHORS.`);
+  }
+
   return {
     slug,
     recit_fr_texte,
     recit_fr_fichier_source: `livrables/sites-web/afroback/Récits africains/${slug}.md`,
     recit_en_texte,
     recit_en_fichier_source: `livrables/sites-web/afroback/Récits africains/${slug}-EN.md`,
+    recit_chapitres_fr: splitIntoChapters(recit_fr_texte, anchors.fr, titres, slug, 'FR'),
+    recit_chapitres_en: splitIntoChapters(recit_en_texte, anchors.en, titres, slug, 'EN'),
     frise_chronologique: parseFrise(frRaw),
     sources: parseSources(frRaw),
     heros_lies: parseHerosLies(frRaw, slug),
-    chapitres_storyboard: [1, 2, 3, 4].map((n) => parseChapitre(n, slug)),
+    chapitres_storyboard,
   };
 }
 

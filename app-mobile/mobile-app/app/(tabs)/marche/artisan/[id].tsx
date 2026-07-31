@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeroPlaceholder } from '../../../../src/components/HeroVisual';
 import { ProductCard } from '../../../../src/components/ProductCard';
 import { SectionTitle } from '../../../../src/components/SectionTitle';
@@ -26,6 +26,7 @@ type State =
 export default function ArtisanProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [state, setState] = useState<State>({ status: 'loading' });
   const [ratings, setRatings] = useState<Map<string, { moyenne: number; total: number }>>(new Map());
 
@@ -72,7 +73,7 @@ export default function ArtisanProfileScreen() {
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.banner}>
-          <Pressable onPress={() => router.back()} style={styles.backBtn} hitSlop={10}>
+          <Pressable onPress={() => router.back()} style={[styles.backBtn, { top: insets.top + 8 }]} hitSlop={10}>
             <Text style={styles.backIcon}>‹</Text>
           </Pressable>
         </View>
@@ -139,6 +140,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.placeholderStripeDark,
   },
   backBtn: {
+    // `top` par défaut, écrasé à l'usage par `insets.top + 8` (retour de test
+    // Yannick du 2026-07-31, cohérence globale avec les autres fiches).
     position: 'absolute',
     top: 12,
     left: 14,

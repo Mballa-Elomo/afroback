@@ -4,12 +4,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
-import { GoldButton } from '../../../src/components/Buttons';
-import { HeroPlaceholder } from '../../../src/components/HeroVisual';
-import { useHero } from '../../../src/data/useHeroesData';
-import { colors, spacing, typography } from '../../../src/theme/tokens';
-import type { Heros } from '../../../src/data/types';
+import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
+import { GoldButton } from '../../../../../src/components/Buttons';
+import { HeroPlaceholder } from '../../../../../src/components/HeroVisual';
+import { useHero } from '../../../../../src/data/useHeroesData';
+import { colors, spacing, typography } from '../../../../../src/theme/tokens';
+import type { Heros } from '../../../../../src/data/types';
 
 /**
  * Lecteur audio plein écran. Quand aucune narration n'est disponible pour
@@ -17,6 +17,10 @@ import type { Heros } from '../../../src/data/types';
  * lecture restent absents plutôt que simulés dans le vide — spec §4
  * "jamais un bouton mort". Dès qu'une URL audio existe (narration_audio_fr_url
  * / narration_audio_en_url), un vrai lecteur (expo-audio) prend le relais.
+ * Écran nesté dans l'onglet Accueil (voir accueil/_layout.tsx) : la barre
+ * d'onglets basse est volontairement masquée ici via BottomTabBar (lecteur
+ * plein écran immersif), à la différence de la fiche héros et du récit qui
+ * la gardent visible.
  */
 export default function LecteurAudioScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -57,7 +61,7 @@ export default function LecteurAudioScreen() {
             <Text style={styles.chevronDown}>⌄</Text>
           </Pressable>
           <Text style={styles.topLabel}>NARRATION · HISTOIRE</Text>
-          <Pressable onPress={() => router.push(`/heros/${heros.slug}/recit`)} hitSlop={10} style={styles.topBtn}>
+          <Pressable onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} hitSlop={10} style={styles.topBtn}>
             <Text style={styles.readIcon}>≡</Text>
           </Pressable>
         </View>
@@ -104,7 +108,7 @@ export default function LecteurAudioScreen() {
           )}
 
           <View style={styles.cta}>
-            <GoldButton label="Lire le récit en attendant" onPress={() => router.replace(`/heros/${heros.slug}/recit`)} />
+            <GoldButton label="Lire le récit en attendant" onPress={() => router.replace(`/accueil/heros/${heros.slug}/recit`)} />
           </View>
         </View>
       </SafeAreaView>

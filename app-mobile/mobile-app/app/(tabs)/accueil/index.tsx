@@ -105,7 +105,7 @@ export default function AccueilScreen() {
         {featured && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>HISTOIRE DU JOUR</Text>
-            <Pressable onPress={() => router.push(`/heros/${featured.slug}`)}>
+            <Pressable onPress={() => router.push(`/accueil/heros/${featured.slug}`)}>
               <HeroPlaceholder style={styles.featuredCard} radius={20} imageUrl={featured.image_carte_catalogue}>
                 <LinearGradient
                   colors={['transparent', 'rgba(10,7,4,0.55)', 'rgba(8,6,4,0.92)']}
@@ -132,7 +132,7 @@ export default function AccueilScreen() {
             </View>
             <Pressable
               style={styles.resumeCard}
-              onPress={() => router.push(`/heros/${reprendreHero.slug}/recit`)}
+              onPress={() => router.push(`/accueil/heros/${reprendreHero.slug}/recit`)}
             >
               <HeroPlaceholder style={styles.resumeThumb} radius={12} imageUrl={reprendreHero.image_carte_catalogue} />
               <View style={styles.resumeBody}>
@@ -160,7 +160,7 @@ export default function AccueilScreen() {
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pourToiRow}>
               {pourToi.map((h) => (
-                <Pressable key={h.slug} style={styles.pourToiItem} onPress={() => router.push(`/heros/${h.slug}`)}>
+                <Pressable key={h.slug} style={styles.pourToiItem} onPress={() => router.push(`/accueil/heros/${h.slug}`)}>
                   <HeroPlaceholder style={styles.pourToiThumb} radius={14} imageUrl={h.image_carte_catalogue} />
                   <Text style={styles.pourToiName} numberOfLines={2}>
                     {h.nom_affiche}

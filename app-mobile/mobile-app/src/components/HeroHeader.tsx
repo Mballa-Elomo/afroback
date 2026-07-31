@@ -1,5 +1,6 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Heros } from '../data/types';
 import { colors, typography } from '../theme/tokens';
 
@@ -17,6 +18,7 @@ function shortEra(epoque: string) {
 
 /** En-tête immersif de la fiche héros — 340px, vraie photo si produite (sinon placeholder) + dégradé de fondu, fidèle à la maquette. */
 export function HeroHeader({ heros, onBack }: { heros: Heros; onBack: () => void }) {
+  const insets = useSafeAreaInsets();
   return (
     <View style={styles.wrap}>
       {heros.image_carte_catalogue ? (
@@ -34,7 +36,7 @@ export function HeroHeader({ heros, onBack }: { heros: Heros; onBack: () => void
         locations={[0, 0.4, 1]}
         style={StyleSheet.absoluteFill}
       />
-      <Pressable onPress={onBack} style={styles.backBtn} hitSlop={10}>
+      <Pressable onPress={onBack} style={[styles.backBtn, { top: insets.top + 8 }]} hitSlop={10}>
         <Text style={styles.backIcon}>‹</Text>
       </Pressable>
       <View style={styles.bottom}>
@@ -57,6 +59,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.placeholderStripeDark,
   },
   backBtn: {
+    // `top` par défaut, écrasé à l'usage par `insets.top + 8` (retour de test
+    // Yannick du 2026-07-31 : trop proche de l'encoche/status bar sans ça).
     position: 'absolute',
     top: 12,
     left: 14,

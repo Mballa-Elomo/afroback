@@ -2,12 +2,12 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
-import { GhostButton, OutlineButton } from '../../../src/components/Buttons';
-import { HeroPlaceholder } from '../../../src/components/HeroVisual';
-import { StoryboardSlideshow } from '../../../src/components/StoryboardSlideshow';
-import { useHero, useRelatedHeroes } from '../../../src/data/useHeroesData';
-import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
+import { GhostButton, OutlineButton } from '../../../../../src/components/Buttons';
+import { HeroPlaceholder } from '../../../../../src/components/HeroVisual';
+import { StoryboardSlideshow } from '../../../../../src/components/StoryboardSlideshow';
+import { useHero, useRelatedHeroes } from '../../../../../src/data/useHeroesData';
+import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 
 /**
  * Lecteur vidéo plein écran. Dès qu'une URL de documentaire existe
@@ -17,6 +17,9 @@ import { colors, spacing, typography } from '../../../src/theme/tokens';
  * (`StoryboardSlideshow`) plutôt qu'un état "bientôt disponible" vide :
  * les 96 planches et leur voix off existent déjà pour les 9 héros, ça
  * donne quelque chose de réel à voir en attendant le vrai tournage/montage.
+ * Écran nesté dans l'onglet Accueil (voir accueil/_layout.tsx) : la barre
+ * d'onglets basse est volontairement masquée ici via BottomTabBar (lecteur
+ * plein écran immersif).
  */
 export default function LecteurVideoScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -93,10 +96,10 @@ export default function LecteurVideoScreen() {
 
           <View style={styles.actions}>
             <View style={styles.actionsHalf}>
-              <GhostButton label="Lire l'histoire" onPress={() => router.push(`/heros/${heros.slug}/recit`)} />
+              <GhostButton label="Lire l'histoire" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
             </View>
             <View style={styles.actionsHalf}>
-              <OutlineButton label="▶ Écouter" onPress={() => router.push(`/heros/${heros.slug}/audio`)} />
+              <OutlineButton label="▶ Écouter" onPress={() => router.push(`/accueil/heros/${heros.slug}/audio`)} />
             </View>
           </View>
 
@@ -105,7 +108,7 @@ export default function LecteurVideoScreen() {
               <Text style={styles.relatedLabel}>AUTRES VIDÉOS</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.relatedRow}>
                 {related.map((h) => (
-                  <Pressable key={h.slug} style={styles.relatedItem} onPress={() => router.replace(`/heros/${h.slug}/video`)}>
+                  <Pressable key={h.slug} style={styles.relatedItem} onPress={() => router.replace(`/accueil/heros/${h.slug}/video`)}>
                     <HeroPlaceholder style={styles.relatedVisual} radius={12} imageUrl={h.image_carte_catalogue}>
                       <Text style={styles.relatedPlay}>▶</Text>
                     </HeroPlaceholder>

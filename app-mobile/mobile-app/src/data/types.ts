@@ -61,6 +61,18 @@ export interface ChapitreStoryboard {
   planches: Planche[];
 }
 
+/**
+ * Chapitre du récit texte (pilier lecture) — découpage du récit intégral en
+ * 4 parties calées sur les vrais chapitres du storyboard vidéo (mêmes
+ * titres), pas une coupe arbitraire à volume de mots égal. Voir
+ * `CHAPITRE_ANCHORS` dans `scripts/build-heroes-data.mjs`.
+ */
+export interface RecitChapitre {
+  numero: number;
+  titre: string;
+  texte: string;
+}
+
 export interface Heros {
   id: string;
   slug: string;
@@ -75,8 +87,10 @@ export interface Heros {
   annee_mort_indicative?: string | null;
   recit_fr_texte: string;
   recit_fr_fichier_source: string;
+  recit_chapitres_fr: RecitChapitre[];
   recit_en_texte?: string | null;
   recit_en_fichier_source?: string | null;
+  recit_chapitres_en?: RecitChapitre[] | null;
   frise_chronologique: FriseEvenement[];
   citations: Citation[];
   sources: string[];

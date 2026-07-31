@@ -13,7 +13,7 @@ export function RelatedHeroes({ heroes, title = 'Héros liés' }: { heroes: Hero
       <SectionTitle title={title} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
         {heroes.map((h) => (
-          <Pressable key={h.slug} style={styles.item} onPress={() => router.push(`/heros/${h.slug}`)}>
+          <Pressable key={h.slug} style={styles.item} onPress={() => router.push(`/accueil/heros/${h.slug}`)}>
             <HeroPlaceholder style={styles.visual} radius={14} imageUrl={h.image_carte_catalogue} />
             <Text style={styles.name} numberOfLines={2}>
               {h.nom_affiche}

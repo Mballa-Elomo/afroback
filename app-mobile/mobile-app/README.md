@@ -9,9 +9,9 @@ Application mobile AFROBACK, pilier **Histoires & Héros** (Phase 1). Construite
 - **UI refaite le 2026-07-29 pour être fidèle à la vraie maquette Claude Design** (`AFROBACK Mobile.dc.html`, projet `a6ac90b2-…`, lu directement via l'outil de design). La première version avait été construite par un agent sans accès à la maquette, qui avait inventé sa propre charte — corrigé : couleurs, typographies (Cinzel/Manrope/Space Mono), grille catalogue 2 colonnes avec tuiles image + badges, en-tête immersif de la fiche héros, lecteur avec lettrine et popover de réglages, lecteur audio avec portrait et forme d'onde, lecteur vidéo 16:9 — tout est recalé sur les styles inline exacts du prototype (`src/theme/tokens.ts`). Simplification assumée : le motif `repeating-linear-gradient` (rayures diagonales) de la maquette pour les images manquantes est approximé par un dégradé diagonal deux tons (React Native n'a pas d'équivalent direct sans dépendance supplémentaire) ; les libellés entre crochets du prototype (ex. `[ portrait · Nom ]`) sont des annotations de maquette, pas du texte produit, donc pas repris.
 - 4 écrans de la Phase 1, avec les **vraies données** des 9 héros déjà écrits par le griot, chargées en direct depuis Supabase :
   - `app/index.tsx` — Catalogue héros (recherche, filtres thème/région)
-  - `app/heros/[slug]/index.tsx` — Fiche héros (frise, citations avec statut d'attestation, légendes, héros liés, sources)
-  - `app/heros/[slug]/recit.tsx` — Lecteur de récit intégral (FR/EN, barre de progression, taille de texte)
-  - `app/heros/[slug]/audio.tsx` et `.../video.tsx` — Lecteurs plein écran ; `video.tsx` affiche un vrai documentaire dès que `video_url` existe, sinon un **diaporama animé du storyboard** (`src/components/StoryboardSlideshow.tsx`) — 96 planches réelles (voix off, cadrage, transitions) par héros, jamais un texte inventé, plutôt qu'un simple "bientôt disponible"
+  - `app/(tabs)/accueil/heros/[slug]/index.tsx` — Fiche héros (frise, citations avec statut d'attestation, légendes, héros liés, sources)
+  - `app/(tabs)/accueil/heros/[slug]/recit.tsx` — Lecteur de récit **paginé par chapitre** (4 chapitres, FR/EN, taille de texte) — voir "Corrections de test (2026-07-31)"
+  - `app/(tabs)/accueil/heros/[slug]/audio.tsx` et `.../video.tsx` — Lecteurs plein écran ; `video.tsx` affiche un vrai documentaire dès que `video_url` existe, sinon un **diaporama animé du storyboard** (`src/components/StoryboardSlideshow.tsx`) — 96 planches réelles (voix off, cadrage, transitions) par héros, jamais un texte inventé, plutôt qu'un simple "bientôt disponible"
 - Séparation stricte fait/légende respectée dans l'UI (`FactVsLegendCallout.tsx`) — jamais une légende présentée comme un fait.
 - États de chargement/erreur soignés (`LoadingState.tsx`) plutôt qu'un écran blanc en cas de coupure réseau.
 
@@ -43,13 +43,15 @@ Les données ne s'éditent **jamais directement en base**. Le pipeline complet :
 1. **Auto-extrait** (`scripts/build-heroes-data.mjs`, mécanique et fiable) : texte intégral du récit FR/EN, frise chronologique, sources, héros liés, chapitres du storyboard **avec le détail des 24 planches par chapitre** (texte à l'écran, voix off, cadrage, décor, ambiance, durée, transition — alimente `StoryboardSlideshow`) — lu directement dans `../../Récits africains/` et `../../Récits africains storyboards/`. Régénère `src/data/heroes.generated.json`.
 2. **Curaté à la main** (`src/data/heroes.curated.ts`) : résumé catalogue, thème, citations avec leur statut d'attestation, légendes, avertissement de lecture. Volontairement **pas auto-extrait** : ces champs demandent un jugement éditorial (ex. distinguer une citation attestée d'une citation rapportée), qu'un parseur générique risquerait de mal classer. À éditer à la main pour un nouveau héros.
 3. **Génération du SQL** (`scripts/generate-supabase-seed.mjs`) : fusionne les deux sources et produit `supabase/seed.sql`.
-4. **Exécution manuelle** : copier `supabase/seed.sql` dans le SQL Editor du dashboard Supabase et l'exécuter (⚠️ le script fait un `truncate table` avant de réinsérer — il régénère l'intégralité de la table, pas un ajout incrémental).
+4. **Vérification mécanique** (`scripts/verify-seed-sql.mjs`) : compare, pour chaque héros, le nombre de colonnes déclarées au nombre de valeurs fournies, et vérifie l'équilibre des guillemets/parenthèses sur tout le fichier — **à lancer systématiquement avant de coller quoi que ce soit dans le SQL Editor** (voir "Corrections de test (2026-07-31)", point 2bis : un vrai bug de ce type est passé inaperçu une fois).
+5. **Exécution manuelle** : copier `supabase/seed.sql` dans le SQL Editor du dashboard Supabase et l'exécuter (⚠️ le script fait un `truncate table` avant de réinsérer — il régénère l'intégralité de la table, pas un ajout incrémental).
 
 ```bash
 node scripts/build-heroes-data.mjs
 node scripts/export-heroes-json.mjs ./heroes-export.tmp.json
 node scripts/generate-supabase-seed.mjs ./heroes-export.tmp.json supabase/seed.sql
 rm heroes-export.tmp.json
+node scripts/verify-seed-sql.mjs
 ```
 
 ## Pilier Découverte — contenu, backend et UI construits (2026-07-30)
@@ -122,6 +124,68 @@ rm heroes-export.tmp.json
 - **Permissions natives** : `app.json` déclare le plugin `expo-image-picker` avec un message `photosPermission` (Info.plist iOS) — **sans effet réel tant que l'app tourne dans Expo Go** (Expo Go est un binaire pré-compilé, ses propres chaînes de permission génériques s'appliquent, pas celles du projet ; les nôtres ne prendront effet qu'au moment d'un vrai build natif). L'accès à la pellicule via Expo Go a néanmoins déjà été vérifié comme un cas standard, largement supporté.
 - **Hors scope, laissé en l'état** : l'avatar du compte principal (onglet Profil, `app/(tabs)/profil.tsx`) n'a pas de champ `avatar_url` dans son modèle de données actuel (`user_metadata` Supabase Auth) — non touché pour ne pas modifier un fichier partagé par tous les piliers sans nécessité. Les photos jointes à un avis produit/commentaire (`image_url` existe dans `marketplace_reviews`) n'ont pas non plus d'UI d'upload — non demandé, à faire si besoin sur le même modèle.
 
+## Corrections de test (2026-07-31)
+
+> 4 retours de Yannick après test réel sur téléphone, traités dans l'ordre de priorité donné.
+
+**1. Bug — produit vendeur invisible dans `/marche` (cause réelle trouvée, pas de patch à l'aveugle).**
+Vérifié empiriquement via l'API REST Supabase (clé anon) : `marketplace_products` était vide côté public alors qu'un produit existait bien. Cause : la policy RLS `"Read products public or own"` sur `marketplace_products` filtrait les vendeurs actifs via une sous-requête sur la table `marketplace_vendors` — table elle-même protégée par RLS (une seule policy, `user_id = auth.uid()`), donc cette sous-requête ne retournait jamais rien pour personne d'autre que le propriétaire de la boutique. Corrigé dans `supabase/schema-marketplace.sql` : la sous-requête cible maintenant `marketplace_vendors_public` (la vue, qui contourne RLS car exécutée avec les droits de son propriétaire). **⚠️ Yannick doit réexécuter `supabase/schema-marketplace.sql` dans le SQL Editor Supabase** pour que le correctif prenne effet (script idempotent, sans danger à rejouer).
+
+**2. Contenu — lecteur de récit paginé par chapitre.**
+`recit.tsx` affichait tout le récit en un seul scroll continu. Remplacé par une pagination à 4 chapitres (précédent/suivant, points de progression), calée sur les **vrais chapitres du storyboard vidéo** (mêmes titres) plutôt qu'une coupe arbitraire à volume de mots égal : chaque frontière de chapitre a été déterminée par lecture réelle des 9 récits, confrontée au titre et à la première planche de chaque chapitre du storyboard (voir `CHAPITRE_ANCHORS` dans `scripts/build-heroes-data.mjs`, avec le raisonnement documenté par héros). Nouveau champ généré `recit_chapitres_fr` / `recit_chapitres_en` (`{numero, titre, texte}[]`), ajouté à `heroes.generated.json`, au type `Heros` (`src/data/types.ts`) et à la table Supabase `heros` (2 nouvelles colonnes jsonb). **⚠️ Yannick doit réexécuter `supabase/seed.sql`** pour peupler ces colonnes (le script `truncate` + réinsère les 9 héros, sans danger). Mythologie n'a **pas** reçu le même traitement : ce pilier n'a aucun lecteur construit dans l'app (juste une bannière "bientôt disponible" sur l'écran Histoires & Héros) malgré le contenu déjà prêt côté griot (5 mythes + storyboards) — construire tout un pilier n'était pas dans le périmètre de ce correctif, à cadrer séparément.
+
+**3. Navigation — barre d'onglets visible partout (annule une décision précédente).**
+Cause confirmée : `app/heros/[slug]/*` (fiche, récit, audio, vidéo) étaient enregistrés comme `Stack.Screen` au niveau racine (`app/_layout.tsx`), en dehors du groupe `(tabs)` — ce qui masque nécessairement la barre. Déplacés dans `app/(tabs)/accueil/heros/[slug]/*`, nichés dans la pile de l'onglet Accueil (`accueil/_layout.tsx`), même pattern que `histoires-heros.tsx`. Tous les liens internes (`accueil/index.tsx`, `histoires-heros.tsx`, `RelatedHeroes.tsx`, et les écrans déplacés eux-mêmes) mis à jour vers `/accueil/heros/...`. Exception assumée : les lecteurs plein écran audio et vidéo masquent volontairement la barre (immersion), via une liste `ROUTES_SANS_BARRE` dans `src/components/BottomTabBar.tsx` (basée sur `getFocusedRouteNameFromRoute`) — la fiche héros et le récit, eux, la gardent visible. Audit fait sur les 3 autres piliers (Découverte, Communauté, Marché) : déjà tous correctement nichés dans `(tabs)`, aucune correction nécessaire là.
+
+**2bis. Bug supplémentaire trouvé par Yannick à l'exécution du seed régénéré, corrigé.**
+`supabase/seed.sql` régénéré pour le point 2 plantait dès le premier `insert` (`INSERT has more target columns than expressions`) : la liste de colonnes déclarait 31 champs mais le tuple de valeurs n'en fournissait que 27, `image_carte_catalogue`, `narration_audio_fr_url`, `narration_audio_en_url` et `video_url` manquant purement et simplement dans le tableau `values` de `scripts/generate-supabase-seed.mjs` — un bug préexistant (pas introduit par l'ajout des colonnes de chapitres, qui étaient elles correctement alignées), révélé seulement quand Yannick a tenté d'exécuter le script. Corrigé, puis vérifié **mécaniquement**, pas à l'œil : `scripts/verify-seed-sql.mjs` (nouveau, conservé dans le repo comme garde-fou permanent) tokenize chaque `insert` (conscient des guillemets SQL échappés `''`, de la profondeur des parenthèses/crochets `ARRAY[...]`) et confirme pour les 9 héros que le nombre de colonnes déclarées égale exactement le nombre de valeurs fournies, plus un contrôle d'équilibre global des guillemets/parenthèses sur tout le fichier. Validé en plus par un vrai parseur SQL indépendant (`node-sql-parser`, dialecte `postgresql`, installé temporairement hors du projet pour ce contrôle ponctuel) : les 9 `insert into public.heros (...)` parsent sans erreur.
+
+```bash
+node scripts/verify-seed-sql.mjs   # à relancer après toute régénération de supabase/seed.sql
+```
+
+**4. Ergonomie — bouton retour trop haut, cohérence globale.**
+Cherché toutes les occurrences du bouton retour circulaire (‹) positionné en `absolute` au-dessus d'un en-tête qui bleed sous la status bar/encoche (`edges={['bottom']}` sans `'top'`) : `HeroHeader.tsx` (fiche héros), `marche/[id].tsx` (fiche produit), `marche/artisan/[id].tsx` (profil artisan), `decouverte/[slug].tsx` (fiche Découverte). Corrigé en calculant la position via `useSafeAreaInsets()` (`top: insets.top + 8`) plutôt qu'un `top: 12` fixe qui ne tenait pas compte de l'encoche. Un 5ᵉ cas différent trouvé : `communaute/post/[id].tsx` avait un en-tête en flux normal (pas de bleed d'image) mais `edges={['bottom']}` seul, sans raison d'immersion — simplement passé à `edges={['top', 'bottom']}`.
+
+## Module Parent/Enfant (2026-07-31)
+
+> Demande de Yannick, cadrage préalable fait avec le chef de projet avant transmission. Mécanique confirmée façon Netflix : **un seul compte** (téléphone + mot de passe existant), **plusieurs profils dedans** — un profil adulte + des profils enfants ajoutés depuis l'app. L'enfant ne se connecte jamais lui-même : pas de mot de passe séparé, pas de ligne `auth.users` dédiée, `auth.uid()` reste tout du long celui du parent — le changement de profil est un état purement côté app (`ActiveProfileProvider`), jamais une session Supabase distincte.
+
+- **Pas de tarification par enfant en V1** (décision explicite de Yannick) : l'ajout d'un profil enfant est gratuit et sans friction de paiement, comme les commissions Marketplace laissées "pas encore configurées". L'écran d'ajout (`app/profils/ajouter.tsx`) reprend le formulaire de la maquette (`ONBOARDING · PROFILS ENFANTS`) mais **sans** le compteur "Enfants rattachés" ni le bouton "Continuer vers les forfaits" qui suivait dans la maquette.
+- **Backend Supabase** : `supabase/schema-parent-enfant.sql` (à exécuter par Yannick dans le SQL Editor) — 3 tables, toutes scopées `parent_user_id = auth.uid()` :
+  - `child_profiles` (prénom, âge, couleur d'avatar parmi 4 fixes — pas de photo uploadée pour un enfant, `langues_actives`, `decouverte_activee`, `limite_ecran_minutes`).
+  - `parent_settings` (code PIN à 4 chiffres, voir plus bas).
+  - `child_sessions` (suivi réel du temps passé, voir plus bas).
+- **Couche de données** : `src/data/parentEnfantTypes.ts` + `parentEnfantRepository.ts` (lecture + écriture, pas de cache — données mutables propres à chaque parent, même choix que `communityRepository.ts`).
+
+### ⚠️ Deux décisions provisoires, PAR DÉFAUT du chef de projet — Yannick n'a pas explicitement tranché ces deux points, à valider ou changer
+
+1. **Code PIN à 4 chiffres** (`src/profils/PinGate.tsx`) — la maquette ne prévoit AUCUNE protection pour revenir au profil adulte ou entrer dans l'Espace Parent depuis un profil enfant. Choix par défaut : un code à 4 chiffres, défini par le parent au premier besoin (pas d'étape d'onboarding dédiée — `PinGate` bascule automatiquement en mode "créer un code" si `parent_settings.pin_code` est encore `null`), demandé uniquement pour (a) revenir au profil adulte depuis un profil enfant (bouton ↩ de l'accueil enfant), (b) entrer dans l'Espace Parent (depuis le sélecteur ou l'onglet Profil). **Jamais** demandé pour choisir un profil enfant depuis le sélecteur "Qui est-ce ?", ni pour aller de l'adulte vers le sélecteur ("Changer de profil"). Stocké en clair côté Supabase (RLS scopée au parent) : c'est un verrou anti-enfant local, pas un secret de sécurité informatique — voir le commentaire dans `schema-parent-enfant.sql`.
+2. **Limite d'écran quotidienne — V1 informative seulement.** La maquette montre juste un réglage ("Limite d'écran quotidienne : Xh") dans l'Espace Parent, sans mécanisme d'application. Choix par défaut : le temps passé par session enfant est **réellement suivi** (table `child_sessions`, démarré/arrêté par `ActiveProfileProvider` à l'entrée/sortie du mode enfant) et affiché au parent (donnée réelle), la limite est réglable (stepper +/- 15 min dans l'Espace Parent), mais **l'app ne se verrouille jamais automatiquement** à la limite atteinte — cohérent avec le principe "jamais un mécanisme qui a l'air fonctionnel sans l'être" déjà appliqué ailleurs dans l'app, mais aussi pas de vrai blocage forcé faute de l'avoir jugé prioritaire pour cette V1.
+
+### Navigation — sélecteur inséré sans casser le parcours existant
+
+`ActiveProfileProvider` (`src/profils/ActiveProfileProvider.tsx`) décide de l'état `checking` / `selecting` / `adult` / `child` juste après authentification + onboarding terminés. **Règle clé : si le parent n'a AUCUN profil enfant, le statut passe directement à `adult` sans jamais montrer le sélecteur** — comportement strictement identique à avant ce chantier tant qu'aucun enfant n'est ajouté (Yannick, qui teste en direct, n'a rien vu changer tant qu'il n'ajoute pas de profil). `app/_layout.tsx` (Stack.Protected) et `app/index.tsx` ont été mis à jour pour router sur ce statut. En cas d'échec réseau ou si `schema-parent-enfant.sql` n'a pas encore été exécuté (table absente), le provider échoue silencieusement vers `adult` plutôt que de bloquer l'app.
+
+- `app/profils/selection.tsx` — "Qui est-ce ?" (grille adulte + enfants + "+ ajouter"), fidèle à la maquette.
+- `app/profils/ajouter.tsx` — ajout de profil enfant, répétable (reste accessible que ce soit depuis le sélecteur ou l'Espace Parent).
+- `app/profils/parent.tsx` — Espace Parent (liste des enfants, stats réelles, réglages).
+- `app/enfant/accueil.tsx`, `app/enfant/histoire.tsx`, `app/enfant/carnet/index.tsx`, `app/enfant/carnet/[slug].tsx` — mode enfant plein écran, tab bar masquée (même exception que les lecteurs audio/vidéo, voir "Corrections de test (2026-07-31)" point 3).
+- Exception assumée à la règle "tab bar visible partout" (point 3 des corrections de test) : tout le groupe `profils/*` et `enfant/*` reste **hors** de `(tabs)`, sans barre du bas — traité comme les écrans d'onboarding et les lecteurs plein écran (mode/sécurité, pas de la navigation de contenu ordinaire). `app/(tabs)/profil.tsx` reçoit deux nouvelles entrées ("Espace Parent", PIN-gated ; "Changer de profil", visible seulement si au moins un enfant existe) comme point d'entrée depuis les onglets normaux.
+
+### Contenu de l'accueil enfant — traitement honnête carte par carte
+
+La maquette (`KID HOME`) montrait un "Jeu du jour", "Apprendre l'ewondo" et une carte "Histoire : Mansa Moussa". **Mansa Moussa ne fait pas partie des 9 héros réels du catalogue** (Reine Nzinga, Martin Paul Samba, Rudolf Douala Manga Bell, Sultan Njoya, Ruben Um Nyobè, Charles Atangana, Félix Moumié, Ernest Ouandié, Manu Dibango) — c'est un contenu de maquette, jamais construit tel quel.
+
+- **"Jeu du jour" et "Apprendre une langue"** : aucun jeu ni leçon réel n'existe (le pilier langues camerounaises est bloqué, traductions insuffisantes — voir `context/AFROBACK.md`). État honnête "bientôt disponible" (`Alert.alert`), jamais un jeu/leçon simulé.
+- **"Histoire du jour"** (`app/enfant/histoire.tsx`) : pioche un **vrai héros** du catalogue, choix déterministe par jour de l'année (`src/profils/heroDuJour.ts`, tourne chaque jour, pas de tirage aléatoire). Traitement **volontairement simplifié**, décision éditoriale du chef de projet : n'ouvre **pas** le récit intégral du griot ni les lecteurs audio/vidéo adultes. Les 9 récits réels contiennent des passages historiquement intenses (exécutions, empoisonnement, violence coloniale, traite négrière pour Reine Nzinga) qui ne sont rédigés pour aucun public enfant à ce jour — aucune version adaptée n'existe. L'écran enfant affiche donc seulement portrait, époque/région et le résumé déjà curaté (`resume_catalogue`, le même texte que la vignette du catalogue adulte), avec une invitation à lire l'histoire complète avec un parent plutôt qu'un lien direct. **Si Yannick veut une vraie version adaptée aux enfants des 9 récits, c'est un chantier de contenu à part (probablement via l'agent griot), pas fait ici.**
+- **"Carnet d'explorateur"** (`app/enfant/carnet/`) : vrai contenu, les 10 fiches Découverte déjà en base, réutilise directement `DecouverteItemRow`/`FaitsList`/`SourcesList` — ce contenu (villages, coutumes, objets, rôles traditionnels génériques) est déjà neutre et adapté à un jeune public, contrairement aux récits de héros. Visible seulement si le parent a laissé "Découverte activée" sur ce profil (réglage Espace Parent, réel).
+- **Écran "KID LESSON / SESSION END" de la maquette non construit** : il affichait un faux résultat de leçon ("Bravo, tu as appris 6 nouveaux mots aujourd'hui", étoiles, badges) alors qu'aucune leçon réelle n'existe derrière — l'aurait construit tel quel aurait été un mécanisme qui a l'air fonctionnel sans l'être. Le retour au sélecteur se fait directement depuis l'accueil enfant (bouton ↩, protégé par PIN), sans écran de célébration intermédiaire.
+
+### Limite connue — sessions non closes si l'app est tuée brutalement
+
+`child_sessions` est ouverte à l'entrée en mode enfant et close (avec la durée calculée côté client) à la sortie via le bouton retour. Si l'app est fermée brutalement (kill du process) pendant une session enfant, cette session reste "ouverte" (`ended_at`/`duree_secondes` restent `null`) et n'est simplement pas comptée dans les stats du jour de l'Espace Parent — pas de tâche de fond pour la fiabiliser en V1, documenté comme simplification assumée plutôt que corrigé silencieusement.
+
 ## Comment la maquette a été lue (DesignSync indisponible dans cette session)
 
 `DesignSync` n'a jamais été accessible dans les sessions ayant construit ces trois piliers, malgré plusieurs tentatives et un déblocage confirmé côté compte Yannick. Pour ne pas bloquer indéfiniment sur cet écart d'outillage, Yannick a lu lui-même les sections concernées de `AFROBACK Mobile.dc.html` dans une session où l'outil fonctionnait, et en a extrait le markup + styles inline + bindings d'origine, **verbatim, sans reformulation**, dans trois fichiers de référence lisibles directement :
@@ -142,7 +206,10 @@ Toutes les couleurs, polices et espacements utilisés dans les écrans ci-dessus
 
 ```
 app/                        écrans (Expo Router, routing par fichiers)
+  (tabs)/accueil/heros/[slug]/   fiche héros, récit paginé, audio, vidéo (pile interne, tab bar visible sauf audio/vidéo)
   (tabs)/decouverte/         liste, fiche détail, hub pays (pile interne, tab bar visible)
+  profils/                   sélecteur "Qui est-ce ?", ajout de profil enfant, Espace Parent (module Parent/Enfant, hors (tabs), pas de tab bar)
+  enfant/                    accueil enfant, histoire du jour, carnet d'explorateur (mode enfant plein écran, hors (tabs))
   (tabs)/communaute/         fil, détail de post, création, profil membre, signalement, charte
   (tabs)/marche/             catalogue, fiche produit, profil artisan, panier, checkout, commandes, espace vendeur
 src/
@@ -160,6 +227,11 @@ src/
     communityTypes.ts / communityRepository.ts / useCommunityData.ts / relativeTime.ts           couche de données Communauté (lecture + écriture UGC)
     marketplaceTypes.ts / marketplaceRepository.ts / useMarketplaceData.ts / marketplaceDisplay.ts   couche de données Marketplace (catalogue vide, lecture + écriture)
     uploadImage.ts             helper d'upload générique (bucket user-uploads), utilisé par Communauté et Marketplace
+    parentEnfantTypes.ts / parentEnfantRepository.ts   couche de données module Parent/Enfant (profils enfants, réglages PIN, sessions)
+  profils/
+    ActiveProfileProvider.tsx  état "quel profil est actif" (adulte/enfant), module Parent/Enfant
+    PinGate.tsx                modale code PIN (création si aucun code, vérification sinon)
+    enfantPalette.ts / heroDuJour.ts   couleurs d'avatar enfant, choix du héros du jour (jamais inventé)
   theme/
     tokens.ts                 couleurs, typographie, spacing (design-system-mobile.md + design-reference-*.dc.excerpt.html)
     useAppFonts.ts             chargement Cinzel/Barlow
@@ -170,9 +242,10 @@ scripts/
   build-decouverte-data.mjs    régénère decouverte.generated.json depuis livrables/.../Découverte/*.md
   generate-decouverte-seed.mjs génère supabase/seed-decouverte.sql à partir de decouverte.generated.json
 supabase/
-  seed.sql                     schéma + seed complet, exécuté dans Supabase (héros)
+  seed.sql                     schéma + seed complet, exécuté dans Supabase (héros) — ⚠️ à réexécuter (2026-07-31, colonnes recit_chapitres_fr/en)
   seed-decouverte.sql          schéma + seed du pilier Découverte, exécuté par Yannick le 2026-07-30
   schema-communaute.sql        schéma du pilier Communauté (pas de seed, contenu UGC), exécuté par Yannick le 2026-07-30
-  schema-marketplace.sql       schéma du pilier Marketplace (pas de seed, catalogue vide) — à exécuter par Yannick dans le SQL Editor Supabase
+  schema-marketplace.sql       schéma du pilier Marketplace (pas de seed, catalogue vide) — ⚠️ à réexécuter (2026-07-31, correctif RLS visibilité produits)
   schema-storage-user-uploads.sql   bucket Storage `user-uploads` + policies (photos post/produit, avatars) — à exécuter par Yannick dans le SQL Editor Supabase
+  schema-parent-enfant.sql     schéma du module Parent/Enfant (child_profiles, parent_settings, child_sessions) — à exécuter par Yannick dans le SQL Editor Supabase
 ```

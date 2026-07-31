@@ -1,0 +1,176 @@
+<!-- ===== ONBOARDING · PROFILS ENFANTS (répétable) ===== -->
+        <!-- ============ ONBOARDING · PROFILS ENFANTS (répétable) ============ -->
+        <sc-if value="{{ isOnbChildren }}" hint-placeholder-val="{{ true }}">
+          <div style="position:relative;min-height:100%;background:radial-gradient(150% 60% at 50% -10%,#3a1d0a 0%,#160d06 46%,#0d0805 100%)">
+            <div style="padding:14px 26px 40px;animation:afbFade .4s ease both">
+              <button onClick="{{ onbBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:22px;cursor:pointer;padding:0;margin-bottom:6px">‹</button>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><span style="font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#9A8870">{{ onbStepLabel }}</span><span style="flex:1;height:4px;border-radius:9px;background:#2a1f14"><span style="display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#F0C36B,#8B5A2B);width:{{ onbPct }}"></span></span></div>
+              <div style="font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:#F7E7C8">Ajoute tes enfants</div>
+              <p style="font-size:13px;color:#9A8870;margin:6px 0 18px">Le nombre d'enfants détermine ton tarif à l'étape suivante.</p>
+
+              <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:18px">
+                <label style="display:block">
+                  <span style="font-size:11px;font-family:'Space Mono',monospace;letter-spacing:.08em;color:#9A8870">PRÉNOM DE L'ENFANT</span>
+                  <input type="text" placeholder="Léa" style="width:100%;margin-top:6px;font:inherit;font-size:14px;padding:14px;border-radius:13px;border:1px solid rgba(240,195,107,.2);background:#170f0a;color:#EDE3D4;outline:none">
+                </label>
+                <div style="display:flex;gap:12px">
+                  <label style="flex:1">
+                    <span style="font-size:11px;font-family:'Space Mono',monospace;letter-spacing:.08em;color:#9A8870">ÂGE</span>
+                    <input type="number" placeholder="8" style="width:100%;margin-top:6px;font:inherit;font-size:14px;padding:14px;border-radius:13px;border:1px solid rgba(240,195,107,.2);background:#170f0a;color:#EDE3D4;outline:none">
+                  </label>
+                  <div style="flex:2">
+                    <span style="font-size:11px;font-family:'Space Mono',monospace;letter-spacing:.08em;color:#9A8870">AVATAR</span>
+                    <div style="display:flex;gap:8px;margin-top:8px">
+                      <span style="width:38px;height:38px;border-radius:12px;background:linear-gradient(150deg,#C25E2E,#8B3A2F);border:2px solid #F0C36B"></span>
+                      <span style="width:38px;height:38px;border-radius:12px;background:linear-gradient(150deg,#3E6B8B,#274a63)"></span>
+                      <span style="width:38px;height:38px;border-radius:12px;background:linear-gradient(150deg,#5B4B8A,#3A2E63)"></span>
+                      <span style="width:38px;height:38px;border-radius:12px;background:linear-gradient(150deg,#D9A441,#B06A1E)"></span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <span style="font-size:11px;font-family:'Space Mono',monospace;letter-spacing:.08em;color:#9A8870">LANGUES À ACTIVER</span>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+                    <span style="font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px;border:1px solid #F0C36B;background:linear-gradient(135deg,rgba(240,195,107,.2),rgba(139,90,43,.15));color:#F7E7C8">Ewondo</span>
+                    <span style="font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px;border:1px solid rgba(240,195,107,.22);background:#170f0a;color:#c9b8a4">Douala</span>
+                    <span style="font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px;border:1px solid rgba(240,195,107,.22);background:#170f0a;color:#c9b8a4">Bassa</span>
+                    <span style="font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px;border:1px solid rgba(240,195,107,.22);background:#170f0a;color:#c9b8a4">Bamiléké</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;background:#150e09;border:1px solid rgba(240,195,107,.14);border-radius:14px;padding:12px 14px;margin-bottom:16px">
+                <span style="font-size:13px;color:#c9b8a4">Enfants rattachés</span>
+                <div style="display:flex;align-items:center;gap:14px">
+                  <button onClick="{{ decChild }}" style="font:inherit;width:30px;height:30px;border-radius:9px;border:1px solid rgba(240,195,107,.3);background:transparent;color:#E9BE77;font-size:18px;cursor:pointer">−</button>
+                  <span style="font-family:'Space Mono',monospace;font-size:16px;color:#F7E7C8;min-width:18px;text-align:center">{{ childCount }}</span>
+                  <button onClick="{{ incChild }}" style="font:inherit;width:30px;height:30px;border-radius:9px;border:1px solid rgba(240,195,107,.3);background:transparent;color:#E9BE77;font-size:18px;cursor:pointer">+</button>
+                </div>
+              </div>
+              <button onClick="{{ incChild }}" style="width:100%;font:inherit;font-weight:600;font-size:13.5px;padding:13px;border-radius:14px;border:1px dashed rgba(240,195,107,.4);background:rgba(240,195,107,.05);color:#E9BE77;cursor:pointer">+ Ajouter un autre enfant</button>
+              <div style="text-align:center;font-family:'Space Mono',monospace;font-size:11px;color:#E9A15C;margin-top:14px">{{ childCountLabel }}</div>
+              <button onClick="{{ childrenNext }}" style="width:100%;margin-top:16px;font:inherit;font-weight:700;font-size:15px;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer;box-shadow:0 10px 34px rgba(240,195,107,.28)">Continuer vers les forfaits</button>
+            </div>
+          </div>
+        </sc-if>
+
+<!-- ===== PROFILE SELECTOR (Qui est-ce ?) ===== -->
+        <!-- ============ PROFILE SELECTOR ============ -->
+        <sc-if value="{{ isSelect }}" hint-placeholder-val="{{ true }}">
+          <div style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px 60px;text-align:center;animation:afbFade .5s ease both">
+            <img src="assets/afroback-logo.png" alt="" style="width:96px;height:96px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(240,195,107,.4),0 0 60px rgba(240,195,107,.25);margin-bottom:18px">
+            <div style="font-family:'Cinzel',serif;font-weight:700;font-size:15px;letter-spacing:.14em;color:#C99A5B;margin-bottom:6px">QUI EST-CE&nbsp;?</div>
+            <p style="margin:0 0 26px;font-size:13px;color:#9A8870;max-width:250px;line-height:1.5">Un seul compte, plusieurs profils. Choisis le tien pour retrouver ton fil.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:280px">
+              <div onClick="{{ goAdultHome }}" style="cursor:pointer">
+                <div style="aspect-ratio:1;border-radius:20px;background:repeating-linear-gradient(135deg,#2a1f14 0 10px,#1f1710 10px 20px);border:2px solid rgba(240,195,107,.5);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:34px;color:#E9BE77">Y</div>
+                <div style="margin-top:8px;font-weight:600;font-size:13px">Yannick</div>
+                <div style="font-size:10.5px;color:#8C7B67">Adulte</div>
+              </div>
+              <div onClick="{{ goKid }}" style="cursor:pointer">
+                <div style="aspect-ratio:1;border-radius:20px;background:linear-gradient(150deg,#C25E2E,#8B3A2F);border:2px solid rgba(255,196,120,.6);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:34px;color:#fff">L</div>
+                <div style="margin-top:8px;font-weight:600;font-size:13px">Léa <span style="font-size:10px;color:#E9A15C">· enfant</span></div>
+                <div style="font-size:10.5px;color:#8C7B67">8 ans</div>
+              </div>
+              <div onClick="{{ goKid }}" style="cursor:pointer">
+                <div style="aspect-ratio:1;border-radius:20px;background:linear-gradient(150deg,#3E6B8B,#274a63);border:2px solid rgba(150,200,240,.5);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:34px;color:#fff">M</div>
+                <div style="margin-top:8px;font-weight:600;font-size:13px">Malik <span style="font-size:10px;color:#7FB0D6">· enfant</span></div>
+                <div style="font-size:10.5px;color:#8C7B67">6 ans</div>
+              </div>
+              <div style="cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <div style="aspect-ratio:1;width:100%;border-radius:20px;border:2px dashed rgba(240,195,107,.3);display:flex;align-items:center;justify-content:center;font-size:34px;color:#6f5f4d;font-weight:300">+</div>
+                <div style="margin-top:8px;font-size:11.5px;color:#8C7B67">Ajouter un<br>profil enfant</div>
+              </div>
+            </div>
+            <button onClick="{{ goParent }}" style="margin-top:30px;font:inherit;font-size:12px;color:#9A8870;background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Gérer les profils (Espace Parent)</button>
+          </div>
+        </sc-if>
+
+<!-- ===== KID HOME ===== -->
+        <!-- ============ KID HOME ============ -->
+        <sc-if value="{{ isKid }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:10px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+              <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(150deg,#C25E2E,#8B3A2F);border:2px solid #F0C36B;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;color:#fff;font-size:20px">L</div>
+              <div style="flex:1"><div style="font-size:12px;color:#E9A15C">Salut,</div><div style="font-family:'Cinzel',serif;font-size:22px;color:#F7E7C8">Léa&nbsp;!</div></div>
+              <button onClick="{{ goSelect }}" style="font:inherit;font-size:22px;background:none;border:none;color:#E9BE77;cursor:pointer">↩</button>
+            </div>
+            <div onClick="{{ goKidLesson }}" style="cursor:pointer;border-radius:26px;padding:22px;background:linear-gradient(150deg,#E07B3A,#A0392C);box-shadow:0 12px 30px rgba(160,57,44,.4);position:relative;overflow:hidden;margin-bottom:16px">
+              <div style="position:absolute;right:-10px;bottom:-10px;font-size:90px;opacity:.25">🦁</div>
+              <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;color:#FFE6C9">JEU DU JOUR</div>
+              <div style="font-family:'Cinzel',serif;font-size:24px;color:#fff;margin:6px 0;font-weight:700">Les mots<br>animaux</div>
+              <div style="display:inline-block;background:#fff;color:#A0392C;font-weight:800;font-size:14px;padding:9px 20px;border-radius:999px;margin-top:6px">Jouer ▶</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div onClick="{{ goKidLesson }}" style="cursor:pointer;border-radius:24px;padding:18px;background:linear-gradient(150deg,#3E7B8B,#274a63);min-height:130px;display:flex;flex-direction:column;justify-content:space-between">
+                <div style="font-size:40px">🗣️</div>
+                <div style="font-family:'Cinzel',serif;font-size:16px;color:#fff;font-weight:600">Apprendre<br>l'ewondo</div>
+              </div>
+              <div style="cursor:pointer;border-radius:24px;padding:18px;background:linear-gradient(150deg,#D9A441,#B06A1E);min-height:130px;display:flex;flex-direction:column;justify-content:space-between">
+                <div style="font-size:40px">📖</div>
+                <div style="font-family:'Cinzel',serif;font-size:16px;color:#fff;font-weight:600">Histoire :<br>Mansa Moussa</div>
+              </div>
+            </div>
+            <div style="margin-top:16px;border-radius:24px;padding:18px;background:linear-gradient(150deg,#5B4B8A,#3A2E63);display:flex;align-items:center;gap:14px">
+              <div style="font-size:40px">🧭</div>
+              <div><div style="font-family:'Cinzel',serif;font-size:16px;color:#fff;font-weight:600">Carnet d'explorateur</div><div style="font-size:12px;color:#D6CBEF">Découvre un village africain&nbsp;!</div></div>
+            </div>
+          </div>
+        </sc-if>
+
+<!-- ===== KID LESSON / SESSION END ===== -->
+        <!-- ============ KID LESSON / SESSION END ============ -->
+        <sc-if value="{{ isKidLesson }}" hint-placeholder-val="{{ true }}">
+          <div style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 24px 120px;animation:afbFade .4s ease both">
+            <div style="font-size:80px;animation:afbPop .6s ease both">🎉</div>
+            <div style="font-family:'Cinzel',serif;font-size:26px;color:#F7E7C8;margin:14px 0 4px;font-weight:700">Bravo Léa&nbsp;!</div>
+            <p style="font-size:14px;color:#E9C9A6;margin:0 0 22px">Tu as appris 6 nouveaux mots aujourd'hui.</p>
+            <div style="display:flex;gap:10px;margin-bottom:8px">
+              <span style="font-size:38px">⭐</span><span style="font-size:38px">⭐</span><span style="font-size:38px;opacity:.35">⭐</span>
+            </div>
+            <div style="display:flex;gap:12px;margin:18px 0 26px">
+              <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(150deg,#E07B3A,#A0392C);display:flex;align-items:center;justify-content:center;font-size:30px;border:3px solid #F0C36B">🦁</div>
+              <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(150deg,#3E7B8B,#274a63);display:flex;align-items:center;justify-content:center;font-size:30px;border:3px solid #F0C36B">🗣️</div>
+              <div style="width:64px;height:64px;border-radius:50%;background:#1A130D;display:flex;align-items:center;justify-content:center;font-size:30px;border:3px dashed rgba(240,195,107,.4);opacity:.5">?</div>
+            </div>
+            <button onClick="{{ goKid }}" style="font:inherit;font-weight:800;font-size:15px;padding:15px 30px;border-radius:999px;border:none;background:linear-gradient(135deg,#F0C36B,#C98A3D);color:#1a1109;cursor:pointer">Continuer</button>
+            <button onClick="{{ goSelect }}" style="margin-top:16px;font:inherit;font-size:12.5px;color:#9A8870;background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Rendre l'écran à un adulte</button>
+          </div>
+        </sc-if>
+
+<!-- ===== PARENT SPACE ===== -->
+        <!-- ============ PARENT SPACE ============ -->
+        <sc-if value="{{ isParent }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 4px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">‹</button>
+              <div style="font-family:'Cinzel',serif;font-size:19px;font-weight:600">Espace Parent</div>
+            </div>
+            <p style="font-size:12.5px;color:#8C7B67;margin:0 0 18px;padding-left:2px">Contrôle parental &amp; suivi des profils enfants.</p>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ children }}" as="c" hint-placeholder-count="2">
+                <div style="background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:18px;padding:16px">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                    <div style="width:46px;height:46px;border-radius:14px;background:{{ c.grad }};display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;color:#fff;font-size:20px">{{ c.initial }}</div>
+                    <div style="flex:1"><div style="font-weight:700;font-size:15px">{{ c.name }} <span style="font-weight:400;color:#8C7B67;font-size:12px">· {{ c.age }} ans</span></div><div style="font-size:11px;color:#8C7B67">Dernière activité : {{ c.last }}</div></div>
+                    <span style="color:#E9BE77">›</span>
+                  </div>
+                  <div style="display:flex;gap:10px;margin-bottom:12px">
+                    <div style="flex:1;background:#150e09;border-radius:12px;padding:10px;text-align:center"><div style="font-family:'Space Mono',monospace;font-size:15px;color:#E9BE77">{{ c.time }}</div><div style="font-size:9.5px;color:#8C7B67">aujourd'hui</div></div>
+                    <div style="flex:1;background:#150e09;border-radius:12px;padding:10px;text-align:center"><div style="font-family:'Space Mono',monospace;font-size:15px;color:#E9BE77">{{ c.pct }}%</div><div style="font-size:9.5px;color:#8C7B67">ewondo</div></div>
+                    <div style="flex:1;background:#150e09;border-radius:12px;padding:10px;text-align:center"><div style="font-family:'Space Mono',monospace;font-size:15px;color:#E9BE77">{{ c.badges }}</div><div style="font-size:9.5px;color:#8C7B67">badges</div></div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 2px;border-top:1px solid rgba(240,195,107,.1)">
+                    <span style="font-size:12.5px;color:#c9b8a4">Limite d'écran quotidienne</span>
+                    <span style="font-family:'Space Mono',monospace;font-size:12px;color:#E9BE77">{{ c.limit }}</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 2px">
+                    <span style="font-size:12.5px;color:#c9b8a4">Découverte activée</span>
+                    <span style="width:40px;height:22px;border-radius:999px;background:{{ c.toggleBg }};position:relative;flex:none"><span style="position:absolute;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;{{ c.togglePos }}"></span></span>
+                  </div>
+                </div>
+              </sc-for>
+              <button style="font:inherit;font-weight:700;font-size:13.5px;padding:14px;border-radius:14px;border:1px dashed rgba(240,195,107,.4);background:rgba(240,195,107,.05);color:#E9BE77;cursor:pointer">+ Ajouter un profil enfant</button>
+            </div>
+          </div>
+        </sc-if>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { DecouverteItemRow } from '../../../src/components/DecouverteItemRow';
 import { FaitsList } from '../../../src/components/FaitsList';
@@ -28,6 +28,7 @@ import { colors, spacing, typography } from '../../../src/theme/tokens';
 export default function DecouverteDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const itemState = useDecouverteItem(slug);
   const item = itemState.status === 'ready' ? itemState.data : undefined;
   const relatedItems = useRelatedDecouverteItems(item);
@@ -86,7 +87,7 @@ export default function DecouverteDetailScreen() {
               locations={[0, 0.4, 1]}
               style={StyleSheet.absoluteFill}
             />
-            <Pressable onPress={() => router.back()} style={styles.backBtn} hitSlop={10}>
+            <Pressable onPress={() => router.back()} style={[styles.backBtn, { top: insets.top + 8 }]} hitSlop={10}>
               <Text style={styles.backIcon}>‹</Text>
             </Pressable>
             <View style={styles.immersiveBottom}>
@@ -153,6 +154,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.placeholderStripeDark,
   },
   backBtn: {
+    // `top` par défaut, écrasé à l'usage par `insets.top + 8` (retour de test
+    // Yannick du 2026-07-31, cohérence globale avec les autres fiches).
     position: 'absolute',
     top: 12,
     left: 14,

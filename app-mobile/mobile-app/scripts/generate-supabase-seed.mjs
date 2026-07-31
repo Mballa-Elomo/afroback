@@ -30,6 +30,12 @@ function sqlJsonb(value) {
   return `'${json.replace(/'/g, "''")}'::jsonb`;
 }
 
+/** Comme sqlJsonb, mais préserve `null` (ex. recit_chapitres_en pour un héros sans version EN) au lieu de le remplacer par un tableau vide. */
+function sqlJsonbNullable(value) {
+  if (value === null || value === undefined) return 'null';
+  return sqlJsonb(value);
+}
+
 const schema = `
 -- AFROBACK Mobile — schéma Postgres pour le pilier Histoires & Héros
 -- Généré le ${new Date().toISOString().slice(0, 10)} à partir de
@@ -51,8 +57,10 @@ create table if not exists public.heros (
   annee_mort_indicative text,
   recit_fr_texte text not null,
   recit_fr_fichier_source text not null,
+  recit_chapitres_fr jsonb not null default '[]',
   recit_en_texte text,
   recit_en_fichier_source text,
+  recit_chapitres_en jsonb,
   frise_chronologique jsonb not null default '[]',
   citations jsonb not null default '[]',
   sources text[] not null default '{}',
@@ -71,6 +79,13 @@ create table if not exists public.heros (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Colonnes ajoutées le 2026-07-31 pour la pagination du lecteur par
+-- chapitre (voir app/(tabs)/accueil/heros/[slug]/recit.tsx) — \`alter ... add column if not
+-- exists\` plutôt que de compter sur \`create table if not exists\`, qui ne
+-- touche pas une table déjà existante en production.
+alter table public.heros add column if not exists recit_chapitres_fr jsonb not null default '[]';
+alter table public.heros add column if not exists recit_chapitres_en jsonb;
 
 alter table public.heros enable row level security;
 
@@ -100,8 +115,10 @@ const inserts = heroes
       'annee_mort_indicative',
       'recit_fr_texte',
       'recit_fr_fichier_source',
+      'recit_chapitres_fr',
       'recit_en_texte',
       'recit_en_fichier_source',
+      'recit_chapitres_en',
       'frise_chronologique',
       'citations',
       'sources',
@@ -131,8 +148,10 @@ const inserts = heroes
       sqlString(h.annee_mort_indicative),
       sqlString(h.recit_fr_texte),
       sqlString(h.recit_fr_fichier_source),
+      sqlJsonb(h.recit_chapitres_fr),
       sqlString(h.recit_en_texte),
       sqlString(h.recit_en_fichier_source),
+      sqlJsonbNullable(h.recit_chapitres_en),
       sqlJsonb(h.frise_chronologique),
       sqlJsonb(h.citations),
       sqlTextArray(h.sources),
@@ -142,6 +161,10 @@ const inserts = heroes
       sqlString(h.statut_recit_texte),
       sqlString(h.statut_narration_audio),
       sqlString(h.statut_video),
+      sqlString(h.image_carte_catalogue),
+      sqlString(h.narration_audio_fr_url),
+      sqlString(h.narration_audio_en_url),
+      sqlString(h.video_url),
       sqlString(h.avertissement_lecture),
       String(h.ordre_affichage),
     ];

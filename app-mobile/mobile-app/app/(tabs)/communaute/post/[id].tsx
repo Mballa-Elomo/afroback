@@ -68,14 +68,14 @@ export default function PostDetailScreen() {
 
   if (state.status === 'loading') {
     return (
-      <SafeAreaView style={styles.safe} edges={['bottom']}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <LoadingState />
       </SafeAreaView>
     );
   }
   if (state.status === 'error') {
     return (
-      <SafeAreaView style={styles.safe} edges={['bottom']}>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ErrorState />
       </SafeAreaView>
     );
@@ -84,8 +84,11 @@ export default function PostDetailScreen() {
 
   const { post, comments } = state;
 
+  // edges inclut désormais 'top' (retour de test Yannick du 2026-07-31) :
+  // ce header n'a pas d'image en fond, `edges={['bottom']}` seul laissait le
+  // bouton retour ‹ trop proche de l'encoche/status bar, sans raison d'immersion.
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>

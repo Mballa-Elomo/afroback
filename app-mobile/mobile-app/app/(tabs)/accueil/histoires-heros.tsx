@@ -95,7 +95,7 @@ export default function HistoiresHerosScreen() {
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <HeroCard heros={item} onPress={() => router.push(`/heros/${item.slug}`)} />
+            <HeroCard heros={item} onPress={() => router.push(`/accueil/heros/${item.slug}`)} />
           )}
         />
       )}

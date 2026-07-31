@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddToCartToast } from '../../../src/components/AddToCartToast';
 import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
 import { SectionTitle } from '../../../src/components/SectionTitle';
@@ -32,6 +32,7 @@ import { colors, spacing, typography } from '../../../src/theme/tokens';
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const productState = useMarketplaceProduct(id);
   const product = productState.status === 'ready' ? productState.data : undefined;
@@ -127,7 +128,7 @@ export default function ProductDetailScreen() {
           ) : (
             <View style={styles.headerPlaceholder} />
           )}
-          <Pressable onPress={() => router.back()} style={styles.backBtn} hitSlop={10}>
+          <Pressable onPress={() => router.back()} style={[styles.backBtn, { top: insets.top + 8 }]} hitSlop={10}>
             <Text style={styles.backIcon}>‹</Text>
           </Pressable>
         </View>
@@ -285,6 +286,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.placeholderStripeDark,
   },
   backBtn: {
+    // `top` par défaut, écrasé à l'usage par `insets.top + 8` (retour de test
+    // Yannick du 2026-07-31 : trop proche de l'encoche/status bar sans ça,
+    // car ce header bleed sous la zone sûre — edges=['bottom'] au-dessus).
     position: 'absolute',
     top: 12,
     left: 14,

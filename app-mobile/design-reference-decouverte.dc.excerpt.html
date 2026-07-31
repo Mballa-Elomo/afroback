@@ -1,0 +1,474 @@
+        <!-- ============ DISCOVERY ============ -->
+        <sc-if value="{{ isDiscover }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="font-family:'Cinzel',serif;font-size:19px;font-weight:600;margin:6px 0 14px">{{ tDiscoverT }}</div>
+            <div style="position:relative;height:260px;border-radius:20px;overflow:hidden;background:radial-gradient(120% 90% at 50% 25%,#241a11,#140d07);border:1px solid rgba(240,195,107,.16);margin-bottom:8px">
+              <iframe src="afroback-africa-map.html" title="Carte de l'Afrique" style="position:absolute;inset:0;width:100%;height:100%;border:none;background:transparent"></iframe>
+              <div style="position:absolute;top:12px;left:14px;pointer-events:none;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:#c9b08a;background:rgba(0,0,0,.4);padding:4px 8px;border-radius:6px">CARTE INTERACTIVE · AFRIQUE</div>
+              <div style="position:absolute;bottom:12px;right:14px;display:flex;flex-direction:column;gap:5px;background:rgba(12,9,6,.55);border:1px solid rgba(240,195,107,.14);border-radius:10px;padding:8px 10px">
+                <sc-for list="{{ mapPins }}" as="p" hint-placeholder-count="5">
+                  <div onClick="{{ p.open }}" style="cursor:pointer;display:flex;align-items:center;gap:7px;font-size:9.5px;color:#c9b8a4"><span style="width:7px;height:7px;border-radius:50%;background:{{ p.color }};box-shadow:0 0 6px {{ p.color }}"></span>{{ p.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <p style="font-size:11.5px;color:#8C7B67;margin:0 0 16px;padding-left:2px">Touchez un point de la carte pour explorer une région du continent.</p>
+            <div style="display:flex;align-items:center;gap:10px;background:#170f0a;border:1px solid rgba(240,195,107,.24);border-radius:14px;padding:11px 14px;margin-bottom:16px">
+              <span style="color:#E9BE77;font-size:14px">⌕</span>
+              <input value="{{ discQ }}" onInput="{{ onDiscQ }}" placeholder="Rechercher dans la Découverte…" style="flex:1;min-width:0;font:inherit;font-size:13.5px;background:none;border:none;outline:none;color:#EDE3D4">
+              <sc-if value="{{ hasDiscQ }}" hint-placeholder-val="{{ false }}"><span onClick="{{ clearDiscQ }}" style="cursor:pointer;color:#8C7B67;font-size:14px">✕</span></sc-if>
+            </div>
+
+            <sc-if value="{{ discoverySearching }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B">RÉSULTATS</div>
+                <span style="font-size:11px;color:#8C7B67">{{ discResultCount }} trouvé(s)</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ discoveryBrowsing }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                <button onClick="{{ discPrevCat }}" style="flex:none;width:38px;height:38px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;font-size:18px;cursor:pointer">‹</button>
+                <div style="flex:1;text-align:center;background:linear-gradient(135deg,#241a11,#160f09);border:1px solid rgba(240,195,107,.24);border-radius:14px;padding:10px 8px">
+                  <div style="font-size:22px;line-height:1">{{ discCatIcon }}</div>
+                  <div style="font-family:'Cinzel',serif;font-weight:600;font-size:14px;color:#F7E7C8;margin-top:4px">{{ discCatName }}</div>
+                  <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:#8C7B67;margin-top:3px">CATÉGORIE {{ discCatPos }} · {{ discResultCount }} CONTENU(S)</div>
+                </div>
+                <button onClick="{{ discNextCat }}" style="flex:none;width:38px;height:38px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;font-size:18px;cursor:pointer">›</button>
+              </div>
+              <div class="afb-scroll" style="display:flex;gap:8px;overflow-x:auto;margin:0 -18px 20px;padding:0 18px 2px">
+                <sc-for list="{{ discCatChips }}" as="c" hint-placeholder-count="7">
+                  <span onClick="{{ c.pick }}" style="flex:none;cursor:pointer;font-size:11.5px;padding:7px 13px;border-radius:999px;white-space:nowrap;{{ c.style }}">{{ c.label }}</span>
+                </sc-for>
+              </div>
+              <div onClick="{{ openMuseum }}" style="cursor:pointer;position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(240,195,107,.2);padding:16px;background:linear-gradient(135deg,#221a12,#171009);margin-bottom:20px">
+                <div style="display:inline-block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:#0F0B08;background:linear-gradient(135deg,#F0C36B,#C98A3D);padding:3px 9px;border-radius:999px;font-weight:700;margin-bottom:8px">BIENTÔT DISPONIBLE</div>
+                <div style="font-family:'Cinzel',serif;font-size:17px;font-weight:600;color:#F7E7C8">Visite virtuelle des musées · 360°</div>
+                <div style="font-size:12.5px;color:#c9b8a4;margin-top:4px">Parcourez les collections avec points d'intérêt cliquables vers les objets sacrés. →</div>
+              </div>
+            </sc-if>
+
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ discoveryFiltered }}" as="d" hint-placeholder-count="4">
+                <div onClick="{{ d.open }}" style="cursor:pointer;display:flex;gap:13px;align-items:center;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:16px;padding:11px">
+                  <div style="width:60px;height:60px;flex:none;border-radius:12px;background:repeating-linear-gradient(135deg,#2a1f14 0 8px,#1f1710 8px 16px);border:1px solid rgba(240,195,107,.2);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:7px;color:#6f5f4d">PHOTO</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-family:'Space Mono',monospace;font-size:8.5px;color:#E9A15C;letter-spacing:.06em">{{ d.catLabel }} · {{ d.region }}</div>
+                    <div style="font-weight:600;font-size:14px;margin-top:2px">{{ d.name }}</div>
+                    <div style="font-size:11px;color:#8C7B67;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ d.blurb }}</div>
+                  </div>
+                  <span style="color:#E9BE77;font-size:18px">›</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ discNoResults }}" hint-placeholder-val="{{ false }}">
+                <div style="text-align:center;padding:30px 20px;color:#8C7B67;font-size:13px">Aucun contenu ne correspond à « {{ discQ }} ».</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ DISCOVERY DETAIL ============ -->
+        <sc-if value="{{ isDiscoverDetail }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:afbFade .4s ease both">
+            <div style="position:relative;height:280px;background:repeating-linear-gradient(135deg,#2c2116 0 12px,#1f160f 12px 24px)">
+              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,.15) 0%,rgba(15,11,8,.1) 40%,#0F0B08 100%)"></div>
+              <button onClick="{{ goBack }}" style="position:absolute;top:12px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(240,195,107,.3);color:#E9BE77;font-size:18px;cursor:pointer;z-index:5">‹</button>
+              <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:9px;color:#c9b08a;background:rgba(0,0,0,.4);padding:4px 9px;border-radius:6px">[ galerie · {{ disc.name }} ]</div>
+              <div style="position:absolute;bottom:16px;left:18px;right:18px">
+                <div style="display:inline-block;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#E9A15C;border:1px solid rgba(233,161,92,.4);padding:3px 8px;border-radius:999px;margin-bottom:8px">{{ disc.catLabel }}</div>
+                <div style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:#F7E7C8;line-height:1.05">{{ disc.name }}</div>
+                <div style="font-size:12px;color:#c9b8a4;margin-top:4px;font-family:'Space Mono',monospace;letter-spacing:.05em">📍 {{ disc.region }}</div>
+              </div>
+            </div>
+            <div style="padding:18px 18px 130px">
+              <p style="font-size:15px;line-height:1.8;color:#D6C6B2;margin:0 0 22px">{{ disc.blurb }}</p>
+
+              <sc-if value="{{ discIsMythe }}" hint-placeholder-val="{{ false }}">
+                <div style="border-left:2px solid #A0522D;padding:2px 0 2px 14px;margin-bottom:22px;font-family:'Cinzel',serif;font-size:16px;font-style:italic;color:#E3C79A;line-height:1.5">« Les histoires que l'on se raconte le soir tissent la mémoire d'un peuple. »</div>
+                <p style="font-size:15px;line-height:1.8;color:#D6C6B2;margin:0 0 22px">Transmis oralement de génération en génération, ce récit voyage, se transforme et relie les communautés du continent et de sa diaspora. Il porte une leçon, une origine, une manière de comprendre le monde.</p>
+              </sc-if>
+
+              <sc-if value="{{ discIsRecipe }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">INGRÉDIENTS <span style="color:#8C7B67;font-weight:400;letter-spacing:0">· touchez pour voir</span></div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
+                  <sc-for list="{{ disc.ingredients }}" as="ing" hint-placeholder-count="4">
+                    <span onClick="{{ ing.open }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:8px 13px;border-radius:999px;border:1px solid rgba(240,195,107,.28);background:#170f0a;color:#c9b8a4">🖼 {{ ing.name }}</span>
+                  </sc-for>
+                </div>
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:14px">PRÉPARATION PAS À PAS</div>
+                <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:8px">
+                  <sc-for list="{{ disc.steps }}" as="st" hint-placeholder-count="4">
+                    <div style="display:flex;gap:14px;align-items:flex-start">
+                      <div style="width:28px;height:28px;flex:none;border-radius:50%;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;font-weight:800;font-family:'Space Mono',monospace;font-size:12px;display:flex;align-items:center;justify-content:center">{{ st.n }}</div>
+                      <div style="flex:1;font-size:14px;line-height:1.6;color:#D6C6B2;padding-top:3px">{{ st.text }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ discHasFacts }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">À RETENIR</div>
+                <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
+                  <sc-for list="{{ disc.facts }}" as="f" hint-placeholder-count="3">
+                    <div onClick="{{ f.open }}" style="cursor:pointer;display:flex;gap:10px;align-items:center;background:#150e09;border:1px solid rgba(240,195,107,.14);border-radius:10px;padding:11px 13px">
+                      <span style="color:#C99A5B">◆</span><span style="flex:1;font-size:13px;line-height:1.5;color:#c9b8a4">{{ f.text }}</span><span style="color:#E9BE77;font-size:16px">›</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ discHasRich }}" hint-placeholder-val="{{ false }}">
+                <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(240,195,107,.25),transparent);margin:6px 0 22px"></div>
+
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ richData.docLabel }}</div>
+                <div style="position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(240,195,107,.18);margin-bottom:26px">
+                  <sc-if value="{{ docOpen }}" hint-placeholder-val="{{ false }}">
+                    <sc-if value="{{ hasDocSrc }}" hint-placeholder-val="{{ false }}">
+                      {{ docVideoEl }}
+                    </sc-if>
+                    <sc-if value="{{ noDocSrc }}" hint-placeholder-val="{{ true }}">
+                      <div style="width:100%;aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#1a120b 0 12px,#120c07 12px 24px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:20px">
+                        <div style="font-family:'Space Mono',monospace;font-size:10px;color:#c9b08a">VIDÉO À RATTACHER</div>
+                        <div style="font-size:12px;color:#8C7B67;max-width:220px">Dépose ici le documentaire (fichier ou lien) et il se jouera dans ce lecteur.</div>
+                        <button onClick="{{ closeDiscDoc }}" style="margin-top:6px;font:inherit;font-size:11px;color:#E9BE77;background:none;border:1px solid rgba(240,195,107,.3);border-radius:999px;padding:6px 12px;cursor:pointer">Fermer</button>
+                      </div>
+                    </sc-if>
+                  </sc-if>
+                  <sc-if value="{{ docClosed }}" hint-placeholder-val="{{ true }}">
+                    <div onClick="{{ openDiscDoc }}" style="cursor:pointer;position:relative;width:100%;aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#2c2116 0 12px,#1f160f 12px 24px);display:flex;align-items:center;justify-content:center">
+                      <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(240,195,107,.14),transparent 65%)"></div>
+                      <div style="position:relative;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#F0C36B,#8B5A2B);display:flex;align-items:center;justify-content:center;color:#1a1109;font-size:22px;box-shadow:0 8px 24px rgba(0,0,0,.5)">▶</div>
+                      <div style="position:absolute;bottom:10px;left:12px;right:12px;font-family:'Space Mono',monospace;font-size:8.5px;color:#c9b08a;background:rgba(0,0,0,.4);padding:4px 8px;border-radius:6px">{{ richData.docCaption }}</div>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">HISTOIRE</div>
+                <div style="margin-bottom:26px">
+                  <sc-for list="{{ richData.histoire }}" as="para" hint-placeholder-count="2">
+                    <p style="font-size:14.5px;line-height:1.78;color:#D6C6B2;margin:0 0 14px">{{ para }}</p>
+                  </sc-for>
+                </div>
+
+                <sc-if value="{{ richData.hasSacre }}" hint-placeholder-val="{{ false }}">
+                <div style="background:linear-gradient(160deg,#241a11,#160f09);border:1px solid rgba(240,195,107,.28);border-radius:16px;padding:16px 18px;margin-bottom:26px">
+                  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#E9BE77;margin-bottom:10px">✦ POURQUOI C'EST SACRÉ</div>
+                  <sc-for list="{{ richData.sacre }}" as="para" hint-placeholder-count="2">
+                    <p style="font-size:14px;line-height:1.72;color:#E3D3BE;margin:0 0 10px">{{ para }}</p>
+                  </sc-for>
+                </div>
+                </sc-if>
+
+                <sc-if value="{{ richData.hasCoutumes }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ richData.coutumesLabel }}</div>
+                <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:26px">
+                  <sc-for list="{{ richData.coutumes }}" as="c" hint-placeholder-count="4">
+                    <div onClick="{{ c.open }}" style="cursor:pointer;display:flex;gap:10px;align-items:center;background:#150e09;border:1px solid rgba(240,195,107,.14);border-radius:10px;padding:11px 13px">
+                      <span style="color:#C99A5B">◆</span><span style="flex:1;font-size:13px;line-height:1.5;color:#c9b8a4">{{ c.text }}</span><span style="color:#E9BE77;font-size:16px">›</span>
+                    </div>
+                  </sc-for>
+                </div>
+                </sc-if>
+
+                <sc-if value="{{ richData.hasVillages }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ richData.villagesLabel }}</div>
+                <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:26px">
+                  <sc-for list="{{ richData.villages }}" as="v" hint-placeholder-count="3">
+                    <div onClick="{{ v.open }}" style="cursor:pointer;display:flex;gap:13px;align-items:center;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:14px;padding:11px">
+                      <div style="width:52px;height:52px;flex:none;border-radius:12px;background:repeating-linear-gradient(135deg,#2a1f14 0 8px,#1f1710 8px 16px);border:1px solid rgba(240,195,107,.2);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:7px;color:#6f5f4d">PHOTO</div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-weight:700;font-size:14px">{{ v.name }}</div>
+                        <div style="font-size:11.5px;color:#8C7B67;line-height:1.4">{{ v.note }}</div>
+                      </div>
+                      <span style="color:#E9BE77;font-size:18px">›</span>
+                    </div>
+                  </sc-for>
+                </div>
+                </sc-if>
+
+                <sc-if value="{{ richData.hasHeroes }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ richData.heroesLabel }}</div>
+                <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:26px">
+                  <sc-for list="{{ richData.heroes }}" as="h" hint-placeholder-count="2">
+                    <div onClick="{{ h.open }}" style="cursor:pointer;display:flex;gap:13px;align-items:center;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:14px;padding:11px">
+                      <div style="width:52px;height:52px;flex:none;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 8px,#1f1710 8px 16px);border:1px solid rgba(240,195,107,.25)"></div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-weight:700;font-size:14px">{{ h.name }}</div>
+                        <div style="font-size:11.5px;color:#8C7B67;line-height:1.4">{{ h.note }}</div>
+                      </div>
+                      <sc-if value="{{ h.clickable }}" hint-placeholder-val="{{ false }}"><span style="color:#E9BE77;font-size:18px">›</span></sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+                </sc-if>
+
+                <sc-if value="{{ richData.hasTraditions }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ richData.traditionsLabel }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+                  <sc-for list="{{ richData.traditions }}" as="t" hint-placeholder-count="2">
+                    <span onClick="{{ t.open }}" style="cursor:pointer;font-size:12px;padding:8px 14px;border-radius:999px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77">{{ t.name }} ›</span>
+                  </sc-for>
+                </div>
+              </sc-if>
+              </sc-if>
+
+              <div style="margin-top:20px;position:relative;height:130px;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(135deg,#241a11 0 12px,#1c140d 12px 24px);border:1px solid rgba(240,195,107,.14)">
+                <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 55%,rgba(240,195,107,.14),transparent 60%)"></div>
+                <span style="position:absolute;top:56px;left:150px;width:12px;height:12px;border-radius:50%;background:#F0C36B;box-shadow:0 0 12px #F0C36B;animation:afbGlow 2s infinite"></span>
+                <div style="position:absolute;bottom:10px;left:12px;font-family:'Space Mono',monospace;font-size:9px;color:#c9b08a;background:rgba(0,0,0,.4);padding:4px 8px;border-radius:6px">📍 Localisation · {{ disc.region }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ FACT DETAIL (À retenir → détail + carrousel) ============ -->
+        <sc-if value="{{ isFactDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 16px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:22px;cursor:pointer;padding:0">‹</button>
+              <div style="flex:1;min-width:0">
+                <div style="font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.08em;color:#E9A15C">{{ factView.parentName }} · {{ factView.region }}</div>
+              </div>
+            </div>
+            <div style="display:inline-block;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#E9A15C;border:1px solid rgba(233,161,92,.4);padding:3px 8px;border-radius:999px;margin-bottom:10px">{{ factView.catLabel }}</div>
+            <div style="font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:#F7E7C8;line-height:1.1;margin-bottom:18px">{{ factView.title }}</div>
+
+            <sc-if value="{{ factHasCarousel }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B">LES CHEFFERIES · EN IMAGES</div>
+                <span style="font-family:'Space Mono',monospace;font-size:10px;color:#8C7B67">{{ factView.pos }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <button onClick="{{ factPrevSlide }}" style="flex:none;width:36px;height:36px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;font-size:18px;cursor:pointer">‹</button>
+                <div onClick="{{ openFactLightbox }}" style="flex:1;cursor:pointer">
+                  <div style="height:180px;border-radius:16px;background:repeating-linear-gradient(135deg,#2a1f14 0 9px,#1f1710 9px 18px);border:1px solid rgba(240,195,107,.18);position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:14px">
+                    <div style="position:absolute;top:10px;left:10px;font-family:'Space Mono',monospace;font-size:7.5px;color:#6f5f4d">PHOTO</div>
+                    <div style="position:absolute;top:10px;right:10px;font-family:'Space Mono',monospace;font-size:8px;color:#1a1109;background:linear-gradient(135deg,#F0C36B,#C98A3D);padding:3px 8px;border-radius:6px;font-weight:700">⛶ Agrandir</div>
+                    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,0) 45%,rgba(15,11,8,.85))"></div>
+                    <div style="position:relative;font-family:'Cinzel',serif;font-size:18px;font-weight:600;color:#F7E7C8;line-height:1.15">{{ factView.cur.name }}</div>
+                  </div>
+                </div>
+                <button onClick="{{ factNextSlide }}" style="flex:none;width:36px;height:36px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;font-size:18px;cursor:pointer">›</button>
+              </div>
+              <p style="font-size:12.5px;color:#8C7B67;margin:0 0 10px;padding:0 46px;text-align:center;line-height:1.5">{{ factView.cur.note }}</p>
+              <div style="display:flex;gap:6px;justify-content:center;margin-bottom:26px">
+                <sc-for list="{{ factView.dots }}" as="d" hint-placeholder-count="3">
+                  <span onClick="{{ d.go }}" style="cursor:pointer;height:7px;border-radius:9px;transition:all .2s;{{ d.style }}"></span>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">EN DÉTAIL</div>
+            <div>
+              <sc-for list="{{ factView.desc }}" as="para" hint-placeholder-count="2">
+                <p style="font-size:14.5px;line-height:1.78;color:#D6C6B2;margin:0 0 14px">{{ para }}</p>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ COUTUME DETAIL (culture & coutumes → détail) ============ -->
+        <sc-if value="{{ isCoutumeDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 16px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:22px;cursor:pointer;padding:0">‹</button>
+              <div style="flex:1;min-width:0"><div style="font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.08em;color:#E9A15C">{{ coutumeView.parentName }} · Culture &amp; coutumes</div></div>
+            </div>
+            <div style="font-family:'Cinzel',serif;font-size:23px;font-weight:700;color:#F7E7C8;line-height:1.15;margin-bottom:18px">{{ coutumeView.title }}</div>
+
+            <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">EN DÉTAIL</div>
+            <div style="margin-bottom:26px">
+              <sc-for list="{{ coutumeView.desc }}" as="para" hint-placeholder-count="2">
+                <p style="font-size:14.5px;line-height:1.78;color:#D6C6B2;margin:0 0 14px">{{ para }}</p>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ coutumeView.gallery.hasGallery }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B">{{ coutumeView.galleryLabel }}</div>
+                <span style="font-family:'Space Mono',monospace;font-size:10px;color:#8C7B67">{{ coutumeView.gallery.pos }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                <button onClick="{{ coutumeView.gallery.prev }}" style="flex:none;width:36px;height:36px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;font-size:18px;cursor:pointer">‹</button>
+                <div onClick="{{ openFactLightbox }}" style="flex:1;cursor:pointer">
+                  <div style="height:180px;border-radius:16px;background:repeating-linear-gradient(135deg,#2a1f14 0 9px,#1f1710 9px 18px);border:1px solid rgba(240,195,107,.18);position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:14px">
+                    <div style="position:absolute;top:10px;left:10px;font-family:'Space Mono',monospace;font-size:7.5px;color:#6f5f4d">PHOTO</div>
+                    <div style="position:absolute;top:10px;right:10px;font-family:'Space Mono',monospace;font-size:8px;color:#1a1109;background:linear-gradient(135deg,#F0C36B,#C98A3D);padding:3px 8px;border-radius:6px;font-weight:700">⛶ Agrandir</div>
+                    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,0) 45%,rgba(15,11,8,.85))"></div>
+                    <div style="position:relative;font-family:'Cinzel',serif;font-size:18px;font-weight:600;color:#F7E7C8;line-height:1.15">{{ coutumeView.gallery.cur.name }}</div>
+                  </div>
+                </div>
+                <button onClick="{{ coutumeView.gallery.next }}" style="flex:none;width:36px;height:36px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;font-size:18px;cursor:pointer">›</button>
+              </div>
+              <div style="display:flex;gap:6px;justify-content:center;margin-bottom:14px">
+                <sc-for list="{{ coutumeView.gallery.dots }}" as="d" hint-placeholder-count="3">
+                  <span onClick="{{ d.go }}" style="cursor:pointer;height:7px;border-radius:9px;transition:all .2s;{{ d.style }}"></span>
+                </sc-for>
+              </div>
+              <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:14px 16px;margin-bottom:26px">
+                <div style="font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:#F7E7C8;margin-bottom:6px">{{ coutumeView.gallery.cur.name }}</div>
+                <sc-for list="{{ coutumeView.gallery.curStory }}" as="para" hint-placeholder-count="2">
+                  <p style="font-size:13.5px;line-height:1.7;color:#D6C6B2;margin:0 0 10px">{{ para }}</p>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ coutumeView.hasPeople }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:4px">{{ coutumeView.peopleLabel }}</div>
+              <p style="font-size:11.5px;color:#8C7B67;margin:0 0 14px">Des fondateurs au souverain actuel — touchez un roi pour lire son histoire.</p>
+              <div class="afb-scroll" style="display:flex;gap:13px;overflow-x:auto;margin:0 -18px 8px;padding:0 18px 6px;scroll-snap-type:x mandatory">
+                <sc-for list="{{ coutumeView.people }}" as="k" hint-placeholder-count="4">
+                  <div onClick="{{ k.open }}" style="cursor:pointer;flex:none;width:150px;scroll-snap-align:center">
+                    <div style="height:170px;border-radius:16px;background:repeating-linear-gradient(135deg,#2a1f14 0 9px,#1f1710 9px 18px);border:1px solid rgba(240,195,107,.18);position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:12px">
+                      <div style="position:absolute;top:10px;left:10px;font-family:'Space Mono',monospace;font-size:7.5px;color:#6f5f4d">PORTRAIT</div>
+                      <div style="position:absolute;top:10px;right:10px;font-family:'Space Mono',monospace;font-size:7.5px;color:#1a1109;background:linear-gradient(135deg,#F0C36B,#C98A3D);padding:2px 7px;border-radius:6px;font-weight:700">{{ k.period }}</div>
+                      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,0) 40%,rgba(15,11,8,.9))"></div>
+                      <div style="position:relative;font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:#F7E7C8;line-height:1.15">{{ k.name }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ============ PERSON DETAIL (histoire d'un roi) ============ -->
+        <sc-if value="{{ isPersonDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:afbFade .4s ease both">
+            <div style="position:relative;height:300px;background:repeating-linear-gradient(135deg,#2c2116 0 12px,#1f160f 12px 24px)">
+              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,.2) 0%,rgba(15,11,8,.1) 40%,#0F0B08 100%)"></div>
+              <button onClick="{{ goBack }}" style="position:absolute;top:12px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(240,195,107,.3);color:#E9BE77;font-size:18px;cursor:pointer;z-index:5">‹</button>
+              <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:9px;color:#c9b08a;background:rgba(0,0,0,.4);padding:4px 9px;border-radius:6px">[ portrait · {{ personView.name }} ]</div>
+              <div style="position:absolute;bottom:16px;left:18px;right:18px">
+                <div style="display:inline-block;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#E9A15C;border:1px solid rgba(233,161,92,.4);padding:3px 8px;border-radius:999px;margin-bottom:8px">{{ personView.period }}</div>
+                <div style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:#F7E7C8;line-height:1.05">{{ personView.name }}</div>
+                <div style="font-size:11.5px;color:#c9b8a4;margin-top:4px;font-family:'Space Mono',monospace">{{ personView.parentName }}</div>
+              </div>
+            </div>
+            <div style="padding:20px 18px 130px">
+              <sc-for list="{{ personView.story }}" as="para" hint-placeholder-count="2">
+                <p style="font-size:14.5px;line-height:1.78;color:#D6C6B2;margin:0 0 14px">{{ para }}</p>
+              </sc-for>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:20px">
+                <button onClick="{{ personPrev }}" style="flex:1;font:inherit;font-weight:600;font-size:12.5px;padding:12px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;cursor:pointer">‹ Roi précédent</button>
+                <span style="flex:none;font-family:'Space Mono',monospace;font-size:11px;color:#8C7B67">{{ personView.pos }}</span>
+                <button onClick="{{ personNext }}" style="flex:1;font:inherit;font-weight:600;font-size:12.5px;padding:12px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;cursor:pointer">Roi suivant ›</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ VILLAGE DETAIL (villages & lieux → détail + galerie) ============ -->
+        <sc-if value="{{ isVillageDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:afbFade .4s ease both">
+            <div style="position:relative;height:280px;background:repeating-linear-gradient(135deg,#2c2116 0 12px,#1f160f 12px 24px)">
+              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,.15) 0%,rgba(15,11,8,.1) 40%,#0F0B08 100%)"></div>
+              <button onClick="{{ goBack }}" style="position:absolute;top:12px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(240,195,107,.3);color:#E9BE77;font-size:18px;cursor:pointer;z-index:5">‹</button>
+              <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:9px;color:#c9b08a;background:rgba(0,0,0,.4);padding:4px 9px;border-radius:6px">[ galerie · {{ villageView.name }} ]</div>
+              <div style="position:absolute;bottom:16px;left:18px;right:18px">
+                <div style="display:inline-block;font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#E9A15C;border:1px solid rgba(233,161,92,.4);padding:3px 8px;border-radius:999px;margin-bottom:8px">VILLAGE · {{ villageView.parentName }}</div>
+                <div style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:#F7E7C8;line-height:1.05">{{ villageView.name }}</div>
+                <div style="font-size:11.5px;color:#c9b8a4;margin-top:4px;font-family:'Space Mono',monospace">📍 {{ villageView.region }}</div>
+              </div>
+            </div>
+            <div style="padding:20px 18px 130px">
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">EN DÉTAIL</div>
+              <div style="margin-bottom:26px">
+                <sc-for list="{{ villageView.desc }}" as="para" hint-placeholder-count="2">
+                  <p style="font-size:14.5px;line-height:1.78;color:#D6C6B2;margin:0 0 14px">{{ para }}</p>
+                </sc-for>
+              </div>
+
+              <sc-if value="{{ villageView.gallery.hasGallery }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                  <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B">{{ villageView.galleryLabel }}</div>
+                  <span style="font-family:'Space Mono',monospace;font-size:10px;color:#8C7B67">{{ villageView.gallery.pos }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                  <button onClick="{{ villageView.gallery.prev }}" style="flex:none;width:36px;height:36px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;font-size:18px;cursor:pointer">‹</button>
+                  <div onClick="{{ openFactLightbox }}" style="flex:1;cursor:pointer">
+                    <div style="height:190px;border-radius:16px;background:repeating-linear-gradient(135deg,#2a1f14 0 9px,#1f1710 9px 18px);border:1px solid rgba(240,195,107,.18);position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:14px">
+                      <div style="position:absolute;top:10px;left:10px;font-family:'Space Mono',monospace;font-size:7.5px;color:#6f5f4d">PHOTO</div>
+                      <div style="position:absolute;top:10px;right:10px;font-family:'Space Mono',monospace;font-size:8px;color:#1a1109;background:linear-gradient(135deg,#F0C36B,#C98A3D);padding:3px 8px;border-radius:6px;font-weight:700">⛶ Agrandir</div>
+                      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,0) 45%,rgba(15,11,8,.85))"></div>
+                      <div style="position:relative;font-family:'Cinzel',serif;font-size:18px;font-weight:600;color:#F7E7C8;line-height:1.15">{{ villageView.gallery.cur.name }}</div>
+                    </div>
+                  </div>
+                  <button onClick="{{ villageView.gallery.next }}" style="flex:none;width:36px;height:36px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;font-size:18px;cursor:pointer">›</button>
+                </div>
+                <div style="display:flex;gap:6px;justify-content:center;margin-bottom:14px">
+                  <sc-for list="{{ villageView.gallery.dots }}" as="d" hint-placeholder-count="3">
+                    <span onClick="{{ d.go }}" style="cursor:pointer;height:7px;border-radius:9px;transition:all .2s;{{ d.style }}"></span>
+                  </sc-for>
+                </div>
+                <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:14px 16px">
+                  <div style="font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:#F7E7C8;margin-bottom:6px">{{ villageView.gallery.cur.name }}</div>
+                  <sc-for list="{{ villageView.gallery.curStory }}" as="para" hint-placeholder-count="2">
+                    <p style="font-size:13.5px;line-height:1.7;color:#D6C6B2;margin:0 0 10px">{{ para }}</p>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ COUNTRY HUB (tout le contenu d'un pays) ============ -->
+        <sc-if value="{{ isCountryHub }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 6px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">‹</button>
+              <div style="flex:1">
+                <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.14em;color:#E9A15C">EXPLORER LE PAYS</div>
+                <div style="font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:#F7E7C8;line-height:1.1">{{ countryHub.name }}</div>
+              </div>
+            </div>
+            <p style="font-size:12.5px;color:#9A8870;margin:0 0 22px;padding-left:2px">Héros, patrimoine et mythologie de {{ countryHub.name }}.</p>
+
+            <sc-if value="{{ countryHub.hasHeroes }}" hint-placeholder-val="{{ true }}">
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">HÉROS &amp; HISTOIRE</div>
+              <div class="afb-scroll" style="display:flex;gap:13px;overflow-x:auto;margin:0 -18px 24px;padding:0 18px">
+                <sc-for list="{{ countryHub.heroes }}" as="h" hint-placeholder-count="2">
+                  <div onClick="{{ h.open }}" style="cursor:pointer;flex:none;width:135px">
+                    <div style="height:170px;border-radius:16px;background:repeating-linear-gradient(135deg,#2a1f14 0 9px,#1f1710 9px 18px);border:1px solid rgba(240,195,107,.16);position:relative;display:flex;align-items:flex-end;padding:11px;overflow:hidden">
+                      {{ h.photoCover }}<sc-if value="{{ h.hasPhoto }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,0) 40%,rgba(15,11,8,.9))"></span></sc-if>
+                      <div style="position:relative;font-family:'Cinzel',serif;font-size:14px;color:#F7E7C8;line-height:1.15;font-weight:600">{{ h.name }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ countryHub.hasDiscovery }}" hint-placeholder-val="{{ true }}">
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">CULTURE &amp; PATRIMOINE</div>
+              <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+                <sc-for list="{{ countryHub.discovery }}" as="d" hint-placeholder-count="3">
+                  <div onClick="{{ d.open }}" style="cursor:pointer;display:flex;gap:13px;align-items:center;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:16px;padding:11px">
+                    <div style="width:56px;height:56px;flex:none;border-radius:12px;background:repeating-linear-gradient(135deg,#2a1f14 0 8px,#1f1710 8px 16px);border:1px solid rgba(240,195,107,.2);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:7px;color:#6f5f4d">PHOTO</div>
+                    <div style="flex:1;min-width:0">
+                      <div style="font-family:'Space Mono',monospace;font-size:8.5px;color:#E9A15C;letter-spacing:.06em">{{ d.catLabel }}</div>
+                      <div style="font-weight:600;font-size:14px;margin-top:2px">{{ d.name }}</div>
+                    </div>
+                    <span style="color:#E9BE77;font-size:18px">›</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ countryHub.hasMythes }}" hint-placeholder-val="{{ true }}">
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">MYTHOLOGIE</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ countryHub.mythes }}" as="m" hint-placeholder-count="2">
+                  <div onClick="{{ m.open }}" style="cursor:pointer;position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(240,195,107,.16);background:#1A130D;padding:14px">
+                    <div style="font-family:'Space Mono',monospace;font-size:8.5px;color:#E9A15C;letter-spacing:.06em">{{ m.peuple }}</div>
+                    <div style="font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:#F7E7C8;margin-top:4px">{{ m.title }}</div>
+                    <div style="font-size:11.5px;color:#8C7B67;margin-top:3px">{{ m.summary }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ countryHub.empty }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:30px 20px;color:#8C7B67;font-size:13px">Contenu à venir pour {{ countryHub.name }}.</div>
+            </sc-if>
+          </div>
+        </sc-if>
+

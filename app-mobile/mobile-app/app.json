@@ -29,7 +29,13 @@
       "expo-splash-screen",
       "expo-audio",
       "expo-video",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "AFROBACK a besoin d'accéder à tes photos pour ajouter une image à un post, un produit ou ton profil."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

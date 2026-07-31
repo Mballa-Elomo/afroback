@@ -49,6 +49,16 @@ export const colors = {
 
   headerScrim: 'rgba(12, 9, 6, 0.94)',
   tabBarBg: 'rgba(12, 9, 6, 0.92)',
+
+  // Ajoutés le 2026-07-30 pour les piliers Découverte/Communauté, extraits
+  // verbatim des sections DISCOVERY/COMMUNITY de AFROBACK Mobile.dc.html
+  // (voir app-mobile/design-reference-*.dc.excerpt.html).
+  surfaceCard: '#1A130D',
+  surfaceCardDeep: '#150e09',
+  inputBg: '#170f0a',
+  overlayCaption: '#c9b08a',
+  placeholderLabel: '#6f5f4d',
+  reportColor: '#B06A4A',
 } as const;
 
 export const typography = {

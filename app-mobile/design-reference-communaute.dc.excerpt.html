@@ -1,0 +1,210 @@
+        <!-- ============ COMMUNITY ============ -->
+        <sc-if value="{{ isCommunity }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:6px 0 14px">
+              <div style="font-family:'Cinzel',serif;font-size:19px;font-weight:600">{{ tCommunityT }}</div>
+              <button onClick="{{ goPremiumSpace }}" style="font:inherit;font-size:11.5px;font-weight:700;padding:8px 13px;border-radius:999px;border:1px solid rgba(240,195,107,.4);background:rgba(240,195,107,.08);color:#E9BE77;cursor:pointer">✦ {{ tExclusive }}</button>
+            </div>
+            <div class="afb-scroll" style="display:flex;gap:8px;overflow-x:auto;margin:0 -18px 12px;padding:0 18px">
+              <sc-for list="{{ comTabs }}" as="t" hint-placeholder-count="5">
+                <span onClick="{{ t.pick }}" style="flex:none;cursor:pointer;font-size:11.5px;padding:7px 13px;border-radius:999px;white-space:nowrap;{{ t.style }}">{{ t.label }}</span>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:14px;margin-bottom:16px;font-size:11.5px">
+              <span onClick="{{ sortRecent }}" style="cursor:pointer;{{ sortRecentStyle }}">{{ tRecent }}</span>
+              <span onClick="{{ sortPopular }}" style="cursor:pointer;{{ sortPopularStyle }}">{{ tPopular }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ posts }}" as="p" hint-placeholder-count="3">
+                <div style="background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:16px;padding:14px">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <div onClick="{{ p.openAuthor }}" style="cursor:pointer;width:38px;height:38px;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 7px,#1f1710 7px 14px);border:1px solid rgba(240,195,107,.25)"></div>
+                    <div style="flex:1;min-width:0">
+                      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                        <span onClick="{{ p.openAuthor }}" style="cursor:pointer;font-weight:700;font-size:13px">{{ p.author }}</span>
+                        <sc-for list="{{ p.badges }}" as="b" hint-placeholder-count="1"><span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 5px;border-radius:5px;font-weight:700;{{ b.style }}">{{ b.label }}</span></sc-for>
+                      </div>
+                      <div style="font-size:10.5px;color:#8C7B67">{{ p.place }} · {{ p.time }}</div>
+                    </div>
+                    <span style="display:inline-flex;align-items:center;gap:5px;font-family:'Space Mono',monospace;font-size:8px;color:{{ p.pillarColor }};border:1px solid {{ p.pillarColor }};padding:2px 7px;border-radius:999px">{{ p.pillarLabel }}</span>
+                  </div>
+                  <p onClick="{{ p.open }}" style="cursor:pointer;font-size:13.5px;line-height:1.6;color:#D6C6B2;margin:0 0 12px">{{ p.text }}</p>
+                  <sc-if value="{{ p.hasPhoto }}" hint-placeholder-val="{{ false }}"><div style="height:150px;border-radius:12px;background:repeating-linear-gradient(135deg,#2a1f14 0 9px,#1f1710 9px 18px);border:1px solid rgba(240,195,107,.14);margin-bottom:12px"></div></sc-if>
+                  <sc-if value="{{ p.hasLink }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ p.linkGo }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;background:#150e09;border:1px solid rgba(240,195,107,.16);border-radius:12px;padding:10px;margin-bottom:12px">
+                      <div style="width:40px;height:40px;flex:none;border-radius:8px;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.2)"></div>
+                      <div style="flex:1;min-width:0"><div style="font-family:'Space Mono',monospace;font-size:8px;color:#E9A15C;letter-spacing:.06em">{{ p.link.kind }}</div><div style="font-weight:600;font-size:12.5px">{{ p.link.name }}</div></div>
+                      <span style="color:#E9BE77">›</span>
+                    </div>
+                  </sc-if>
+                  <div style="display:flex;gap:20px;font-size:12px;color:#8C7B67">
+                    <span onClick="{{ p.open }}" style="cursor:pointer">♥ {{ p.likes }}</span>
+                    <span onClick="{{ p.open }}" style="cursor:pointer">💬 {{ p.comments }}</span>
+                    <span style="cursor:pointer">↗ {{ tShare }}</span>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ comEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="text-align:center;padding:50px 20px;color:#8C7B67;font-size:13px">{{ tComEmpty }}</div>
+              </sc-if>
+            </div>
+          </div>
+          <div onClick="{{ goCreatePost }}" style="position:absolute;right:20px;bottom:90px;z-index:22;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:300;box-shadow:0 10px 26px rgba(0,0,0,.5);cursor:pointer">+</div>
+        </sc-if>
+
+        <!-- ============ POST DETAIL ============ -->
+        <sc-if value="{{ isPostDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 16px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">‹</button>
+              <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:600">{{ tPost }}</div>
+              <div style="flex:1"></div>
+              <span onClick="{{ goReport }}" style="cursor:pointer;font-size:11.5px;color:#B06A4A">⚑ {{ tReport }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+              <div onClick="{{ curPost.openAuthor }}" style="cursor:pointer;width:44px;height:44px;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 7px,#1f1710 7px 14px);border:1px solid rgba(240,195,107,.25)"></div>
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:700;font-size:14px">{{ curPost.author }}</span><sc-for list="{{ curPost.badges }}" as="b" hint-placeholder-count="1"><span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 5px;border-radius:5px;font-weight:700;{{ b.style }}">{{ b.label }}</span></sc-for></div>
+                <div style="font-size:11px;color:#8C7B67">{{ curPost.place }} · {{ curPost.time }}</div>
+              </div>
+            </div>
+            <p style="font-size:15px;line-height:1.7;color:#D6C6B2;margin:0 0 14px">{{ curPost.textEl }}</p>
+            <sc-if value="{{ curPost.hasPhoto }}" hint-placeholder-val="{{ false }}"><div style="height:200px;border-radius:14px;background:repeating-linear-gradient(135deg,#2a1f14 0 10px,#1f1710 10px 20px);border:1px solid rgba(240,195,107,.14);margin-bottom:14px"></div></sc-if>
+            <sc-if value="{{ curPost.hasLink }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ curPost.linkGo }}" style="display:flex;align-items:center;gap:10px;background:#150e09;border:1px solid rgba(240,195,107,.16);border-radius:12px;padding:12px;margin-bottom:18px;cursor:pointer">
+                <div style="width:46px;height:46px;flex:none;border-radius:10px;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.2)"></div>
+                <div style="flex:1"><div style="font-family:'Space Mono',monospace;font-size:8px;color:#E9A15C;letter-spacing:.06em">{{ curPost.link.kind }}</div><div style="font-weight:600;font-size:13.5px">{{ curPost.link.name }}</div></div>
+                <span style="color:#E9BE77">›</span>
+              </div>
+            </sc-if>
+            <div style="display:flex;gap:24px;font-size:13px;color:#c9b8a4;padding:12px 0;border-top:1px solid rgba(240,195,107,.1);border-bottom:1px solid rgba(240,195,107,.1);margin-bottom:18px">
+              <span style="cursor:pointer">♥ {{ curPost.likes }}</span>
+              <span>💬 {{ curPost.comments }}</span>
+              <span style="cursor:pointer">↗ {{ tShare }}</span>
+            </div>
+            <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ tComments }}</div>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px">
+              <sc-for list="{{ postComments }}" as="c" hint-placeholder-count="2">
+                <div style="display:flex;gap:10px">
+                  <div style="width:32px;height:32px;flex:none;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.25)"></div>
+                  <div style="flex:1;background:#150e09;border:1px solid rgba(240,195,107,.1);border-radius:12px;padding:10px 12px">
+                    <div style="font-weight:600;font-size:12px;margin-bottom:3px">{{ c.author }}</div>
+                    <p style="font-size:12.5px;line-height:1.5;color:#c9b8a4;margin:0">{{ c.textEl }}</p>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <input value="{{ commentDraft }}" onInput="{{ onCommentDraft }}" placeholder="{{ tAddComment }}" style="flex:1;font:inherit;font-size:13px;background:#170f0a;border:1px solid rgba(240,195,107,.16);border-radius:12px;padding:12px 14px;color:#EDE3D4;outline:none">
+              <button onClick="{{ sendComment }}" style="font:inherit;font-weight:700;font-size:13px;padding:12px 16px;border-radius:12px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">{{ tSend }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ CREATE POST ============ -->
+        <sc-if value="{{ isCreatePost }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 40px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 18px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">✕</button>
+              <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:600">{{ tCreatePost }}</div>
+              <div style="flex:1"></div>
+              <button onClick="{{ goCommunity }}" style="font:inherit;font-weight:700;font-size:13px;padding:9px 18px;border-radius:12px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">{{ tPublish }}</button>
+            </div>
+            <textarea placeholder="{{ tPostPh }}" style="width:100%;min-height:120px;font:inherit;font-size:14.5px;line-height:1.6;background:#170f0a;border:1px solid rgba(240,195,107,.16);border-radius:14px;padding:14px;color:#EDE3D4;outline:none;resize:none;box-sizing:border-box;margin-bottom:14px"></textarea>
+            <div style="display:flex;gap:10px;margin-bottom:18px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:#1A130D;border:1px dashed rgba(240,195,107,.3);border-radius:12px;padding:16px;cursor:pointer"><span style="font-size:22px">📷</span><span style="font-size:11px;color:#8C7B67">{{ tAddPhoto }}</span></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;background:#1A130D;border:1px dashed rgba(240,195,107,.3);border-radius:12px;padding:16px;cursor:pointer"><span style="font-size:22px">🔗</span><span style="font-size:11px;color:#8C7B67">{{ tLinkContent }}</span></div>
+            </div>
+            <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:10px">{{ tLinkRecent }}</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+              <sc-for list="{{ linkables }}" as="l" hint-placeholder-count="3">
+                <div style="cursor:pointer;display:flex;align-items:center;gap:10px;background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:10px;padding:10px 12px">
+                  <div style="width:34px;height:34px;flex:none;border-radius:8px;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.2)"></div>
+                  <div style="flex:1"><div style="font-family:'Space Mono',monospace;font-size:8px;color:#E9A15C">{{ l.kind }}</div><div style="font-size:12.5px;font-weight:600">{{ l.name }}</div></div>
+                  <span style="width:16px;height:16px;border-radius:5px;border:1.5px solid rgba(240,195,107,.3)"></span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:8px;background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:12px;padding:12px 14px">
+              <span style="color:#C99A5B">ℹ</span>
+              <p style="font-size:11.5px;line-height:1.5;color:#8C7B67;margin:0">{{ tCharterNote }} <span onClick="{{ goCharter }}" style="cursor:pointer;color:#E9BE77;text-decoration:underline">{{ tCharter }}</span>.</p>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ MEMBER PROFILE ============ -->
+        <sc-if value="{{ isMemberProfile }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 18px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">‹</button>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:20px">
+              <div style="width:80px;height:80px;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 8px,#1f1710 8px 16px);border:2px solid rgba(240,195,107,.4);margin-bottom:12px"></div>
+              <div style="display:flex;align-items:center;gap:6px"><span style="font-family:'Cinzel',serif;font-size:20px;font-weight:600">{{ curPost.author }}</span><sc-for list="{{ curPost.badges }}" as="b" hint-placeholder-count="1"><span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:5px;font-weight:700;{{ b.style }}">{{ b.label }}</span></sc-for></div>
+              <div style="font-size:12px;color:#8C7B67;margin-top:4px">📍 {{ curPost.place }}</div>
+              <p style="font-size:13px;color:#c9b8a4;margin:10px 0 0;max-width:260px;line-height:1.55">{{ tMemberBio }}</p>
+              <button onClick="{{ toggleFollow }}" style="margin-top:16px;font:inherit;font-weight:700;font-size:13px;padding:11px 30px;border-radius:12px;border:none;{{ followStyle }};cursor:pointer">{{ followLabel }}</button>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:22px">
+              <div style="flex:1;background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:12px;padding:12px;text-align:center"><div style="font-family:'Cinzel',serif;font-size:16px;color:#E9BE77">🔥 15</div><div style="font-size:9.5px;color:#8C7B67">{{ tStreakDays }}</div></div>
+              <div style="flex:1;background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:12px;padding:12px;text-align:center"><div style="font-family:'Cinzel',serif;font-size:16px;color:#E9BE77">32</div><div style="font-size:9.5px;color:#8C7B67">{{ tStoriesRead }}</div></div>
+              <div style="flex:1;background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:12px;padding:12px;text-align:center"><div style="font-family:'Cinzel',serif;font-size:16px;color:#E9BE77">7</div><div style="font-size:9.5px;color:#8C7B67">{{ tBadgesLabel }}</div></div>
+            </div>
+            <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ tRecentPosts }}</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ posts }}" as="p" hint-placeholder-count="2">
+                <div onClick="{{ p.open }}" style="cursor:pointer;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:14px;padding:12px">
+                  <p style="font-size:13px;line-height:1.5;color:#D6C6B2;margin:0">{{ p.text }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ REPORT ============ -->
+        <sc-if value="{{ isReport }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 40px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 18px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">‹</button>
+              <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:600">{{ tReportTitle }}</div>
+            </div>
+            <sc-if value="{{ reportSent }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:50px 20px">
+                <div style="font-size:48px">🛡️</div>
+                <div style="font-family:'Cinzel',serif;font-size:19px;font-weight:700;color:#F7E7C8;margin:14px 0 6px">{{ tReportThanks }}</div>
+                <p style="font-size:13px;color:#9A8870;margin:0 0 22px">{{ tReportSub }}</p>
+                <button onClick="{{ goCommunity }}" style="font:inherit;font-weight:700;font-size:13px;padding:12px 26px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;cursor:pointer">{{ tBackToFeed }}</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ reportForm }}" hint-placeholder-val="{{ true }}">
+              <p style="font-size:13px;color:#9A8870;margin:0 0 18px">{{ tReportIntro }}</p>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">
+                <sc-for list="{{ reportReasons }}" as="r" hint-placeholder-count="4">
+                  <div onClick="{{ r.pick }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;{{ r.style }}">
+                    <span style="{{ r.radio }}"></span><span style="font-size:13.5px">{{ r.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <button onClick="{{ sendReport }}" style="width:100%;font:inherit;font-weight:700;font-size:14px;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">{{ tSendReport }}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ============ CHARTER ============ -->
+        <sc-if value="{{ isCharter }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 40px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 18px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">‹</button>
+              <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:600">{{ tCharterTitle }}</div>
+            </div>
+            <p style="font-size:14px;line-height:1.7;color:#D6C6B2;margin:0 0 20px">{{ tCharterIntro }}</p>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ charterRules }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex;gap:12px;align-items:flex-start;background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:12px;padding:14px">
+                  <span style="font-size:18px">{{ r.icon }}</span>
+                  <div><div style="font-weight:600;font-size:13.5px;color:#F7E7C8;margin-bottom:3px">{{ r.title }}</div><div style="font-size:12.5px;color:#8C7B67;line-height:1.5">{{ r.text }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>

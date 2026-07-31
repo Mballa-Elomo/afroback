@@ -4,11 +4,12 @@ import { colors } from '../../src/theme/tokens';
 
 /**
  * Barre d'onglets racine de l'app (une fois connecté et l'assistant
- * post-inscription terminé) — 5 onglets fidèles à la maquette. Seul
- * "Accueil" a un vrai contenu construit sur les données ; Découverte,
- * Marché et Commu. affichent un état "bientôt disponible" honnête (ces
- * piliers du produit n'ont aucun contenu produit à ce jour, voir
- * context/AFROBACK.md). "Profil" affiche les vraies infos du compte.
+ * post-inscription terminé) — 5 onglets fidèles à la maquette.
+ * Mise à jour 2026-07-31 : les 5 onglets ont désormais un vrai contenu
+ * construit sur les données Supabase (Accueil, Découverte, Marché,
+ * Communauté, Profil). "Marché" a un catalogue vide au lancement (aucun
+ * vendeur/produit réel à ce jour) mais une infrastructure complète — voir
+ * context/AFROBACK.md et app-mobile/data-model-marketplace.md.
  */
 export default function TabsLayout() {
   return (

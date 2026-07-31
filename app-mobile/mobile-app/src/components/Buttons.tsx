@@ -6,14 +6,17 @@ export function GoldButton({
   label,
   onPress,
   muted = false,
+  disabled = false,
 }: {
   label: string;
   onPress: () => void;
   /** État "média à produire" : bouton visible mais visuellement atténué, jamais retiré. */
   muted?: boolean;
+  /** Bloque l'appui — utilisé pour empêcher une double soumission (ex. pendant un enregistrement réseau). */
+  disabled?: boolean;
 }) {
   return (
-    <Pressable onPress={onPress} style={styles.wrapper}>
+    <Pressable onPress={onPress} disabled={disabled} style={[styles.wrapper, disabled && styles.wrapperDisabled]}>
       <LinearGradient
         colors={muted ? ['#4a4238', '#3a332b'] : [...colors.ctaGradient]}
         start={{ x: 0, y: 0 }}
@@ -47,6 +50,9 @@ const styles = StyleSheet.create({
   wrapper: {
     borderRadius: radii.button,
     overflow: 'hidden',
+  },
+  wrapperDisabled: {
+    opacity: 0.6,
   },
   gradient: {
     paddingVertical: 12,

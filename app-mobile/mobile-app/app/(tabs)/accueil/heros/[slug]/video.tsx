@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +9,7 @@ import { HeroPlaceholder } from '../../../../../src/components/HeroVisual';
 import { StoryboardSlideshow } from '../../../../../src/components/StoryboardSlideshow';
 import { useHero, useRelatedHeroes } from '../../../../../src/data/useHeroesData';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
+import type { Heros } from '../../../../../src/data/types';
 
 /**
  * Lecteur vidéo plein écran. Dès qu'une URL de documentaire existe
@@ -27,6 +29,11 @@ export default function LecteurVideoScreen() {
   const herosState = useHero(slug);
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
   const related = useRelatedHeroes(heros);
+  const [chapterIdx, setChapterIdx] = useState(0);
+
+  useEffect(() => {
+    setChapterIdx(0);
+  }, [slug]);
 
   if (herosState.status === 'loading') {
     return (
@@ -46,6 +53,22 @@ export default function LecteurVideoScreen() {
 
   if (!heros) return <Redirect href="/accueil" />;
 
+  // Deux modèles coexistent : `video_url` (documentaire complet, un seul
+  // fichier — ex. Martin Paul Samba) et `video_chapitres` (documentaire
+  // tourné chapitre par chapitre, aligné sur les 4 chapitres du récit/
+  // storyboard — ex. Reine Nzinga, chapitre 1 seul tourné à ce jour). Un
+  // héros n'a jamais les deux à la fois.
+  const videoChapitres = heros.video_chapitres ?? [];
+  const hasChapterVideos = videoChapitres.length > 0;
+  const storyboardChapitres = heros.chapitres_storyboard;
+  const safeChapterIdx = Math.min(chapterIdx, Math.max(storyboardChapitres.length - 1, 0));
+  const selectedStoryboard = storyboardChapitres[safeChapterIdx] as (typeof storyboardChapitres)[number] | undefined;
+  const selectedVideoChapitre = hasChapterVideos
+    ? videoChapitres.find((c) => c.numero === selectedStoryboard?.numero)
+    : undefined;
+  const hasLegacyVideo = Boolean(heros.video_url) && !hasChapterVideos;
+  const showingRealVideo = hasLegacyVideo || Boolean(selectedVideoChapitre);
+
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.topBar}>
@@ -57,17 +80,22 @@ export default function LecteurVideoScreen() {
             {heros.nom_affiche}
           </Text>
           <Text style={styles.topSub}>
-            {heros.video_url ? 'DOCUMENTAIRE' : 'APERÇU STORYBOARD'} · {heros.region.toUpperCase()}
+            {showingRealVideo ? 'DOCUMENTAIRE' : 'APERÇU STORYBOARD'}
+            {hasChapterVideos ? ` · CHAP. ${selectedStoryboard?.numero ?? 1}/${storyboardChapitres.length}` : ''}
+            {' · '}
+            {heros.region.toUpperCase()}
           </Text>
         </View>
         <View style={styles.topBtn} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {heros.video_url ? (
-          <VideoPlayerArea uri={heros.video_url} />
-        ) : heros.chapitres_storyboard.some((c) => c.planches.length > 0) ? (
-          <StoryboardSlideshow chapitres={heros.chapitres_storyboard} />
+        {hasLegacyVideo ? (
+          <VideoPlayerArea uri={heros.video_url as string} />
+        ) : selectedVideoChapitre ? (
+          <VideoChapitrePlayerArea chapitre={selectedVideoChapitre} />
+        ) : selectedStoryboard && selectedStoryboard.planches.length > 0 ? (
+          <StoryboardSlideshow chapitres={[selectedStoryboard]} />
         ) : (
           <View style={styles.videoArea}>
             <View style={styles.playCircle}>
@@ -77,17 +105,37 @@ export default function LecteurVideoScreen() {
           </View>
         )}
 
+        {hasChapterVideos && storyboardChapitres.length > 1 && (
+          <View style={styles.chapterTabs}>
+            {storyboardChapitres.map((c, i) => {
+              const tourne = videoChapitres.some((vc) => vc.numero === c.numero);
+              return (
+                <Pressable
+                  key={c.numero}
+                  onPress={() => setChapterIdx(i)}
+                  style={[styles.chapterTab, i === safeChapterIdx && styles.chapterTabActive]}
+                >
+                  <Text style={[styles.chapterTabLabel, i === safeChapterIdx && styles.chapterTabLabelActive]}>
+                    {tourne ? '▶' : '○'} {c.numero}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+
         <View style={styles.body}>
           <Text style={styles.title}>{heros.nom_affiche} — l'histoire en vidéo</Text>
           <Text style={styles.meta}>
             DOCUMENTAIRE · {heros.region} · {heros.annee_naissance_indicative ?? heros.epoque}
           </Text>
 
-          {!heros.video_url && (
+          {!showingRealVideo && (
             <View style={styles.missingBanner}>
               <Text style={styles.missingText}>
-                🎬 Le documentaire n'est pas encore tourné — voici le storyboard complet en avant-goût, planche par
-                planche.
+                {hasChapterVideos
+                  ? `🎬 Ce chapitre n'est pas encore tourné — voici son storyboard en avant-goût, planche par planche. ${videoChapitres.length}/${storyboardChapitres.length} chapitre${videoChapitres.length > 1 ? 's' : ''} déjà tourné${videoChapitres.length > 1 ? 's' : ''}.`
+                  : "🎬 Le documentaire n'est pas encore tourné — voici le storyboard complet en avant-goût, planche par planche."}
               </Text>
             </View>
           )}
@@ -139,6 +187,42 @@ function VideoPlayerArea({ uri }: { uri: string }) {
       allowsPictureInPicture
       nativeControls
     />
+  );
+}
+
+/**
+ * Lecteur d'un chapitre vidéo réellement tourné, avec bascule FR/EN quand
+ * les deux pistes existent (même bande, langue de narration différente —
+ * voir `AudioPlayerBlock` dans audio.tsx pour le même principe). `key={uri}`
+ * force le remontage de `VideoPlayerArea` au changement de langue : `useVideoPlayer`
+ * ne recharge pas sa source tout seul si l'URL change en prop.
+ */
+function VideoChapitrePlayerArea({ chapitre }: { chapitre: Heros['video_chapitres'][number] }) {
+  const hasBoth = Boolean(chapitre.video_url_fr && chapitre.video_url_en);
+  const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const uri = (lang === 'fr' ? chapitre.video_url_fr : chapitre.video_url_en)
+    ?? chapitre.video_url_fr
+    ?? chapitre.video_url_en
+    ?? '';
+
+  useEffect(() => {
+    setLang('fr');
+  }, [chapitre.numero]);
+
+  return (
+    <View>
+      <VideoPlayerArea key={uri} uri={uri} />
+      {hasBoth && (
+        <View style={styles.videoLangToggle}>
+          <Pressable onPress={() => setLang('fr')} style={[styles.videoLangPill, lang === 'fr' && styles.videoLangPillActive]}>
+            <Text style={[styles.videoLangLabel, lang === 'fr' && styles.videoLangLabelActive]}>FR</Text>
+          </Pressable>
+          <Pressable onPress={() => setLang('en')} style={[styles.videoLangPill, lang === 'en' && styles.videoLangPillActive]}>
+            <Text style={[styles.videoLangLabel, lang === 'en' && styles.videoLangLabelActive]}>EN</Text>
+          </Pressable>
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -205,6 +289,59 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.55)',
     textAlign: 'center',
     paddingHorizontal: 30,
+  },
+  videoLangToggle: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    backgroundColor: colors.backgroundVideo,
+  },
+  videoLangPill: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    paddingVertical: 4,
+    paddingHorizontal: 14,
+  },
+  videoLangPillActive: {
+    backgroundColor: colors.accentGoldSoft,
+    borderColor: colors.accentGoldSoft,
+  },
+  videoLangLabel: {
+    fontFamily: typography.monoBold,
+    fontSize: 11,
+    letterSpacing: 1,
+    color: 'rgba(255,255,255,0.6)',
+  },
+  videoLangLabelActive: {
+    color: colors.ctaTextOnGold,
+  },
+  chapterTabs: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    paddingTop: 14,
+    paddingHorizontal: 20,
+  },
+  chapterTab: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.borderHairline,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  chapterTabActive: {
+    borderColor: colors.accentGold,
+    backgroundColor: 'rgba(240,195,107,0.12)',
+  },
+  chapterTabLabel: {
+    fontFamily: typography.monoBold,
+    fontSize: 11,
+    color: colors.textMuted,
+  },
+  chapterTabLabelActive: {
+    color: colors.accentGold,
   },
   body: {
     padding: 20,

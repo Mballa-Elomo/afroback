@@ -74,6 +74,7 @@ create table if not exists public.heros (
   narration_audio_fr_url text,
   narration_audio_en_url text,
   video_url text,
+  video_chapitres jsonb not null default '[]',
   avertissement_lecture text,
   ordre_affichage integer not null default 0,
   created_at timestamptz not null default now(),
@@ -86,6 +87,11 @@ create table if not exists public.heros (
 -- touche pas une table déjà existante en production.
 alter table public.heros add column if not exists recit_chapitres_fr jsonb not null default '[]';
 alter table public.heros add column if not exists recit_chapitres_en jsonb;
+
+-- Colonne ajoutée le 2026-07-31 pour les chapitres du documentaire
+-- réellement tourné (distincts de chapitres_storyboard, l'avant-goût
+-- dessiné) — voir app/(tabs)/accueil/heros/[slug]/video.tsx.
+alter table public.heros add column if not exists video_chapitres jsonb not null default '[]';
 
 alter table public.heros enable row level security;
 
@@ -132,6 +138,7 @@ const inserts = heroes
       'narration_audio_fr_url',
       'narration_audio_en_url',
       'video_url',
+      'video_chapitres',
       'avertissement_lecture',
       'ordre_affichage',
     ];
@@ -165,6 +172,7 @@ const inserts = heroes
       sqlString(h.narration_audio_fr_url),
       sqlString(h.narration_audio_en_url),
       sqlString(h.video_url),
+      sqlJsonb(h.video_chapitres),
       sqlString(h.avertissement_lecture),
       String(h.ordre_affichage),
     ];

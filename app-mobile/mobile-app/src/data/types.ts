@@ -73,6 +73,21 @@ export interface RecitChapitre {
   texte: string;
 }
 
+/**
+ * Chapitre du documentaire vidéo réellement tourné/monté — distinct de
+ * `chapitres_storyboard` (l'avant-goût dessiné, toujours disponible pour les
+ * 9 héros). Un héros peut avoir 1 à 4 chapitres vidéo produits sans avoir
+ * les 4 : `video_chapitres` ne contient que ceux qui existent réellement.
+ * Une seule URL par langue (pas de doublon de texte à traduire comme pour
+ * `RecitChapitre`) : la vidéo est la même bande, seule la piste diffère.
+ */
+export interface VideoChapitre {
+  numero: number;
+  titre_chapitre: string;
+  video_url_fr?: string | null;
+  video_url_en?: string | null;
+}
+
 export interface Heros {
   id: string;
   slug: string;
@@ -104,6 +119,7 @@ export interface Heros {
   narration_audio_fr_url?: string | null;
   narration_audio_en_url?: string | null;
   video_url?: string | null;
+  video_chapitres: VideoChapitre[];
   avertissement_lecture?: string | null;
   ordre_affichage: number;
 }

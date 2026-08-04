@@ -37,11 +37,12 @@ const heroes = HEROES_CURATED.map((curated) => {
     chapitres_storyboard: gen.chapitres_storyboard,
     statut_recit_texte: 'pret',
     statut_narration_audio: media.narration_audio_fr_url || media.narration_audio_en_url ? 'pret' : 'a_produire',
-    statut_video: media.video_url ? 'pret' : 'storyboard_pret',
+    statut_video: media.video_url || (media.video_chapitres?.length ?? 0) > 0 ? 'pret' : 'storyboard_pret',
     image_carte_catalogue: media.image_carte_catalogue ?? null,
     narration_audio_fr_url: media.narration_audio_fr_url ?? null,
     narration_audio_en_url: media.narration_audio_en_url ?? null,
     video_url: media.video_url ?? null,
+    video_chapitres: media.video_chapitres ?? [],
     avertissement_lecture: curated.avertissement_lecture ?? null,
     ordre_affichage: curated.ordre_affichage,
   };

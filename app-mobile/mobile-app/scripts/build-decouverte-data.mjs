@@ -20,6 +20,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DECOUVERTE_DIR = join(__dirname, '..', '..', '..', 'Découverte');
 const OUT_FILE = join(__dirname, '..', 'src', 'data', 'decouverte.generated.json');
 
+const STORAGE_BASE = 'https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/decouverte';
+
+/**
+ * Photos réellement produites par slug (dossier local "AFROBACK CONTENT/
+ * Photos" de Yannick, 2026-07-31). Un slug absent de cette table n'a
+ * simplement aucune photo à ce jour ; `image_url` reste `null` et
+ * `HeroPlaceholder` affiche le halo de substitution habituel.
+ */
+const DECOUVERTE_MEDIA = {
+  'fon-chef-traditionnel-bamoun': `${STORAGE_BASE}/fon-chef-traditionnel-bamoun.jpg`,
+  nguon: `${STORAGE_BASE}/nguon.jpg`,
+  'palais-royal-foumban': `${STORAGE_BASE}/palais-royal-foumban.jpg`,
+  'trone-mandu-yenu': `${STORAGE_BASE}/trone-mandu-yenu.jpg`,
+  ebolowa: `${STORAGE_BASE}/ebolowa.jpg`,
+};
+
 function listMarkdownFiles(dir) {
   const entries = readdirSync(dir);
   let files = [];
@@ -109,7 +125,7 @@ const items = files.map((filePath, index) => {
     contenu_fr_texte: section(md, 'Le récit'),
     contenu_en_texte: null,
     statut_fait_legende: parseFaitsEtStatut(md),
-    image_url: null,
+    image_url: DECOUVERTE_MEDIA[field(md, 'Slug')] ?? null,
     sources: parseSources(md),
     heros_lies: parseListField(md, 'Héros liés \\(slug\\)'),
     items_lies: parseListField(md, 'Autres items Découverte liés'),

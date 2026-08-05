@@ -102,6 +102,24 @@ export default function AccueilScreen() {
           <Text style={styles.searchPlaceholder}>Rechercher un héros, un lieu, un objet...</Text>
         </Pressable>
 
+        <Pressable style={styles.donBanner} onPress={() => router.push('/don')}>
+          <Text style={styles.donIcon}>🙏</Text>
+          <View style={styles.donBody}>
+            <Text style={styles.donTitle}>Soutenir AFROBACK</Text>
+            <Text style={styles.donSub}>Aide à financer les prochains récits, audios et vidéos</Text>
+          </View>
+          <Text style={styles.donChevron}>›</Text>
+        </Pressable>
+
+        <Pressable style={styles.mythBanner} onPress={() => router.push('/accueil/mythologie')}>
+          <Text style={styles.mythIcon}>📖</Text>
+          <View style={styles.mythBody}>
+            <Text style={styles.mythTitle}>Découvrir la mythologie africaine</Text>
+            <Text style={styles.mythSub}>5 mythes fondateurs, par peuple — lire, écouter, BD</Text>
+          </View>
+          <Text style={styles.mythChevron}>›</Text>
+        </Pressable>
+
         {featured && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>HISTOIRE DU JOUR</Text>
@@ -227,6 +245,72 @@ const styles = StyleSheet.create({
     fontFamily: typography.body,
     fontSize: 13,
     color: colors.textMuted,
+  },
+  donBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.terracottaBorder,
+    backgroundColor: colors.terracottaBg,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 26,
+  },
+  donIcon: {
+    fontSize: 20,
+  },
+  donBody: {
+    flex: 1,
+  },
+  donTitle: {
+    fontFamily: typography.bodySemiBold,
+    fontSize: 13.5,
+    color: colors.textPrimary,
+  },
+  donSub: {
+    fontFamily: typography.body,
+    fontSize: 11,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  donChevron: {
+    fontSize: 18,
+    color: colors.terracottaTextAlt,
+  },
+  mythBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.accentGold,
+    backgroundColor: colors.placeholderStripeDark,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 26,
+  },
+  mythIcon: {
+    fontSize: 20,
+  },
+  mythBody: {
+    flex: 1,
+  },
+  mythTitle: {
+    fontFamily: typography.bodySemiBold,
+    fontSize: 13.5,
+    color: colors.textPrimary,
+  },
+  mythSub: {
+    fontFamily: typography.body,
+    fontSize: 11,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  mythChevron: {
+    fontSize: 18,
+    color: colors.accentGold,
   },
   section: {
     marginBottom: 26,

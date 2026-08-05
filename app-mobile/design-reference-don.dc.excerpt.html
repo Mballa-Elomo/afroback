@@ -1,0 +1,122 @@
+<!-- Extrait verbatim de AFROBACK Mobile.dc.html (Claude Design, projectId a6ac90b2-d70d-4065-aa96-7c9c5757759a), lu via DesignSync le 2026-08-05. Module Don : 3 écrans trouvés dans la maquette (Hub, fiche cause, montant+paiement). Le prompt prompt-claude-design-don.md décrit 11 écrans côté donateur + 2 côté transparence : la maquette réelle n’en couvre que 3, les autres (mode paiement séparé, récap avant validation, erreur, mes dons, reçu, widget réutilisable, suivi admin) ne sont pas dans ce fichier .dc.html à ce jour. -->
+        <!-- ============ DON HUB ============ -->
+        <sc-if value="{{ isDonHub }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 6px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">‹</button>
+              <div style="font-family:'Cinzel',serif;font-size:19px;font-weight:600">{{ tDonTitle }}</div>
+            </div>
+            <p style="font-size:13px;color:#c9b8a4;line-height:1.6;margin:0 0 18px;padding-left:2px">{{ tDonMission }}</p>
+            <div style="display:flex;gap:10px;margin-bottom:20px">
+              <div style="flex:1;background:linear-gradient(160deg,#241a11,#160f09);border:1px solid rgba(240,195,107,.18);border-radius:14px;padding:14px;text-align:center"><div style="font-family:'Cinzel',serif;font-size:18px;color:#F7E7C8">4,2 M</div><div style="font-size:9px;color:#8C7B67;font-family:'Space Mono',monospace">FCFA {{ tCollected }}</div></div>
+              <div style="flex:1;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:14px;padding:14px;text-align:center"><div style="font-family:'Cinzel',serif;font-size:18px;color:#F7E7C8">318</div><div style="font-size:9px;color:#8C7B67;font-family:'Space Mono',monospace">{{ tDonors }}</div></div>
+              <div style="flex:1;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:14px;padding:14px;text-align:center"><div style="font-family:'Cinzel',serif;font-size:18px;color:#F7E7C8">2</div><div style="font-size:9px;color:#8C7B67;font-family:'Space Mono',monospace">{{ tFunded }}</div></div>
+            </div>
+            <div style="background:rgba(240,195,107,.05);border:1px solid rgba(240,195,107,.15);border-radius:10px;padding:9px 12px;margin-bottom:18px;font-size:10px;color:#8C7B67;line-height:1.5;font-family:'Space Mono',monospace">{{ tDonDisclaimer }}</div>
+            <div class="afb-scroll" style="display:flex;gap:8px;overflow-x:auto;margin:0 -18px 16px;padding:0 18px">
+              <sc-for list="{{ donFilters }}" as="f" hint-placeholder-count="4"><span onClick="{{ f.pick }}" style="flex:none;cursor:pointer;font-size:11.5px;padding:7px 13px;border-radius:999px;white-space:nowrap;{{ f.style }}">{{ f.label }}</span></sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ donCauses }}" as="c" hint-placeholder-count="4">
+                <div onClick="{{ c.open }}" style="cursor:pointer;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:16px;overflow:hidden">
+                  <div style="height:120px;position:relative;background:repeating-linear-gradient(135deg,#2a1f14 0 10px,#1f1710 10px 20px);display:flex;align-items:flex-end;padding:12px">
+                    {{ c.cover }}<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,0) 40%,rgba(15,11,8,.9))"></div>
+                    <span style="position:relative;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.08em;color:#E9A15C">{{ c.tag }}</span>
+                  </div>
+                  <div style="padding:13px 14px">
+                    <div style="font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:#F7E7C8;line-height:1.2">{{ c.title }}</div>
+                    <div style="font-size:11.5px;color:#8C7B67;margin-top:4px;line-height:1.45">{{ c.short }}</div>
+                    <sc-if value="{{ c.hasGoal }}" hint-placeholder-val="{{ true }}">
+                      <div style="height:6px;border-radius:9px;background:#2a1f14;margin-top:12px"><div style="height:100%;border-radius:9px;background:linear-gradient(90deg,#F0C36B,#8B5A2B);width:{{ c.pct }}"></div></div>
+                      <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:9.5px;color:#8C7B67;margin-top:5px"><span style="color:#E9BE77">{{ c.raised }}</span><span>{{ c.goal }}</span></div>
+                    </sc-if>
+                    <sc-if value="{{ c.noGoal }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Space Mono',monospace;font-size:10px;color:#E9BE77;margin-top:10px">{{ c.raised }} {{ tCollected }}</div></sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <button onClick="{{ donFree }}" style="width:100%;margin-top:18px;font:inherit;font-weight:700;font-size:14px;padding:15px;border-radius:14px;border:1px solid rgba(240,195,107,.4);background:rgba(240,195,107,.06);color:#E9BE77;cursor:pointer">{{ tFreeDon }}</button>
+          </div>
+        </sc-if>
+
+        <!-- ============ DON CAUSE DETAIL ============ -->
+        <sc-if value="{{ isDonCause }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:afbFade .4s ease both">
+            <div style="position:relative;height:240px;background:repeating-linear-gradient(135deg,#2c2116 0 12px,#1f160f 12px 24px)">
+              {{ donCur.cover }}<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,.15) 0%,rgba(15,11,8,.1) 40%,#0F0B08 100%)"></div>
+              <button onClick="{{ goDonHub }}" style="position:absolute;top:12px;left:14px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(240,195,107,.3);color:#E9BE77;font-size:18px;cursor:pointer;z-index:5">‹</button>
+              <div style="position:absolute;bottom:16px;left:18px;right:18px">
+                <div style="display:inline-block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:#E9A15C;border:1px solid rgba(233,161,92,.4);padding:3px 8px;border-radius:999px;margin-bottom:8px">{{ donCur.tag }}</div>
+                <div style="font-family:'Cinzel',serif;font-size:23px;font-weight:700;color:#F7E7C8;line-height:1.08">{{ donCur.title }}</div>
+              </div>
+            </div>
+            <div style="padding:18px 18px 130px">
+              <sc-if value="{{ donCur.hasGoal }}" hint-placeholder-val="{{ true }}">
+                <div style="height:8px;border-radius:9px;background:#2a1f14"><div style="height:100%;border-radius:9px;background:linear-gradient(90deg,#F0C36B,#8B5A2B);width:{{ donCur.pct }}"></div></div>
+                <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;margin:8px 0 20px"><span style="color:#E9BE77">{{ donCur.raised }}</span><span style="color:#8C7B67">{{ tGoal }} {{ donCur.goal }}</span></div>
+              </sc-if>
+              <p style="font-size:14.5px;line-height:1.75;color:#D6C6B2;margin:0 0 22px">{{ donCur.long }}</p>
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ tRecentDonors }}</div>
+              <sc-if value="{{ donCur.hasDonors }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ donCur.donors }}" as="d" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:10px;background:#150e09;border:1px solid rgba(240,195,107,.1);border-radius:10px;padding:10px 12px">
+                      <div style="width:28px;height:28px;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.25)"></div>
+                      <span style="flex:1;font-size:12.5px;font-weight:600">{{ d.name }}</span>
+                      <span style="font-family:'Space Mono',monospace;font-size:11px;color:#E9BE77">{{ d.amount }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ donCur.noDonors }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:24px;color:#8C7B67;font-size:12.5px;background:#150e09;border-radius:12px">{{ tBeFirst }}</div></sc-if>
+            </div>
+            <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 18px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(15,11,8,0),#0F0B08 30%);z-index:20">
+              <button onClick="{{ donGiveNow }}" style="width:100%;font:inherit;font-weight:700;font-size:14px;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">{{ tGiveForCause }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ DON AMOUNT + PAYMENT ============ -->
+        <sc-if value="{{ isDonAmount }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:6px 18px 40px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin:6px 0 16px">
+              <button onClick="{{ goBack }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">‹</button>
+              <div style="font-family:'Cinzel',serif;font-size:18px;font-weight:600">{{ tYourDon }}</div>
+            </div>
+            <sc-if value="{{ donDone }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:40px 20px">
+                <div style="font-size:56px">🙏</div>
+                <div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#F7E7C8;margin:16px 0 8px">{{ tThankYou }}</div>
+                <p style="font-size:14px;color:#D6C6B2;line-height:1.6;margin:0 0 6px">{{ donThanksMsg }}</p>
+                <div style="font-family:'Space Mono',monospace;font-size:12px;color:#E9BE77;margin-bottom:24px">{{ donAmountLabel }} · {{ donCur.title }}</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <button style="font:inherit;font-weight:700;font-size:13px;padding:13px;border-radius:12px;border:1px solid rgba(240,195,107,.3);background:rgba(240,195,107,.06);color:#E9BE77;cursor:pointer">↗ {{ tSharePost }}</button>
+                  <button onClick="{{ goDonHub }}" style="font:inherit;font-weight:700;font-size:13px;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">{{ tOtherCause }}</button>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ donForm }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:11px;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:12px;padding:11px;margin-bottom:20px">
+                <div style="width:40px;height:40px;flex:none;border-radius:9px;background:repeating-linear-gradient(135deg,#2a1f14 0 7px,#1f1710 7px 14px);border:1px solid rgba(240,195,107,.2)"></div>
+                <div style="flex:1;min-width:0"><div style="font-family:'Space Mono',monospace;font-size:8px;color:#E9A15C">{{ donCur.tag }}</div><div style="font-weight:600;font-size:13px;line-height:1.2">{{ donCur.title }}</div></div>
+              </div>
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ tAmount }}</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+                <sc-for list="{{ donPresets }}" as="a" hint-placeholder-count="4"><div onClick="{{ a.pick }}" style="cursor:pointer;text-align:center;padding:16px;border-radius:12px;font-weight:700;font-size:15px;{{ a.style }}">{{ a.label }}</div></sc-for>
+              </div>
+              <input value="{{ donCustom }}" onInput="{{ onDonCustom }}" placeholder="{{ tCustomAmount }}" style="width:100%;font:inherit;font-size:14px;background:#170f0a;border:1px solid rgba(240,195,107,.16);border-radius:12px;padding:13px 14px;color:#EDE3D4;outline:none;box-sizing:border-box;margin-bottom:18px">
+              <div onClick="{{ toggleRecurring }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:12px;padding:13px;margin-bottom:10px"><div style="flex:1"><div style="font-weight:600;font-size:13px">{{ tRecurring }}</div><div style="font-size:11px;color:#8C7B67">{{ tRecurringSub }}</div></div><span style="width:40px;height:22px;border-radius:999px;background:{{ recurTrack }};position:relative;flex:none"><span style="position:absolute;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;{{ recurKnob }}"></span></span></div>
+              <div onClick="{{ toggleAnon }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:12px;padding:13px;margin-bottom:20px"><span style="{{ anonChk }}"></span><span style="flex:1;font-size:13px">{{ tAnon }}</span></div>
+              <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.16em;color:#C99A5B;margin-bottom:12px">{{ tPayment }}</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">
+                <sc-for list="{{ donPayMethods }}" as="m" hint-placeholder-count="3"><div onClick="{{ m.pick }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;{{ m.style }}"><span style="font-size:18px">{{ m.icon }}</span><div style="flex:1"><div style="font-weight:600;font-size:13.5px">{{ m.name }}</div><div style="font-size:11px;color:#8C7B67">{{ m.sub }}</div></div><span style="{{ m.radio }}"></span></div></sc-for>
+              </div>
+              <div style="background:#150e09;border:1px solid rgba(240,195,107,.14);border-radius:14px;padding:14px 16px;margin-bottom:18px">
+                <div style="display:flex;justify-content:space-between;font-size:13px;color:#c9b8a4;margin-bottom:6px"><span>{{ tCause }}</span><span style="color:#EDE3D4;text-align:right;max-width:60%">{{ donCur.title }}</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:#F7E7C8;padding-top:8px;border-top:1px solid rgba(240,195,107,.12)"><span>{{ tTotal }}</span><span style="font-family:'Space Mono',monospace;color:#E9BE77">{{ donAmountLabel }}</span></div>
+              </div>
+              <button onClick="{{ donSubmit }}" style="width:100%;font:inherit;font-weight:700;font-size:14px;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">{{ tConfirmDon }}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+

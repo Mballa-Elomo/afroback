@@ -12,7 +12,7 @@ import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
 import { useDecouverteItem, useRelatedDecouverteItems } from '../../../src/data/useDecouverteData';
 import { getHeroBySlug } from '../../../src/data/heroesRepository';
 import type { Heros } from '../../../src/data/types';
-import { DECOUVERTE_IMMERSIVE_HEADER_TYPES, DECOUVERTE_TYPE_LABEL } from '../../../src/data/decouverteDisplay';
+import { DECOUVERTE_TYPE_LABEL } from '../../../src/data/decouverteDisplay';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
 
 /**
@@ -64,7 +64,13 @@ export default function DecouverteDetailScreen() {
   }
   if (!item) return <Redirect href="/decouverte" />;
 
-  const immersive = DECOUVERTE_IMMERSIVE_HEADER_TYPES.includes(item.type);
+  // En-tête immersif (grande photo) dès qu'une vraie photo existe pour cet
+  // item, quel que soit son type (personnage/coutume/fait inclus) — plutôt
+  // qu'une liste de types en dur, qui laissait silencieusement de côté une
+  // vraie photo produite pour un item "personnage" ou "coutume" (retour de
+  // test Yannick, 2026-08-05). En-tête sobre (texte) uniquement en
+  // fallback honnête pour un item sans aucune photo à ce jour.
+  const immersive = Boolean(item.image_url);
   const paragraphs = item.contenu_fr_texte.split(/\n{2,}/).filter((p) => p.trim().length > 0);
 
   return (

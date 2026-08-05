@@ -24,17 +24,25 @@ export function FaitsList({ faits }: { faits: AffirmationStatuee[] }) {
   return (
     <View style={styles.section}>
       <SectionTitle title="Faits" />
-      {faits.map((f, i) => (
-        <View key={i} style={styles.row}>
-          <Text style={[styles.bullet, { color: STATUT_COLOR[f.statut] }]}>◆</Text>
-          <Text style={styles.text}>{f.affirmation}</Text>
-          <View style={[styles.tag, { borderColor: STATUT_COLOR[f.statut] }]}>
-            <Text style={[styles.tagLabel, { color: STATUT_COLOR[f.statut] }]}>
-              {STATUT_FACTUEL_LABEL[f.statut].toUpperCase()}
-            </Text>
+      {faits.map((f, i) => {
+        // `f.statut` vient d'un fichier markdown édité à la main par l'agent
+        // afroback-decouverte : une valeur hors des 3 statuts attendus (vue
+        // le 2026-08-05 sur "le-ngondo.md", colonne Statut contenant une
+        // explication au lieu du seul mot-clé) ne doit jamais faire planter
+        // l'app — repli honnête sur la valeur brute plutôt qu'un statut
+        // inventé, en attendant la correction de la fiche source.
+        const color = STATUT_COLOR[f.statut] ?? colors.textMuted;
+        const label = STATUT_FACTUEL_LABEL[f.statut]?.toUpperCase() ?? f.statut.toUpperCase();
+        return (
+          <View key={i} style={styles.row}>
+            <Text style={[styles.bullet, { color }]}>◆</Text>
+            <Text style={styles.text}>{f.affirmation}</Text>
+            <View style={[styles.tag, { borderColor: color }]}>
+              <Text style={[styles.tagLabel, { color }]}>{label}</Text>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 }

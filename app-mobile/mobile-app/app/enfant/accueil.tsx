@@ -14,8 +14,9 @@ import { colors, radii, typography } from '../../src/theme/tokens';
  * Accueil enfant — fidèle à design-reference-parent-enfant.dc.excerpt.html
  * (KID HOME), avec un traitement honnête carte par carte (décidé par le
  * chef de projet, voir mobile-app/README.md) :
- * - "Jeu du jour" et "Apprendre une langue" : aucun jeu ni leçon réel
- *   n'existe → état "bientôt disponible" (alerte), jamais un jeu/leçon simulé.
+ * - "Jeu du jour" est remplacé par "École des Héros" (2026-08-05, voir
+ *   context/AFROBACK.md) : premier vrai mécanisme gamifié de l'app. "Apprendre
+ *   une langue" reste "bientôt disponible" (pilier langues toujours bloqué).
  * - "Histoire du jour" : un vrai héros du catalogue (jamais "Mansa Moussa",
  *   qui n'existe pas dans les 9 héros réels), traitement simplifié — voir
  *   enfant/histoire.tsx.
@@ -52,12 +53,12 @@ export default function AccueilEnfantScreen() {
           </Pressable>
         </View>
 
-        <Pressable style={styles.gameCard} onPress={() => bientotDisponible('Jeu du jour')}>
-          <Text style={styles.gameEmoji}>🦁</Text>
-          <Text style={styles.gameKicker}>JEU DU JOUR</Text>
-          <Text style={styles.gameTitle}>Bientôt un{'\n'}nouveau jeu</Text>
+        <Pressable style={styles.gameCard} onPress={() => router.push('/enfant/ecole')}>
+          <Text style={styles.gameEmoji}>🏅</Text>
+          <Text style={styles.gameKicker}>ÉCOLE DES HÉROS</Text>
+          <Text style={styles.gameTitle}>Découvre tes{'\n'}héros africains</Text>
           <View style={styles.gamePill}>
-            <Text style={styles.gamePillLabel}>Bientôt ▶</Text>
+            <Text style={styles.gamePillLabel}>Jouer ▶</Text>
           </View>
         </Pressable>
 

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeroCard } from '../../../src/components/HeroCard';
@@ -26,11 +26,7 @@ export default function HistoiresHerosScreen() {
     [heroes, eraFilter]
   );
 
-  const openMythologie = () =>
-    Alert.alert(
-      'Bientôt disponible',
-      "Le pilier Mythologie africaine (mythes par peuple, lecture/écoute/BD) n'est pas encore construit."
-    );
+  const openMythologie = () => router.push('/accueil/mythologie');
 
   if (heroesState.status === 'loading') {
     return (

@@ -21,9 +21,6 @@ export const DECOUVERTE_TYPE_ICON: Record<DecouverteType, string> = {
   fait: '◆',
 };
 
-/** Types dont la fiche détail utilise l'en-tête immersif (grande photo) plutôt que l'en-tête sobre (texte). */
-export const DECOUVERTE_IMMERSIVE_HEADER_TYPES: DecouverteType[] = ['village', 'objet'];
-
 export const STATUT_FACTUEL_LABEL: Record<StatutFactuel, string> = {
   atteste: 'Attesté',
   tradition_orale: 'Tradition orale',

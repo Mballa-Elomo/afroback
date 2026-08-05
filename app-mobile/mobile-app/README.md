@@ -186,12 +186,56 @@ La maquette (`KID HOME`) montrait un "Jeu du jour", "Apprendre l'ewondo" et une 
 
 `child_sessions` est ouverte à l'entrée en mode enfant et close (avec la durée calculée côté client) à la sortie via le bouton retour. Si l'app est fermée brutalement (kill du process) pendant une session enfant, cette session reste "ouverte" (`ended_at`/`duree_secondes` restent `null`) et n'est simplement pas comptée dans les stats du jour de l'Espace Parent — pas de tâche de fond pour la fiabiliser en V1, documenté comme simplification assumée plutôt que corrigé silencieusement.
 
+## Module Don (2026-08-05)
+
+> Yannick a fait maquetter ce module puis, lors du cadrage, tranché pour une version **volontairement simplifiée** par rapport à `prompt-claude-design-don.md` (11 écrans) et même par rapport aux 3 écrans réellement présents dans la maquette (`design-reference-don.dc.excerpt.html`). Détail des 2 décisions structurantes (le don comme 4ᵉ levier économique, périmètre) dans `context/AFROBACK.md`.
+
+- **Une seule cause générique "Soutenir AFROBACK"**, pas de liste de causes par héros/histoire. Conséquence directe : pas de Hub à choisir parmi plusieurs cartes (écran 2 de la maquette, retiré), pas de filtre par catégorie. Les deux points d'entrée (bannière accueil, menu Profil → "Faire un don") mènent **directement** à l'écran mission (`app/don/index.tsx`).
+- **Retiré par rapport à la maquette, sur demande explicite de Yannick** : le compteur "montant collecté / donateurs / causes financées" (Yannick : *"AFROBACK est un vrai projet"*, pas de chiffre affiché tant qu'il n'est pas réel) et la section "derniers donateurs" (aucun donateur réel à ce jour, une liste vide aurait été un état à gérer pour rien vu qu'il n'y a qu'une seule cause).
+- **Flux réel** : `app/don/index.tsx` (mission, sans compteur ni donateurs) → `app/don/montant.tsx` (montant prédéfini/libre, ponctuel ou mensuel, anonyme ou non, mode de paiement Mobile Money, récapitulatif, confirmation). Même règle que le checkout Marketplace : **jamais un faux succès de paiement** — le don est enregistré (`statut = 'en_attente_paiement'`), le bouton dit "Confirmer mon don" (pas "Payer"), l'écran de remerciement explique que Yannick contactera le donateur pour le règlement.
+- **Backend** : `supabase/schema-don.sql` — une seule table `dons` (pas de table `dons_causes` séparée, une colonne `cause` texte à valeur constante pour l'instant : ne pas sur-construire pour une seule cause). RLS : le donateur ne voit/crée que ses propres dons ; aucune policy update/delete (un don enregistré n'est modifiable par personne depuis l'app). **Pas encore exécuté par Yannick.**
+- **Volontairement absent, questions ouvertes non résolues par ce chantier** (voir `context/AFROBACK.md`) : reçu fiscal (statut juridique d'AFROBACK non tranché), objectif chiffré par cause (plus de jauge puisqu'il n'y a plus de compteur), politique de gestion de l'argent collecté.
+- **Écrans non construits** (absents de la maquette réelle, voir extrait) : mode de paiement séparé, récap avant validation en écran dédié, "Mes dons" dans le Profil, reçu téléchargeable, widget compteur réutilisable, suivi admin des causes.
+
+## Module École des Héros (2026-08-05)
+
+> Yannick a validé d'étendre l'architecture à plusieurs/tous les héros plutôt que de rester sur un pilote à 1 seul héros (Sultan Njoya), comme recommandé initialement par le chef de projet. Règle inchangée : **aucun contenu inventé**. Détail du cadrage dans `context/AFROBACK.md` et `app-mobile/data-model-ecole-heros.md`.
+
+- **Remplace la carte "Jeu du jour"** de l'accueil enfant (`app/enfant/accueil.tsx`), qui était un état "bientôt disponible" sans rien derrière. "Apprendre une langue" reste "bientôt disponible" (pilier langues toujours bloqué, ne pas confondre les deux chantiers).
+- **6 écrans**, fidèles dans l'esprit à `design-reference-ecole-heros.dc.excerpt.html` (la maquette réelle n'a que 6 des 11 écrans du prompt de cadrage — pas d'écran explicatif de première visite, pas d'ajouts Espace Parent) :
+  - `app/enfant/ecole/index.tsx` — carte du niveau (sentier de héros + grand quiz de fin de niveau)
+  - `app/enfant/ecole/lecon/[id].tsx` — fiche leçon, 4 formats (Lire/Écouter/Regarder/BD)
+  - `app/enfant/ecole/quiz/[leconId].tsx` — quiz (leçon **et** fin de niveau, `leconId="final"` + query param `niveau` pour le second cas)
+  - `app/enfant/ecole/resultat.tsx` — résultat de quiz (score, étoiles, revoir/continuer)
+  - `app/enfant/ecole/niveau-suivant.tsx` — passage de niveau (silhouettes non révélées, comme la maquette)
+  - `app/enfant/ecole/collection.tsx` — tous les héros du module, débloqués ou non
+- **Backend** : `supabase/schema-ecole-heros.sql` — 7 tables (`ecole_niveaux`, `ecole_lecons`, `ecole_quiz_questions`, `ecole_quiz_niveau`, `enfant_ecole_progression`, `enfant_lecon_resultats`, `enfant_quiz_niveau_resultats`). **Structure insérée mais aucun contenu** : les 4 niveaux (noms/tranches d'âge, repris du prompt de design de Yannick) et le rattachement de chacun des 9 héros réels à un niveau (mapping proposé par Yannick dans ce même prompt) sont peuplés, mais `texte_adapte`, `narration_audio_url`, `video_url`, `bd_planches` restent NULL/vides sur les 9 lignes, et aucune question de quiz n'existe. **Pas encore exécuté par Yannick.**
+- **Conséquence honnête et attendue tant qu'aucun contenu réel n'est produit** : la fiche leçon affiche un état "pas encore prêt" sur chaque format (jamais le récit adulte réutilisé tel quel), le quiz affiche "Quiz pas encore prêt" tant qu'aucune question n'existe pour la leçon, et la progression reste bloquée au premier héros du niveau puisqu'aucun quiz ne peut être réussi. Ce n'est pas un bug : c'est la structure du pilier, prête à s'activer leçon par leçon dès qu'un vrai contenu est produit (texte réécrit, narration dédiée enfant, vidéo adaptée, BD dessinée — voir `data-model-ecole-heros.md` pour l'ampleur du chantier de contenu, largement plus lourd que le code lui-même).
+- **Seuil de réussite du quiz : 60 % de bonnes réponses.** Choix par défaut du chef de projet (`PASS_RATIO` dans `app/enfant/ecole/quiz/[leconId].tsx`), pas une décision produit tranchée par Yannick — trivial à ajuster.
+- **Un héros peut apparaître à plusieurs niveaux** (ex. Sultan Njoya niveau 1 *et* niveau 2, "approfondi" comme le prévoit le prompt de Yannick) : chaque couple (héros, niveau) est une leçon distincte ; l'écran Collection regroupe par héros (débloqué dès qu'une de ses leçons est terminée).
+
+## Pilier Mythologie (2026-08-05)
+
+> 5 récits mythologiques déjà écrits par l'agent griot (`Récits africains/mythe-*.md`), jamais branchés à l'app jusqu'ici. Détail complet du modèle de données dans `app-mobile/data-model-mythologie.md`.
+
+- **Vérification faite avant de coder** : Yannick pensait avoir "déjà mis les histoires et les images". Les 5 récits texte existent bien, mais **aucune image ni narration audio n'a été retrouvée** pour ce pilier (recherché dans `app-mobile/` et `context/import/`) — `image_url`/`narration_audio_url` restent `null` pour les 5 mythes, état "bientôt disponible" comme partout ailleurs sur ce projet quand un média manque.
+- **Pipeline de données plus simple que celui des héros** : un seul script mécanique (`scripts/build-mythologie-data.mjs`) extrait les champs de la fiche structurée de chaque `.md` et découpe le récit en 4 chapitres, avec des titres repris verbatim des vrais storyboards (`## Chapitre N/4 — ...`) et un regroupement de paragraphes fixé à la main par mythe (`MYTHES_CONFIG`, comme `CHAPITRE_ANCHORS` pour les héros) — 5 éléments seulement, pas besoin d'une couche curatée séparée. `scripts/generate-mythologie-seed.mjs` génère `supabase/schema-mythologie.sql`.
+- **Backend** : table unique `mythes` (pas de table séparée par chapitre/source), RLS lecture publique comme `heros`/`decouverte_items`. Pas de `recit_chapitres_en` (aucune traduction n'existe) ni de champ "citations" (les 5 fiches indiquent explicitement qu'aucune citation individuelle attribuable n'existe pour ces récits collectifs). **Pas encore exécuté par Yannick.**
+- **2 écrans**, nichés dans la pile de l'onglet Accueil comme les héros (`app/(tabs)/accueil/mythologie/`) : liste groupée par zone avec recherche (`index.tsx`), détail 3 onglets Lire/Écouter/BD (`[slug].tsx`).
+  - **BD (`openBd`)** : aucun composant de lecteur BD identifié dans la maquette complète (`design-reference-mythologie.dc.excerpt.html` le signale explicitement) — traité en "bientôt disponible", même situation que le format BD de l'École des Héros.
+  - **Écouter** : vrai lecteur `expo-audio` déjà câblé (même pattern que le lecteur audio héros), affiche "bientôt disponible" tant qu'aucune narration n'existe.
+  - **Sources** affichées uniquement en fin de lecture et uniquement si le mythe en a — jamais une source inventée.
+- **Points d'entrée câblés** : nouvelle bannière "Découvrir la mythologie africaine" sur l'accueil adulte (sur le modèle de la bannière Don déjà existante), et la bannière "Mythologie africaine" déjà présente dans le catalogue Histoires & Héros (menait à un "bientôt disponible" depuis le 2026-07-30) rebranchée vers le vrai écran.
+
 ## Comment la maquette a été lue (DesignSync indisponible dans cette session)
 
-`DesignSync` n'a jamais été accessible dans les sessions ayant construit ces trois piliers, malgré plusieurs tentatives et un déblocage confirmé côté compte Yannick. Pour ne pas bloquer indéfiniment sur cet écart d'outillage, Yannick a lu lui-même les sections concernées de `AFROBACK Mobile.dc.html` dans une session où l'outil fonctionnait, et en a extrait le markup + styles inline + bindings d'origine, **verbatim, sans reformulation**, dans trois fichiers de référence lisibles directement :
+`DesignSync` n'a jamais été accessible dans les sessions ayant construit ces six chantiers (Découverte, Communauté, Marketplace, Don, École des Héros, Mythologie), malgré plusieurs tentatives et un déblocage confirmé côté compte Yannick. Pour ne pas bloquer indéfiniment sur cet écart d'outillage, Yannick a lu lui-même les sections concernées de `AFROBACK Mobile.dc.html` dans une session où l'outil fonctionnait, et en a extrait le markup + styles inline + bindings d'origine, **verbatim, sans reformulation**, dans des fichiers de référence lisibles directement :
 - `app-mobile/design-reference-decouverte.dc.excerpt.html`
 - `app-mobile/design-reference-communaute.dc.excerpt.html`
 - `app-mobile/design-reference-marketplace.dc.excerpt.html`
+- `app-mobile/design-reference-don.dc.excerpt.html`
+- `app-mobile/design-reference-ecole-heros.dc.excerpt.html`
+- `app-mobile/design-reference-mythologie.dc.excerpt.html`
 
 Toutes les couleurs, polices et espacements utilisés dans les écrans ci-dessus viennent de ces extraits (recoupés avec `src/theme/tokens.ts`, complété le 2026-07-30 avec les tokens manquants : `surfaceCard`, `surfaceCardDeep`, `inputBg`, `overlayCaption`, `placeholderLabel`, `reportColor` — aucun nouveau token n'a été nécessaire pour Marketplace), pas d'une lecture directe de l'outil par cette session.
 
@@ -200,16 +244,21 @@ Toutes les couleurs, polices et espacements utilisés dans les écrans ci-dessus
 - **Pas de vrai lecteur audio/vidéo** : aucun média n'est produit pour les 9 héros (voir `app-mobile/production-media/`). Les écrans `audio.tsx` / `video.tsx` sont prêts à recevoir `expo-av`/`expo-video` le jour où le média existe (voir le commentaire en tête de chaque fichier). Le champ `image_carte_catalogue` est vide pour les 9 héros (aucun visuel produit à ce jour).
 - **Pas de build natif ni de publication sur les stores** (App Store / Google Play) — nécessite un Mac pour iOS, des comptes développeur payants, et n'est pas faisable depuis ce workspace Claude Code.
 - **Pas de cache offline** : l'app doit interroger Supabase à chaque ouverture pour l'instant.
-- **Pas de vrai paiement Mobile Money** (agrégateur type CamPay non choisi/intégré), **pas de mode enfant, pas de commission/abonnement vendeur configuré** — hors Phase 1, voir `context/AFROBACK.md` pour la feuille de route complète. Les 5 piliers ont désormais tous une UI réelle (Histoires & Héros, Découverte, Communauté, Marché) ou un catalogue fonctionnel vide (Marché).
+- **Pas de vrai paiement Mobile Money** (agrégateur type CamPay non choisi/intégré) : ni pour le checkout Marketplace, ni pour le module Don, **pas de commission/abonnement vendeur configuré** — hors Phase 1, voir `context/AFROBACK.md` pour la feuille de route complète. Les 5 piliers de contenu ont désormais tous une UI réelle (Histoires & Héros, Découverte, Communauté, Marché) ou un catalogue fonctionnel vide (Marché).
+- **Aucun contenu réel pour le module École des Héros** : la structure (4 niveaux, 9 héros rattachés) est en base, mais aucune leçon (texte adapté, narration enfant, vidéo, BD) ni aucune question de quiz n'existe à ce jour — c'est un chantier de production de contenu à part entière, voir `app-mobile/data-model-ecole-heros.md`.
+- **Images du pilier Mythologie retrouvées le 2026-08-05** dans le dossier local "AFROBACK CONTENT/Photos" de Yannick (fichiers nommés d'après le titre du mythe) : copiées et renommées par slug dans un sous-dossier `mythologie-renamed`, référencées dans `scripts/build-mythologie-data.mjs` (`MYTHES_MEDIA`) et `supabase/schema-mythologie.sql` (`image_url`), sur le modèle de `HEROES_MEDIA`/`DECOUVERTE_MEDIA`. **Pas encore uploadées côté Supabase Storage** (upload manuel par Yannick, comme héros/découverte) : les URLs générées ne répondront qu'une fois l'upload fait dans `heroes-media/images/mythologie/`. Toujours aucune narration audio retrouvée (`narration_audio_url` reste `null`), et pas de lecteur BD (aucun composant identifié dans la maquette).
 
 ## Structure
 
 ```
 app/                        écrans (Expo Router, routing par fichiers)
   (tabs)/accueil/heros/[slug]/   fiche héros, récit paginé, audio, vidéo (pile interne, tab bar visible sauf audio/vidéo)
+  (tabs)/accueil/mythologie/     pilier Mythologie — liste par zone, détail 3 onglets Lire/Écouter/BD (pile interne, tab bar visible)
   (tabs)/decouverte/         liste, fiche détail, hub pays (pile interne, tab bar visible)
   profils/                   sélecteur "Qui est-ce ?", ajout de profil enfant, Espace Parent (module Parent/Enfant, hors (tabs), pas de tab bar)
   enfant/                    accueil enfant, histoire du jour, carnet d'explorateur (mode enfant plein écran, hors (tabs))
+  enfant/ecole/              module École des Héros — carte du niveau, leçon 4 formats, quiz, résultat, passage de niveau, collection
+  don/                       module Don — mission, montant/paiement/confirmation (hors (tabs), pas de tab bar)
   (tabs)/communaute/         fil, détail de post, création, profil membre, signalement, charte
   (tabs)/marche/             catalogue, fiche produit, profil artisan, panier, checkout, commandes, espace vendeur
 src/
@@ -228,6 +277,10 @@ src/
     marketplaceTypes.ts / marketplaceRepository.ts / useMarketplaceData.ts / marketplaceDisplay.ts   couche de données Marketplace (catalogue vide, lecture + écriture)
     uploadImage.ts             helper d'upload générique (bucket user-uploads), utilisé par Communauté et Marketplace
     parentEnfantTypes.ts / parentEnfantRepository.ts   couche de données module Parent/Enfant (profils enfants, réglages PIN, sessions)
+    donTypes.ts / donRepository.ts                     couche de données module Don (une seule cause générique, écriture seule côté app)
+    ecoleTypes.ts / ecoleRepository.ts                 couche de données module École des Héros (contenu éditorial + progression par enfant)
+    mythologie.generated.json  auto-extrait par scripts/build-mythologie-data.mjs — pilier Mythologie (5 mythes)
+    mythologieTypes.ts / mythologieRepository.ts / useMythologieData.ts   couche de données Mythologie (lecture seule)
   profils/
     ActiveProfileProvider.tsx  état "quel profil est actif" (adulte/enfant), module Parent/Enfant
     PinGate.tsx                modale code PIN (création si aucun code, vérification sinon)
@@ -241,6 +294,8 @@ scripts/
   generate-supabase-seed.mjs   génère supabase/seed.sql à partir de cet export
   build-decouverte-data.mjs    régénère decouverte.generated.json depuis livrables/.../Découverte/*.md
   generate-decouverte-seed.mjs génère supabase/seed-decouverte.sql à partir de decouverte.generated.json
+  build-mythologie-data.mjs    régénère mythologie.generated.json depuis livrables/.../Récits africains/mythe-*.md + leurs storyboards
+  generate-mythologie-seed.mjs génère supabase/schema-mythologie.sql à partir de mythologie.generated.json
 supabase/
   seed.sql                     schéma + seed complet, exécuté dans Supabase (héros) — ⚠️ à réexécuter (2026-07-31, colonnes recit_chapitres_fr/en)
   seed-decouverte.sql          schéma + seed du pilier Découverte, exécuté par Yannick le 2026-07-30
@@ -248,4 +303,7 @@ supabase/
   schema-marketplace.sql       schéma du pilier Marketplace (pas de seed, catalogue vide) — ⚠️ à réexécuter (2026-07-31, correctif RLS visibilité produits)
   schema-storage-user-uploads.sql   bucket Storage `user-uploads` + policies (photos post/produit, avatars) — à exécuter par Yannick dans le SQL Editor Supabase
   schema-parent-enfant.sql     schéma du module Parent/Enfant (child_profiles, parent_settings, child_sessions) — à exécuter par Yannick dans le SQL Editor Supabase
+  schema-don.sql                schéma du module Don (table dons, une seule cause générique), exécuté par Yannick le 2026-08-05
+  schema-ecole-heros.sql        schéma du module École des Héros (7 tables + structure niveaux/leçons sans contenu), exécuté par Yannick le 2026-08-05
+  schema-mythologie.sql         schéma + seed du pilier Mythologie (5 mythes) — à exécuter par Yannick dans le SQL Editor Supabase
 ```

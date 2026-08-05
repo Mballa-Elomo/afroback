@@ -20,6 +20,8 @@ export default function AccueilStackLayout() {
       <Stack.Screen name="heros/[slug]/recit" />
       <Stack.Screen name="heros/[slug]/audio" />
       <Stack.Screen name="heros/[slug]/video" />
+      <Stack.Screen name="mythologie/index" />
+      <Stack.Screen name="mythologie/[slug]" />
     </Stack>
   );
 }

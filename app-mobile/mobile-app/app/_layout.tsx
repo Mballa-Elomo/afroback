@@ -85,6 +85,12 @@ function RootNavigator() {
         <Stack.Screen name="enfant/histoire" />
         <Stack.Screen name="enfant/carnet/index" />
         <Stack.Screen name="enfant/carnet/[slug]" />
+        <Stack.Screen name="enfant/ecole/index" />
+        <Stack.Screen name="enfant/ecole/lecon/[id]" />
+        <Stack.Screen name="enfant/ecole/quiz/[leconId]" />
+        <Stack.Screen name="enfant/ecole/resultat" />
+        <Stack.Screen name="enfant/ecole/niveau-suivant" />
+        <Stack.Screen name="enfant/ecole/collection" />
       </Stack.Protected>
       <Stack.Protected guard={!!session && onboardingComplete && profileState.status === 'adult'}>
         <Stack.Screen name="(tabs)" />
@@ -92,6 +98,8 @@ function RootNavigator() {
       <Stack.Protected guard={!!session && onboardingComplete}>
         <Stack.Screen name="profils/ajouter" />
         <Stack.Screen name="profils/parent" />
+        <Stack.Screen name="don/index" />
+        <Stack.Screen name="don/montant" />
       </Stack.Protected>
     </Stack>
   );

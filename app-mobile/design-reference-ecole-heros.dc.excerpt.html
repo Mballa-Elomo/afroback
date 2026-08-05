@@ -1,0 +1,134 @@
+<!-- Extrait verbatim de AFROBACK Mobile.dc.html (Claude Design, projectId a6ac90b2-d70d-4065-aa96-7c9c5757759a), lu via DesignSync le 2026-08-05. Module École des Héros : 6 écrans (carte du niveau, leçon 4 formats, quiz, résultat de quiz, passage de niveau, collection). Le prompt prompt-claude-design-ecole-heros.md décrit 11 écrans (dont un écran d’explication première visite et des ajouts Espace Parent) : la maquette réelle en couvre 6, les écrans explicatif et Espace Parent ne sont pas dans ce fichier .dc.html à ce jour. NE PAS reconstruire le bloc KID LESSON / SESSION END qui suit immédiatement dans le fichier source (écran Bravo Léa, contenu fictif) : Yannick a déjà tranché le 2026-07-31 de ne pas le construire, volontairement exclu de cet extrait. -->
+        <!-- ============ ÉCOLE DES HÉROS — LEVEL MAP ============ -->
+        <sc-if value="{{ isEcole }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:10px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+              <button onClick="{{ goKid }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:22px;cursor:pointer;padding:0">‹</button>
+              <div style="flex:1"><div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;color:#E9A15C">{{ tEcoleTag }}</div><div style="font-family:'Cinzel',serif;font-size:22px;color:#F7E7C8;font-weight:700">{{ ecoleLevelName }}</div></div>
+              <div onClick="{{ goCollection }}" style="cursor:pointer;width:44px;height:44px;border-radius:50%;background:linear-gradient(150deg,#D9A441,#B06A1E);display:flex;align-items:center;justify-content:center;font-size:22px">🏅</div>
+            </div>
+            <div style="height:8px;border-radius:9px;background:#2a1810;margin-bottom:6px"><div style="height:100%;border-radius:9px;background:linear-gradient(90deg,#F0C36B,#E07B3A);width:{{ ecolePct }}"></div></div>
+            <div style="font-size:11px;color:#E9C9A6;margin-bottom:22px;font-family:'Space Mono',monospace">{{ ecoleProgressLabel }}</div>
+            <div style="position:relative;display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ ecoleHeroes }}" as="h" hint-placeholder-count="4">
+                <div onClick="{{ h.open }}" style="cursor:{{ h.cursor }};display:flex;align-items:center;gap:16px;padding:6px 0;{{ h.rowAlign }}">
+                  <div style="width:74px;height:74px;border-radius:50%;flex:none;position:relative;display:flex;align-items:center;justify-content:center;{{ h.medalStyle }}">
+                    <span style="font-size:30px">{{ h.medalIcon }}</span>
+                    <sc-if value="{{ h.done }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-4px;right:-4px;font-size:20px">⭐</span></sc-if>
+                  </div>
+                  <div style="flex:1"><div style="font-family:'Cinzel',serif;font-size:16px;font-weight:600;color:{{ h.nameColor }}">{{ h.name }}</div><div style="font-size:11.5px;color:#B89B7E">{{ h.sub }}</div></div>
+                </div>
+              </sc-for>
+              <div onClick="{{ openFinalQuiz }}" style="cursor:{{ finalCursor }};display:flex;align-items:center;gap:16px;padding:10px 0;margin-top:6px">
+                <div style="width:74px;height:74px;border-radius:20px;flex:none;display:flex;align-items:center;justify-content:center;{{ finalStyle }}"><span style="font-size:32px">{{ finalIcon }}</span></div>
+                <div style="flex:1"><div style="font-family:'Cinzel',serif;font-size:16px;font-weight:600;color:{{ finalColor }}">{{ tFinalQuiz }}</div><div style="font-size:11.5px;color:#B89B7E">{{ tFinalQuizSub }}</div></div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ============ ÉCOLE — LESSON (4 FORMATS) ============ -->
+        <sc-if value="{{ isEcoleLesson }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:afbFade .4s ease both;padding-bottom:120px">
+            <div style="position:relative;height:200px;background:linear-gradient(150deg,#E07B3A,#A0392C)">
+              {{ ecLessonCover }}<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,11,8,.1),rgba(15,11,8,.75))"></div>
+              <button onClick="{{ goEcole }}" style="position:absolute;top:14px;left:16px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.4);border:2px solid rgba(255,255,255,.5);color:#fff;font-size:20px;cursor:pointer;z-index:5">‹</button>
+              <div style="position:absolute;bottom:14px;left:18px;right:18px"><div style="font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:#fff">{{ ecLesson.name }}</div><div style="font-size:12px;color:#FFE6C9">{{ ecLesson.context }}</div></div>
+            </div>
+            <div style="display:flex;gap:8px;padding:14px 18px 0">
+              <sc-for list="{{ ecFormats }}" as="f" hint-placeholder-count="4">
+                <div onClick="{{ f.pick }}" style="flex:1;cursor:pointer;text-align:center;padding:11px 4px;border-radius:14px;position:relative;{{ f.style }}"><div style="font-size:22px">{{ f.icon }}</div><div style="font-size:10.5px;font-weight:700;margin-top:3px">{{ f.label }}</div><sc-if value="{{ f.soon }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:4px;right:4px;font-size:8px">🔒</span></sc-if></div>
+              </sc-for>
+            </div>
+            <div style="padding:18px">
+              <sc-if value="{{ ecFmtRead }}" hint-placeholder-val="{{ true }}">
+                <sc-for list="{{ ecLesson.text }}" as="para" hint-placeholder-count="2"><p style="font-size:15.5px;line-height:1.8;color:#EDE3D4;margin:0 0 16px">{{ para }}</p></sc-for>
+              </sc-if>
+              <sc-if value="{{ ecFmtListen }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ ecLesson.hasAudio }}" hint-placeholder-val="{{ true }}">
+                  <div style="text-align:center;padding:30px 0"><div style="width:130px;height:130px;border-radius:50%;background:linear-gradient(150deg,#E07B3A,#A0392C);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:50px;box-shadow:0 0 40px rgba(224,123,58,.4)">▶</div><div style="font-size:14px;color:#E9C9A6">{{ tKidNarration }}</div></div>
+                </sc-if>
+                <sc-if value="{{ ecLesson.noAudio }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:50px 20px"><div style="font-size:44px;opacity:.5">🎧</div><div style="font-size:14px;color:#B89B7E;margin-top:12px">{{ tSoonKid }}</div></div></sc-if>
+              </sc-if>
+              <sc-if value="{{ ecFmtWatch }}" hint-placeholder-val="{{ false }}">
+                <div style="text-align:center;padding:50px 20px"><div style="font-size:44px;opacity:.5">🎬</div><div style="font-size:14px;color:#B89B7E;margin-top:12px">{{ tSoonKid }}</div></div>
+              </sc-if>
+              <sc-if value="{{ ecFmtBd }}" hint-placeholder-val="{{ false }}">
+                <div style="text-align:center;padding:50px 20px"><div style="font-size:44px;opacity:.5">📖</div><div style="font-size:14px;color:#B89B7E;margin-top:12px">{{ tSoonKid }}</div></div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 18px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(15,11,8,0),#1a0f06 30%);z-index:20">
+            <button onClick="{{ startQuiz }}" style="width:100%;font:inherit;font-weight:800;font-size:15px;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,#F0C36B,#E07B3A);color:#1a1109;cursor:pointer">{{ tReadyQuiz }}</button>
+          </div>
+        </sc-if>
+
+        <!-- ============ ÉCOLE — QUIZ ============ -->
+        <sc-if value="{{ isEcoleQuiz }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;display:flex;flex-direction:column;padding:16px 18px 30px;animation:afbFade .3s ease both">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+              <button onClick="{{ goEcole }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:20px;cursor:pointer;padding:0">✕</button>
+              <div style="flex:1;height:10px;border-radius:9px;background:#2a1810"><div style="height:100%;border-radius:9px;background:linear-gradient(90deg,#F0C36B,#E07B3A);width:{{ quizPct }}"></div></div>
+              <span style="font-family:'Space Mono',monospace;font-size:11px;color:#E9C9A6">{{ quizPos }}</span>
+            </div>
+            <sc-if value="{{ quizAsking }}" hint-placeholder-val="{{ true }}">
+              <div style="font-family:'Cinzel',serif;font-size:22px;color:#F7E7C8;line-height:1.3;margin-bottom:28px;font-weight:600">{{ quizQuestion }}</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ quizChoices }}" as="c" hint-placeholder-count="3"><div onClick="{{ c.pick }}" style="cursor:pointer;padding:18px;border-radius:16px;font-size:15px;font-weight:600;{{ c.style }}">{{ c.label }}</div></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ quizFeedback }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+                <div style="font-size:70px;animation:afbPop .5s ease both">{{ fbIcon }}</div>
+                <div style="font-family:'Cinzel',serif;font-size:22px;color:#F7E7C8;margin:14px 0 8px;font-weight:700">{{ fbTitle }}</div>
+                <p style="font-size:14px;color:#E9C9A6;margin:0 0 26px;max-width:270px;line-height:1.5">{{ fbText }}</p>
+                <button onClick="{{ quizNext }}" style="font:inherit;font-weight:800;font-size:15px;padding:15px 40px;border-radius:16px;border:none;background:linear-gradient(135deg,#F0C36B,#E07B3A);color:#1a1109;cursor:pointer">{{ tContinue }}</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ============ ÉCOLE — QUIZ RESULT ============ -->
+        <sc-if value="{{ isEcoleResult }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 24px 120px;animation:afbFade .4s ease both">
+            <div style="font-size:80px;animation:afbPop .6s ease both">{{ resultIcon }}</div>
+            <div style="font-family:'Cinzel',serif;font-size:28px;color:#F7E7C8;margin:16px 0 6px;font-weight:700">{{ resultScore }}</div>
+            <p style="font-size:14.5px;color:#E9C9A6;margin:0 0 20px;max-width:280px;line-height:1.55">{{ resultMsg }}</p>
+            <div style="display:flex;gap:12px;margin-bottom:30px"><span style="font-size:40px">{{ star1 }}</span><span style="font-size:40px">{{ star2 }}</span><span style="font-size:40px">{{ star3 }}</span></div>
+            <button onClick="{{ resultContinue }}" style="font:inherit;font-weight:800;font-size:15px;padding:16px 36px;border-radius:16px;border:none;background:linear-gradient(135deg,#F0C36B,#E07B3A);color:#1a1109;cursor:pointer">{{ resultCta }}</button>
+            <sc-if value="{{ resultRetry }}" hint-placeholder-val="{{ false }}"><button onClick="{{ retryLesson }}" style="margin-top:14px;font:inherit;font-size:13px;color:#E9C9A6;background:none;border:none;cursor:pointer;text-decoration:underline">{{ tReview }}</button></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- ============ ÉCOLE — LEVEL UP ============ -->
+        <sc-if value="{{ isEcoleLevelUp }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 24px 120px;background:radial-gradient(circle at 50% 40%,rgba(240,195,107,.18),transparent 60%);animation:afbFade .4s ease both">
+            <div style="font-size:90px;animation:afbPop .7s ease both">🎊</div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:#E9A15C;margin-top:10px">{{ tLevelDone }}</div>
+            <div style="font-family:'Cinzel',serif;font-size:26px;color:#F7E7C8;margin:8px 0 20px;font-weight:700">{{ tNextLevel }} :<br>{{ nextLevelName }}</div>
+            <div style="display:flex;gap:12px;margin-bottom:28px">
+              <div style="width:60px;height:60px;border-radius:50%;background:#2a1810;border:2px dashed rgba(240,195,107,.4);display:flex;align-items:center;justify-content:center;font-size:26px;opacity:.6">👤</div>
+              <div style="width:60px;height:60px;border-radius:50%;background:#2a1810;border:2px dashed rgba(240,195,107,.4);display:flex;align-items:center;justify-content:center;font-size:26px;opacity:.6">👤</div>
+              <div style="width:60px;height:60px;border-radius:50%;background:#2a1810;border:2px dashed rgba(240,195,107,.4);display:flex;align-items:center;justify-content:center;font-size:26px;opacity:.6">👤</div>
+            </div>
+            <button onClick="{{ goEcole }}" style="font:inherit;font-weight:800;font-size:15px;padding:16px 36px;border-radius:16px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">{{ tKeepGoing }}</button>
+          </div>
+        </sc-if>
+
+        <!-- ============ ÉCOLE — COLLECTION ============ -->
+        <sc-if value="{{ isEcoleCollection }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:10px 18px 120px;animation:afbFade .4s ease both">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+              <button onClick="{{ goEcole }}" style="font:inherit;background:none;border:none;color:#E9BE77;font-size:22px;cursor:pointer;padding:0">‹</button>
+              <div style="font-family:'Cinzel',serif;font-size:20px;color:#F7E7C8;font-weight:700">{{ tMyCollection }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <sc-for list="{{ collectionHeroes }}" as="h" hint-placeholder-count="4">
+                <div onClick="{{ h.open }}" style="cursor:{{ h.cursor }};border-radius:18px;padding:16px;text-align:center;{{ h.cardStyle }}">
+                  <div style="width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;{{ h.medalStyle }};font-size:28px">{{ h.medalIcon }}</div>
+                  <div style="font-family:'Cinzel',serif;font-size:13.5px;font-weight:600;color:{{ h.nameColor }};line-height:1.2">{{ h.name }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>

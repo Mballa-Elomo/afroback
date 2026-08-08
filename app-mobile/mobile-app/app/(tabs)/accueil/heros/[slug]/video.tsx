@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +8,7 @@ import { GhostButton, OutlineButton } from '../../../../../src/components/Button
 import { HeroPlaceholder } from '../../../../../src/components/HeroVisual';
 import { StoryboardSlideshow } from '../../../../../src/components/StoryboardSlideshow';
 import { useHero, useRelatedHeroes } from '../../../../../src/data/useHeroesData';
+import { recordHeroEngagement, recordVideoChapterEngagement } from '../../../../../src/data/engagementRepository';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import type { Heros } from '../../../../../src/data/types';
 
@@ -30,10 +31,28 @@ export default function LecteurVideoScreen() {
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
   const related = useRelatedHeroes(heros);
   const [chapterIdx, setChapterIdx] = useState(0);
+  const engagementLoggedRef = useRef(false);
 
   useEffect(() => {
     setChapterIdx(0);
   }, [slug]);
+
+  // Engagement réel (voir "ENGAGEMENT GLOBAL" côté back-office) : compté
+  // dès qu'il y a du vrai contenu vidéo à voir — documentaire (unique ou par
+  // chapitre) OU diaporama animé du storyboard (planches réelles, pas un
+  // texte inventé, voir le commentaire en tête de fichier) — jamais quand
+  // l'écran n'affiche que le placeholder statique "DOCUMENTAIRE BIENTÔT
+  // DISPONIBLE" sans aucun storyboard derrière.
+  useEffect(() => {
+    if (engagementLoggedRef.current || !heros) return;
+    const hasRealVideoContent =
+      Boolean(heros.video_url) ||
+      (heros.video_chapitres ?? []).length > 0 ||
+      heros.chapitres_storyboard.some((c) => c.planches.length > 0);
+    if (!hasRealVideoContent) return;
+    engagementLoggedRef.current = true;
+    recordHeroEngagement(heros.id, 'video');
+  }, [heros]);
 
   if (herosState.status === 'loading') {
     return (
@@ -93,7 +112,7 @@ export default function LecteurVideoScreen() {
         {hasLegacyVideo ? (
           <VideoPlayerArea uri={heros.video_url as string} />
         ) : selectedVideoChapitre ? (
-          <VideoChapitrePlayerArea chapitre={selectedVideoChapitre} />
+          <VideoChapitrePlayerArea heroId={heros.id} chapitre={selectedVideoChapitre} />
         ) : selectedStoryboard && selectedStoryboard.planches.length > 0 ? (
           <StoryboardSlideshow chapitres={[selectedStoryboard]} />
         ) : (
@@ -196,18 +215,44 @@ function VideoPlayerArea({ uri }: { uri: string }) {
  * voir `AudioPlayerBlock` dans audio.tsx pour le même principe). `key={uri}`
  * force le remontage de `VideoPlayerArea` au changement de langue : `useVideoPlayer`
  * ne recharge pas sa source tout seul si l'URL change en prop.
+ *
+ * Engagement détaillé par chapitre × langue (demande de Yannick le
+ * 2026-08-06) : même composant qui reste monté d'un chapitre à l'autre
+ * (`chapterIdx` change juste la prop `chapitre`, pas de remontage), donc le
+ * garde-fou "déjà loggé" est une Set de clés `numero-langue` plutôt qu'un
+ * simple booléen — sinon changer de chapitre après avoir déjà écouté le
+ * chapitre précédent en FR ne relogerait jamais rien.
  */
-function VideoChapitrePlayerArea({ chapitre }: { chapitre: Heros['video_chapitres'][number] }) {
+function VideoChapitrePlayerArea({ heroId, chapitre }: { heroId: string; chapitre: Heros['video_chapitres'][number] }) {
   const hasBoth = Boolean(chapitre.video_url_fr && chapitre.video_url_en);
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  // Même repli qu'AudioPlayerBlock (audio.tsx) : la langue réellement jouée
+  // peut différer du réglage `lang` si une seule des deux pistes existe pour
+  // ce chapitre précis.
+  const actualLang: 'fr' | 'en' =
+    lang === 'fr'
+      ? chapitre.video_url_fr
+        ? 'fr'
+        : 'en'
+      : chapitre.video_url_en
+        ? 'en'
+        : 'fr';
   const uri = (lang === 'fr' ? chapitre.video_url_fr : chapitre.video_url_en)
     ?? chapitre.video_url_fr
     ?? chapitre.video_url_en
     ?? '';
+  const loggedKeysRef = useRef(new Set<string>());
 
   useEffect(() => {
     setLang('fr');
   }, [chapitre.numero]);
+
+  useEffect(() => {
+    const key = `${chapitre.numero}-${actualLang}`;
+    if (loggedKeysRef.current.has(key)) return;
+    loggedKeysRef.current.add(key);
+    recordVideoChapterEngagement(heroId, chapitre.numero, actualLang);
+  }, [heroId, chapitre.numero, actualLang]);
 
   return (
     <View>

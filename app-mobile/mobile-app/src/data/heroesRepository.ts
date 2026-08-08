@@ -19,7 +19,12 @@ async function fetchHeroes(): Promise<Heros[]> {
   if (error) {
     throw new Error(`Impossible de charger les héros depuis Supabase : ${error.message}`);
   }
-  return (data ?? []) as Heros[];
+  const heroes = (data ?? []) as Heros[];
+  // Filtré côté client, pas dans la requête Supabase : reste compatible même
+  // si backoffice/supabase/schema-admin-heros.sql n'a pas encore été exécuté
+  // par Yannick (colonne absente -> traité comme publié, comportement
+  // identique à avant l'introduction du back-office).
+  return heroes.filter((h) => (h.statut_publication ?? 'publie') !== 'depublie');
 }
 
 export async function getHeroes(): Promise<Heros[]> {
@@ -35,6 +40,21 @@ export async function getHeroes(): Promise<Heros[]> {
       });
   }
   return inflight;
+}
+
+/**
+ * Force un vrai aller-retour Supabase, en ignorant le cache mémoire —
+ * utilisé par `useHeroesList()` (voir useHeroesData.ts) pour que le
+ * catalogue héros et l'accueil se rafraîchissent tout seuls quand l'écran
+ * reprend le focus (ex. après une action faite depuis le back-office :
+ * publier/dépublier, mettre à la une). Sans cette fonction, `getHeroes()`
+ * continuerait à renvoyer le même tableau en mémoire pour toute la durée de
+ * vie du process, quel que soit le nombre de refocus.
+ */
+export async function refreshHeroes(): Promise<Heros[]> {
+  const heroes = await fetchHeroes();
+  cache = heroes;
+  return heroes;
 }
 
 export async function getHeroBySlug(slug: string): Promise<Heros | undefined> {

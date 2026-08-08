@@ -1,5 +1,5 @@
 -- AFROBACK Mobile — schéma Postgres pour le pilier Histoires & Héros
--- Généré le 2026-07-31 à partir de
+-- Généré le 2026-08-06 à partir de
 -- livrables/sites-web/afroback/app-mobile/data-model-heros.md
 
 create extension if not exists pgcrypto;
@@ -64,7 +64,16 @@ create policy "Public read access" on public.heros
 -- Écriture réservée au rôle service_role (dashboard / futur back-office),
 -- jamais au rôle anon utilisé par l'app mobile.
 
-truncate table public.heros;
+-- Plus de `truncate` ici depuis le 2026-08-06. Un truncate + reinsert donnait
+-- un nouvel id (gen_random_uuid()) à chaque héros à chaque exécution de ce
+-- script, ce qui cassait par cascade ecole_lecons (module École des Héros),
+-- hero_engagement et hero_video_chapter_engagement (stats réelles de lecture/
+-- écoute/visionnage) à chaque réexécution — un bug découvert quand ce script
+-- a échoué sur ERROR 0A000 (ecole_lecons référence heros(id) en cascade).
+-- Chaque insert ci-dessous est maintenant un upsert (`on conflict (slug) do
+-- update`) : le slug identifie le héros de façon stable, son id ne change
+-- plus une fois créé, donc les tables qui en dépendent survivent aux
+-- réexécutions futures de seed.sql.
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'reine-nzinga',
@@ -183,7 +192,40 @@ If you descend from this land that watched her fight into being, remember this: 
   '[{"numero":1,"titre_chapitre":"Naître dans un monde qui se referme","video_url_fr":"https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/video/reine-nzinga-chap1-fr.mp4","video_url_en":"https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/video/reine-nzinga-chap1-en.mp4"}]'::jsonb,
   null,
   1
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'martin-paul-samba',
@@ -254,15 +296,48 @@ Even today, a statue watches over Ebolowa, from a hill overlooking the town. If 
   '[{"numero":1,"titre_chapitre":"Naître à la croisée de deux mondes","fichier_source":"livrables/sites-web/afroback/Récits africains storyboards/martin-paul-samba/chapitre-1.md","nb_planches":24,"statut":"pret","planches":[{"numero":1,"titre":"Le Kamerun allemand","texte_ecran":"Sud du Kamerun, colonie allemande, fin du XIXe siècle","voix_off":"Il y a un siècle et plus, dans le sud de ce qui s''appelait alors le Kamerun, une colonie allemande arrachée à coups de traités inégaux et de campagnes militaires...","cadrage":"plan d''ensemble, vue aérienne","action_visuelle":"carte vivante du sud du Kamerun, forêt dense traversée par des sentiers, un drapeau allemand planté sur un poste avancé au loin, contraste entre l''immensité verte et ce petit symbole étranger","decor":"canopée équatoriale, collines du pays bulu, rivière serpentant vers Ebolowa","ambiance_lumiere":"aube brumeuse, lumière verte filtrée","palette":"vert profond, ocre, noir","duree_secondes":4,"transition":"fondu"},{"numero":2,"titre":"Un village bulu","texte_ecran":null,"voix_off":"Un enfant naît dans un petit village du pays bulu, non loin d''Ebolowa.","cadrage":"plan large","action_visuelle":"cases groupées autour d''une place commune, femmes pilant, enfants jouant, hommes revenant de la chasse, vie communautaire dense et digne","decor":"clairière de forêt, cases en bois et raphia, fumée de foyers","ambiance_lumiere":"milieu de matinée, lumière chaude et douce","palette":"ocre, terracotta, vert","duree_secondes":3,"transition":"cut"},{"numero":3,"titre":"Mebenga m''Ebono","texte_ecran":"Mebenga m''Ebono, v. 1874-1875","voix_off":"On le nomme Mebenga m''Ebono.","cadrage":"gros plan","action_visuelle":"le visage d''un nouveau-né dans les bras d''une accoucheuse, regard déjà grave qui deviendra son trait constant","decor":"intérieur de case, nattes, pénombre chaude","ambiance_lumiere":"lumière de lampe à huile, clair-obscur marqué","palette":"brun sombre, orange chaud, noir","duree_secondes":3,"transition":"fondu"},{"numero":4,"titre":"Un père absent","texte_ecran":null,"voix_off":"Le monde ne lui fait pas de cadeau dès le départ : son père meurt avant sa naissance.","cadrage":"plan rapproché","action_visuelle":"une mère enceinte, seule devant l''entrée de sa case, regard tourné vers l''horizon, silence pesant de la communauté autour d''elle","decor":"seuil de case, cour de terre battue","ambiance_lumiere":"fin de jour, lumière rasante et grise","palette":"gris-brun, ocre éteint","duree_secondes":3,"transition":"cut"},{"numero":5,"titre":"Une mère qui s''éteint","texte_ecran":null,"voix_off":"Sa mère meurt peu après. Orphelin, il est recueilli par les siens.","cadrage":"plan moyen","action_visuelle":"des femmes du village portant le nourrisson entre elles, cérémonie sobre de deuil en arrière-plan, solidarité communautaire immédiate","decor":"place du village, foyers éteints","ambiance_lumiere":"aube grise, brume basse","palette":"gris-bleu, brun terreux","duree_secondes":4,"transition":"fondu"},{"numero":6,"titre":"Grandir parmi les siens","texte_ecran":null,"voix_off":"Il grandit parmi sa famille élargie, comme tant d''enfants du pays bulu.","cadrage":"plan large","action_visuelle":"l''enfant Mebenga parmi d''autres enfants, appris à pêcher, à reconnaître les plantes, à écouter les anciens autour du feu","decor":"lisière de forêt, rivière peu profonde","ambiance_lumiere":"après-midi, lumière tachetée par le feuillage","palette":"vert, ocre, or pâle","duree_secondes":3,"transition":"cut"},{"numero":7,"titre":"Le départ vers Kribi","texte_ecran":null,"voix_off":"Tout jeune encore, il est envoyé vers la côte, à Kribi.","cadrage":"plan d''ensemble, vue de dos","action_visuelle":"l''enfant marchant sur un sentier forestier avec un guide adulte, village qui disparaît derrière lui, petite silhouette face à l''immensité du chemin","decor":"sentier bordé de fougères géantes, forêt dense","ambiance_lumiere":"matin, rayons filtrant entre les arbres","palette":"vert sombre, ocre, gris-vert","duree_secondes":4,"transition":"fondu"},{"numero":8,"titre":"Kribi, la ville des étrangers","texte_ecran":"Kribi, comptoir colonial allemand","voix_off":"Il grandit dans l''orbite des étrangers venus d''Europe, qui plantent leur drapeau sur cette terre.","cadrage":"plan large, contre-jour","action_visuelle":"port de Kribi, bâtiments coloniaux en bois et tôle, navire allemand à quai, drapeau flottant, agitation du comptoir commercial","decor":"littoral atlantique, jetée de bois, entrepôts","ambiance_lumiere":"fin de matinée, lumière dure et métallique","palette":"gris-bleu, terracotta délavé, noir","duree_secondes":4,"transition":"cut"},{"numero":9,"titre":"Deux mondes côte à côte","texte_ecran":null,"voix_off":"C''est là que le destin de cet enfant bascule une première fois.","cadrage":"plan moyen","action_visuelle":"le jeune Mebenga observant des commerçants et administrateurs allemands décharger des caisses, curiosité mêlée de méfiance sur son visage","decor":"quai animé, caisses empilées, porteurs locaux","ambiance_lumiere":"milieu de journée, ombres nettes","palette":"ocre, gris acier, noir","duree_secondes":3,"transition":"cut"},{"numero":10,"titre":"Le regard de Kurt von Morgan","texte_ecran":null,"voix_off":"Il attire l''attention d''un explorateur allemand, Kurt von Morgan.","cadrage":"plan rapproché, champ-contrechamp","action_visuelle":"von Morgan, casque colonial, observant longuement le jeune Mebenga avec un calcul froid, l''enfant soutenant le regard sans se dérober","decor":"véranda d''un bâtiment colonial, ombre portée","ambiance_lumiere":"après-midi, lumière latérale dure","palette":"gris-bleu, terracotta sombre, noir","duree_secondes":4,"transition":"cut"},{"numero":11,"titre":"La décision de l''envoyer en Allemagne","texte_ecran":"1891","voix_off":"En 1891, on l''envoie loin de chez lui, en Allemagne, pour y recevoir une formation militaire.","cadrage":"plan large","action_visuelle":"le jeune Mebenga, une quinzaine d''années, sur le pont d''un navire à vapeur, dernière vue de la côte camerounaise qui s''efface à l''horizon","decor":"pont de navire, cordages, cheminée fumante","ambiance_lumiere":"fin de journée, ciel orangé strié","palette":"terracotta sombre, gris-bleu, noir","duree_secondes":4,"transition":"fondu"},{"numero":12,"titre":"La traversée","texte_ecran":null,"voix_off":"Imagine ce que c''est, ce grand écart.","cadrage":"plan d''ensemble, vue aérienne","action_visuelle":"le navire minuscule au milieu d''un océan gris et vaste, seul point de vie dans l''immensité, symbole de l''arrachement","decor":"océan Atlantique, ciel bas","ambiance_lumiere":"jour gris, lumière plate et froide","palette":"gris-bleu, blanc cassé, noir","duree_secondes":3,"transition":"cut"},{"numero":13,"titre":"L''arrivée en Allemagne","texte_ecran":null,"voix_off":"Naître dans un village bulu et se retrouver sur les bancs d''une académie militaire prussienne.","cadrage":"plan large, contre-plongée","action_visuelle":"façade imposante d''une académie militaire allemande, colonnes de pierre, cadets en uniforme marchant au pas, Mebenga debout, seul, face à ce décor écrasant","decor":"cour pavée d''une académie militaire, architecture prussienne","ambiance_lumiere":"matin froid, lumière blanche et dure","palette":"gris pierre, bleu prussien, noir","duree_secondes":4,"transition":"cut"},{"numero":14,"titre":"Le baptême, un nom nouveau","texte_ecran":"Martin-Paul Samba","voix_off":"Là-bas, on le baptise, on lui donne un nom nouveau : Martin-Paul Samba.","cadrage":"gros plan","action_visuelle":"un officier allemand inscrivant un nom sur un registre, plume grattant le papier, le visage de Samba hors champ mais sa main visible signant ou touchant le document","decor":"bureau d''enregistrement militaire, registres empilés","ambiance_lumiere":"intérieur, lumière de fenêtre froide","palette":"gris, noir encre, blanc papier","duree_secondes":3,"transition":"cut"},{"numero":15,"titre":"L''instruction du cadet","texte_ecran":null,"voix_off":"Apprendre à marcher au pas, à manier les armes d''un empire qui vient de s''installer chez les siens.","cadrage":"plan moyen","action_visuelle":"Samba en uniforme de cadet, rangé parmi d''autres élèves européens, exercice de maniement d''armes, posture apprise et rigide","decor":"terrain d''exercice militaire, ciel gris","ambiance_lumiere":"matin, lumière froide et plate","palette":"bleu prussien, gris acier, noir","duree_secondes":3,"transition":"cut"},{"numero":16,"titre":"Le reflet dans la vitre","texte_ecran":null,"voix_off":"Imagine ce que c''est, ce grand écart entre le village bulu et les bancs de cette académie.","cadrage":"gros plan symbolique","action_visuelle":"le reflet du visage de Samba en uniforme dans une vitre embuée, superposé en transparence à l''image fugace de la forêt bulu, tension entre les deux mondes qu''il porte désormais en lui","decor":"fenêtre d''un dortoir militaire, nuit","ambiance_lumiere":"nocturne, lumière de lampe froide","palette":"noir profond, bleu-gris, touche d''ocre fantôme","duree_secondes":4,"transition":"fondu au noir bref"},{"numero":17,"titre":"Le retour au Kamerun","texte_ecran":"1894","voix_off":"Quand Samba rentre au Kamerun en 1894, gradé officier, il ne revient pas en résistant.","cadrage":"plan large","action_visuelle":"Samba débarquant à Kribi en uniforme d''officier de la Schutztruppe, accueilli par des administrateurs allemands, foule locale observant à distance, silencieuse","decor":"quai de Kribi, drapeaux coloniaux","ambiance_lumiere":"milieu de journée, lumière dure sans nuance","palette":"gris acier, terracotta sec, noir","duree_secondes":4,"transition":"cut"},{"numero":18,"titre":"Au service de l''administration","texte_ecran":null,"voix_off":"Il revient au service de l''administration coloniale allemande.","cadrage":"plan moyen","action_visuelle":"Samba en uniforme d''officier, debout parmi des officiers allemands lors d''un rapport militaire, intégré mais visiblement seul de son rang parmi eux","decor":"cour de garnison coloniale","ambiance_lumiere":"après-midi, lumière frontale crue","palette":"gris, terracotta terne, noir","duree_secondes":3,"transition":"cut"},{"numero":19,"titre":"Hans Dominik","texte_ecran":"Hans Dominik, officier de la Schutztruppe","voix_off":"Pendant huit ans, il accompagne les expéditions militaires du redouté Hans Dominik.","cadrage":"plan rapproché, contre-plongée","action_visuelle":"Dominik, cravache à la main, donnant des ordres à une colonne de soldats coloniaux dont Samba fait partie, autorité brutale et froide qui domine le cadre","decor":"lisière de forêt, colonne en marche","ambiance_lumiere":"matin, lumière dure et sans pitié","palette":"gris-vert, noir, terracotta sale","duree_secondes":4,"transition":"cut"},{"numero":20,"titre":"Les campagnes de pacification","texte_ecran":null,"voix_off":"Des campagnes dites de « pacification » menées contre d''autres communautés camerounaises.","cadrage":"plan d''ensemble","action_visuelle":"un village voisin soumis par la force, colonne de soldats coloniaux encadrant des habitants effrayés, fumée légère au loin, aucune complaisance dans la mise en scène de cette violence historique","decor":"village camerounais non-bulu, clairière","ambiance_lumiere":"fin de journée, lumière orangée dure, ombres longues","palette":"terracotta brûlé, gris, noir","duree_secondes":4,"transition":"cut"},{"numero":21,"titre":"Samba dans le rang","texte_ecran":null,"voix_off":"Ce n''est pas un détail qu''on efface pour rendre l''histoire plus belle. C''est un fait.","cadrage":"gros plan","action_visuelle":"le visage de Samba au milieu de la colonne, impassible en apparence, mais un muscle tendu à la mâchoire, un détail qui trahit un malaise contenu","decor":"arrière-plan flou de colonne militaire","ambiance_lumiere":"lumière dure de fin de journée","palette":"gris, ocre sale, noir","duree_secondes":3,"transition":"cut"},{"numero":22,"titre":"Un homme pris dans un système","texte_ecran":null,"voix_off":"Avant d''être un héros de la résistance, Martin Paul Samba a porté l''uniforme de ceux qui soumettaient son propre continent.","cadrage":"plan moyen, symétrie appuyée","action_visuelle":"Samba seul face à un feu de camp la nuit, uniforme posé à côté de lui, regard perdu dans les flammes, première fissure visible dans son assurance d''officier","decor":"campement militaire nocturne","ambiance_lumiere":"nuit, lumière de feu orangée, contraste fort","palette":"noir profond, orange de braise, brun","duree_secondes":4,"transition":"fondu"},{"numero":23,"titre":"Huit années passent","texte_ecran":"1894-1902","voix_off":"L''histoire africaine, la vraie, n''est pas faite de lignes droites et de statues immaculées.","cadrage":"montage de plans rapprochés successifs (à traiter comme un enchaînement rapide sur une seule planche)","action_visuelle":"trois fragments visuels superposés en fondu : Samba jeune officier fier, Samba marchant fatigué sous la pluie, Samba au regard de plus en plus lointain ; le temps qui pèse","decor":"décors variés de garnison et de brousse, traités en fondu","ambiance_lumiere":"transitions de lumière du jour vers la nuit, dégradé","palette":"gris-brun, terracotta éteint, noir","duree_secondes":5,"transition":"fondu enchaîné"},{"numero":24,"titre":"Le regard qui doute","texte_ecran":null,"voix_off":"Elle est faite d''hommes pris dans des systèmes plus grands qu''eux, et qui, parfois, finissent par se retourner contre le système qui les a façonnés.","cadrage":"gros plan, contre-plongée légère","action_visuelle":"Samba en uniforme, regard tourné vers l''horizon camerounais au loin, quelque chose dans ses yeux qui n''est plus tout à fait celui d''un officier loyal","decor":"lisière de forêt surplombant une vallée du sud Kamerun","ambiance_lumiere":"lever de soleil naissant, première touche de chaleur après le froid du chapitre","palette":"or naissant, terracotta, noir profond","duree_secondes":4,"transition":"fondu enchaîné vers le chapitre 2"}]},{"numero":2,"titre_chapitre":"Voir avec ses propres yeux","fichier_source":"livrables/sites-web/afroback/Récits africains storyboards/martin-paul-samba/chapitre-2.md","nb_planches":24,"statut":"pret","planches":[{"numero":1,"titre":"1902, la décision","texte_ecran":"1902","voix_off":"C''est bien ce qui arrive. En 1902, Samba quitte l''armée.","cadrage":"plan rapproché","action_visuelle":"Samba posant son sabre et son casque colonial sur une table, geste lent et définitif, plus aucune hésitation dans son visage","decor":"quartier d''officier dépouillé, malle de voyage ouverte","ambiance_lumiere":"matin, lumière neutre et froide qui commence à se réchauffer","palette":"gris, brun sobre, touche d''or naissant","duree_secondes":4,"transition":"cut"},{"numero":2,"titre":"Homme d''affaires à Ebolowa","texte_ecran":"Ebolowa, 1902","voix_off":"Il s''installe à Ebolowa comme homme d''affaires.","cadrage":"plan large","action_visuelle":"Samba en tenue civile, supervisant un petit comptoir commercial, sacs de cacao et de produits locaux, échanges avec des commerçants bulu","decor":"marché d''Ebolowa, étals de bois","ambiance_lumiere":"milieu de journée, lumière chaude et vivante","palette":"ocre, terracotta, brun chaud","duree_secondes":3,"transition":"cut"},{"numero":3,"titre":"Retrouver son peuple","texte_ecran":null,"voix_off":"Au contact quotidien de son peuple, loin des salles d''état-major, il voit ce que le régime colonial allemand fait vraiment aux siens.","cadrage":"plan moyen","action_visuelle":"Samba assis parmi des anciens du village, écoutant, une posture d''attention qu''il n''avait plus eue depuis l''enfance","decor":"véranda d''une maison bulu, cour ombragée","ambiance_lumiere":"après-midi, lumière tamisée par un auvent","palette":"brun chaud, ocre, vert sourd","duree_secondes":4,"transition":"cut"},{"numero":4,"titre":"Le travail forcé","texte_ecran":null,"voix_off":"Le Kamerun allemand n''est pas une administration débonnaire : c''est un système de travail forcé.","cadrage":"plan d''ensemble","action_visuelle":"une équipe d''hommes bulu contraints à des travaux de piste sous surveillance d''agents coloniaux, corps épuisés, poussière soulevée par les outils","decor":"chantier de route en construction dans la forêt","ambiance_lumiere":"plein midi, lumière crue, aucune ombre protectrice","palette":"ocre sale, gris poussière, noir","duree_secondes":4,"transition":"cut"},{"numero":5,"titre":"Les châtiments corporels","texte_ecran":null,"voix_off":"De châtiments corporels, de réquisitions brutales.","cadrage":"plan rapproché, cadrage serré et pudique","action_visuelle":"un agent colonial levant une cravache sur un travailleur agenouillé, le geste suspendu juste avant l''impact, traitement digne et sans complaisance de la violence","decor":"bord de chantier, groupe d''ouvriers figés de peur","ambiance_lumiere":"lumière dure de fin de matinée","palette":"gris-brun, rouille, noir","duree_secondes":3,"transition":"cut"},{"numero":6,"titre":"Femmes et enfants non épargnés","texte_ecran":null,"voix_off":"Les femmes et les enfants bulu ne sont pas épargnés par la dureté des agents coloniaux.","cadrage":"plan moyen","action_visuelle":"des femmes contraintes de livrer des récoltes entières à un agent colonial qui inspecte froidement les paniers, un enfant serré contre sa mère","decor":"entrée d''un village, paniers de récolte au sol","ambiance_lumiere":"fin d''après-midi, lumière orangée dure","palette":"terracotta terne, brun, gris","duree_secondes":4,"transition":"cut"},{"numero":7,"titre":"Samba témoin silencieux","texte_ecran":null,"voix_off":"Ce que Samba avait servi de loin, il le voit maintenant de près, et quelque chose se brise en lui.","cadrage":"gros plan","action_visuelle":"le visage de Samba observant la scène depuis le bord du chemin, mâchoire serrée, poings fermés le long du corps, silence habité","decor":"lisière du village, arrière-plan flou de la scène de réquisition","ambiance_lumiere":"lumière dorée déclinante, contraste marqué sur le visage","palette":"or-bronze, noir profond, brun","duree_secondes":4,"transition":"fondu"},{"numero":8,"titre":"Le souvenir qui revient","texte_ecran":null,"voix_off":"Ce n''est pas un détail qu''on efface : avant, lui aussi avait marché dans cette colonne.","cadrage":"plan rapproché, surimpression","action_visuelle":"le visage de Samba se superpose en transparence à un souvenir fugace de lui-même en uniforme, marchant avec les hommes de Dominik, reconnaissance douloureuse de sa propre part dans le système","decor":"flou, fondu entre présent et souvenir","ambiance_lumiere":"clair-obscur, transition de teintes chaudes vers un gris froid du souvenir","palette":"noir profond, gris-bleu, touche d''ocre","duree_secondes":4,"transition":"cut"},{"numero":9,"titre":"Une résolution silencieuse","texte_ecran":null,"voix_off":"Quelque chose se brise en lui, et dans ce silence naît une décision qu''il ne dira encore à personne.","cadrage":"plan moyen, symétrie centrale","action_visuelle":"Samba seul, assis devant sa maison à la tombée du jour, regard fixe, mains posées à plat sur les genoux, calme apparent qui cache une résolution profonde","decor":"véranda d''Ebolowa, nuit tombante","ambiance_lumiere":"crépuscule, lumière bleu-indigo naissante","palette":"bleu-indigo, noir, touche d''or de lampe","duree_secondes":4,"transition":"fondu"},{"numero":10,"titre":"1910, chef dans la hiérarchie bulu","texte_ecran":"1910","voix_off":"En 1910, il devient chef dans la hiérarchie bulu.","cadrage":"plan large, légère contre-plongée","action_visuelle":"cérémonie d''investiture, Samba recevant un bâton de commandement des mains des anciens, communauté rassemblée en cercle","decor":"place centrale du village, poteaux sculptés","ambiance_lumiere":"matin, lumière dorée et solennelle","palette":"or-bronze, terracotta, noir","duree_secondes":4,"transition":"cut"},{"numero":11,"titre":"Écouter les griefs de son peuple","texte_ecran":null,"voix_off":"Chef, il écoute maintenant les griefs de son peuple avec une autorité qu''il n''avait plus utilisée que pour servir d''autres intérêts.","cadrage":"plan moyen","action_visuelle":"Samba tenant conseil sous un arbre, des villageois exposant tour à tour leurs plaintes contre les réquisitions, Samba attentif, grave","decor":"grand arbre à palabres, sièges de bois","ambiance_lumiere":"milieu de journée, lumière tamisée par le feuillage","palette":"vert sourd, ocre, brun","duree_secondes":3,"transition":"cut"},{"numero":12,"titre":"1911, l''ascension d''Atangana","texte_ecran":"1911 — Charles Atangana, chef supérieur des Ewondo","voix_off":"Un an plus tard, l''administration allemande élève un autre homme, Charles Atangana, au rang de chef supérieur des Ewondo.","cadrage":"plan large, contre-plongée","action_visuelle":"cérémonie officielle allemande, Atangana en tenue de chef distincte, décorée d''insignes accordés par l''administration, officiers allemands autour de lui applaudissant","decor":"place officielle coloniale, drapeaux allemands","ambiance_lumiere":"plein jour, lumière froide et cérémonielle","palette":"gris acier, or terne, noir","duree_secondes":4,"transition":"cut"},{"numero":13,"titre":"L''inquiétude de Samba","texte_ecran":null,"voix_off":"Ce choix inquiète Samba : il y voit le signe que les Allemands entendent gouverner en jouant les peuples les uns contre les autres.","cadrage":"gros plan","action_visuelle":"le visage de Samba recevant la nouvelle, un léger froncement, calcul silencieux derrière ses yeux","decor":"intérieur sobre de sa maison à Ebolowa","ambiance_lumiere":"lumière de fin de journée entrant par une fenêtre étroite","palette":"brun, ocre sombre, noir","duree_secondes":3,"transition":"cut"},{"numero":14,"titre":"Un conseil restreint","texte_ecran":null,"voix_off":"C''est à partir de là, entre 1911 et 1912, que Samba bascule pour de bon.","cadrage":"plan moyen, cercle rapproché","action_visuelle":"Samba entouré de quelques fidèles de confiance, discussion à voix basse à la lueur d''une lampe, cartes ou bâtons tracés au sol pour illustrer un plan","decor":"arrière-salle d''une maison, volets fermés","ambiance_lumiere":"nuit, lumière de lampe unique, ombres portées longues","palette":"noir profond, orange de lampe, brun","duree_secondes":4,"transition":"fondu"},{"numero":15,"titre":"Il ne s''agit plus de protester","texte_ecran":null,"voix_off":"Il ne s''agit plus de protester. Il s''agit de préparer un soulèvement.","cadrage":"gros plan, contre-plongée","action_visuelle":"Samba debout, éclairé de dessous par la lampe posée au sol, expression transformée, déterminée, presque dure","decor":"même pièce, cercle de fidèles hors focus","ambiance_lumiere":"contraste fort, lumière montante depuis le bas","palette":"noir, orange intense, brun sombre","duree_secondes":3,"transition":"cut"},{"numero":16,"titre":"Le messager vers la côte","texte_ecran":null,"voix_off":"Il entre en contact secret avec un autre chef, à des centaines de kilomètres de là, sur la côte.","cadrage":"plan d''ensemble","action_visuelle":"un messager de confiance quittant Ebolowa de nuit, silhouette solitaire s''enfonçant sur une piste vers Douala","decor":"piste forestière, nuit étoilée","ambiance_lumiere":"nocturne, clair de lune bleuté","palette":"bleu-indigo, noir, touche argentée","duree_secondes":4,"transition":"fondu"},{"numero":17,"titre":"Rudolf Duala Manga Bell","texte_ecran":"Rudolf Duala Manga Bell, roi du clan Bell","voix_off":"Rudolf Duala Manga Bell, roi du clan Bell chez les Duala, lui-même excédé par les expropriations allemandes à Douala.","cadrage":"plan moyen","action_visuelle":"Manga Bell, regalia royale duala distincte de la tenue bulu, recevant le message de Samba des mains du messager, visage grave et déterminé","decor":"résidence royale duala, vue sur l''estuaire du Wouri","ambiance_lumiere":"fin de journée, lumière dorée sur l''eau","palette":"or-bronze, bleu d''estuaire, noir","duree_secondes":4,"transition":"cut"},{"numero":18,"titre":"Le plan à deux têtes","texte_ecran":null,"voix_off":"Samba chercherait des armes du côté des Français, tandis que Manga Bell chercherait un appui du côté des Britanniques.","cadrage":"plan large, split visuel implicite","action_visuelle":"deux itinéraires esquissés sur une carte tenue par des mains différentes, l''une tournée vers l''Afrique équatoriale française, l''autre vers le Nigeria britannique, symbole d''un plan à double front","decor":"carte coloniale d''Afrique centrale et occidentale posée sur une table de bois","ambiance_lumiere":"lumière de lampe sur la carte, reste de la pièce dans l''ombre","palette":"brun parchemin, noir, or terne","duree_secondes":4,"transition":"cut"},{"numero":19,"titre":"Entraîner les guerriers bulu","texte_ecran":null,"voix_off":"Pendant deux ans, dans l''ombre, Samba rassemble des soutiens, entraîne des guerriers bulu.","cadrage":"plan d''ensemble","action_visuelle":"une clairière cachée en forêt, des hommes bulu s''entraînant au maniement d''armes sous la supervision discrète de Samba, guetteurs postés en lisière","decor":"clairière isolée, sous-bois dense","ambiance_lumiere":"lumière filtrée, alternance d''ombre et de percées de soleil","palette":"vert sombre, ocre, noir","duree_secondes":4,"transition":"cut"},{"numero":20,"titre":"L''appui de Madola","texte_ecran":"Le chef Madola, Grand Batanga","voix_off":"Il obtient l''appui d''autres chefs comme Madola à Grand Batanga.","cadrage":"plan moyen","action_visuelle":"rencontre discrète entre Samba et le chef Madola sur une plage isolée de Grand Batanga, poignée d''avant-bras scellant l''alliance","decor":"littoral rocheux, palmiers courbés par le vent","ambiance_lumiere":"fin d''après-midi, ciel orangé","palette":"terracotta, bleu d''océan sombre, noir","duree_secondes":3,"transition":"cut"},{"numero":21,"titre":"L''appui d''Edande Mbita","texte_ecran":"Le chef Edande Mbita","voix_off":"Et Edande Mbita, accumule des armes.","cadrage":"plan moyen","action_visuelle":"Edande Mbita et ses hommes déchargeant discrètement des caisses dissimulées sous des feuillages dans une clairière nocturne","decor":"clairière cachée, nuit","ambiance_lumiere":"clair de lune, lampes tamisées","palette":"bleu-nuit, noir, éclat métallique discret","duree_secondes":4,"transition":"cut"},{"numero":22,"titre":"Les armes cachées","texte_ecran":null,"voix_off":"Imagine le courage que cela demande : préparer un soulèvement armé sous le nez d''une administration coloniale dont il connaît de l''intérieur les méthodes et la brutalité.","cadrage":"gros plan","action_visuelle":"mains de Samba refermant une caisse d''armes dissimulée sous un plancher, regard vers la porte, vigilance permanente","decor":"réserve secrète sous une maison d''Ebolowa","ambiance_lumiere":"intérieur sombre, unique rai de lumière par une fente","palette":"noir profond, brun, éclat d''acier","duree_secondes":3,"transition":"cut"},{"numero":23,"titre":"Deux années sous tension","texte_ecran":"1912-1914","voix_off":"Sachant exactement ce qui l''attend si l''on découvre le complot.","cadrage":"plan d''ensemble, montage de saisons","action_visuelle":"enchaînement suggéré de saisons sur Ebolowa (saison sèche, saison des pluies), Samba toujours présent en arrière-plan des scènes, vie apparemment normale masquant la préparation secrète","decor":"Ebolowa vu de loin à différentes saisons","ambiance_lumiere":"alternance de lumières, du sec doré à l''humide gris-vert","palette":"ocre, vert-gris, terracotta","duree_secondes":5,"transition":"fondu enchaîné"},{"numero":24,"titre":"L''été 1914 approche","texte_ecran":"Été 1914","voix_off":"L''été 1914 arrive, et avec lui, l''Europe entière glisse vers la guerre.","cadrage":"plan large, contre-jour","action_visuelle":"Samba debout sur une hauteur dominant Ebolowa, regard fixé vers l''horizon nord, comme s''il sentait déjà que le moment approche","decor":"colline surplombant Ebolowa, ciel changeant","ambiance_lumiere":"fin de journée, nuages sombres à l''horizon, lumière encore dorée au premier plan","palette":"or-bronze, gris d''orage, noir","duree_secondes":4,"transition":"fondu enchaîné vers le chapitre 3"}]},{"numero":3,"titre_chapitre":"La lettre et le peloton","fichier_source":"livrables/sites-web/afroback/Récits africains storyboards/martin-paul-samba/chapitre-3.md","nb_planches":24,"statut":"pret","planches":[{"numero":1,"titre":"L''Europe glisse vers la guerre","texte_ecran":"Été 1914","voix_off":"L''été 1914 arrive, et avec lui, l''Europe entière glisse vers la guerre.","cadrage":"plan d''ensemble","action_visuelle":"rumeurs de guerre parvenant à Ebolowa par bribes, administrateurs allemands nerveux, télégrammes échangés en hâte au poste colonial","decor":"bureau colonial d''Ebolowa, cartes d''Europe affichées","ambiance_lumiere":"après-midi, lumière tendue, nuages","palette":"gris acier, terracotta terne, noir","duree_secondes":4,"transition":"cut"},{"numero":2,"titre":"Le moment est venu","texte_ecran":null,"voix_off":"Samba, pressé par les événements, sent que le moment est venu d''agir.","cadrage":"gros plan","action_visuelle":"le visage de Samba, immobile, recevant la nouvelle de la tension européenne par un allié, décision qui se lit dans son regard sans un mot","decor":"intérieur sobre à Ebolowa","ambiance_lumiere":"fin de journée, lumière rasante","palette":"ocre sombre, brun, noir","duree_secondes":3,"transition":"cut"},{"numero":3,"titre":"La lettre la plus dangereuse","texte_ecran":null,"voix_off":"Il écrit aux forces françaises stationnées à Brazzaville pour leur annoncer son intention de se soulever. Cette lettre, la plus dangereuse qu''il ait jamais écrite.","cadrage":"plan rapproché","action_visuelle":"Samba penché sur une table, plume à la main, écriture soignée et lente, une seule lampe éclairant le papier, concentration totale","decor":"pièce close, volets fermés, nuit","ambiance_lumiere":"lumière chaude de lampe, reste de la pièce dans l''obscurité","palette":"orange de lampe, noir profond, brun","duree_secondes":4,"transition":"cut"},{"numero":4,"titre":"Sceller le message","texte_ecran":null,"voix_off":"aucun","cadrage":"gros plan","action_visuelle":"mains de Samba pliant la lettre, la scellant avec de la cire, geste précis malgré l''enjeu, respiration retenue","decor":"même table, détail serré","ambiance_lumiere":"lumière de lampe concentrée sur les mains","palette":"noir, orange chaud, brun sombre","duree_secondes":3,"transition":"cut"},{"numero":5,"titre":"Le messager part vers Brazzaville","texte_ecran":null,"voix_off":"Un messager de confiance s''enfonce dans la nuit, en direction du territoire français.","cadrage":"plan d''ensemble","action_visuelle":"un cavalier ou un porteur solitaire quittant Ebolowa avant l''aube, silhouette pressée sur une piste forestière","decor":"piste vers l''Afrique équatoriale française, brume matinale","ambiance_lumiere":"aube grise, lumière naissante et froide","palette":"gris-bleu, vert sombre, noir","duree_secondes":4,"transition":"fondu"},{"numero":6,"titre":"Un poste allemand sur la route","texte_ecran":null,"voix_off":"Mais cette lettre tombe entre des mains allemandes.","cadrage":"plan moyen","action_visuelle":"une patrouille allemande arrêtant le messager à un poste de contrôle, fouille brutale, la lettre découverte et arrachée des mains du porteur","decor":"poste de contrôle colonial, barrière de bois","ambiance_lumiere":"matin, lumière dure et directe","palette":"gris acier, terracotta sale, noir","duree_secondes":4,"transition":"cut"},{"numero":7,"titre":"La lettre est lue","texte_ecran":null,"voix_off":"Un officier allemand découvre l''intention de Samba, noire sur blanc.","cadrage":"gros plan","action_visuelle":"mains gantées d''un officier allemand dépliant la lettre, visage se durcissant à mesure de la lecture, regard qui se lève vers l''horizon d''Ebolowa","decor":"bureau colonial, lampe à pétrole","ambiance_lumiere":"intérieur, lumière jaune froide","palette":"gris, jaune terne, noir","duree_secondes":3,"transition":"cut"},{"numero":8,"titre":"L''alarme se répand","texte_ecran":null,"voix_off":"L''alarme se répand aussitôt dans l''administration coloniale.","cadrage":"plan large","action_visuelle":"des officiers allemands se rassemblant en hâte, chevaux sellés, ordres criés, mobilisation d''une petite troupe vers Ebolowa","decor":"garnison coloniale, cour pavée","ambiance_lumiere":"matin, lumière crue","palette":"gris acier, noir, touche de rouge d''uniforme","duree_secondes":4,"transition":"cut"},{"numero":9,"titre":"1er août 1914, l''arrestation","texte_ecran":"1er août 1914","voix_off":"Le premier août 1914, il est arrêté et inculpé de haute trahison.","cadrage":"plan moyen, légère contre-plongée","action_visuelle":"des soldats allemands encerclant la maison de Samba à Ebolowa, Samba sortant de lui-même, sans résistance, tête haute face aux fusils pointés","decor":"devant sa maison à Ebolowa","ambiance_lumiere":"matin, lumière blanche et dure","palette":"gris, noir, terracotta pâle","duree_secondes":4,"transition":"cut"},{"numero":10,"titre":"Emmené sous escorte","texte_ecran":null,"voix_off":"aucun","cadrage":"plan large, vue de dos","action_visuelle":"Samba encadré par des gardes, marchant vers le poste colonial, villageois observant à distance, silencieux et impuissants","decor":"rue principale d''Ebolowa","ambiance_lumiere":"milieu de matinée, lumière frontale sans nuance","palette":"gris, ocre pâle, noir","duree_secondes":3,"transition":"cut"},{"numero":11,"titre":"Face aux officiers","texte_ecran":"Inculpé de haute trahison","voix_off":"Inculpé de haute trahison.","cadrage":"plan rapproché","action_visuelle":"Samba debout devant une table d''officiers allemands qui l''interrogent, posture droite, regard qui ne se dérobe pas malgré la gravité de l''accusation","decor":"salle d''interrogatoire coloniale sommaire","ambiance_lumiere":"lumière de fenêtre latérale, contraste fort","palette":"gris, noir, brun sombre","duree_secondes":4,"transition":"cut"},{"numero":12,"titre":"La cellule","texte_ecran":null,"voix_off":"Une semaine ne s''écoule pas.","cadrage":"plan moyen","action_visuelle":"Samba seul dans une cellule sommaire, assis contre le mur, regard fixe, ni peur ni supplication visibles sur son visage","decor":"cellule coloniale, barreaux de bois et de fer","ambiance_lumiere":"lumière filtrée par une petite ouverture, pénombre","palette":"gris-bleu, noir, brun terne","duree_secondes":4,"transition":"fondu"},{"numero":13,"titre":"Le fil d''une vie qui repasse","texte_ecran":null,"voix_off":"aucun","cadrage":"gros plan, surimpression","action_visuelle":"le visage de Samba dans la pénombre de la cellule, traversé en transparence par des fragments de sa vie : l''enfant du village, le cadet en Allemagne, l''officier de Dominik, le chef bulu ; un homme qui se retrouve enfin entier","decor":"cellule, flou en surimpression","ambiance_lumiere":"clair-obscur profond","palette":"noir profond, ocre fantôme, gris","duree_secondes":4,"transition":"cut"},{"numero":14,"titre":"L''inquiétude à Ebolowa","texte_ecran":null,"voix_off":"La nouvelle de son arrestation se répand parmi les Bulu, qui craignent le pire.","cadrage":"plan large","action_visuelle":"des villageois rassemblés à distance du poste colonial, murmures anxieux, une mère serrant son enfant contre elle","decor":"abords du poste colonial d''Ebolowa","ambiance_lumiere":"fin d''après-midi, lumière grise et tendue","palette":"gris, brun, ocre éteint","duree_secondes":3,"transition":"cut"},{"numero":15,"titre":"À Douala, une autre affaire","texte_ecran":"Douala, la même semaine","voix_off":"Ce même mois, à Douala, à l''autre bout du pays, une autre affaire suit son cours : celle de Rudolf Duala Manga Bell, né de la révolte duala contre l''expropriation de leurs terres.","cadrage":"plan large","action_visuelle":"Rudolf Duala Manga Bell également placé sous surveillance allemande stricte dans sa résidence de Douala, son conseiller Ngosso Din à ses côtés, tension parallèle et distincte de celle d''Ebolowa","decor":"résidence royale duala, estuaire du Wouri en arrière-plan","ambiance_lumiere":"fin de journée, lumière grise sur l''eau","palette":"gris-bleu, noir, or terne","duree_secondes":4,"transition":"cut"},{"numero":16,"titre":"8 août 1914, l''aube à Ebolowa","texte_ecran":"8 août 1914, Ebolowa","voix_off":"Le 8 août 1914, à Ebolowa, un peloton d''exécution allemand met fin à sa vie.","cadrage":"plan d''ensemble, contre-jour","action_visuelle":"un peloton de soldats allemands se mettant en formation dans la brume matinale, silhouettes disciplinées et froides","decor":"terrain dégagé à la sortie d''Ebolowa","ambiance_lumiere":"aube grise, brume basse, lumière plate et froide","palette":"gris-bleu, noir, blanc de brume","duree_secondes":4,"transition":"cut"},{"numero":17,"titre":"Samba mené au lieu d''exécution","texte_ecran":null,"voix_off":"aucun","cadrage":"plan moyen, vue de dos","action_visuelle":"Samba escorté vers le terrain, démarche lente mais sans hésitation, tête haute jusqu''au bout, dignité intacte","decor":"chemin menant au terrain d''exécution","ambiance_lumiere":"aube, lumière grise perçant lentement la brume","palette":"gris, noir, touche d''ocre pâle","duree_secondes":4,"transition":"cut"},{"numero":18,"titre":"Ce que raconte la tradition : le bandeau refusé","texte_ecran":"Ce que raconte la tradition à Ebolowa...","voix_off":"Ce que l''on raconte à Ebolowa depuis, la tradition populaire l''a gardé précieusement : que Samba, face au peloton, aurait refusé qu''on lui bande les yeux.","cadrage":"gros plan","action_visuelle":"un soldat tendant un bandeau vers Samba, qui d''un geste de la main le repousse doucement, regard droit fixé sur ceux qui vont tirer (scène explicitement présentée comme légende, jamais comme un fait établi)","decor":"terrain d''exécution, brume qui se lève","ambiance_lumiere":"lumière naissante, contraste fort","palette":"gris, noir, touche d''or pâle sur le visage","duree_secondes":4,"transition":"cut"},{"numero":19,"titre":"Ce que raconte la tradition : le mouchoir blanc","texte_ecran":"« Je n''ai pas peur de la mort... » — selon la légende","voix_off":"Qu''il aurait sorti un mouchoir blanc et l''aurait agité en regardant ses bourreaux en face, qu''il aurait lancé qu''on pouvait le tuer mais qu''on n''aurait jamais le Cameroun. Je te le raconte parce que cette image dit quelque chose de vrai sur la mémoire qu''un peuple garde de ses résistants, mais aucune archive ne vient garantir mot pour mot cette scène.","cadrage":"gros plan, contre-plongée","action_visuelle":"Samba agitant un mouchoir blanc face au peloton, regard fixe et sans peur (image forte et symbolique, clairement rattachée à la tradition orale et non à un fait vérifié)","decor":"terrain d''exécution, brume dorée par le lever de soleil","ambiance_lumiere":"lumière dorée naissante contre le gris du peloton","palette":"gris-bleu, or naissant, noir","duree_secondes":4,"transition":"cut"},{"numero":20,"titre":"L''exécution","texte_ecran":null,"voix_off":"aucun","cadrage":"plan large, traitement pudique","action_visuelle":"le peloton levant les armes, cadrage qui s''arrête juste avant l''impact, coupe sur un envol d''oiseaux dans le ciel gris ; aucune complaisance dans la représentation de la mort","decor":"terrain d''exécution, ciel d''aube","ambiance_lumiere":"lumière grise, contre-jour","palette":"gris, noir, blanc","duree_secondes":3,"transition":"cut sec"},{"numero":21,"titre":"Le même jour, à Douala","texte_ecran":"8 août 1914, Douala — une affaire distincte","voix_off":"Ce même jour, à Douala, les Allemands pendent Rudolf Duala Manga Bell et son conseiller Ngosso Din, dans une affaire distincte, née de la révolte duala contre l''expropriation de leurs terres.","cadrage":"plan d''ensemble","action_visuelle":"la potence dressée à Douala, Manga Bell et Ngosso Din menés dignement vers leur exécution, foule contenue à distance par des soldats","decor":"place publique de Douala, estuaire en arrière-plan","ambiance_lumiere":"même heure d''aube, lumière grise similaire, écho visuel volontaire avec Ebolowa","palette":"gris, noir, or terne","duree_secondes":4,"transition":"fondu au noir"},{"numero":22,"titre":"Deux villes, une même main","texte_ecran":"Deux hommes, deux villes, la même date funeste","voix_off":"Deux hommes, deux villes, deux histoires de résistance, la même date funeste, la même main coloniale allemande qui frappe.","cadrage":"plan d''ensemble, split symbolique","action_visuelle":"image composite sobre, Ebolowa et Douala reliées par une même ligne d''horizon grise, symbolisant la coïncidence tragique de la même journée","decor":"carte stylisée du sud Kamerun reliant les deux villes","ambiance_lumiere":"gris uniforme, sans chaleur","palette":"gris, noir, touche de terracotta éteinte","duree_secondes":4,"transition":"cut"},{"numero":23,"titre":"Le silence d''Ebolowa","texte_ecran":null,"voix_off":"aucun","cadrage":"plan large","action_visuelle":"Ebolowa au matin, silence pesant, quelques habitants immobiles face au terrain d''exécution désormais vide, deuil contenu","decor":"abords du terrain, brume qui se dissipe lentement","ambiance_lumiere":"matin avancé, lumière qui se réchauffe très légèrement malgré le deuil","palette":"gris-brun, ocre éteint, noir","duree_secondes":3,"transition":"fondu"},{"numero":24,"titre":"Ce qui ne fait aucun doute","texte_ecran":null,"voix_off":"Ce qui, en revanche, ne fait aucun doute, c''est ceci : un homme né dans un village bulu, formé par la puissance coloniale elle-même pour la servir, a fini par retourner tout ce qu''il avait appris contre elle, au prix de sa vie.","cadrage":"plan d''ensemble, contre-jour","action_visuelle":"le terrain d''exécution vide sous un ciel qui commence à s''éclaircir, un rayon de soleil perçant enfin la brume, image de transition vers la mémoire plutôt que vers la mort","decor":"même terrain, à distance","ambiance_lumiere":"lever de soleil franc, première vraie chaleur du chapitre","palette":"or naissant, gris clair, noir profond","duree_secondes":4,"transition":"fondu enchaîné vers le chapitre 4"}]},{"numero":4,"titre_chapitre":"Ce que la terre garde","fichier_source":"livrables/sites-web/afroback/Récits africains storyboards/martin-paul-samba/chapitre-4.md","nb_planches":24,"statut":"pret","planches":[{"numero":1,"titre":"Ebolowa après le 8 août","texte_ecran":"Ebolowa, l''automne 1914","voix_off":"Il n''a pas vécu assez longtemps pour voir la suite. Mais la vie, elle, continue.","cadrage":"plan large","action_visuelle":"Ebolowa reprenant son cours, marché qui rouvre timidement, un vide perceptible dans la ville, un absent que tous ressentent","decor":"rue principale d''Ebolowa","ambiance_lumiere":"fin de matinée, lumière encore grise mais qui se réchauffe","palette":"ocre pâle, gris, brun","duree_secondes":4,"transition":"cut"},{"numero":2,"titre":"La guerre s''intensifie en Europe","texte_ecran":"1914-1916","voix_off":"L''Europe entière s''enfonce dans la Première Guerre mondiale, et cette même puissance allemande qui semblait inébranlable vacille.","cadrage":"plan d''ensemble","action_visuelle":"carte du Kamerun avec des lignes de front qui avancent, symboles militaires franco-britanniques progressant depuis les frontières","decor":"carte stylisée du Kamerun colonial","ambiance_lumiere":"lumière neutre de document d''époque","palette":"brun parchemin, noir, or terne","duree_secondes":4,"transition":"cut"},{"numero":3,"titre":"Les forces franco-britanniques avancent","texte_ecran":null,"voix_off":"Les armées franco-britanniques progressent sur le territoire du Kamerun allemand.","cadrage":"plan large","action_visuelle":"colonnes de troupes françaises et britanniques traversant la forêt camerounaise, avancée méthodique vers l''intérieur des terres","decor":"piste forestière, végétation dense","ambiance_lumiere":"milieu de journée, lumière filtrée par la canopée","palette":"vert profond, ocre, gris","duree_secondes":4,"transition":"cut"},{"numero":4,"titre":"La chute du Kamerun allemand","texte_ecran":"1916","voix_off":"Ce régime qui semblait inébranlable est tombé.","cadrage":"plan large, contre-plongée","action_visuelle":"le drapeau allemand abaissé au-dessus d''un poste colonial, symbole visuel de l''effondrement de l''administration qui avait exécuté Samba deux ans plus tôt","decor":"mât de poste colonial, ciel changeant","ambiance_lumiere":"fin de journée, lumière qui bascule du gris vers un doré timide","palette":"gris, or terne, noir","duree_secondes":4,"transition":"fondu"},{"numero":5,"titre":"Il avait vu juste","texte_ecran":null,"voix_off":"Il n''a pas vécu assez longtemps pour voir cette défaite. Mais il avait vu juste.","cadrage":"gros plan, symbolique","action_visuelle":"un rayon de lumière traversant la brume au-dessus d''Ebolowa, comme un écho silencieux à la clairvoyance de Samba, aucune figure humaine dans le cadre","decor":"colline surplombant Ebolowa","ambiance_lumiere":"lever de soleil, lumière dorée qui s''installe pour de bon dans ce chapitre","palette":"or-bronze, terracotta, noir profond","duree_secondes":4,"transition":"cut"},{"numero":6,"titre":"La mémoire des anciens","texte_ecran":null,"voix_off":"Le nom qu''on lui a donné en Allemagne, Martin-Paul Samba, est resté gravé, non pas comme celui d''un serviteur loyal, mais comme celui d''un homme qui a choisi de se tenir du côté des siens.","cadrage":"plan moyen","action_visuelle":"un ancien du village racontant l''histoire de Samba à un cercle d''enfants assis autour d''un feu, gestes amples et visage habité par le récit","decor":"cour d''un village bulu, nuit tombante","ambiance_lumiere":"lumière de feu chaude, ombres dansantes","palette":"orange de feu, noir profond, brun","duree_secondes":4,"transition":"cut"},{"numero":7,"titre":"Les enfants écoutent","texte_ecran":null,"voix_off":"aucun","cadrage":"gros plan","action_visuelle":"visages d''enfants fascinés, yeux grands ouverts, reflet du feu dansant sur leurs traits, transmission vivante de la mémoire","decor":"même cercle nocturne","ambiance_lumiere":"lumière de feu, chaleur visuelle intense","palette":"orange, ocre, noir","duree_secondes":3,"transition":"cut"},{"numero":8,"titre":"Le récit qui voyage","texte_ecran":null,"voix_off":"L''histoire de Samba se transmet de génération en génération, et dépasse peu à peu les frontières du seul pays bulu.","cadrage":"plan d''ensemble","action_visuelle":"montage suggéré de plusieurs générations racontant l''histoire dans différents contextes : une salle de classe, une place de marché, une veillée urbaine, symbole de la mémoire qui grandit avec le temps","decor":"lieux camerounais variés, traités en enchaînement","ambiance_lumiere":"lumière chaude et constante malgré les décors changeants","palette":"ocre, or-bronze, brun","duree_secondes":5,"transition":"fondu enchaîné"},{"numero":9,"titre":"Vers l''indépendance","texte_ecran":"Cameroun, XXe siècle","voix_off":"Au fil du vingtième siècle, à mesure que le Cameroun avance vers son indépendance, son nom devient un symbole partagé bien au-delà du pays bulu.","cadrage":"plan large","action_visuelle":"foule camerounaise diverse rassemblée lors d''une commémoration publique, drapeaux et portraits évoquant les figures de la résistance, dignité collective","decor":"place publique camerounaise","ambiance_lumiere":"plein jour, lumière franche et chaleureuse","palette":"or-bronze, terracotta, noir","duree_secondes":4,"transition":"cut"},{"numero":10,"titre":"Un symbole national","texte_ecran":null,"voix_off":"Son nom entre dans la mémoire nationale, non comme celui d''un serviteur, mais comme celui d''un homme qui a choisi son camp.","cadrage":"plan moyen","action_visuelle":"portrait officiel stylisé de Samba affiché lors d''une cérémonie nationale, entouré de dignitaires, respect institutionnel rendu à sa mémoire","decor":"bâtiment public camerounais, drapeaux","ambiance_lumiere":"matin, lumière solennelle","palette":"or-bronze, noir profond, terracotta","duree_secondes":3,"transition":"cut"},{"numero":11,"titre":"La décision d''un monument","texte_ecran":null,"voix_off":"Une décision se prend : lui élever un monument, à Ebolowa même, là où tout s''est achevé.","cadrage":"plan large","action_visuelle":"esquisses et plans d''un monument déployés devant des responsables municipaux d''Ebolowa, choix de l''emplacement sur une colline dominant la ville","decor":"bureau municipal, maquette sur une table","ambiance_lumiere":"lumière de jour, neutre et posée","palette":"brun, gris, ocre","duree_secondes":3,"transition":"cut"},{"numero":12,"titre":"La construction du monument","texte_ecran":null,"voix_off":"aucun","cadrage":"plan d''ensemble","action_visuelle":"ouvriers érigeant la statue sur la colline d''Ebolowa, échafaudages, effort collectif pour honorer la mémoire du chef bulu","decor":"colline en construction surplombant Ebolowa","ambiance_lumiere":"milieu de journée, lumière vive","palette":"gris pierre, ocre, or-bronze","duree_secondes":4,"transition":"cut"},{"numero":13,"titre":"La statue s''élève","texte_ecran":null,"voix_off":"Aujourd''hui encore, une statue le regarde veiller sur Ebolowa, depuis une colline qui domine la ville.","cadrage":"plan large, contre-plongée","action_visuelle":"la statue achevée de Martin Paul Samba, silhouette droite et digne, dominant la ville depuis sa colline","decor":"sommet de la colline, ciel dégagé","ambiance_lumiere":"fin d''après-midi, lumière dorée sur la pierre","palette":"or-bronze, terracotta, noir","duree_secondes":4,"transition":"cut"},{"numero":14,"titre":"Le visage de pierre","texte_ecran":null,"voix_off":"aucun","cadrage":"gros plan","action_visuelle":"détail du visage sculpté de la statue, traits fidèles à la description constante du personnage (regard grave et perçant, port de tête droit), permanence dans la pierre","decor":"détail de la statue, fond de ciel","ambiance_lumiere":"lumière rasante de fin de journée, reliefs marqués","palette":"or-bronze, gris pierre, noir","duree_secondes":3,"transition":"cut"},{"numero":15,"titre":"Ebolowa aujourd''hui","texte_ecran":"Ebolowa, aujourd''hui","voix_off":"La ville a grandi, mais la colline veille toujours.","cadrage":"plan d''ensemble, vue aérienne","action_visuelle":"Ebolowa contemporaine vue depuis la colline, toits, rues animées, vie quotidienne qui se déploie sous le regard silencieux de la statue","decor":"panorama urbain moderne d''Ebolowa","ambiance_lumiere":"matin, lumière claire et vivante","palette":"ocre, vert urbain, or pâle","duree_secondes":4,"transition":"cut"},{"numero":16,"titre":"La vie continue à ses pieds","texte_ecran":null,"voix_off":"aucun","cadrage":"plan moyen","action_visuelle":"des passants d''Ebolowa vaquant à leurs occupations au pied de la colline, indifférents ou habitués à la présence de la statue au-dessus d''eux","decor":"rue au pied de la colline","ambiance_lumiere":"milieu de journée, lumière chaude","palette":"ocre, terracotta, brun","duree_secondes":3,"transition":"cut"},{"numero":17,"titre":"Un jeune s''arrête","texte_ecran":null,"voix_off":"Si tu descends de cette terre, souviens-toi que le chemin d''un héros n''est pas toujours droit depuis le premier jour.","cadrage":"plan rapproché, contre-plongée","action_visuelle":"un jeune Camerounais s''arrêtant au pied de la colline, levant les yeux vers la statue avec curiosité, premier contact silencieux avec cette mémoire","decor":"base de la colline, escalier menant à la statue","ambiance_lumiere":"fin de matinée, lumière douce et dorée","palette":"or-bronze, ocre, noir","duree_secondes":4,"transition":"cut"},{"numero":18,"titre":"Retour sur l''enfant du village","texte_ecran":null,"voix_off":"Il y a des hommes qui commencent du mauvais côté de l''histoire.","cadrage":"gros plan, flash de mémoire","action_visuelle":"bref retour visuel à l''enfant Mebenga du village bulu (chapitre 1), même regard grave déjà présent, aucune invention nouvelle, pur écho du début du récit","decor":"clairière du village bulu, comme au chapitre 1","ambiance_lumiere":"lumière chaude du matin, identique au tout premier souvenir","palette":"ocre, vert, or pâle","duree_secondes":3,"transition":"fondu enchaîné"},{"numero":19,"titre":"Retour sur l''officier","texte_ecran":null,"voix_off":"Et qui trouvent, un jour, le courage de la rejoindre du bon.","cadrage":"gros plan, flash de mémoire","action_visuelle":"bref retour visuel à Samba en uniforme d''officier de la Schutztruppe (chapitre 1), image qui se fige puis se dissout progressivement, symbole d''un passage révolu","decor":"identique aux scènes d''officier du chapitre 1","ambiance_lumiere":"lumière froide qui se réchauffe lentement à mesure du fondu","palette":"gris acier virant à l''or, noir","duree_secondes":3,"transition":"fondu enchaîné"},{"numero":20,"titre":"Retour sur le chef","texte_ecran":null,"voix_off":"Samba fut de ceux-là.","cadrage":"gros plan, flash de mémoire","action_visuelle":"bref retour visuel à Samba investi chef bulu (chapitre 2), bâton de commandement en main, dignité retrouvée parmi les siens","decor":"identique à la cérémonie d''investiture du chapitre 2","ambiance_lumiere":"lumière dorée et solennelle","palette":"or-bronze, terracotta, noir","duree_secondes":3,"transition":"fondu enchaîné"},{"numero":21,"titre":"Retour à la statue","texte_ecran":null,"voix_off":"Tiens-toi droit.","cadrage":"plan large, contre-plongée","action_visuelle":"retour au présent, la statue baignée par la lumière du soleil couchant, le jeune homme toujours à ses pieds, tête levée","decor":"sommet de la colline d''Ebolowa","ambiance_lumiere":"coucher de soleil, halo doré enveloppant la statue","palette":"or-bronze intense, terracotta, noir profond","duree_secondes":4,"transition":"cut"},{"numero":22,"titre":"Le halo doré","texte_ecran":null,"voix_off":"Tu viens de là.","cadrage":"gros plan symbolique","action_visuelle":"la tête de la statue nimbée d''un halo de lumière dorée, écho direct au halo doré de l''identité visuelle d''AFROBACK, gravité et fierté réunies","decor":"détail de la statue contre le ciel du soir","ambiance_lumiere":"lumière dorée intense, contre-jour chaud","palette":"or pur, noir profond, terracotta","duree_secondes":3,"transition":"fondu"},{"numero":23,"titre":"Retour aux origines","texte_ecran":"Retour aux origines","voix_off":"Un homme né dans un village bulu, qui a fini par retourner tout ce qu''il avait appris pour se tenir du côté des siens.","cadrage":"plan d''ensemble","action_visuelle":"vue élargie d''Ebolowa au crépuscule, la statue veillant sur la colline, la ville qui s''illumine doucement en contrebas, image de synthèse et d''apaisement","decor":"panorama complet d''Ebolowa au coucher du soleil","ambiance_lumiere":"crépuscule doré, transition vers la nuit","palette":"or-bronze, terracotta, noir profond","duree_secondes":4,"transition":"fondu au noir"},{"numero":24,"titre":"Martin Paul Samba","texte_ecran":"Martin Paul Samba (Mebenga m''Ebono), 1874-1914 — Retour aux origines","voix_off":"Martin Paul Samba. Un homme qui a choisi, à un moment de sa vie, de se tenir du côté des siens.","cadrage":"plan fixe, carton final","action_visuelle":"écran noir profond, silhouette discrète de la statue en contre-jour, logo et signature visuelle AFROBACK apparaissant doucement","decor":"fond noir uni","ambiance_lumiere":"obscurité totale ponctuée d''une lueur or-bronze centrale","palette":"noir profond, or-bronze, terracotta","duree_secondes":5,"transition":"fin"}]}]'::jsonb,
   'pret',
   'pret',
-  'pret',
+  'storyboard_pret',
   'https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/martin-paul-samba.jpg',
   'https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/audio/martin-paul-samba-fr.mp3',
   null,
-  'https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/video/martin-paul-samba.mp4',
+  null,
   '[]'::jsonb,
   null,
   2
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'rudolf-douala-manga-bell',
@@ -341,7 +416,40 @@ So remember this man. A king born into the comfort of an established dynasty, sh
   '[]'::jsonb,
   null,
   3
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'sultan-njoya',
@@ -416,7 +524,40 @@ This is what a king can do, without cannon or resistance army: refuse to let his
   '[]'::jsonb,
   null,
   4
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'ruben-um-nyobe',
@@ -507,7 +648,40 @@ That was the life of the Mpodol: a peasant''s son turned court clerk, then trade
   '[]'::jsonb,
   null,
   5
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'charles-atangana',
@@ -618,7 +792,40 @@ African history, the real kind, is not told only through those who died standing
   '[]'::jsonb,
   'Charles Atangana n''est pas un résistant. C''est une figure ambiguë : un chef qui a bâti pouvoir et fortune en servant deux administrations coloniales successives, tout en modernisant sa région. Ce récit ne tranche jamais vers « collaborateur » ni vers « bâtisseur pragmatique » : il montre les faits, dans les deux sens, et laisse le lecteur juger. Les zones d''ombre (dénonciation d''un complot de son propre peuple en 1907, exode forcé de milliers de personnes en 1916, enrichissement personnel, ascendance royale inventée en 1929) restent visibles, jamais lissées.',
   6
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'felix-moumie',
@@ -705,7 +912,40 @@ This is the story of a child from Foumban, son of an evangelist, trained by the 
   '[]'::jsonb,
   null,
   7
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'ernest-ouandie',
@@ -792,7 +1032,40 @@ So hold on to this. Ernest Ouandié did not begin his life as a hero wrapped in 
   '[]'::jsonb,
   null,
   8
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
 
 insert into public.heros (slug, nom_affiche, nom_complet, sous_titre, epoque, region, theme, resume_catalogue, annee_naissance_indicative, annee_mort_indicative, recit_fr_texte, recit_fr_fichier_source, recit_chapitres_fr, recit_en_texte, recit_en_fichier_source, recit_chapitres_en, frise_chronologique, citations, sources, legendes_associees, heros_lies, chapitres_storyboard, statut_recit_texte, statut_narration_audio, statut_video, image_carte_catalogue, narration_audio_fr_url, narration_audio_en_url, video_url, video_chapitres, avertissement_lecture, ordre_affichage) values (
   'manu-dibango',
@@ -903,4 +1176,69 @@ So hold on to this. Manu Dibango never took up arms, never led a country, never 
   '[]'::jsonb,
   null,
   9
-);
+)
+on conflict (slug) do update set
+    nom_affiche = excluded.nom_affiche,
+    nom_complet = excluded.nom_complet,
+    sous_titre = excluded.sous_titre,
+    epoque = excluded.epoque,
+    region = excluded.region,
+    theme = excluded.theme,
+    resume_catalogue = excluded.resume_catalogue,
+    annee_naissance_indicative = excluded.annee_naissance_indicative,
+    annee_mort_indicative = excluded.annee_mort_indicative,
+    recit_fr_texte = excluded.recit_fr_texte,
+    recit_fr_fichier_source = excluded.recit_fr_fichier_source,
+    recit_chapitres_fr = excluded.recit_chapitres_fr,
+    recit_en_texte = excluded.recit_en_texte,
+    recit_en_fichier_source = excluded.recit_en_fichier_source,
+    recit_chapitres_en = excluded.recit_chapitres_en,
+    frise_chronologique = excluded.frise_chronologique,
+    citations = excluded.citations,
+    sources = excluded.sources,
+    legendes_associees = excluded.legendes_associees,
+    heros_lies = excluded.heros_lies,
+    chapitres_storyboard = excluded.chapitres_storyboard,
+    statut_recit_texte = excluded.statut_recit_texte,
+    statut_narration_audio = excluded.statut_narration_audio,
+    statut_video = excluded.statut_video,
+    image_carte_catalogue = excluded.image_carte_catalogue,
+    narration_audio_fr_url = excluded.narration_audio_fr_url,
+    narration_audio_en_url = excluded.narration_audio_en_url,
+    video_url = excluded.video_url,
+    video_chapitres = excluded.video_chapitres,
+    avertissement_lecture = excluded.avertissement_lecture,
+    ordre_affichage = excluded.ordre_affichage,
+    updated_at = now();
+
+-- Repeuplement du module École des Héros -------------------------------------
+-- Filet de sécurité idempotent (`on conflict do nothing`), identique à
+-- schema-ecole-heros.sql lignes 185-207 : garantit que ecole_niveaux et
+-- ecole_lecons existent après ce script même sur une base neuve où
+-- schema-ecole-heros.sql n'aurait pas encore été exécuté séparément. Sans
+-- effet sur une base déjà peuplée (les heros.id étant désormais stables,
+-- voir le commentaire sur l'upsert plus haut, ce bloc n'a plus besoin de
+-- réparer un cascade de suppression).
+insert into public.ecole_niveaux (niveau, nom, tranche_age, ton_contenu) values
+  (1, 'Les Premiers Récits', '3-5 ans', 'Quasi aucun texte, portrait + un fait marquant, tout en audio/image, ton conte'),
+  (2, 'Petits Explorateurs', '6-8 ans', 'Phrases courtes et illustrées, un fait historique + un trait de caractère'),
+  (3, 'Grands Explorateurs', '9-11 ans', 'Texte complet mais simplifié, plusieurs faits, premières nuances'),
+  (4, 'Héritiers de l''Histoire', '12 ans et plus', 'Contenu proche du récit adulte, nuances assumées mais sans détail graphique')
+on conflict (niveau) do nothing;
+
+insert into public.ecole_lecons (heros_id, niveau, ordre_dans_niveau)
+select h.id, v.niveau, v.ordre
+from (values
+  ('sultan-njoya', 1, 1),
+  ('manu-dibango', 1, 2),
+  ('reine-nzinga', 2, 1),
+  ('sultan-njoya', 2, 2),
+  ('martin-paul-samba', 3, 1),
+  ('rudolf-douala-manga-bell', 3, 2),
+  ('charles-atangana', 3, 3),
+  ('ruben-um-nyobe', 4, 1),
+  ('ernest-ouandie', 4, 2),
+  ('felix-moumie', 4, 3)
+) as v(slug, niveau, ordre)
+join public.heros h on h.slug = v.slug
+on conflict (heros_id, niveau) do nothing;

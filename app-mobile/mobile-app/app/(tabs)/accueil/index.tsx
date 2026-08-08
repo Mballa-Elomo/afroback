@@ -27,18 +27,24 @@ function firstSentence(text: string, maxLen = 90): string {
 }
 
 /**
- * Héros du jour : tourne chaque jour (jour de l'année modulo nombre de
- * héros), pas un choix arbitraire figé. Priorité aux héros qui ont une
- * vraie photo produite — tant que seule une minorité en a, mieux vaut
- * toujours montrer une image plutôt qu'un dégradé sur cette carte mise en
- * avant. Retombe sur l'ensemble des héros si aucun n'a encore de photo.
+ * Héros du jour : priorité à ce qui a été mis "à la une" depuis le
+ * back-office (`a_la_une`, ajouté le 2026-08-05 — voir
+ * backoffice/supabase/schema-admin-heros.sql) ; s'il y en a plusieurs, la
+ * même rotation quotidienne s'applique entre eux. Tant qu'aucun héros n'est
+ * mis à la une (valeur par défaut, comportement inchangé), retombe sur la
+ * rotation automatique parmi tous les héros — priorité à ceux qui ont une
+ * vraie photo produite, retombe sur l'ensemble sinon.
  */
 function pickFeatured(heroes: Heros[]): Heros | undefined {
   if (heroes.length === 0) return undefined;
-  const withImage = heroes.filter((h) => h.image_carte_catalogue);
-  const pool = withImage.length > 0 ? withImage : heroes;
   const start = Date.UTC(new Date().getFullYear(), 0, 0);
   const dayOfYear = Math.floor((Date.now() - start) / 86400000);
+
+  const featured = heroes.filter((h) => h.a_la_une);
+  if (featured.length > 0) return featured[dayOfYear % featured.length];
+
+  const withImage = heroes.filter((h) => h.image_carte_catalogue);
+  const pool = withImage.length > 0 ? withImage : heroes;
   return pool[dayOfYear % pool.length];
 }
 

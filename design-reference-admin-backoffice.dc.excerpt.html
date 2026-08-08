@@ -1,0 +1,876 @@
+<!-- Extrait verbatim de AFROBACK Admin.dc.html (Claude Design, projectId a6ac90b2-d70d-4065-aa96-7c9c5757759a), lu via DesignSync le 2026-08-05. Maquette complète du back-office : sidebar + 14 écrans (Dashboard, Héros liste, Héros détail, Utilisateurs, Communauté, Marketplace, Découverte, Mythologie, École des Héros (matrice), Bibliothèque médias, Traduction, Dons, Sponsors, Abonnements & Revenus, Paramètres) + 2 modales (suppression, ajout vidéo). Les données de exemple viennent de afroback-data.js, qui est le JEU DE DONNÉES FICTIF du prototype mobile (Mansa Moussa, Nelson Mandela, Thomas Sankara...) — PAS le vrai catalogue de 9 héros du produit réel (heroes.curated.ts). Ne jamais utiliser ce fichier comme source de contenu, uniquement comme référence de structure/bindings d’écran. -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  a { color: #E9BE77; text-decoration: none; }
+  a:hover { color: #F7D98B; }
+  .afa-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+  .afa-scroll::-webkit-scrollbar-thumb { background: rgba(240,195,107,.2); border-radius: 8px; }
+  @keyframes afaFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  input, select, textarea { font-family: inherit; }
+</style>
+<script src="./afroback-data.js"></script>
+</helmet>
+
+<div style="min-height:100vh;background:#0F0B08;font-family:'Manrope',sans-serif;color:#EDE3D4;display:flex">
+
+  <!-- SIDEBAR -->
+  <aside style="flex:none;width:236px;min-height:100vh;background:linear-gradient(180deg,#160f09,#0d0805);border-right:1px solid rgba(240,195,107,.12);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:11px;padding:0 8px 20px;border-bottom:1px solid rgba(240,195,107,.1);margin-bottom:16px">
+      <img src="assets/afroback-logo.png" alt="AFROBACK" style="width:38px;height:38px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(240,195,107,.35)">
+      <div style="line-height:1.1"><div style="font-family:'Cinzel',serif;font-weight:800;letter-spacing:.16em;font-size:14px;background:linear-gradient(135deg,#F7D98B,#C98A3D);-webkit-background-clip:text;background-clip:text;color:transparent">AFROBACK</div><div style="font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.14em;color:#8C7B67;margin-top:3px">BACK-OFFICE</div></div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:3px;flex:1;min-height:0;overflow-y:auto">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="7">
+        <sc-if value="{{ n.isGroup }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.14em;color:#6f5f4d;padding:12px 12px 4px">{{ n.group }}</div></sc-if>
+        <sc-if value="{{ n.label }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ n.go }}" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600;{{ n.style }}">
+            <span style="width:20px;text-align:center;font-size:15px">{{ n.icon }}</span>
+            <span style="flex:1">{{ n.label }}</span>
+            <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;background:#8B3A2F;color:#F7E7C8">{{ n.badge }}</span></sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+    </nav>
+    <div style="flex:none;margin-top:12px;display:flex;align-items:center;gap:10px;padding:12px;background:#1A130D;border:1px solid rgba(240,195,107,.12);border-radius:12px">
+      <div style="width:34px;height:34px;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 7px,#1f1710 7px 14px);border:1px solid rgba(240,195,107,.3)"></div>
+      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12.5px">Yannick</div><div style="font-family:'Space Mono',monospace;font-size:9px;color:#8C7B67">ADMIN COMPLET</div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="afa-scroll" style="flex:1;min-width:0;height:100vh;overflow-y:auto">
+    <!-- TOP BAR -->
+    <div style="position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:16px;padding:14px 28px;background:rgba(15,11,8,.86);backdrop-filter:blur(12px);border-bottom:1px solid rgba(240,195,107,.1)">
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:#8C7B67">AFROBACK / <span style="color:#E9BE77">{{ crumb }}</span></div>
+      <div style="flex:1;max-width:420px;display:flex;align-items:center;gap:9px;background:#170f0a;border:1px solid rgba(240,195,107,.14);border-radius:10px;padding:9px 13px">
+        <span style="color:#9A8870;font-size:13px">⌕</span>
+        <input placeholder="Rechercher héros, utilisateur, produit…" style="flex:1;min-width:0;background:none;border:none;outline:none;color:#EDE3D4;font-size:13px">
+      </div>
+      <div style="flex:1"></div>
+      <span style="position:relative;font-size:18px;color:#E9BE77;cursor:pointer">🔔<span style="position:absolute;top:-4px;right:-5px;width:15px;height:15px;border-radius:50%;background:#8B3A2F;color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center">5</span></span>
+      <div style="width:32px;height:32px;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.3)"></div>
+    </div>
+
+    <div style="padding:28px">
+
+      <!-- ============ DASHBOARD ============ -->
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Tableau de bord</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 24px">Salle de contrôle d'AFROBACK — vue d'ensemble et actions prioritaires.</p>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <div style="background:linear-gradient(160deg,#1a130d,#140d08);border:1px solid rgba(240,195,107,.14);border-radius:16px;padding:18px">
+                <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:#E9A15C">{{ k.label }}</div>
+                <div style="font-family:'Cinzel',serif;font-size:30px;font-weight:700;color:#F7E7C8;margin:8px 0 2px">{{ k.value }}</div>
+                <div style="font-size:11px;color:#8C7B67">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px">
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:16px;padding:20px">
+              <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;color:#C99A5B;margin-bottom:16px">ÉTAT DE PRODUCTION DES HÉROS</div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <sc-for list="{{ prodBars }}" as="b" hint-placeholder-count="5">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:#c9b8a4">{{ b.label }}</span><span style="font-family:'Space Mono',monospace;color:#E9BE77">{{ b.count }}/{{ b.total }}</span></div>
+                    <div style="height:7px;border-radius:9px;background:#2a1f14"><div style="height:100%;border-radius:9px;background:linear-gradient(90deg,#F0C36B,#8B5A2B);width:{{ b.pct }}"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:16px;padding:20px">
+              <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;color:#C99A5B;margin-bottom:16px">RÉPARTITION PAR FORFAIT</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ planSplit }}" as="p" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span style="width:10px;height:10px;border-radius:50%;background:{{ p.color }};flex:none"></span>
+                    <span style="flex:1;font-size:13px;color:#c9b8a4">{{ p.name }}</span>
+                    <span style="font-family:'Space Mono',monospace;font-size:13px;color:#F7E7C8">{{ p.count }}</span>
+                    <span style="font-family:'Space Mono',monospace;font-size:11px;color:#8C7B67;width:40px;text-align:right">{{ p.pct }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="background:#150e09;border:1px solid rgba(160,82,45,.35);border-radius:16px;padding:20px">
+              <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;color:#E3A277;margin-bottom:14px">⚠ ACTIONS REQUISES</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="3">
+                  <div onClick="{{ a.go }}" style="cursor:pointer;display:flex;align-items:center;gap:11px;background:#1A130D;border:1px solid rgba(240,195,107,.12);border-radius:10px;padding:11px 13px">
+                    <span style="width:26px;height:26px;flex:none;border-radius:8px;background:rgba(139,58,47,.25);color:#E3A277;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;font-weight:700">{{ a.count }}</span>
+                    <span style="flex:1;font-size:12.5px;color:#c9b8a4">{{ a.label }}</span>
+                    <span style="color:#E9BE77">›</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:16px;padding:20px">
+              <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;color:#C99A5B;margin-bottom:14px">RACCOURCIS</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div onClick="{{ goHeroes }}" style="cursor:pointer;display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,#241a11,#160f09);border:1px solid rgba(240,195,107,.2);border-radius:10px;padding:12px 13px"><span>⭐</span><span style="flex:1;font-size:12.5px;font-weight:600">Mettre une histoire à la une</span><span style="color:#E9BE77">›</span></div>
+                <div onClick="{{ goUsers }}" style="cursor:pointer;display:flex;align-items:center;gap:11px;background:#1A130D;border:1px solid rgba(240,195,107,.12);border-radius:10px;padding:12px 13px"><span>👥</span><span style="flex:1;font-size:12.5px;font-weight:600">Derniers inscrits</span><span style="color:#E9BE77">›</span></div>
+                <div onClick="{{ goHeroes }}" style="cursor:pointer;display:flex;align-items:center;gap:11px;background:#1A130D;border:1px solid rgba(240,195,107,.12);border-radius:10px;padding:12px 13px"><span>⬆</span><span style="flex:1;font-size:12.5px;font-weight:600">Uploader un média</span><span style="color:#E9BE77">›</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ HÉROS LIST ============ -->
+      <sc-if value="{{ isHeroes }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px">
+            <div><h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Histoires &amp; Héros</h1><p style="color:#8C7B67;font-size:13px;margin:0">{{ heroCount }} figures · pilotez publication, médias et mise en avant.</p></div>
+            <div style="display:flex;gap:8px">
+              <span style="font-family:'Space Mono',monospace;font-size:11px;color:#8C7B67;align-self:center;margin-right:4px">Filtrer :</span>
+              <sc-for list="{{ heroFilters }}" as="f" hint-placeholder-count="3">
+                <span onClick="{{ f.pick }}" style="cursor:pointer;font-size:11.5px;padding:7px 12px;border-radius:8px;{{ f.style }}">{{ f.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:2.2fr 1.1fr 1.4fr 1fr 0.8fr 40px;gap:12px;padding:13px 18px;background:#1a130d;border-bottom:1px solid rgba(240,195,107,.12);font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#8C7B67">
+              <span>HÉROS</span><span>ÉPOQUE</span><span>MÉDIAS</span><span>STATUT</span><span>À LA UNE</span><span></span>
+            </div>
+            <sc-for list="{{ heroRows }}" as="h" hint-placeholder-count="8">
+              <div onClick="{{ h.open }}" style="cursor:pointer;display:grid;grid-template-columns:2.2fr 1.1fr 1.4fr 1fr 0.8fr 40px;gap:12px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center" style-hover="background:rgba(240,195,107,.03)">
+                <div style="display:flex;align-items:center;gap:11px;min-width:0">
+                  <div style="width:38px;height:38px;flex:none;border-radius:9px;overflow:hidden;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid {{ h.photoBorder }};position:relative">{{ h.thumb }}</div>
+                  <div style="min-width:0"><div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.name }}</div><div style="font-size:10.5px;color:#8C7B67;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.region }}</div></div>
+                </div>
+                <div style="font-size:11.5px;color:#c9b8a4">{{ h.era }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px">
+                  <sc-for list="{{ h.media }}" as="m" hint-placeholder-count="5"><span style="font-family:'Space Mono',monospace;font-size:8px;font-weight:700;padding:2px 5px;border-radius:5px;{{ m.style }}">{{ m.label }}</span></sc-for>
+                </div>
+                <div><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;{{ h.pubStyle }}">{{ h.pubLabel }}</span></div>
+                <div onClick="{{ h.toggleFeatured }}" style="cursor:pointer;font-size:18px;{{ h.featColor }}">{{ h.featIcon }}</div>
+                <div style="text-align:right;color:#E9BE77">›</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ HÉROS DETAIL ============ -->
+      <sc-if value="{{ isHeroDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <button onClick="{{ goHeroes }}" style="font:inherit;font-size:13px;color:#E9BE77;background:none;border:none;cursor:pointer;margin-bottom:14px">‹ Retour à la liste</button>
+          <div style="display:flex;gap:22px;align-items:flex-start;margin-bottom:22px">
+            <div style="width:120px;height:120px;flex:none;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(135deg,#2a1f14 0 8px,#1f1710 8px 16px);border:1px solid rgba(240,195,107,.25);position:relative">{{ detailThumb }}</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px"><h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0">{{ detailHero.name }}</h1><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:999px;{{ detailPubStyle }}">{{ detailPubLabel }}</span></div>
+              <div style="font-size:12.5px;color:#8C7B67;margin:6px 0 14px">{{ detailHero.years }} · {{ detailHero.region }} · {{ detailHero.era }}</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button onClick="{{ detailToggleFeatured }}" style="font:inherit;font-size:12.5px;font-weight:700;padding:10px 16px;border-radius:10px;border:1px solid rgba(240,195,107,.4);background:{{ detailFeatBg }};color:#E9BE77;cursor:pointer">{{ detailFeatLabel }}</button>
+                <button onClick="{{ detailTogglePub }}" style="font:inherit;font-size:12.5px;font-weight:700;padding:10px 16px;border-radius:10px;border:none;background:{{ detailPubBtnBg }};color:#1a1109;cursor:pointer">{{ detailPubBtn }}</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:18px">
+              <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B;margin-bottom:14px">MÉDIAS &amp; DISPONIBILITÉ</div>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <sc-for list="{{ detailToggles }}" as="t" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(240,195,107,.06)">
+                    <span style="flex:1;font-size:13px;color:#c9b8a4">{{ t.label }}</span>
+                    <span style="font-family:'Space Mono',monospace;font-size:9px;{{ t.availStyle }}">{{ t.avail }}</span>
+                    <span onClick="{{ t.toggle }}" style="cursor:pointer;width:40px;height:22px;border-radius:999px;background:{{ t.trackBg }};position:relative;flex:none;transition:background .15s"><span style="position:absolute;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s;{{ t.knobPos }}"></span></span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:18px">
+              <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B;margin-bottom:14px">UPLOADER / REMPLACER UN MÉDIA</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ uploadSlots }}" as="u" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:11px;border:1px dashed rgba(240,195,107,.28);border-radius:10px;padding:11px 13px;cursor:pointer">
+                    <span style="font-size:15px">⬆</span>
+                    <div style="flex:1"><div style="font-size:12.5px;font-weight:600">{{ u.label }}</div><div style="font-size:10px;color:#8C7B67">{{ u.hint }}</div></div>
+                    <span style="font-family:'Space Mono',monospace;font-size:9px;{{ u.tagStyle }}">{{ u.tag }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:18px">
+              <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B;margin-bottom:14px">MÉTADONNÉES ÉDITORIALES</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div><div style="font-size:10.5px;color:#8C7B67;margin-bottom:5px">Thème(s)</div><input value="{{ detailHero.tag }}" style="width:100%;background:#170f0a;border:1px solid rgba(240,195,107,.16);border-radius:9px;padding:10px 12px;color:#EDE3D4;font-size:13px;outline:none;box-sizing:border-box"></div>
+                <div style="display:flex;gap:10px">
+                  <div style="flex:1"><div style="font-size:10.5px;color:#8C7B67;margin-bottom:5px">Région</div><input value="{{ detailHero.region }}" style="width:100%;background:#170f0a;border:1px solid rgba(240,195,107,.16);border-radius:9px;padding:10px 12px;color:#EDE3D4;font-size:13px;outline:none;box-sizing:border-box"></div>
+                  <div style="width:90px"><div style="font-size:10.5px;color:#8C7B67;margin-bottom:5px">Ordre</div><input value="{{ detailOrder }}" style="width:100%;background:#170f0a;border:1px solid rgba(240,195,107,.16);border-radius:9px;padding:10px 12px;color:#EDE3D4;font-size:13px;outline:none;box-sizing:border-box"></div>
+                </div>
+                <div><div style="font-size:10.5px;color:#8C7B67;margin-bottom:5px">Avertissement de lecture (figures ambivalentes)</div><input placeholder="Aucun" style="width:100%;background:#170f0a;border:1px solid rgba(240,195,107,.16);border-radius:9px;padding:10px 12px;color:#EDE3D4;font-size:13px;outline:none;box-sizing:border-box"></div>
+              </div>
+            </div>
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:18px">
+              <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B;margin-bottom:14px">CONTENU (LECTURE SEULE)</div>
+              <p style="font-size:11.5px;color:#8C7B67;line-height:1.5;margin:0 0 14px">Les récits sont produits par le pipeline éditorial. Consultation uniquement — jamais de réécriture depuis cet outil.</p>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:10px;background:#1A130D;border:1px solid rgba(240,195,107,.12);border-radius:9px;padding:11px 13px;cursor:pointer"><span>📖</span><span style="flex:1;font-size:12.5px">Récit FR</span><span style="color:#E9BE77">›</span></div>
+                <div style="display:flex;align-items:center;gap:10px;background:#1A130D;border:1px solid rgba(240,195,107,.12);border-radius:9px;padding:11px 13px;cursor:pointer"><span>📖</span><span style="flex:1;font-size:12.5px">Récit EN</span><span style="color:#E9BE77">›</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIDEO PAR CHAPITRE × LANGUE -->
+          <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:18px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B">VIDÉOS — 4 CHAPITRES × 2 LANGUES</div><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Space Mono',monospace;font-size:9px;color:#8C7B67">{{ videoReadyLabel }}</span><button onClick="{{ openVideoModal }}" style="font:inherit;font-size:11px;font-weight:700;padding:7px 13px;border-radius:9px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">+ Ajouter une vidéo</button></div></div>
+            <p style="font-size:11.5px;color:#8C7B67;line-height:1.5;margin:0 0 14px">Chaque histoire est découpée en 4 chapitres ; chaque chapitre a sa vidéo en français et en anglais (8 fichiers au total).</p>
+            <div style="background:#140d08;border:1px solid rgba(240,195,107,.1);border-radius:10px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:10px 14px;background:#1a130d;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.05em;color:#8C7B67"><span>CHAPITRE</span><span>FR</span><span>EN</span><span>👁 VUES</span><span>♥ LIKES</span><span>⏱ FIN.</span></div>
+              <sc-for list="{{ videoChapters }}" as="v" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:11px 14px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;font-size:12px">
+                  <span style="font-weight:600">{{ v.title }}</span>
+                  <span><span style="cursor:pointer;font-family:'Space Mono',monospace;font-size:8.5px;font-weight:700;padding:3px 7px;border-radius:6px;{{ v.frStyle }}">{{ v.frLabel }}</span></span>
+                  <span><span style="cursor:pointer;font-family:'Space Mono',monospace;font-size:8.5px;font-weight:700;padding:3px 7px;border-radius:6px;{{ v.enStyle }}">{{ v.enLabel }}</span></span>
+                  <span style="font-family:'Space Mono',monospace;font-size:11px;color:#c9b8a4">{{ v.views }}</span>
+                  <span style="font-family:'Space Mono',monospace;font-size:11px;color:#c9b8a4">{{ v.likes }}</span>
+                  <span style="font-family:'Space Mono',monospace;font-size:11px;color:#c9b8a4">{{ v.completion }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- ENGAGEMENT GLOBAL -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+            <sc-for list="{{ engagementStats }}" as="e" hint-placeholder-count="4">
+              <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:15px"><div style="font-size:19px">{{ e.icon }}</div><div style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#F7E7C8;margin:6px 0 2px">{{ e.value }}</div><div style="font-size:10px;color:#8C7B67">{{ e.label }}</div></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:6px">
+            <button onClick="{{ askDelete }}" style="font:inherit;font-size:12px;font-weight:700;padding:10px 16px;border-radius:9px;border:1px solid rgba(139,58,47,.5);background:rgba(139,58,47,.12);color:#E3A277;cursor:pointer">Dépublier &amp; archiver ce héros…</button>
+            <div style="display:flex;align-items:center;gap:14px">
+              <sc-if value="{{ heroSaved }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#8fbf8f">✓ Modifications enregistrées</span></sc-if>
+              <button onClick="{{ saveHero }}" style="font:inherit;font-size:13px;font-weight:700;padding:12px 26px;border-radius:11px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">Enregistrer les modifications</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ USERS ============ -->
+      <sc-if value="{{ isUsers }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Utilisateurs</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">14 218 comptes · supervision et modération.</p>
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <sc-for list="{{ userFilters }}" as="f" hint-placeholder-count="4"><span onClick="{{ f.pick }}" style="cursor:pointer;font-size:11.5px;padding:7px 13px;border-radius:8px;{{ f.style }}">{{ f.label }}</span></sc-for>
+          </div>
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.8fr 1fr 1.3fr 1fr 1fr 1fr;gap:12px;padding:13px 18px;background:#1a130d;border-bottom:1px solid rgba(240,195,107,.12);font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#8C7B67"><span>MEMBRE</span><span>PAYS</span><span>TÉLÉPHONE</span><span>FORFAIT</span><span>INSCRIT</span><span>STATUT</span></div>
+            <sc-for list="{{ users }}" as="u" hint-placeholder-count="8">
+              <div onClick="{{ u.open }}" style="cursor:pointer;display:grid;grid-template-columns:1.8fr 1fr 1.3fr 1fr 1fr 1fr;gap:12px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;font-size:12.5px" style-hover="background:rgba(240,195,107,.03)">
+                <div style="display:flex;align-items:center;gap:10px;min-width:0"><div style="width:30px;height:30px;flex:none;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.25)"></div><span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.name }}</span></div>
+                <span style="color:#c9b8a4">{{ u.country }}</span>
+                <span style="font-family:'Space Mono',monospace;font-size:11px;color:#8C7B67">{{ u.phone }}</span>
+                <span><span style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;{{ u.planStyle }}">{{ u.plan }}</span></span>
+                <span style="color:#8C7B67;font-size:11.5px">{{ u.joined }}</span>
+                <span><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;{{ u.statusStyle }}">{{ u.status }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ COMMUNITY ============ -->
+      <sc-if value="{{ isCommunity }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0">Communauté — Modération</h1><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(240,195,107,.1);border:1px solid rgba(240,195,107,.3);color:#E9BE77">PILIER EN PRÉPARATION</span></div>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">File d'attente des signalements à traiter.</p>
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:2.4fr 1fr 1.2fr 1.6fr;gap:12px;padding:13px 18px;background:#1a130d;border-bottom:1px solid rgba(240,195,107,.12);font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#8C7B67"><span>CONTENU SIGNALÉ</span><span>AUTEUR</span><span>RAISON</span><span>ACTION</span></div>
+            <sc-for list="{{ reports }}" as="r" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:2.4fr 1fr 1.2fr 1.6fr;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center">
+                <div style="font-size:12.5px;color:#c9b8a4;min-width:0">{{ r.excerpt }}</div>
+                <div style="font-size:12px">{{ r.author }}</div>
+                <div><span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(139,58,47,.2);color:#E3A277">{{ r.reason }}</span></div>
+                <div style="display:flex;gap:6px">
+                  <span style="cursor:pointer;font-size:10.5px;font-weight:700;padding:6px 10px;border-radius:8px;border:1px solid rgba(240,195,107,.25);color:#c9b8a4">Ignorer</span>
+                  <span style="cursor:pointer;font-size:10.5px;font-weight:700;padding:6px 10px;border-radius:8px;border:1px solid rgba(240,195,107,.25);color:#E9BE77">Avertir</span>
+                  <span style="cursor:pointer;font-size:10.5px;font-weight:700;padding:6px 10px;border-radius:8px;border:none;background:#8B3A2F;color:#F7E7C8">Supprimer</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ MARKETPLACE ============ -->
+      <sc-if value="{{ isMarket }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0">Marketplace — Supervision</h1><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(240,195,107,.1);border:1px solid rgba(240,195,107,.3);color:#E9BE77">PILIER EN PRÉPARATION</span></div>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">Validation des vendeurs et modération des produits.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+              <div style="padding:13px 18px;background:#1a130d;border-bottom:1px solid rgba(240,195,107,.12);font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#8C7B67">VENDEURS / ARTISANS</div>
+              <sc-for list="{{ vendors }}" as="v" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:11px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06)">
+                  <div style="width:32px;height:32px;flex:none;border-radius:8px;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.25)"></div>
+                  <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px">{{ v.name }}</div><div style="font-size:10.5px;color:#8C7B67">{{ v.region }}</div></div>
+                  <span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;{{ v.statusStyle }}">{{ v.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+              <div style="padding:13px 18px;background:#1a130d;border-bottom:1px solid rgba(240,195,107,.12);font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:#8C7B67">PRODUITS À MODÉRER</div>
+              <sc-for list="{{ modProducts }}" as="p" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:11px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06)">
+                  <div style="width:32px;height:32px;flex:none;border-radius:8px;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.2)"></div>
+                  <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div><div style="font-size:10.5px;color:#8C7B67">{{ p.maker }} · {{ p.price }}</div></div>
+                  <span style="cursor:pointer;font-size:10px;font-weight:700;padding:5px 9px;border-radius:7px;border:1px solid rgba(139,58,47,.5);color:#E3A277">Retirer</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ DÉCOUVERTE ============ -->
+      <sc-if value="{{ isDiscover }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Découverte</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">Villages, coutumes, objets et rôles traditionnels — chaque affirmation sensible porte un statut obligatoire.</p>
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 0.8fr 0.8fr;gap:10px;padding:11px 18px;background:#1a130d;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:#8C7B67"><span>TITRE</span><span>TYPE</span><span>PEUPLE / RÉGION</span><span>IMAGE</span><span>STATUT</span></div>
+            <sc-for list="{{ discoverRows }}" as="d" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:2fr 1fr 1fr 0.8fr 0.8fr;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;font-size:12.5px">
+                <span style="font-weight:600">{{ d.name }}</span>
+                <span style="color:#c9b8a4;font-size:11px">{{ d.type }}</span>
+                <span style="color:#8C7B67;font-size:11px">{{ d.people }}</span>
+                <span><span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:999px;{{ d.imgStyle }}">{{ d.img }}</span></span>
+                <span><span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:999px;{{ d.pubStyle }}">{{ d.pub }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ MYTHOLOGIE ============ -->
+      <sc-if value="{{ isMythology }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Mythologie</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">5 mythes réels — aucun n'a d'image ni de narration audio à ce jour.</p>
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.6fr 1.2fr 1fr 0.7fr 0.7fr 0.7fr;gap:10px;padding:11px 18px;background:#1a130d;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:#8C7B67"><span>MYTHE</span><span>PEUPLE</span><span>ZONE</span><span>RÉCIT</span><span>IMAGE</span><span>AUDIO</span></div>
+            <sc-for list="{{ mythRows }}" as="m" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:1.6fr 1.2fr 1fr 0.7fr 0.7fr 0.7fr;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;font-size:12.5px">
+                <span style="font-weight:600">{{ m.name }}</span>
+                <span style="color:#8C7B67;font-size:11px">{{ m.people }}</span>
+                <span style="color:#8C7B67;font-size:11px">{{ m.zone }}</span>
+                <span>{{ m.recitBadge }}</span>
+                <span>{{ m.imgBadge }}</span>
+                <span>{{ m.audioBadge }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ ÉCOLE DES HÉROS (MATRIX) ============ -->
+      <sc-if value="{{ isEcole }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0">École des Héros — Production</h1><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(139,58,47,.18);border:1px solid rgba(139,58,47,.5);color:#E3A277">CHANTIER VIDE</span></div>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">9 héros × 4 niveaux × 4 formats (Lire/Écouter/Regarder/BD). Vert = prêt, orange = en cours, vide = à produire.</p>
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden;overflow-x:auto">
+            <div style="display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:8px;padding:11px 16px;background:#1a130d;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;color:#8C7B67;min-width:640px"><span>HÉROS</span><span>NIVEAU 1</span><span>NIVEAU 2</span><span>NIVEAU 3</span><span>NIVEAU 4</span></div>
+            <sc-for list="{{ ecoleMatrix }}" as="r" hint-placeholder-count="9">
+              <div style="display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:8px;padding:10px 16px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;min-width:640px">
+                <span style="font-weight:600;font-size:12px">{{ r.name }}</span>
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="4">
+                  <div style="display:flex;gap:3px">
+                    <sc-for list="{{ c.dots }}" as="d" hint-placeholder-count="4"><span title="{{ d.fmt }}" style="width:13px;height:13px;border-radius:4px;{{ d.style }}"></span></sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:16px;margin-top:14px;font-size:11px;color:#8C7B67"><span>📖 Lire · 🎧 Écouter · 🎬 Regarder · 🖼 BD</span><span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:rgba(90,150,90,.6)"></span>prêt</span><span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:rgba(200,138,61,.6)"></span>en cours</span><span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;border-radius:3px;background:#2a1f14"></span>vide</span></div>
+        </div>
+      </sc-if>
+
+      <!-- ============ BIBLIOTHÈQUE MÉDIAS ============ -->
+      <sc-if value="{{ isMediaLib }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Bibliothèque médias</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">Dépose un fichier, il se rattache directement à une fiche — sans passer par le code.</p>
+          <div style="border:2px dashed rgba(240,195,107,.3);border-radius:16px;padding:34px;text-align:center;background:#140d08;margin-bottom:20px">
+            <div style="font-size:38px;opacity:.5">⬆</div>
+            <div style="font-weight:600;font-size:14px;color:#F7E7C8;margin-top:10px">Glisser un fichier ici</div>
+            <div style="font-size:11px;color:#8C7B67;margin-top:4px">jpg · png · webp (image) · mp3 (audio) · mp4 (vidéo)</div>
+          </div>
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:2fr 0.8fr 1.4fr 0.8fr;gap:10px;padding:11px 18px;background:#1a130d;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:#8C7B67"><span>FICHIER</span><span>TYPE</span><span>RATTACHÉ À</span><span>TAILLE</span></div>
+            <sc-for list="{{ mediaFiles }}" as="m" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:2fr 0.8fr 1.4fr 0.8fr;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;font-size:12px">
+                <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+                <span style="color:#c9b8a4;font-size:11px">{{ m.type }}</span>
+                <span style="color:#8C7B67;font-size:11px">{{ m.attached }}</span>
+                <span style="color:#8C7B67;font-size:11px">{{ m.size }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ TRADUCTION ============ -->
+      <sc-if value="{{ isTranslation }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Traduction</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">4 langues camerounaises. Statut à 3 états : vide / brouillon (non relu) / validé par un locuteur natif — jamais une coche « traduit » avant validation humaine.</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+            <sc-for list="{{ langCoverage }}" as="l" hint-placeholder-count="4">
+              <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:14px;padding:16px"><div style="font-weight:700;font-size:14px;color:#F7E7C8">{{ l.name }}</div><div style="font-family:'Cinzel',serif;font-size:22px;color:#E9BE77;margin:6px 0 2px">{{ l.validated }}</div><div style="font-size:10.5px;color:#8C7B67">clés validées / {{ l.total }}</div></div>
+            </sc-for>
+          </div>
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.4fr 1.6fr 1fr;gap:10px;padding:11px 18px;background:#1a130d;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:#8C7B67"><span>CLÉ (FR)</span><span>BROUILLON EWONDO</span><span>STATUT</span></div>
+            <sc-for list="{{ translationRows }}" as="t" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:1.4fr 1.6fr 1fr;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;font-size:12.5px">
+                <span style="color:#c9b8a4">{{ t.source }}</span>
+                <span style="font-style:italic;color:{{ t.draftColor }}">{{ t.draft }}</span>
+                <span><span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;{{ t.statusStyle }}">{{ t.status }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ DONS ============ -->
+      <sc-if value="{{ isDons }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Dons</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">Aucun total agrégé n'est mis en avant tant que le volume n'est pas significatif. Pas de reçu fiscal (statut juridique non tranché).</p>
+          <div style="background:#140d08;border:1px solid rgba(240,195,107,.12);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 0.9fr 1.1fr 0.9fr;gap:10px;padding:11px 18px;background:#1a130d;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:#8C7B67"><span>CAUSE</span><span>MONTANT</span><span>TYPE</span><span>STATUT</span><span>DATE</span></div>
+            <sc-for list="{{ donRows }}" as="d" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:1.4fr 1fr 0.9fr 1.1fr 0.9fr;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;font-size:12px">
+                <span style="font-weight:600">{{ d.cause }}</span>
+                <span style="font-family:'Space Mono',monospace;color:#E9BE77">{{ d.amount }}</span>
+                <span style="color:#c9b8a4;font-size:11px">{{ d.type }}</span>
+                <span><span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:999px;background:rgba(200,138,61,.15);color:#E3A277">{{ d.status }}</span></span>
+                <span style="color:#8C7B67;font-size:11px">{{ d.date }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ donEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:40px;text-align:center;color:#8C7B67;font-size:13px">Aucun don enregistré pour l'instant.</div></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ SPONSORS (CRM) ============ -->
+      <sc-if value="{{ isSponsors }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0">Sponsors</h1><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(240,195,107,.1);border:1px solid rgba(240,195,107,.3);color:#E9BE77">0 PROSPECT RÉEL</span></div>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">Mini-CRM — pipeline de prospection. Aucun partenaire démarché à ce jour.</p>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+            <sc-for list="{{ sponsorPipeline }}" as="col" hint-placeholder-count="5">
+              <div style="background:#140d08;border:1px solid rgba(240,195,107,.1);border-radius:12px;padding:12px;min-height:120px">
+                <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;color:#8C7B67;margin-bottom:10px">{{ col.label }}</div>
+                <sc-for list="{{ col.cards }}" as="c" hint-placeholder-count="1"><div style="background:#1A130D;border:1px solid rgba(240,195,107,.14);border-radius:9px;padding:10px;margin-bottom:8px;font-size:11.5px;font-weight:600">{{ c.name }}</div></sc-for>
+                <sc-if value="{{ col.empty }}" hint-placeholder-val="{{ true }}"><div style="font-size:10.5px;color:#5f5140;text-align:center;padding:14px 0">—</div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ REVENUE / SUBSCRIPTIONS ============ -->
+      <sc-if value="{{ isRevenue }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Abonnements &amp; Revenus</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">Les trois leviers économiques : abonnement, marketplace, sponsors.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
+            <sc-for list="{{ revenueKpis }}" as="k" hint-placeholder-count="3">
+              <div style="background:linear-gradient(160deg,#1a130d,#140d08);border:1px solid rgba(240,195,107,.14);border-radius:16px;padding:18px"><div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;color:#E9A15C">{{ k.label }}</div><div style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:#F7E7C8;margin:8px 0 2px">{{ k.value }}</div><div style="font-size:11px;color:#8C7B67">{{ k.sub }}</div></div>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:16px">
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:16px;padding:20px">
+              <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B;margin-bottom:16px">PALIERS D'ABONNEMENT</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:12px;background:#1A130D;border:1px solid rgba(240,195,107,.12);border-radius:10px;padding:12px 14px">
+                    <div style="flex:1"><div style="font-weight:700;font-size:13px">{{ t.name }}</div><div style="font-size:10.5px;color:#8C7B67">{{ t.count }} abonnés</div></div>
+                    <span style="font-family:'Space Mono',monospace;font-size:12px;color:#E9BE77">{{ t.price }}</span>
+                    <span style="cursor:pointer;font-size:11px;color:#E9BE77">Modifier</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:16px;padding:20px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B">SPONSORS &amp; PARTENARIATS</div><span style="cursor:pointer;font-size:11px;font-weight:700;color:#E9BE77">+ Ajouter</span></div>
+              <div style="background:#140d08;border-radius:10px;overflow:hidden">
+                <div style="display:grid;grid-template-columns:1.4fr 1fr 1.2fr 1fr;gap:10px;padding:10px 14px;background:#1a130d;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:#8C7B67"><span>PARTENAIRE</span><span>STATUT</span><span>CONTREPARTIE</span><span>ÉCHÉANCE</span></div>
+                <sc-for list="{{ sponsors }}" as="s" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:1.4fr 1fr 1.2fr 1fr;gap:10px;padding:11px 14px;border-bottom:1px solid rgba(240,195,107,.06);align-items:center;font-size:12px">
+                    <span style="font-weight:600">{{ s.name }}</span>
+                    <span><span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:999px;{{ s.statusStyle }}">{{ s.status }}</span></span>
+                    <span style="color:#c9b8a4;font-size:11px">{{ s.deal }}</span>
+                    <span style="color:#8C7B67;font-size:11px">{{ s.date }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ SETTINGS ============ -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:afaFade .3s ease both">
+          <h1 style="font-family:'Cinzel',serif;font-size:26px;font-weight:700;margin:0 0 4px">Paramètres</h1>
+          <p style="color:#8C7B67;font-size:13px;margin:0 0 20px">Administrateurs, pilotage à distance et traçabilité.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:16px;padding:20px">
+              <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B;margin-bottom:14px">COMPTES ADMINISTRATEURS</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ admins }}" as="a" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:11px;background:#1A130D;border:1px solid rgba(240,195,107,.12);border-radius:10px;padding:11px 13px">
+                    <div style="width:30px;height:30px;flex:none;border-radius:50%;background:repeating-linear-gradient(135deg,#2a1f14 0 6px,#1f1710 6px 12px);border:1px solid rgba(240,195,107,.25)"></div>
+                    <div style="flex:1"><div style="font-weight:600;font-size:12.5px">{{ a.name }}</div><div style="font-size:10.5px;color:#8C7B67">{{ a.email }}</div></div>
+                    <span style="font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:999px;{{ a.roleStyle }}">{{ a.role }}</span>
+                  </div>
+                </sc-for>
+                <button style="align-self:flex-start;margin-top:4px;font:inherit;font-size:11.5px;font-weight:700;padding:9px 15px;border-radius:9px;border:1px dashed rgba(240,195,107,.4);background:rgba(240,195,107,.05);color:#E9BE77;cursor:pointer">+ Inviter un administrateur</button>
+              </div>
+            </div>
+            <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:16px;padding:20px">
+              <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B;margin-bottom:14px">PILOTAGE DE L'APP</div>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <sc-for list="{{ appToggles }}" as="t" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(240,195,107,.06)">
+                    <span style="flex:1;font-size:13px;color:#c9b8a4">{{ t.label }}</span>
+                    <span onClick="{{ t.toggle }}" style="cursor:pointer;width:40px;height:22px;border-radius:999px;background:{{ t.trackBg }};position:relative;flex:none;transition:background .15s"><span style="position:absolute;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;{{ t.knobPos }}"></span></span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="background:#150e09;border:1px solid rgba(240,195,107,.12);border-radius:16px;padding:20px">
+            <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;color:#C99A5B;margin-bottom:14px">JOURNAL D'ACTIVITÉ</div>
+            <div style="display:flex;flex-direction:column;gap:0">
+              <sc-for list="{{ activityLog }}" as="l" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(240,195,107,.06);font-size:12.5px">
+                  <span style="font-family:'Space Mono',monospace;font-size:10px;color:#8C7B67;width:120px;flex:none">{{ l.time }}</span>
+                  <span style="font-weight:600;width:80px;flex:none">{{ l.who }}</span>
+                  <span style="flex:1;color:#c9b8a4">{{ l.action }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM MODAL -->
+  <sc-if value="{{ deleteOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelDelete }}" style="position:fixed;inset:0;z-index:100;background:rgba(6,4,2,.8);display:flex;align-items:center;justify-content:center;padding:24px;animation:afaFade .18s ease both">
+      <div style="width:100%;max-width:420px;background:#160f0a;border:1px solid rgba(139,58,47,.5);border-radius:18px;padding:26px">
+        <div style="font-size:34px;margin-bottom:12px">⚠️</div>
+        <div style="font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:#F7E7C8;margin-bottom:8px">Dépublier &amp; archiver&nbsp;?</div>
+        <p style="font-size:13px;color:#9A8870;line-height:1.6;margin:0 0 22px">Le héros sera retiré du catalogue visible dans l'app grand public. Ses données et médias sont conservés — l'action est réversible depuis les archives.</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button onClick="{{ cancelDelete }}" style="font:inherit;font-size:13px;font-weight:700;padding:11px 20px;border-radius:11px;border:1px solid rgba(240,195,107,.3);background:none;color:#c9b8a4;cursor:pointer">Annuler</button>
+          <button onClick="{{ cancelDelete }}" style="font:inherit;font-size:13px;font-weight:700;padding:11px 20px;border-radius:11px;border:none;background:#8B3A2F;color:#F7E7C8;cursor:pointer">Dépublier &amp; archiver</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ADD VIDEO MODAL -->
+  <sc-if value="{{ videoModalOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeVideoModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(6,4,2,.8);display:flex;align-items:center;justify-content:center;padding:24px;animation:afaFade .18s ease both">
+      <div onClick="{{ stopProp }}" style="width:100%;max-width:460px;background:#160f0a;border:1px solid rgba(240,195,107,.25);border-radius:18px;padding:26px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px"><div style="font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:#F7E7C8">Ajouter une vidéo</div><span onClick="{{ closeVideoModal }}" style="cursor:pointer;font-size:18px;color:#8C7B67">✕</span></div>
+        <div style="border:2px dashed rgba(240,195,107,.3);border-radius:14px;padding:26px;text-align:center;background:#140d08;margin-bottom:18px"><div style="font-size:32px;opacity:.5">⬆</div><div style="font-weight:600;font-size:13px;color:#F7E7C8;margin-top:8px">Glisser un fichier MP4</div><div style="font-size:10.5px;color:#8C7B67;margin-top:3px">MP4 · 16:9 · 1080p recommandé</div></div>
+        <div style="margin-bottom:14px"><div style="font-size:11px;color:#8C7B67;margin-bottom:7px">Chapitre</div><div style="display:flex;gap:8px"><sc-for list="{{ chapterOptions }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.pick }}" style="cursor:pointer;flex:1;text-align:center;font-size:12px;font-weight:600;padding:10px 0;border-radius:9px;{{ c.style }}">{{ c.label }}</span></sc-for></div></div>
+        <div style="margin-bottom:20px"><div style="font-size:11px;color:#8C7B67;margin-bottom:7px">Langue</div><div style="display:flex;gap:8px"><sc-for list="{{ videoLangOptions }}" as="l" hint-placeholder-count="2"><span onClick="{{ l.pick }}" style="cursor:pointer;flex:1;text-align:center;font-size:12px;font-weight:600;padding:10px 0;border-radius:9px;{{ l.style }}">{{ l.label }}</span></sc-for></div><div style="font-size:10px;color:#6f5f4d;margin-top:6px">Seules les langues actives du héros sont proposées.</div></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button onClick="{{ closeVideoModal }}" style="font:inherit;font-size:13px;font-weight:700;padding:11px 20px;border-radius:11px;border:1px solid rgba(240,195,107,.3);background:none;color:#c9b8a4;cursor:pointer">Annuler</button>
+          <button onClick="{{ closeVideoModal }}" style="font:inherit;font-size:13px;font-weight:700;padding:11px 20px;border-radius:11px;border:none;background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;cursor:pointer">Téléverser la vidéo</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { section: 'dash', heroIdx: null, featured: {}, published: {}, media: {}, deleteOpen: false, appToggles: { decouverte: false, annonce: false, langues: true } };
+
+  renderVals() {
+    const s = this.state;
+    const A = window.AFROBACK || {};
+    const heroesRaw = A.heroesRaw || [];
+    const heroPhotos = A.heroPhotos || {};
+    const go = (section) => () => this.setState({ section, heroIdx: null });
+
+    const nav = [
+      { id:'dash', icon:'▤', label:'Tableau de bord' },
+      { id:'_g1', group:'CONTENU' },
+      { id:'heroes', icon:'★', label:'Histoires & Héros' },
+      { id:'discover', icon:'🧭', label:'Découverte' },
+      { id:'mythology', icon:'🌙', label:'Mythologie' },
+      { id:'ecole', icon:'🏅', label:'École des Héros' },
+      { id:'media', icon:'🖼', label:'Bibliothèque médias' },
+      { id:'translation', icon:'🌐', label:'Traduction' },
+      { id:'_g2', group:'COMMUNAUTÉ & BUSINESS' },
+      { id:'community', icon:'💬', label:'Communauté', badge:'5' },
+      { id:'market', icon:'🛍', label:'Marketplace' },
+      { id:'dons', icon:'🤲', label:'Dons' },
+      { id:'revenue', icon:'◈', label:'Abonnements' },
+      { id:'sponsors', icon:'🤝', label:'Sponsors' },
+      { id:'_g3', group:'UTILISATEURS & SYSTÈME' },
+      { id:'users', icon:'👥', label:'Utilisateurs' },
+      { id:'settings', icon:'⚙', label:'Paramètres' },
+    ];
+    const sec = s.section;
+    const navItems = nav.map(n => n.group ? { group:n.group, isGroup:true } : ({ ...n, isGroup:false, badge: n.badge || '', go: () => this.setState({ section: n.id, heroIdx: null }), style: (n.id===sec || (n.id==='heroes' && sec==='heroDetail')) ? 'background:linear-gradient(135deg,rgba(240,195,107,.16),rgba(139,90,43,.1));color:#F7E7C8;border:1px solid rgba(240,195,107,.22)' : 'color:#9A8870;border:1px solid transparent' }));
+    const crumbMap = { dash:'Tableau de bord', heroes:'Héros', heroDetail:'Héros / Fiche', discover:'Découverte', mythology:'Mythologie', ecole:'École des Héros', media:'Bibliothèque médias', translation:'Traduction', users:'Utilisateurs', community:'Communauté', market:'Marketplace', dons:'Dons', revenue:'Abonnements', sponsors:'Sponsors', settings:'Paramètres' };
+
+    // media presence per hero (index-keyed defaults)
+    const mediaDefault = {
+      0:{recitFr:1,recitEn:1,story:1,audioFr:1,audioEn:1,video:0,photo:1},
+      1:{recitFr:1,recitEn:0,story:1,audioFr:0,audioEn:0,video:0,photo:1},
+      2:{recitFr:1,recitEn:1,story:0,audioFr:0,audioEn:0,video:0,photo:1},
+      3:{recitFr:1,recitEn:1,story:1,audioFr:1,audioEn:0,video:0,photo:1},
+      4:{recitFr:1,recitEn:0,story:0,audioFr:0,audioEn:0,video:0,photo:1},
+      5:{recitFr:1,recitEn:1,story:1,audioFr:1,audioEn:1,video:1,photo:1},
+      6:{recitFr:1,recitEn:0,story:0,audioFr:0,audioEn:0,video:1,photo:1},
+      7:{recitFr:1,recitEn:1,story:1,audioFr:1,audioEn:1,video:0,photo:1},
+    };
+    const pubDefault = { 0:'published',1:'published',2:'draft',3:'published',4:'draft',5:'published',6:'published',7:'published' };
+    const featDefault = { 0:true,5:true };
+
+    const isFeat = (i) => s.featured[i] !== undefined ? s.featured[i] : !!featDefault[i];
+    const pubOf = (i) => s.published[i] || pubDefault[i] || 'draft';
+    const mediaOf = (i) => Object.assign({}, mediaDefault[i] || {}, s.media[i] || {});
+
+    const badge = (on, label) => ({ label, style: on ? 'color:#8fbf8f;background:rgba(90,150,90,.15)' : 'color:#B06A4A;background:rgba(139,58,47,.14)' });
+    const pubBadge = (p) => p==='published' ? { pubLabel:'Publié', pubStyle:'color:#8fbf8f;background:rgba(90,150,90,.18)' } : p==='draft' ? { pubLabel:'Brouillon', pubStyle:'color:#C9A15B;background:rgba(240,195,107,.12)' } : { pubLabel:'Dépublié', pubStyle:'color:#B06A4A;background:rgba(139,58,47,.16)' };
+
+    const heroFilterId = s.heroFilter || 'all';
+    const heroFilters = [ {id:'all',label:'Tous'}, {id:'incomplete',label:'Incomplets'}, {id:'featured',label:'À la une'} ].map(f => ({ label:f.label, pick:()=>this.setState({heroFilter:f.id}), style: f.id===heroFilterId ? 'background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;font-weight:700' : 'border:1px solid rgba(240,195,107,.22);color:#c9b8a4' }));
+
+    const mkThumb = (i, name) => { const src = heroPhotos[i]; return src ? React.createElement('img',{src,alt:name,style:{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}) : React.createElement('span',{style:{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'8px',fontFamily:"'Space Mono',monospace",color:'#6f5f4d'}},'∅'); };
+
+    let heroRows = heroesRaw.map((h, i) => {
+      const m = mediaOf(i);
+      const complete = m.recitFr && m.photo && (m.audioFr || m.video);
+      return { i, name:h.name, region:h.region, era:h.era, hasPhoto:!!heroPhotos[i], complete,
+        thumb: mkThumb(i, h.name), photoBorder: heroPhotos[i] ? 'rgba(240,195,107,.25)' : 'rgba(139,58,47,.4)',
+        media: [ badge(m.recitFr,'FR'), badge(m.recitEn,'EN'), badge(m.story,'SB'), badge(m.audioFr,'🔊FR'), badge(m.video,'🎬') ],
+        ...pubBadge(pubOf(i)),
+        featIcon: isFeat(i) ? '★' : '☆', featColor: isFeat(i) ? 'color:#F0C36B' : 'color:#6f5f4d',
+        toggleFeatured: (e) => { if(e&&e.stopPropagation)e.stopPropagation(); this.setState({ featured: { ...s.featured, [i]: !isFeat(i) } }); },
+        open: () => this.setState({ section:'heroDetail', heroIdx:i }) };
+    });
+    if (heroFilterId==='incomplete') heroRows = heroRows.filter(r => !r.complete);
+    if (heroFilterId==='featured') heroRows = heroRows.filter(r => isFeat(r.i));
+
+    // detail
+    const di = s.heroIdx ?? 0;
+    const dHero = heroesRaw[di] || {};
+    const dm = mediaOf(di);
+    const setMedia = (key) => () => this.setState({ media: { ...s.media, [di]: { ...(s.media[di]||{}), [key]: (mediaOf(di)[key] ? 0 : 1) } } });
+    const toggleRow = (label, key) => { const on = !!dm[key]; return { label, avail: on?'DISPONIBLE':'ABSENT', availStyle: on?'color:#8fbf8f':'color:#B06A4A', toggle: setMedia(key), trackBg: on?'#8B5A2B':'#2a1f14', knobPos: on?'left:20px':'left:2px' }; };
+    const detailToggles = [ toggleRow('Audio FR','audioFr'), toggleRow('Audio EN','audioEn'), toggleRow('Vidéo','video') ];
+    const vLabel = (on) => on ? { frLabel:'EN LIGNE', frStyle:'color:#8fbf8f;background:rgba(90,150,90,.15)' } : { frLabel:'À PRODUIRE', frStyle:'color:#B06A4A;background:rgba(139,58,47,.14)' };
+    const hasVid = !!dm.video;
+    const vChap = [
+      { title:'Chap. 1 · Origines', frOn:hasVid, enOn:hasVid, views:hasVid?'2 140':'—', likes:hasVid?'186':'—', completion:hasVid?'78%':'—' },
+      { title:'Chap. 2 · L\u2019ascension', frOn:hasVid, enOn:false, views:hasVid?'1 610':'—', likes:hasVid?'142':'—', completion:hasVid?'71%':'—' },
+      { title:'Chap. 3 · Le combat', frOn:hasVid, enOn:false, views:hasVid?'1 205':'—', likes:hasVid?'98':'—', completion:hasVid?'64%':'—' },
+      { title:'Chap. 4 · L\u2019héritage', frOn:false, enOn:false, views:'—', likes:'—', completion:'—' },
+    ];
+    const videoChapters = vChap.map(c => ({ title:c.title, views:c.views, likes:c.likes, completion:c.completion,
+      frLabel: c.frOn?'EN LIGNE':'À PRODUIRE', frStyle: c.frOn?'color:#8fbf8f;background:rgba(90,150,90,.15)':'color:#B06A4A;background:rgba(139,58,47,.14)',
+      enLabel: c.enOn?'EN LIGNE':'À PRODUIRE', enStyle: c.enOn?'color:#8fbf8f;background:rgba(90,150,90,.15)':'color:#B06A4A;background:rgba(139,58,47,.14)' }));
+    const vReadyCount = vChap.reduce((n,c)=>n+(c.frOn?1:0)+(c.enOn?1:0),0);
+    const videoReadyLabel = vReadyCount + ' / 8 en ligne';
+    const engagementStats = hasVid ? [
+      { icon:'👁', value:'6 160', label:'vues vidéo' },
+      { icon:'♥', value:'526', label:'likes' },
+      { icon:'📖', value:'3 480', label:'lectures récit' },
+      { icon:'🎧', value:'1 920', label:'écoutes audio' },
+    ] : [
+      { icon:'👁', value:'—', label:'vues vidéo' },
+      { icon:'♥', value:'—', label:'likes' },
+      { icon:'📖', value:'840', label:'lectures récit' },
+      { icon:'🎧', value:'—', label:'écoutes audio' },
+    ];
+    const uTag = (on) => on ? { tag:'REMPLACER', tagStyle:'color:#8fbf8f' } : { tag:'MANQUANT', tagStyle:'color:#B06A4A' };
+    const uploadSlots = [ { label:'Photo catalogue', hint:'JPG/PNG · 1200×1600', ...uTag(dm.photo) }, { label:'Audio FR', hint:'MP3 · narration', ...uTag(dm.audioFr) }, { label:'Audio EN', hint:'MP3 · narration', ...uTag(dm.audioEn) }, { label:'Vidéo', hint:'MP4 · 16:9', ...uTag(dm.video) } ];
+    const dPub = pubOf(di);
+
+    const users = [
+      { name:'Aïcha Mbarga', country:'🇨🇲 Cameroun', phone:'+237 6•• ••• 412', plan:'Héritage', joined:'12 mai 2026', status:'actif' },
+      { name:'Kwame Osei', country:'🇬🇭 Ghana', phone:'+233 2•• ••• 087', plan:'Racines', joined:'3 juin 2026', status:'actif' },
+      { name:'Fatou Diop', country:'🇸🇳 Sénégal', phone:'+221 7•• ••• 330', plan:'Découverte', joined:'21 juin 2026', status:'actif' },
+      { name:'Ibrahim Sissoko', country:'🇲🇱 Mali', phone:'+223 7•• ••• 654', plan:'Racines', joined:'28 juin 2026', status:'suspendu' },
+      { name:'Marie Tchoumi', country:'🇨🇲 Cameroun', phone:'+237 6•• ••• 901', plan:'Héritage', joined:'2 juil. 2026', status:'actif' },
+      { name:'Léa Kouassi', country:'🇨🇮 Côte d\u2019Ivoire', phone:'+225 0•• ••• 218', plan:'Découverte', joined:'9 juil. 2026', status:'actif' },
+      { name:'Omar Fall', country:'🇸🇳 Sénégal', phone:'+221 7•• ••• 145', plan:'Découverte', joined:'18 juil. 2026', status:'actif' },
+    ];
+    const planStyleOf = (p) => p==='Héritage' ? 'color:#1a1109;background:linear-gradient(135deg,#F0C36B,#C98A3D)' : p==='Racines' ? 'color:#E9BE77;background:rgba(240,195,107,.12);border:1px solid rgba(240,195,107,.3)' : 'color:#c9b8a4;background:rgba(240,195,107,.06)';
+    const uStatusStyle = (st) => st==='actif' ? 'color:#8fbf8f;background:rgba(90,150,90,.16)' : 'color:#B06A4A;background:rgba(139,58,47,.18)';
+    const usersBuilt = users.map((u,i) => ({ ...u, planStyle: planStyleOf(u.plan), statusStyle: uStatusStyle(u.status), status: u.status==='actif'?'Actif':'Suspendu', open:()=>{} }));
+    const userFilterId = s.userFilter || 'all';
+    const userFilters = [ {id:'all',label:'Tous'}, {id:'heritage',label:'Héritage'}, {id:'racines',label:'Racines'}, {id:'suspended',label:'Suspendus'} ].map(f => ({ label:f.label, pick:()=>this.setState({userFilter:f.id}), style: f.id===userFilterId ? 'background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109;font-weight:700' : 'border:1px solid rgba(240,195,107,.22);color:#c9b8a4' }));
+
+    const reports = [
+      { excerpt:'"Cette version de l\u2019histoire est totalement fausse, les Bamiléké…"', author:'Jean P.', reason:'Désinformation' },
+      { excerpt:'"Achetez mes formations !! lien en bio 🔥🔥"', author:'promo_237', reason:'Spam' },
+      { excerpt:'Photo signalée sur la publication de Kwame O.', author:'Anonyme', reason:'Inapproprié' },
+      { excerpt:'"Commentaire à caractère haineux envers…"', author:'user_8841', reason:'Haineux' },
+    ];
+    const vendors = [
+      { name:'Atelier Nji Mama', region:'Foumban, Cameroun', status:'actif' },
+      { name:'Ama Serwaa Textiles', region:'Accra, Ghana', status:'attente' },
+      { name:'Fonderie Hountondji', region:'Abomey, Bénin', status:'actif' },
+      { name:'Amadou Dolo Sculpture', region:'Bandiagara, Mali', status:'suspendu' },
+    ].map(v => ({ ...v, status: v.status==='actif'?'Actif':v.status==='attente'?'En attente':'Suspendu', statusStyle: v.status==='actif'?'color:#8fbf8f;background:rgba(90,150,90,.16)':v.status==='attente'?'color:#C9A15B;background:rgba(240,195,107,.12)':'color:#B06A4A;background:rgba(139,58,47,.18)' }));
+    const modProducts = [
+      { name:'Masque cérémoniel Bamoun', maker:'Atelier Nji Mama', price:'85 000 FCFA' },
+      { name:'Tissu wax authentique', maker:'Ama Serwaa', price:'25 000 FCFA' },
+      { name:'Parure en bronze', maker:'Fonderie Hountondji', price:'45 000 FCFA' },
+      { name:'Sculpture Dogon', maker:'Amadou Dolo', price:'120 000 FCFA' },
+    ];
+
+    const tiers = [ { name:'Découverte', count:'9 840', price:'Gratuit' }, { name:'Racines', count:'3 120', price:'2 500 FCFA' }, { name:'Héritage', count:'1 258', price:'5 000 FCFA' } ];
+    const sponsors = [
+      { name:'MTN Cameroun', status:'Actif', deal:'Bannière fiches', date:'déc. 2026' },
+      { name:'Orange Money', status:'En discussion', deal:'Paiement intégré', date:'—' },
+      { name:'Musée de Foumban', status:'Actif', deal:'Contenu croisé', date:'juin 2027' },
+    ].map(sp => ({ ...sp, statusStyle: sp.status==='Actif'?'color:#8fbf8f;background:rgba(90,150,90,.16)':'color:#C9A15B;background:rgba(240,195,107,.12)' }));
+
+    const admins = [
+      { name:'Yannick', email:'yannick@afroback.co', role:'Admin complet', roleStyle:'color:#1a1109;background:linear-gradient(135deg,#F0C36B,#C98A3D)' },
+      { name:'Sandra M.', email:'sandra@afroback.co', role:'Modération', roleStyle:'color:#E9BE77;background:rgba(240,195,107,.12);border:1px solid rgba(240,195,107,.3)' },
+    ];
+    const at = s.appToggles;
+    const appTog = (label, key) => ({ label, toggle: () => this.setState({ appToggles: { ...at, [key]: !at[key] } }), trackBg: at[key]?'#8B5A2B':'#2a1f14', knobPos: at[key]?'left:20px':'left:2px' });
+    const appToggles = [ appTog('Activer le pilier Découverte','decouverte'), appTog('Bandeau d\u2019annonce global','annonce'), appTog('Module Langues actif','langues') ];
+    const activityLog = [
+      { time:'30 juil. 09:42', who:'Yannick', action:'A mis « Reine Nzinga » à la une' },
+      { time:'30 juil. 09:15', who:'Sandra M.', action:'A supprimé un commentaire signalé (spam)' },
+      { time:'29 juil. 18:03', who:'Yannick', action:'A activé l\u2019audio FR de « Martin-Paul Samba »' },
+      { time:'29 juil. 14:20', who:'Yannick', action:'A publié « Fête nationale du Cameroun »' },
+      { time:'28 juil. 11:47', who:'Sandra M.', action:'A suspendu le compte de Ibrahim Sissoko' },
+    ];
+
+    // dashboard KPIs
+    const total = heroesRaw.length;
+    const pubCount = heroesRaw.filter((h,i)=>pubOf(i)==='published').length;
+    const cnt = (key) => heroesRaw.filter((h,i)=>mediaOf(i)[key]).length;
+    const bar = (label, key) => ({ label, count:cnt(key), total, pct: Math.round(cnt(key)/total*100)+'%' });
+
+    // v2 screens data
+    const okBadge = (on) => on ? React.createElement('span',{style:{fontSize:'9px',fontWeight:700,padding:'3px 7px',borderRadius:'999px',color:'#8fbf8f',background:'rgba(90,150,90,.15)'}},'✓') : React.createElement('span',{style:{fontSize:'9px',fontWeight:700,padding:'3px 7px',borderRadius:'999px',color:'#B06A4A',background:'rgba(139,58,47,.14)'}},'✗');
+    const chip = (txt, ok) => ({ label:txt, style: ok ? 'color:#8fbf8f;background:rgba(90,150,90,.15)' : 'color:#B06A4A;background:rgba(139,58,47,.14)' });
+    const discoverRows = [
+      { name:'Palais royal de Foumban', type:'Village', people:'Bamoun · Ouest', imgOk:true, pubOk:true },
+      { name:'Le Nguon', type:'Coutume', people:'Bamoun · Ouest', imgOk:false, pubOk:true },
+      { name:'Le trône Mandu Yenu', type:'Objet', people:'Bamoun · Ouest', imgOk:false, pubOk:false },
+      { name:'Le Ngondo', type:'Coutume', people:'Sawa · Littoral', imgOk:false, pubOk:true },
+      { name:'Le tangué', type:'Objet', people:'Sawa · Douala', imgOk:false, pubOk:false },
+      { name:'Le rite du Sô', type:'Coutume', people:'Bulu/Beti · Centre', imgOk:false, pubOk:false },
+    ].map(d => ({ ...d, img: d.imgOk?'✓':'✗', imgStyle: d.imgOk?'color:#8fbf8f;background:rgba(90,150,90,.15)':'color:#B06A4A;background:rgba(139,58,47,.14)', pub: d.pubOk?'Publié':'Brouillon', pubStyle: d.pubOk?'color:#8fbf8f;background:rgba(90,150,90,.15)':'color:#C99A5B;background:rgba(240,195,107,.1)' }));
+    const mythRows = [
+      { name:'Les Miengu', people:'Sawa', zone:'Littoral' },
+      { name:'Nchare Yen', people:'Bamoun', zone:'Ouest' },
+      { name:'Ngan Medza', people:'Beti-Fang', zone:'Centre' },
+      { name:'Ngog Lituba', people:'Bassa/Bakoko', zone:'Littoral' },
+      { name:'Les Sao', people:'Kotoko', zone:'Extrême-Nord' },
+    ].map(m => ({ ...m, recitBadge: okBadge(true), imgBadge: okBadge(false), audioBadge: okBadge(false) }));
+    const ecoleMatrix = (heroesRaw.slice(0,9)).map((h,hi) => ({ name: h.name, cells: [0,1,2,3].map(lvl => ({ dots: ['📖','🎧','🎬','🖼'].map((f,fi) => {
+      const state = (hi===3 && lvl===0 && fi===0) ? 'ready' : (hi===3 && lvl===0 && fi<2) ? 'wip' : 'empty';
+      return { fmt:f, style: state==='ready'?'background:rgba(90,150,90,.6)':state==='wip'?'background:rgba(200,138,61,.6)':'background:#2a1f14' };
+    }) })) }));
+    const mediaFiles = [
+      { name:'reine-nzinga-fr.mp3', type:'audio', attached:'Reine Nzinga', size:'4,2 Mo' },
+      { name:'reine-nzinga-en.mp3', type:'audio', attached:'Reine Nzinga', size:'4,0 Mo' },
+      { name:'reine-nzinga.jpg', type:'image', attached:'Reine Nzinga', size:'820 Ko' },
+      { name:'martin-paul-samba.jpg', type:'image', attached:'Martin-Paul Samba', size:'760 Ko' },
+    ];
+    const langCoverage = [
+      { name:'Ewondo', validated:'4', total:'120' }, { name:'Douala', validated:'2', total:'120' },
+      { name:'Bassa', validated:'0', total:'120' }, { name:'Bamiléké', validated:'1', total:'120' },
+    ];
+    const trStatus = { empty:{label:'Vide', style:'color:#6f5f4d;background:rgba(240,195,107,.06)'}, draft:{label:'Brouillon', style:'color:#C99A5B;background:rgba(240,195,107,.1)'}, ok:{label:'Validé', style:'color:#8fbf8f;background:rgba(90,150,90,.15)'} };
+    const translationRows = [
+      { source:'Accueil', draft:'MendZ\u00ed', st:'draft' },
+      { source:'Histoires & Héros', draft:'—', st:'empty' },
+      { source:'Découverte', draft:'—', st:'empty' },
+      { source:'Bonjour', draft:'Mbolo', st:'ok' },
+      { source:'Rechercher', draft:'—', st:'empty' },
+    ].map(t => ({ source:t.source, draft:t.draft, draftColor: t.st==='empty'?'#5f5140':'#c9b8a4', status: trStatus[t.st].label, statusStyle: trStatus[t.st].style }));
+    const donRows = [];
+    const donEmpty = donRows.length === 0;
+    const sponsorPipeline = [
+      { label:'PROSPECT', cards:[] }, { label:'1ER CONTACT', cards:[] }, { label:'DISCUSSION', cards:[] }, { label:'ACTIF', cards:[] }, { label:'TERMINÉ', cards:[] },
+    ].map(c => ({ ...c, empty: c.cards.length===0 }));
+
+    return {
+      navItems, crumb: crumbMap[sec] || '',
+      isDash: sec==='dash', isHeroes: sec==='heroes', isHeroDetail: sec==='heroDetail', isUsers: sec==='users', isCommunity: sec==='community', isMarket: sec==='market', isRevenue: sec==='revenue', isSettings: sec==='settings',
+      isDiscover: sec==='discover', isMythology: sec==='mythology', isEcole: sec==='ecole', isMediaLib: sec==='media', isTranslation: sec==='translation', isDons: sec==='dons', isSponsors: sec==='sponsors',
+      goHeroes: go('heroes'), goUsers: go('users'),
+      kpis: [
+        { label:'HÉROS PUBLIÉS', value:pubCount+'/'+total, sub:'catalogue visible' },
+        { label:'UTILISATEURS', value:'14 218', sub:'+842 sur 30 j' },
+        { label:'ABONNÉS PAYANTS', value:'4 378', sub:'Racines + Héritage' },
+        { label:'SIGNALEMENTS', value:'5', sub:'en attente de revue' },
+      ],
+      prodBars: [ bar('Récit FR','recitFr'), bar('Récit EN','recitEn'), bar('Audio FR','audioFr'), bar('Vidéo','video'), bar('Photo','photo') ],
+      planSplit: [ { name:'Découverte', count:'9 840', pct:'69%', color:'#6f5f4d' }, { name:'Racines', count:'3 120', pct:'22%', color:'#C98A3D' }, { name:'Héritage', count:'1 258', pct:'9%', color:'#F0C36B' } ],
+      alerts: [ { count:'5', label:'Signalements communauté à modérer', go: go('community') }, { count:'3', label:'Médias en attente de validation', go: go('heroes') }, { count:'2', label:'Vendeurs en attente de validation', go: go('market') } ],
+      heroRows, heroFilters, heroCount: total+'',
+      detailHero: dHero, detailThumb: mkThumb(di, dHero.name), detailToggles, uploadSlots, detailOrder: (di+1)+'',
+      ...( () => { const b = pubBadge(dPub); return { detailPubLabel:b.pubLabel, detailPubStyle:b.pubStyle }; })(),
+      detailFeatLabel: isFeat(di) ? '★ Retirer de la une' : '☆ Mettre à la une',
+      detailFeatBg: isFeat(di) ? 'rgba(240,195,107,.14)' : 'transparent',
+      detailToggleFeatured: () => this.setState({ featured: { ...s.featured, [di]: !isFeat(di) } }),
+      detailPubBtn: dPub==='published' ? 'Dépublier' : 'Publier',
+      detailPubBtnBg: dPub==='published' ? '#B06A4A' : 'linear-gradient(135deg,#F0C36B,#8B5A2B)',
+      detailTogglePub: () => this.setState({ published: { ...s.published, [di]: dPub==='published' ? 'depublie' : 'published' } }),
+      askDelete: () => this.setState({ deleteOpen:true }), cancelDelete: () => this.setState({ deleteOpen:false }), deleteOpen: s.deleteOpen,
+      heroSaved: s.heroSaved, saveHero: () => { this.setState({ heroSaved:true }); clearTimeout(this._saveT); this._saveT = setTimeout(()=>this.setState({heroSaved:false}), 3000); },
+      videoModalOpen: s.videoModalOpen, openVideoModal: () => this.setState({ videoModalOpen:true, vmChapter:1, vmLang:'fr' }), closeVideoModal: () => this.setState({ videoModalOpen:false }), stopProp: (e) => { if(e&&e.stopPropagation) e.stopPropagation(); },
+      chapterOptions: [1,2,3,4].map(n => ({ label:'Chap. '+n, pick:()=>this.setState({vmChapter:n}), style: (s.vmChapter||1)===n ? 'background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109' : 'background:#1A130D;border:1px solid rgba(240,195,107,.16);color:#c9b8a4' })),
+      videoLangOptions: [{id:'fr',label:'Français'},{id:'en',label:'English'}].map(l => ({ label:l.label, pick:()=>this.setState({vmLang:l.id}), style: (s.vmLang||'fr')===l.id ? 'background:linear-gradient(135deg,#F0C36B,#8B5A2B);color:#1a1109' : 'background:#1A130D;border:1px solid rgba(240,195,107,.16);color:#c9b8a4' })),
+      users: usersBuilt, userFilters,
+      reports, vendors, modProducts,
+      revenueKpis: [ { label:'REVENU RÉCURRENT / MOIS', value:'22,1 M', sub:'FCFA · abonnements' }, { label:'COMMISSION MARKETPLACE', value:'—', sub:'pilier en préparation' }, { label:'SPONSORS ACTIFS', value:'2', sub:'+1 en discussion' } ],
+      tiers, sponsors, admins, appToggles, activityLog,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
@@ -8,6 +8,7 @@ import { ErrorState, LoadingState } from '../../../../../src/components/LoadingS
 import { GoldButton } from '../../../../../src/components/Buttons';
 import { HeroPlaceholder } from '../../../../../src/components/HeroVisual';
 import { useHero } from '../../../../../src/data/useHeroesData';
+import { recordAudioEngagement } from '../../../../../src/data/engagementRepository';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import type { Heros } from '../../../../../src/data/types';
 
@@ -27,6 +28,13 @@ export default function LecteurAudioScreen() {
   const router = useRouter();
   const herosState = useHero(slug);
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
+
+  // Engagement réel par langue (voir "ENGAGEMENT GLOBAL" et les compteurs
+  // FR/EN côté back-office) : déplacé dans `AudioPlayerBlock` le 2026-08-06
+  // (demande de Yannick : distinguer FR/EN, pas juste "de l'audio a été
+  // écouté"). `AudioPlayerBlock` n'est rendu que si `hasAudio` est vrai
+  // (voir plus bas) — la garde "contenu réel" est donc déjà assurée par ce
+  // rendu conditionnel, pas besoin de la répéter ici.
 
   if (herosState.status === 'loading') {
     return (
@@ -127,6 +135,21 @@ function formatTime(seconds: number) {
 function AudioPlayerBlock({ heros }: { heros: Heros }) {
   const hasBoth = Boolean(heros.narration_audio_fr_url && heros.narration_audio_en_url);
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  // La langue RÉELLEMENT jouée peut différer du réglage `lang` : si une
+  // seule langue existe, le lecteur bascule dessus automatiquement (voir le
+  // repli `?? heros.narration_audio_fr_url ?? heros.narration_audio_en_url`
+  // ci-dessous) même si `lang` reste sur 'fr' par défaut. `actualLang`
+  // reflète ce vrai choix, calculé avec exactement la même logique de repli
+  // — c'est CETTE valeur qui doit être comptée pour "quel audio est le plus
+  // écouté", pas le simple état du bouton de bascule.
+  const actualLang: 'fr' | 'en' =
+    lang === 'fr'
+      ? heros.narration_audio_fr_url
+        ? 'fr'
+        : 'en'
+      : heros.narration_audio_en_url
+        ? 'en'
+        : 'fr';
   const uri = (lang === 'fr' ? heros.narration_audio_fr_url : heros.narration_audio_en_url)
     ?? heros.narration_audio_fr_url
     ?? heros.narration_audio_en_url
@@ -134,11 +157,23 @@ function AudioPlayerBlock({ heros }: { heros: Heros }) {
 
   const player = useAudioPlayer(uri);
   const status = useAudioPlayerStatus(player);
+  const loggedLangsRef = useRef(new Set<'fr' | 'en'>());
 
   // Recharge le lecteur quand on bascule FR/EN.
   useEffect(() => {
     player.replace(uri);
   }, [uri]);
+
+  // Engagement réel par langue : un événement par langue réellement chargée
+  // dans le lecteur pendant cette visite d'écran (pas par re-render) — si
+  // l'utilisateur bascule FR puis EN, ce sont deux écoutes distinctes
+  // (deux fichiers différents), donc les deux comptent, mais jamais deux
+  // fois la même langue sur la même visite.
+  useEffect(() => {
+    if (loggedLangsRef.current.has(actualLang)) return;
+    loggedLangsRef.current.add(actualLang);
+    recordAudioEngagement(heros.id, actualLang);
+  }, [actualLang, heros.id]);
 
   const progress = status.duration > 0 ? status.currentTime / status.duration : 0;
 

@@ -31,7 +31,19 @@ export const HEROES_MEDIA: Record<string, HeroMediaFields> = {
   'martin-paul-samba': {
     image_carte_catalogue: `${STORAGE_BASE}/images/martin-paul-samba.jpg`,
     narration_audio_fr_url: `${STORAGE_BASE}/audio/martin-paul-samba-fr.mp3`,
-    video_url: `${STORAGE_BASE}/video/martin-paul-samba.mp4`,
+    // `video_url` retiré le 2026-08-06 : pointait vers un fichier jamais
+    // réellement mis en ligne (183 Mo, rejeté par la limite de taille du
+    // plan Supabase gratuit ~50 Mo — voir "Points bloquants" dans
+    // context/AFROBACK.md). Un lien mort (404 confirmé) est pire qu'un champ
+    // vide : Yannick a tranché pour convertir ce héros au système
+    // `video_chapitres` (le seul cas qui dépendait encore de `video_url`,
+    // vérifié dans video.tsx). Pas de fichier source retrouvé dans le
+    // dossier local "AFROBACK CONTENT/Vidéos" pour Samba à ce jour — la
+    // conversion est purement structurelle, aucune vraie vidéo à brancher
+    // pour l'instant. `video_chapitres` reste donc absent (comme 6 autres
+    // héros) : l'app retombe naturellement sur le diaporama animé du
+    // storyboard, jamais un lien cassé. Production réelle de sa vidéo =
+    // même point bloquant qu'avant (183 Mo), toujours ouvert.
   },
   'reine-nzinga': {
     image_carte_catalogue: `${STORAGE_BASE}/images/reine-nzinga.jpg`,

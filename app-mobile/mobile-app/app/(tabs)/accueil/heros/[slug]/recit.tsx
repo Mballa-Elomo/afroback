@@ -14,6 +14,7 @@ import { GhostButton } from '../../../../../src/components/Buttons';
 import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
 import { useHero } from '../../../../../src/data/useHeroesData';
 import { saveReadingProgress } from '../../../../../src/data/readingProgress';
+import { recordHeroEngagement } from '../../../../../src/data/engagementRepository';
 import type { RecitChapitre } from '../../../../../src/data/types';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 
@@ -45,6 +46,7 @@ export default function LecteurDeRecitScreen() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const globalProgressRef = useRef(0);
+  const engagementLoggedRef = useRef(false);
 
   const chapitres: RecitChapitre[] | undefined =
     langue === 'en' && heros?.recit_chapitres_en?.length ? heros.recit_chapitres_en : heros?.recit_chapitres_fr;
@@ -67,6 +69,16 @@ export default function LecteurDeRecitScreen() {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
     setScrollProgress(0);
   }, [chapitreIdx, langue]);
+
+  // Engagement réel (voir "ENGAGEMENT GLOBAL" côté back-office) : un récit
+  // existe toujours pour les 9 héros (recit_fr_texte jamais vide), donc pas
+  // de garde "contenu réel disponible" à faire ici contrairement à
+  // audio.tsx/video.tsx — un seul événement par ouverture d'écran.
+  useEffect(() => {
+    if (engagementLoggedRef.current || !heros) return;
+    engagementLoggedRef.current = true;
+    recordHeroEngagement(heros.id, 'recit');
+  }, [heros]);
 
   if (herosState.status === 'loading') {
     return (

@@ -122,4 +122,16 @@ export interface Heros {
   video_chapitres: VideoChapitre[];
   avertissement_lecture?: string | null;
   ordre_affichage: number;
+  /**
+   * Ajoutés le 2026-08-05 pour le back-office admin
+   * (backoffice/supabase/schema-admin-heros.sql). Optionnels côté type
+   * exprès : tant que Yannick n'a pas exécuté cette migration, la colonne
+   * n'existe pas encore en base et `select('*')` ne la renvoie simplement
+   * pas — heroesRepository.ts traite alors ces champs comme absents plutôt
+   * que de planter. Une fois la migration exécutée, tous les héros
+   * existants valent 'publie'/false par défaut : comportement inchangé tant
+   * que personne n'a touché au back-office.
+   */
+  statut_publication?: 'publie' | 'depublie';
+  a_la_une?: boolean;
 }

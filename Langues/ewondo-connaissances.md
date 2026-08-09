@@ -1098,6 +1098,239 @@ Note ethnographique (liste rapportée par le dictionnaire, non vérifiée, sujet
 
 Nouveau fragment du cycle de la Tortue relevé sous l'entrée "zaméyo" (chef des mânes/des esprits des ancêtres, p.699) : "un jour la tortue s'en alla demander en mariage la fille de Zameyo Mebenga." Fragment très bref (l'entrée ne développe pas la suite), mais confirme que "Zaméyo" désigne, dans les croyances traditionnelles rapportées par l'auteur, un chef du monde des esprits/mânes. À recouper avec une source ethnographique avant tout usage éditorial ; piste supplémentaire pour le cycle de contes de la Tortue déjà repéré (cf. notes sous "nlag" et "dzálan" plus haut).
 
+### 2.12bis Densification de la seconde moitié du dictionnaire (lettres M à Z), nouveaux sondages intercalaires
+
+Section alimentée en continu, sondage par sondage, pour resserrer l'espacement entre pages lues sur la seconde moitié de l'ouvrage (pages 347-720). Voir la répartition exacte à jour en section 4.
+
+| Français | Éwondo | Note | Source |
+|---|---|---|---|
+| Cérémonie funèbre nocturne | Mesón | Cérémonies faites la nuit dans la famille du défunt pour que l'âme du disparu ne tourmente pas les vivants et obtienne aide/protection ; pratique païenne présentée par l'auteur comme en déclin. Tradition orale non vérifiée, sujet sensible. | Tsala 1955, p.356 |
+| Dénouement (d'une histoire) | Mesulí | E dzam di angabō — ya : quel sera le dénouement de cette histoire. Utile pour la narration (pilier Histoires & Héros). | Tsala 1955, p.356 |
+| Salive | Meté | — | Tsala 1955, p.356 |
+| Exigeant / difficile à contenter | Mete | Mod — anë ndzug a tōn : un gourmet est difficile à nourrir. | Tsala 1955, p.357 |
+| Rendez-vous / promesse / vœu | Metín | Trois sens liés : convention de se rencontrer ; accomplir une promesse ; vœu (mebua = vœu de pauvreté). | Tsala 1955, p.357 |
+| Automobile / camion | Metoa | — | Tsala 1955, p.357 |
+| Voandzou (légumineuse proche de l'arachide, "pois bambara") | Metõb | Plante alimentaire traditionnelle. | Tsala 1955, p.357 |
+| Souvenir / réminiscence | Metog | — | Tsala 1955, p.358 |
+| Sacrifice / oblation | Metúneña | Mes menē — ya mkpaman amvoe : la messe est le sacrifice de la nouvelle alliance. | Tsala 1955, p.358 |
+| Dot (prix d'achat traditionnel de la femme) | Meveg | Note ethnographique, tradition orale non vérifiée, sujet sensible (statut de la femme dans le mariage traditionnel). | Tsala 1955, p.358 |
+| Supercherie / ruse | Mevie | Kulu anë — abui amu akar, dúg zē : la tortue est pleine de supercherie, elle abuse souvent du léopard. Nouveau fragment du cycle de la Tortue, tradition orale non vérifiée. | Tsala 1955, p.359 |
+| Ébène (arbre à bois noir) | Mevini | "Diospyros", bois noir dur au grain fin, propre à un beau poli. | Tsala 1955, p.359 |
+| Rite fétichiste pour femmes | Mevungu | Confirme le nom déjà relevé dans la liste de rites sous "akéń" (p.38-39 dans l'échantillonnage précédent). Tradition orale non vérifiée. | Tsala 1955, p.359 |
+| Obéissance | Mewog | Bō — : obéir. | Tsala 1955, p.359 |
+| Monnaie / argent | Móní | Emprunt à l'anglais "money". | Tsala 1955, p.379 |
+| Bonjour | Móni | Emprunt à l'anglais "morning". | Tsala 1955, p.379 |
+| Être assis avec prestance, dignité de maintien | Mudú | Nkukuma a — a etoa vë a muda : le roi est assis avec une prestance impressionnante. | Tsala 1955, p.379 |
+| Témoignage | Mvã | Mbé — : témoignage à charge ; mbembé — : témoignage à décharge ; tsig mbe/mbembe — : rendre un mauvais/bon témoignage, faux témoignage. | Tsala 1955, p.380 |
+| Blessure morale (aussi blessure en sorcellerie) | Mvábélá | Sō ai — a dulu, begë — a adzo : rentrer d'un voyage ou d'une discussion avec une blessure morale. Tradition orale non vérifiée (sorcellerie), sujet sensible. | Tsala 1955, p.380 |
+| Herpeste (petit carnivore, genre martre) | Mvág | Proverbe : Mvag angadzo na osab ombā te ai sug = il n'y a pas d'intrigue qu'on ne peut déjouer. | Tsala 1955, p.381 |
+| Coup de lutte traditionnelle | Mválag | Plusieurs techniques nommées : tōmbō (croc-en-jambe), ebege-mvus (tour de hanche), enam-kabad (tour de bras), etc. Sport traditionnel, bonne piste pour le pilier Découverte. | Tsala 1955, p.381 |
+| Grand-parent | Mvam | — | Tsala 1955, p.381 |
+| Mon grand-parent | Mvambá | Nom qu'on donne parfois aussi à l'évêque. | Tsala 1955, p.381 |
+| Campement de chasse | Mvan | Proverbe : Owogo na bibô mvan dzia ana, ñō mbōg abelë = on ne s'associe qu'à ceux dont on attend l'aide. | Tsala 1955, p.382 |
+| Co-épouse | Mván | Nom que se donnent entre elles les femmes d'un même polygame. | Tsala 1955, p.382 |
+| Conflit / palabre | Mváń | Boe — : susciter un conflit, monter un palabre. | Tsala 1955, p.382 |
+| Tatouage | Mváú | Proverbe : Mkpele —, te bub ai é ñol dzie = les donneurs de conseils ne pratiquent pas facilement eux-mêmes leurs propres conseils. | Tsala 1955, p.382 |
+| Rivalité / émulation | Mvanézán | — | Tsala 1955, p.382 |
+
+Note ethnographique fragmentaire (tradition orale non vérifiée, sujet sensible) : l'entrée "mvag" (tabou, p.378-379) rapporte que les Ewondo appelaient "asamvag" l'arbre ou le lieu où l'on avait pendu une femme, cet endroit devenant alors tabou ("Ewondo bangabë na e asa betindi mininga, bō na anë mvag"). Fragment bref, sans contexte historique donné par le dictionnaire (punition, légende ou fait isolé non précisé) ; à ne jamais réutiliser sans recoupement avec une source ethnographique ou historique dédiée.
+
+| Français | Éwondo | Note | Source |
+|---|---|---|---|
+| Aigle huppé (spizaète) | Ndoe | Proverbe : il n'y a sur cette terre aucun abri sûr contre tout péril — des animaux échappent à la panthère en vivant dans les arbres, mais restent exposés aux serres de l'aigle. | Tsala 1955, p.403 |
+| Gourmandise / gourmand | Ndōg | Mod — te wog osōn : le gourmand n'a pas honte. | Tsala 1955, p.403 |
+| Mangue (fruit du manguier) | Ndōg | "Mangifera indica" ; homonyme de ton différent désignant aussi le fruit du mango sauvage ("irvingia gabonensis", dit "beti"). | Tsala 1955, p.403 |
+| Surdité / désobéissance | Ndóg | Proverbe : que l'homme ne meure pas sous la faute de sa désobéissance, qu'il y survive plutôt pour en tirer une leçon de vie. | Tsala 1955, p.403 |
+| Oncle maternel (mon / ton / son) | Ndom-dzăn / Ndom-ñōñ / Ndom-ñań | Système complet de termes de parenté selon la personne (mon, ton/votre, son/leur oncle maternel). | Tsala 1955, p.402 |
+| Jeune homme | Ndomán | — yake sili alug : le jeune homme va demander à se marier (coutume traditionnelle des fiançailles). | Tsala 1955, p.402 |
+| Tissu blanc / linceul | Ndōmbō | Drap de lit, linceul. | Tsala 1955, p.402 |
+| Éphémère / temporaire | Ndón | Si — : le bas monde, la vie d'ici-bas ; terme à connotation philosophique/religieuse. | Tsala 1955, p.403 |
+| Malaguette (épice, "poivre de Guinée") | Ndoú | "Amomum maleguetta". | Tsala 1955, p.403 |
+| Objet emprunté | Ndoú (2e sens) | Eye — ñnie a mebōn : l'objet emprunté exige un double soin. | Tsala 1955, p.403 |
+| Récit / exposé / compte rendu | Ndóń | Tie — : rendre compte. Confirme le champ lexical du récit déjà noté (Nlań, Lê), utile au pilier Histoires & Héros. | Tsala 1955, p.403 |
+| Piège pour oiseaux | Ndóñ | Mongō alam — a aboe a si : l'enfant fait des pièges pour les oiseaux. Activité enfantine traditionnelle. | Tsala 1955, p.403 |
+
+Note ethnographique détaillée (rite religieux traditionnel décrit longuement par le dictionnaire, tradition orale non vérifiée, sujet sensible) : l'entrée "ndongo" (rite fétichiste, p.404) décrit un rite de purification/confession par lequel les non-chrétiens croyaient obtenir la rémission des souillures ("olanda") contractées par l'inceste, l'abattage clandestin d'un animal domestique, ou le vol de gibier dans le piège d'autrui. Hommes et femmes y avaient libre accès. Deux formes existaient : le ndongo solennel (nnom ndongo / ndongo ebul mimbë), où les confessions se faisaient en pleine cour à l'oreille d'un neveu (man kal) chargé de les proclamer ensuite le plus haut possible ; et le ndongo privé (ngal ndongo / ndongo osoe), où des officiants conduisaient le ou les pénitents à la rivière ou derrière une case, devant une marmite d'eau, pour les entendre et les absoudre, moyennant le sacrifice d'un chien ou d'un poulet noir selon la gravité des aveux. À recouper avec une source ethnographique dédiée avant tout usage éditorial (pilier Découverte).
+
+| Français | Éwondo | Note | Source |
+|---|---|---|---|
+| Tisserin (oiseau, aussi appelé "gendarme") | Ngiae | Kōbō anë — : parler sans cesse, allusion au chant continu de l'oiseau. | Tsala 1955, p.427 |
+| Point de repère / signe des chasseurs | Ngie | Bod be nsom babede — ai mebui : les chasseurs marquent, dans la forêt, les points de repère par des rameaux. Aussi : emblème protecteur placé dans un champ pour écarter les maraudeurs, tradition orale non vérifiée. | Tsala 1955, p.427 |
+| Luciole | Ngikié | Petit coléoptère nocturne lumineux ; le ver luisant/lampyre n'en est qu'une espèce. | Tsala 1955, p.428 |
+| Chaussure / soulier | Ngob | Akol — : une paire de souliers. | Tsala 1955, p.429 |
+| Cordon ombilical | Ngōb | — mōn te yabē ki ku : le cordon ombilical de cet enfant n'est pas encore tombé. | Tsala 1955, p.429 |
+| Ceinture en tissu rouge frangée | Ngód | Élément traditionnel de parure. | Tsala 1955, p.429 |
+| Rachat / rançon | Ngode | — | Tsala 1955, p.429 |
+| Voisinage | Ngōdō | Mod — : homme du voisinage. | Tsala 1955, p.430 |
+| Porc / cochon, vocabulaire complet | Ngóé | Ngal — : truie ; nnom/mon — : verrat/cochonnet ; — afan : sanglier ("potamochoerus porcus") ; ngal — afan : laie ; mōn — afan : marcassin. | Tsala 1955, p.430 |
+| Taquinerie / taquin | Ngoe | Mōngō — adiñ mendum : l'enfant taquin aime les rixes. | Tsala 1955, p.430 |
+
+Proverbes relevés sous l'entrée "ngóé" (cochon, p.430) : "Yadzodzo na menē mevōn" = le cochon n'admire pas sa graisse, proche du sens de "à bon vin point d'enseigne" (on ne voit pas ses propres défauts/qualités). Second proverbe, plus développé : le porc resta sans cornes alors que son oncle en fabriquait, ayant toujours retardé sa demande dans l'espoir d'être le premier servi ; entretemps les cornes s'épuisèrent. Se dit d'une trop grande assurance qui conduit souvent à l'échec. Bons candidats pour une section proverbes/sagesse du site AFROBACK.
+
+Note de coutume (tradition orale non vérifiée, sujet sensible) : l'entrée "ngōbinda" (p.427, de "ngōn binda" = fille taboue) désigne le péché de rapport sexuel avec une femme mariée, celle-ci étant taboue pour tout homme autre que son mari selon la coutume rapportée par l'auteur.
+
+| Français | Éwondo | Note | Source |
+|---|---|---|---|
+| Sauveur | Nkode | Terme religieux. | Tsala 1955, p.450 |
+| Célibataire | Nkoe | Dicton : alug abe, — bidim, tōbōgō nala, bō na onë akud = c'est folie de vouloir chercher un moyen terme entre le mariage et le célibat. | Tsala 1955, p.450 |
+| Précurseur / celui qui ouvre le chemin | Nkōe | — osu : précurseur. | Tsala 1955, p.451 |
+| Canne à sucre | Nkóg | — | Tsala 1955, p.451 |
+| Antilope (tragélaphe) | Nkōg | "Tragelaphus scriptus", antilope moyenne à robe fauve tachetée de blanc. | Tsala 1955, p.451 |
+| Montagne / colline | Nkōl | — | Tsala 1955, p.452 |
+| Corde / liane / lien | Nkōl | Aussi ceinture ; ebégē — : hanche (homonyme de ton différent). | Tsala 1955, p.452 |
+| Montre / horloge / pendule | Nkólōg | Emprunt à l'anglais "o'clock". — wōkōbō : l'horloge sonne. | Tsala 1955, p.452 |
+| Créateur (aussi nom de Dieu) | Nkom | Nkom-bodo = Dieu. | Tsala 1955, p.452 |
+| Captif / prisonnier de guerre | Nkóm | — eban : otage. Wog zie anë — onōn : avoir très faim, littéralement "avoir faim comme un captif". | Tsala 1955, p.452 |
+| Taro (colocase) | Ńkomba | "Colocasia antiquorum". | Tsala 1955, p.453 |
+| Semoule de légumes cuite dans des feuilles (plat traditionnel) | Nkōn | — ngōn onë mbeń ai bibobōlō : la semoule de graines de courge est appétissante quand on la mange avec du manioc. | Tsala 1955, p.453 |
+| Rang social / hauteur | Nkóń | Onë — mfé ? : quel est ton rang social ? | Tsala 1955, p.453 |
+| Chenille comestible | Nkóń (homonyme de ton différent) | — mintsañ : chenille processionnaire, mets traditionnel. | Tsala 1955, p.453 |
+
+Proverbes et maximes relevés dans ce lot (p.450-453), bons candidats pour une section sagesse/proverbes du site AFROBACK :
+- Sous "nkóg" (canne à sucre) : "Minlañ misë kiñ minkog" = les confidences ne circulent pas (un secret bien gardé reste secret).
+- Sous "nkōg" (antilope) : "Nkōg, ongatub esag, okë wōman a ebe" = on tombe souvent dans le malheur en fuyant l'apparence, littéralement "l'antilope a fui devant une herbe desséchée et est allée tomber dans une fosse dont elle ne pouvait pas sortir".
+- Sous "nkom" (rocher) : "Wode bie a —" = gratter des ongles sur le rocher, pour dire faire des efforts inutiles.
+- Sous "nkóń" (chenille) : "— ben ontub dumba" = la vérité se révélera en son temps ; "Mōngō ăki — te ayo" = le malheur est un bon maître.
+
+| Français | Éwondo | Note | Source |
+|---|---|---|---|
+| Péché | Nsém | — ntōg : péché véniel ; — ewogan : péché mortel ; — ngalena : péché originel. | Tsala 1955, p.474 |
+| Cri d'étonnement | Nsémé | Proverbe : Akuńu angabudan ai — = le hibou a été condamné pour son cri d'étonnement ; on saisit n'importe quel prétexte pour incriminer celui qu'on déteste. | Tsala 1955, p.474 |
+| Cour (espace nettoyé devant une maison) | Nseń | — beñia kabad, ngal tōń, nnom tōń : "cour du roi Pétaud", lieu où tout le monde commande. Idiome sur le désordre/l'anarchie. | Tsala 1955, p.475 |
+| Banane blette (purée traditionnelle) | Ńsia | Efidig be — : purée de bananes blettes. | Tsala 1955, p.475 |
+| Saisissement / surprise | Nsibana | Kui — : arriver à l'improviste. | Tsala 1955, p.475 |
+| Galago (petit lémurien nocturne) | Nsié | "Galago palida". | Tsala 1955, p.475 |
+| Quête / collecte à domicile (pratique rituelle) | Nsiean | Voyage entrepris pour faire des quêtes à domicile, étape obligée pour tout Ewondo voulant organiser le rite-so. Confirme et précise l'association traditionnelle "so" déjà notée (cf. entrée "sô"). Tradition orale non vérifiée. | Tsala 1955, p.476 |
+| Question | Nsili | — te boe etōm : une simple question ne constitue pas matière à conflit. | Tsala 1955, p.476 |
+| Unique / fils unique | Nsim | — mōn : fils unique. | Tsala 1955, p.476 |
+| Génette (petit carnivore) | Nsiń | "Genetta servalina". | Tsala 1955, p.476 |
+| Esprit / âme / ombre | Nsisim | Engeles anë — : l'ange est un esprit. — mod wōwu ki : l'âme humaine est immortelle. Waē a — alen : se reposer à l'ombre du palmier. | Tsala 1955, p.477 |
+| Huée / cri d'intimidation (aussi pour lever le gibier) | Nsō | Proverbe : Mōn kub añiń ai — = la voix du maître est une protection pour ses sujets. | Tsala 1955, p.477 |
+| Nudité | Nsō (homonyme de ton différent) | Proverbe : — ngōn ngul ai mañań = l'union fait la force. | Tsala 1955, p.477 |
+| Dot / somme d'argent | Nsō = nsoá | — | Tsala 1955, p.477 |
+| Plante médicinale cicatrisante (latex) | Ñama | Plante grimpante à latex abondant utilisée traditionnellement pour cicatriser les plaies ; la poudre de son écorce sert au même usage. Ethnobotanique, tradition orale non vérifiée. | Tsala 1955, p.497 |
+| Téter | Ñáń | Mōn a — mebë me ñia : l'enfant tète les mamelles de sa mère. | Tsala 1955, p.497 |
+| Coquetterie / coquet | Ñangá | Néologisme. Bō — : faire le coquet. | Tsala 1955, p.498 |
+| Hochet traditionnel (accompagnement du xylophone) | Ñas | Panier en sparterie rempli de cailloux ou de graines de balisier, qu'on secoue pour accompagner le jeu du xylophone. Syn. angisa. Instrument de musique traditionnel. | Tsala 1955, p.498 |
+| Être beau / être bon | Ñeb | Wa — ai éwōman dzi : tu es beau sous cet habit. Proverbe : Etam ya — a dzad bikōn = on n'aime à être seul que quand la fortune est bonne. | Tsala 1955, p.498 |
+| Puce chique | Ñedeg | — aso : puce chique. | Tsala 1955, p.499 |
+| Bouderie / pleurnicherie | Ñegë | Proverbe : — mōn asë a eza mbë-si = on ne boude qu'auprès de ceux dont on attend des consolations. | Tsala 1955, p.499 |
+| Jeu d'enfants (jonglage avec des noix) | Ñeń | Jeu traditionnel. | Tsala 1955, p.500 |
+| Démonstratif "ce / cette / ces" (mots invariables) | Ñi | — | Tsala 1955, p.500 |
+| Quand / lorsque | Okăń | A — ya mavebë a oyoa, matari tsog Nti : quand je m'éveille, je commence par penser au Seigneur. | Tsala 1955, p.521 |
+| Petite hotte de voyage | Ókeledë | Syn. wuwulu. | Tsala 1955, p.522 |
+| Couteau | Okeń | — biniga : couteau de poche ; — ngeń : rasoir ; — mawōd : truelle. | Tsala 1955, p.522 |
+| Anneau / bague | Okéndé = okéné | — alug : alliance (bague de mariage). | Tsala 1955, p.522 |
+| Rasoir | Okeń-ngeń | Nged — : cruauté extrême. Mevol me — : rigoureuse impartialité. Proverbe : le tranchant du rasoir ne respecte même pas son propriétaire, pour dire être aussi tranchant qu'un rasoir. | Tsala 1955, p.522 |
+| Demain | Okídí | — | Tsala 1955, p.522 |
+| Jadis / autrefois | Ókoa = ókobá | — | Tsala 1955, p.522 |
+| Queue acuminée / extrémité pointue | Okōd | Proverbe : Kul kul yatăn — = le poêle ne se moque pas du fourgon (équivalent de "l'hôpital qui se moque de la charité"). | Tsala 1955, p.523 |
+| Nain / rabougri | Okōdōg | — | Tsala 1955, p.523 |
+| Pion (pièce du jeu traditionnel "sōngō") | Okóg | Confirme le jeu de damier traditionnel déjà noté ailleurs dans ce fichier. | Tsala 1955, p.523 |
+| Hamster | Ókókóe | Syn. koesi. | Tsala 1955, p.523 |
+| Bracelet (généralement en ivoire) | Okōm | Parure traditionnelle. | Tsala 1955, p.524 |
+| Souillure légale / empêchement au mariage | Okōm (homonyme de ton différent) | Syn. olanda. — alug : empêchement du mariage. Confirme la notion de souillure "olanda" déjà rencontrée sous l'entrée "ndongo". | Tsala 1955, p.524 |
+| Créateur des hommes, Dieu | Okombodo | Confirme le terme "Nkom-bodo" déjà relevé. | Tsala 1955, p.524 |
+| Arc musical à une corde (instrument traditionnel) | Okōngō | Petit arc dont on met la corde à la bouche et qu'on frappe avec un bâtonnet. Instrument de musique traditionnel, bonne piste pour le pilier Découverte/Culture. | Tsala 1955, p.524 |
+| Cleptomanie | Okpáb | Folie de vol, action d'attraper au vol. | Tsala 1955, p.524 |
+
+Proverbe relevé en tête de page (contexte précis non capturé dans cet échantillon, p.544) : "un malingre cabri a tué un vigoureux léopard" = les coups de la vengeance portent souvent plus loin que ceux de l'offense. Bon candidat pour une section proverbes/sagesse du site AFROBACK.
+
+| Français | Éwondo | Note | Source |
+|---|---|---|---|
+| Endurant / dur à la fatigue | Ovam = ovamenda | Man — mod : petit homme endurant. | Tsala 1955, p.544 |
+| Projet / décision délibérée | Ováń | Proverbe : — osë (ki) anë olom = ce que l'on fait volontiers n'est pas pénible. | Tsala 1955, p.544 |
+| Jeu d'enfants (chatouille rituelle du ventre) | Oveb | Jeu où un enfant annonce à un camarade "ye obań ye oveb wadi dze ?" avant de lui enfoncer brusquement les index dans le ventre, le partenaire consentant répondant "oveb". D'où l'expression "faire une chose par pur réflexe" (Bō dzam anë e mod asigan —). Tradition orale, jeu traditionnel. | Tsala 1955, p.545 |
+| Sorgho (céréale traditionnelle) | Ovéga | "Sorghum communis", graines utilisées pour faire du couscous. | Tsala 1955, p.545 |
+| Défi | Ovë-me-bōdzé | Angabimi engeń mō me bë : le défi fait doubler les forces. | Tsala 1955, p.545 |
+| But / objectif | Ovéna | Ye meké fō tege ai — ? : me faut-il aller sans but précis ? | Tsala 1955, p.545 |
+| Débrouillard | Oviág | Bō — : faire le malin, le débrouillard. | Tsala 1955, p.546 |
+| Ressentiment / rancune | Ovídá = ovílá | Mfăń kristen osiki — : un bon chrétien n'est pas rancunier. | Tsala 1955, p.546 |
+| Oubli (maxime de sagesse) | Ovóán | Proverbe : il ne faut pas en vouloir à quelqu'un pour un oubli, l'oubli n'est pas une mauvaise excuse. | Tsala 1955, p.546 |
+| Bâtonnet de divination par la mygale | Ovol | Confirme et précise la pratique de divination par mygale déjà détaillée dans ce fichier (entrée "ngám") : "ovol" désigne précisément le bâtonnet utilisé pour cette consultation. Tradition orale non vérifiée. | Tsala 1955, p.546 |
+| Toupie et castagnettes traditionnelles (fruit d'arbre) | Ovolóń | Le fruit desséché, évidé et troué sert de toupie ronflante ; plusieurs de ces fruits reliés et remplis de grains servent de castagnettes pour les jeunes filles. Mebua me — : extrême pauvreté (expression imagée). Bon exemple de jouet traditionnel, piste pour le pilier Découverte. | Tsala 1955, p.547 |
+| Banane douce mûre à point | Óvolávo | — | Tsala 1955, p.547 |
+| Hamster | Ovōngō | Syn. kósi. — man bela adiń di ngeg : le hamster aime manger les fruits d'angeg. | Tsala 1955, p.547 |
+| Terre / monde / univers | Si | Si ndon = si emō minlań : "cette terre où l'on ne fait que passer", expression philosophique sur le caractère éphémère de la vie ici-bas (à rapprocher de "Ndón", éphémère, déjà noté). | Tsala 1955, p.569 |
+| Effrayer / intimider / terroriser | Si (homonyme) | Bâyi ki ñe bō dzom, ba — ñe ve nsian : on ne va rien lui faire, on l'intimide simplement. | Tsala 1955, p.569 |
+| Diminution progressive (note historique/sociologique) | Sibi | Tań behaide ya — a nnam ewondo : le nombre des non-chrétiens diminue progressivement en pays ewondo. Observation datée de l'auteur, missionnaire, en 1955 ; à contextualiser historiquement avant tout usage éditorial. | Tsala 1955, p.569 |
+| Feindre / faire semblant | Sie | Nouveau fragment de fable animalière (tradition orale non vérifiée) : Zë anga — awu na ayen mbol batsidi bayi ñe = le léopard avait feint la mort pour voir comment tous les animaux allaient le pleurer. | Tsala 1955, p.570 |
+| Jugement optimiste de l'enfant (maxime) | Sie (autre sens) | A mōngō a — etōm a adzab a si, atala anë ayi yân ai bibōn bi adzab : l'enfant juge en optimiste les conséquences de ses actes. | Tsala 1955, p.570 |
+| Travailler / nettoyer / soigner | Sié | — afub : travailler le champ ; — a nda : travailler dans la maison ; — mintsañ : soigner la gale. | Tsala 1955, p.570 |
+| Ingratitude (proverbe, sous l'entrée "sié") | — | O — mod mebōn, adzala wa mbil = on utilise souvent les bienfaits reçus contre leur auteur. | Tsala 1955, p.571 |
+| Cigare / cigarette | Sigá | Emprunt à l'anglais "cigar". | Tsala 1955, p.571 |
+| Termite ailée | Sil | Via — : champignon des termitières. Proverbe : je ne pêche pas avec des vers mais avec des termites ; si les poissons ne prennent pas à l'hameçon, je me nourris de mes termites — dans tous les cas il me reste toujours un petit avantage à tirer. | Tsala 1955, p.571 |
+| Argent (monnaie) | Silba | Emprunt à l'allemand "silber". | Tsala 1955, p.571 |
+| Religieuse / sœur | Síksa | Emprunt à l'anglais "sister". Désigne aussi le couvent de religieuses et l'internat des fiancées, institution missionnaire de l'époque. | Tsala 1955, p.572 |
+| Toupie (jeu traditionnel) | Sóno | Mōngō a — a esila ndōngō : un enfant est accroupi au jeu de toupie. Confirme le jeu traditionnel de toupie déjà noté (cf. entrée "ovolóń"). | Tsala 1955, p.587 |
+| Tunnel initiatique du rite-so | Sōm-si | E — mvon so ekaregë ñi engabë belë mimbë mi la : le tunnel que devaient parcourir les récipiendaires au rite-so avait trois branches. Précise l'association initiatique "so" déjà notée. Tradition orale non vérifiée, sujet sensible. | Tsala 1955, p.587 |
+| Justice / droit / équité | Sósó | Yosef angabë — mod : Joseph était un homme juste. Proverbe : Ngul, esiki — = la force n'est pas synonyme du droit. Excellente maxime pour une section sagesse du site AFROBACK. | Tsala 1955, p.587 |
+| Saki (singe à barbe) | Sósóe | Idiome : "brave à trois poils, d'un courage stoïque" (E ñe balum a ndoń, — awodege tem). | Tsala 1955, p.587 |
+| Dieu caché (terme théologique) | Sósólō | — Zamba : Dieu caché. | Tsala 1955, p.588 |
+| Soupe | Sub | Emprunt à l'anglais "soup". | Tsala 1955, p.588 |
+| Exclusion d'héritage (coutume successorale) | Sub (2e sens) | Mbe mōn ayean — ngab elig : un mauvais fils mérite de ne pas participer à l'héritage. | Tsala 1955, p.588 |
+| Coton / cotonnier | Sud | "Gossypium". Aussi : duvet du palmier. | Tsala 1955, p.588 |
+| Salutation traditionnelle par "ovuma" | Sug | — mod na ovuma a : saluer quelqu'un par un "ovuma" (geste ou formule de salutation traditionnelle). Tradition orale non vérifiée, à recouper. | Tsala 1955, p.589 |
+| Vaille que vaille (maxime sur le travail) | Sugulu-súgulu | Esie mod adiń abō ki dzō — : on ne fait pas vaille que vaille un travail aimé. | Tsala 1955, p.590 |
+| Descendre / faire descendre | Sui | — ndum : apaiser une dispute. — nkōbō : conclure, tirer une conclusion. | Tsala 1955, p.590 |
+
+Note historique (fait daté, rapporté par le dictionnaire) : l'entrée "sugubikum" (bronchite aiguë/grippe, p.590) rapporte que la grippe a fait beaucoup de victimes parmi les Ewondo en 1918, et que le nom de la maladie daterait de cette même époque. L'auteur relaie une image locale pour expliquer la sévérité inégale de l'épidémie : la maladie est comparée à un homme allant chercher du bois dans son champ, les souches solides lui résistant tandis qu'il n'emporte que les branlantes — ainsi cette maladie aurait fait plus de victimes parmi les hommes déjà affaiblis. Référence probable à la grippe espagnole de 1918 ; à recouper avec une source historique avant tout usage éditorial, mais donnée intéressante pour une éventuelle chronologie du pays ewondo.
+
+| Français | Éwondo | Note | Source |
+|---|---|---|---|
+| Faire le pont (terme de lutte traditionnelle) | Tobé | Ku — : se cambrer de façon à ne toucher la terre qu'avec les pieds, la tête ou les mains. Confirme le vocabulaire de la lutte traditionnelle déjà noté (cf. entrée "mválag"). | Tsala 1955, p.611 |
+| Reculer de peur | Tod | Awog añgawog mvam ze, ndō anga — : ayant entendu le cri de la panthère, il recula de peur. | Tsala 1955, p.612 |
+| Plante herbacée médicinale (scarification traditionnelle) | Tōd = todó = tódó | Ses fruits épineux servent à scarifier les endroits rhumatisants du corps, pratique médicinale traditionnelle. Tradition orale/ethnobotanique non vérifiée. | Tsala 1955, p.612 |
+| Poitrine | Tóé | Vë — : embrasser. Kud — : avouer avec emphase. Abe — : muscle pectoral. | Tsala 1955, p.612 |
+| Cuiller | Tóg | Di ai — : manger avec une cuiller. | Tsala 1955, p.613 |
+| Se rassembler (dans la maison du chef) | Tógan | Bod ba — a nda nkukuma : les hommes se rassemblent dans la maison du chef. Vocabulaire social/politique traditionnel. | Tsala 1955, p.614 |
+| Petitesse et jeunesse (proverbe) | Tōgébō | Ye ngē mod a — bōn na anë mōngō : on n'est pas jeune parce qu'on est petit. | Tsala 1955, p.614 |
+| Sycomore (figuier) | Tōl | Genre de figuier. | Tsala 1955, p.614 |
+| Être renfrogné / gonflé de colère | Tumú | Besolan fō ñe man dzom na, an — : à la moindre contradiction, il devient renfrogné. | Tsala 1955, p.634 |
+| Se montrer inexorable / cruel | Tun | — nged : se montrer inexorable, cruel. | Tsala 1955, p.634 |
+| Peine inutile | Tŭń | Eden — : peine inutile. — dze ? : pour quelle utilité ? | Tsala 1955, p.634 |
+| Sacrifier / faire amende honorable | Túni | — esia : faire amende honorable à son père. | Tsala 1955, p.635 |
+| Grand matin / de bonne heure | Tútú | Ozag okidi — : viens demain de bonne heure. | Tsala 1955, p.635 |
+| Donner aveuglément (par crainte) | Tútúá | Vë dzom — : donner une chose aveuglément. | Tsala 1955, p.635 |
+| Présent ! (réponse à l'appel) | Vá | Aussi : ici (où je suis, où nous sommes). | Tsala 1955, p.637 |
+| Veille / garde militaire | Váa | Emprunt à l'allemand "wache". Bezimbi bétele a — : les soldats montent la garde. | Tsala 1955, p.637 |
+| Sou (monnaie) | Váb | Emprunt à l'anglais "half" (moitié). | Tsala 1955, p.637 |
+| Envoûter / ensorceler | Vali (sous-sens) | — evu : envoûter, ensorceler. Confirme la notion de sorcellerie "evu" déjà signalée plus haut dans ce fichier, tradition orale non vérifiée, sujet sensible. | Tsala 1955, p.637 |
+| Envahir / usurper | Vámán | Bilōg bia — afub : l'ivraie envahit le champ. Aussi : accaparer, s'emparer, usurper. | Tsala 1955, p.637 |
+| S'enfuir prestement (idiome) | Vúl | — mimbōd esoa : s'enfuir prestement. | Tsala 1955, p.658 |
+| Être salué (formule "ovuma") | Vúmá | Ovuma a ! Mivuma a ! : sois salué ! soyez salués ! Confirme et explique le mot de salutation traditionnelle "ovuma" déjà repéré sous l'entrée "sug". | Tsala 1955, p.658 |
+| Être parents / lien de parenté | Vúman | Besiki dzam lugan : bevuman = ils ne peuvent pas se marier parce qu'ils sont parents. Note de coutume sur l'interdit matrimonial entre parents. | Tsala 1955, p.658 |
+| Saluer | Vúman (homonyme) | Za obë — ai ñe a nseń va ? : qui as-tu salué tout à l'heure à la cour ? | Tsala 1955, p.658 |
+| Revivre / raviver | Vumelan | Okōn te wō dugan — : cette maladie revit. Aussi : réveiller, faire revivre. | Tsala 1955, p.658 |
+| Ne pas se mêler des soucis d'autrui (proverbe, sous "vúndl/vúndu") | — | Ba — (ki) ayoń a eza tog = on ne s'ingénie pas à remédier aux petits inconvénients du voisin, aux causes secrètes de son chagrin. | Tsala 1955, p.659 |
+| Se tromper (universalité de l'erreur) | Vus | Proverbe : Mod osë a — = tout homme se trompe. | Tsala 1955, p.659 |
+| Semoule de manioc (couscous traditionnel) | Vuvú | Semoule de manioc vulgairement appelée couscous. | Tsala 1955, p.660 |
+| Connaître ses limites (proverbe de l'oiseau déterreur) | Vúvui | Petit oiseau qui ne déterre que les jeunes pousses de maïs, jamais les boutures de canne à sucre ni les drageons de bananiers, trop coriaces pour lui. Proverbe : on ne tente pas raisonnablement une entreprise au-dessus de ses forces. | Tsala 1955, p.660 |
+| Payer / compenser (système coutumier d'amende) | Yân | — etōm : payer une amende pour complicité d'infidélité conjugale, ou pour un délit quelconque. Note de coutume juridique traditionnelle. | Tsala 1955, p.681 |
+| Prendre congé / dire au revoir | Yân (autre sens) | Makē — ai madzań, akē a dulu : je vais dire au revoir à mon frère qui part en voyage. | Tsala 1955, p.681 |
+| Rôtir / griller | Yáń | — kōs : frire du poisson ; — owondo : griller des arachides ; — tsid : rôtir de la viande. | Tsala 1955, p.681 |
+| Endurance (maxime) | Yáń (autre sens) | Sê fē na benga — wa, tege tub eboga : à moins d'être habitué à l'endurance, on n'y peut rien. | Tsala 1955, p.681 |
+| Foulard / mouchoir de tête | Yángis | Emprunt à l'anglais "handkerchief". | Tsala 1955, p.682 |
+| Casserole / poêle | Yán-yaña | — | Tsala 1955, p.682 |
+| Devinette géographique (fleuves Sanaga et Nyong) | Yë | Osananga — Nlon dze enë abōd ? Kë Nlōń a : de la Sanaga ou du Nyong, lequel est le plus petit ? Évidemment, c'est le Nyong. Exemple de devinette/plaisanterie locale. | Tsala 1955, p.682 |
+| Porter le deuil (coutume de la veuve) | Yeb | Nkus wō — nnom : la veuve porte le deuil de son mari. Proverbe : celui qui s'est dévoué pour l'un est censé pouvoir le faire pour un autre. Tradition orale, note de coutume. | Tsala 1955, p.683 |
+| Croire (formule de credo chrétien) | Yébë | Ma — abë Zamba Esia ngul mesë : je crois en Dieu le Père Tout-Puissant. | Tsala 1955, p.683 |
+| Cruauté envers une victime (proverbe) | Yëg | Mvog osab te — eza mbōndō okpëń : le méchant n'a égard ni aux charmes ni aux grâces de sa victime. | Tsala 1955, p.684 |
+| Se méfier des affaires louches (proverbe imagé) | Yégan | O — onōn meki, te wadi wa biyel : on doit s'abstenir de s'engager dans les affaires dont les débuts paraissent louches, littéralement "ne mange pas les petits d'un oiseau dont les œufs sont anormaux". | Tsala 1955, p.684 |
+| Deuil collectif du village (coutume) | Yegan (autre sens) | A — ngum dzal osë vë minyon : aussitôt qu'il avait rendu le dernier soupir, tout le village se trouva en pleurs. Tradition orale, note de coutume funéraire. | Tsala 1955, p.684 |
+| Éclaircie / forêt peu dense (proverbe sur l'entreprise imprudente) | Zézáña | Proverbe : celui qui veut faire une plantation dans une forêt peu dense se laisse entraîner par la facilité à la débroussailler, mais ne réussit plus à en abattre les gros arbres — aveuglé par les premiers succès d'une grande entreprise, il néglige de s'assurer les moyens de la mener à bonne fin et risque un échec. Excellente maxime pour une section sagesse/entrepreneuriat du site AFROBACK. | Tsala 1955, p.705 |
+| Rien / néant | Zëzë | Proverbe : Olama ai ebōdan, okōli ai fianga, oti — = une mauvaise préparation conduit à l'insuccès. | Tsala 1955, p.705 |
+| Éternuement | Zézémë | Semelë — : éternuer. | Tsala 1955, p.707 |
+| Scie / râpe | Zig | Kabinda atsig mebam ai — : le menuisier coupe des planches avec une scie. | Tsala 1955, p.707 |
+| École (écolier) | Zikúlu | Emprunt à l'anglais "school". Confirme la variante "sikúlu" déjà connue. | Tsala 1955, p.709 |
+| Rancune | Zíla | Syn. ovílá, déjà noté. | Tsala 1955, p.709 |
+| Variation des traits de caractère en famille (proverbe) | Ziń | Mōn — akoe, esia akab : tel fils est avare alors que le père est généreux. | Tsala 1955, p.709 |
+| Tôle (matériau de construction) | Ziń (homonyme) | Corruption du mot "zinc". Nda — : une maison en tôle. | Tsala 1955, p.709 |
+
+Nouveau fragment du cycle du Léopard et de la Tortue (tradition orale non vérifiée, sujet sensible car lié à un tabou de circoncision) : l'entrée "zib" (grande antilope noire à tache triangulaire, p.707) rapporte une fable où le léopard, désireux d'attraper le "zib" mais ne pouvant l'approcher, chargea la tortue de le provoquer au passage pendant que lui-même restait caché dans un buisson. Aux insultes de la tortue, l'antilope répondit avec sagesse : "y a-t-il quelqu'un derrière toi qui te dit d'insulter le zib ?", et continua son chemin sans s'attarder à la provocation. Le dictionnaire précise que cette antilope est taboue pour les enfants non encore circoncis. Fragment à recouper avant tout usage éditorial ; bonne piste supplémentaire pour l'agent griot (cycle de contes de la Tortue).
+
+Note ethnographique détaillée et bien documentée (l'auteur cite lui-même deux sources externes, Vergiat "Mœurs et coutumes des manjas" p.104 et Berthaut) : l'entrée "zig-ndóan" (allume-feu, p.708) décrit en détail la technique traditionnelle de production du feu par friction. En forêt, l'allume-feu se compose de deux bûches arrondies d'un bois très combustible, conservées avec de la bourre sèche dans un sachet de cuir ; on frotte ces bûches entre les mains en leur imprimant un mouvement de rotation jusqu'à ce qu'une étincelle jaillisse et enflamme la bourre. Le bois de prédilection en forêt est l'akendég (famille des tiliacées, "microcos oligoneura"). En savane, la technique diffère : deux morceaux de bois sont utilisés, l'un posé au sol et maintenu sous le pied, portant un alvéole entaillé au couteau, l'autre tenu verticalement la pointe engagée dans cette cavité ; un mouvement rapide alternatif entre les paumes des mains échauffe le bois et enflamme l'amadou en deux ou trois minutes (l'ajout d'un peu de sable dans l'alvéole accélère l'opération). Les deux bois utilisés sont distingués par genre : le "bois femelle" (ekad-nlōn, "anona senegalensis") et le "bois mâle" (une verbénacée, "vitex species"). Description technique précise et bien sourcée, excellente piste pour une fiche "artisanat/techniques traditionnelles" du pilier Découverte.
+
 ---
 
 ## 3. Phrases et expressions utiles
@@ -1198,4 +1431,4 @@ Phrases complètes tirées du dictionnaire de l'éducation (source : Dictionnair
 - **707330349-Dictionnaire-de-l-education-francais-ewondo.pdf** : lu intégralement (480 entrées numérotées sur 16 pages, copie dupliquée `(1).pdf` ignorée comme demandé). Vocabulaire très majoritairement scolaire/administratif (inspecteur, bulletin, tableau, MINESEC...) ; seule une sélection pertinente pour AFROBACK a été reprise dans le lexique ci-dessus (famille, culture, langues, verbes courants, phrases complètes). Sources citées par ce dictionnaire lui-même : Essono J.M. "Langue et culture ewondo" (2012), Mialaret G. "Vocabulaire de l'éducation" (1979), De Lansheree G. "Dictionnaire de l'évaluation et de la recherche en éducation" (1979), A. Garcia "Dictionnaire savant de l'éducation" (2009).
 - **9782402210997.pdf** : identifié (premières 18 pages lues). Il s'agit de "Nama l'Ewondo", roman d'aventures pour la jeunesse de Jean Kerlyve (1959, Éditions Debresse), qui se déroule dans un village ewondo fictif du Cameroun colonial. **Ce n'est pas un ouvrage linguistique** : aucune grammaire, aucun lexique éwondo, uniquement un récit en français (avec les stéréotypes coloniaux typiques de l'époque sur les populations africaines, à noter si ce texte est un jour réutilisé). Le mot "ewondé"/"ewondo" n'y apparaît que pour désigner la langue/l'ethnie du village. Aucune contribution linguistique retenue de cette source ; lecture non poursuivie au-delà de la vérification de sa nature, le temps de lecture étant mieux investi sur les vrais ouvrages de langue.
 - **800587642-Grammaire-Ewondo-1930.pdf** (219 pages) : **lu en quasi-intégralité** sur les 3 sessions de travail (reprises après coupures réseau). Couverture : phonétique et tons (§7-16), 6 classes nominales (§17-45), toute la morphologie (démonstratifs, possessifs, qualificatifs, numéraux, indéfinis, interrogatifs, pronoms sous toutes leurs formes, §46-74), toute la conjugaison verbale (personnes, temps, modes : indicatif, impératif, subjonctif, continuatif, inceptif, itératif, participe, infinitif, négation, dérivation verbale, §75-100), tous les adverbes/prépositions/conjonctions (§100-111), toute la syntaxe (accord du verbe, article, substantif, adjectif qualificatif/comparatif/superlatif, propositions indépendantes et emploi des modes, proposition relative, complétives, interrogation indirecte, verbes d'opinion/volonté/conseil/désir/défense/crainte/mouvement, propositions circonstancielles complètes : causale, finale, consécutive, concessive, conditionnelle (5 types + négatif), temporelle (antériorité/simultanéité/postériorité), comparative, §112-234), le supplément à la syntaxe (particularités de style, règles de tons dans la conversation, tambour d'appel nkú, ekigá, §235-242). Non retranscrit en détail dans cette fiche (hors périmètre grammaire/lexique, mais lu et localisé pour référence future) : l'appendice littéraire (proverbes, devinettes, fables de la Tortue, poésie, chants, p.161-172). **Intégralement dépouillés et versés au lexique thématique (section 2)** : les 9 dialogues bilingues "Conversations ewondo" (rencontre, visite, voyage, école, travail, repas, service de la maison, marché, maladie, p.173-184) et le lexique Ewondo-Français final (p.185-198, environ 700 entrées, lu intégralement de A à Z). Le lexique inverse Français-Ewondo (p.199-213) n'a pas été relu mot à mot : il contient le même vocabulaire que le lexique Ewondo-Français déjà dépouillé, simplement trié dans l'autre sens.
-- **800587173-Dictionnaire-Ewondo-francais-Tsala-1955.pdf** (720 pages, dictionnaire du R.P. Thomas Tsala) : **échantillonné par 46 sondages répartis sur toute la longueur de l'ouvrage** (densité renforcée sur cette 5e session, 15 nouveaux sondages intercalés dans la première moitié de l'ouvrage), du tout début (avant-propos, table des préfixes) jusqu'à la toute fin de l'alphabet (lettre Z). Pages PDF lues, dans l'ordre du livre : 9-18 [avant-propos, table des préfixes, orthographe, classification des consonnes, début des entrées A], 19-22, 23-26, 31-34, 40-43, 50-53, 62-65, 73-76, 85-88, 96-99, 109-112, 119-122, 130-133, 142-145, 156-159, 166-169, 178-181, 189-192, 203-206, 213-216, 225-228, 236-239, 250-253, 260-263, 272-275, 283-286, 297-300, 308-311, 320-323, 331-334, 344-347, 367-370, 391-394, 415-418, 438-441, 462-465, 485-488, 510-513, 532-535, 557-560, 579-582, 604-607, 626-629, 650-653, 673-676, 700-703. Au total environ 190 pages lues sur 720 (~26%), couvrant les entrées de la lettre A jusqu'à la lettre Z. Les 15 nouveaux sondages de cette session (pages PDF 19-22, 31-34, 50-53, 73-76, 96-99, 119-122, 142-145, 166-169, 189-192, 213-216, 236-239, 260-263, 283-286, 308-311, 331-334) sont intercalés entre les sondages précédents, du début de l'alphabet (lettre A) jusqu'au début de la lettre M, ramenant l'espacement moyen entre sondages à environ 11-12 pages sur cette portion du livre (pages 9 à 347 environ) ; le reste de l'ouvrage (pages 347-720, lettres M à Z) conserve l'espacement plus large (~22-23 pages) des sessions précédentes et reste la priorité pour une densification future. Trop volumineux pour une lecture exhaustive (720 pages de dictionnaire dense, plusieurs entrées par mot avec exemples). Le dictionnaire est nettement plus riche que la grammaire de 1930 : chaque entrée est développée avec plusieurs sens numérotés, des phrases d'exemple en éwondo traduites, et souvent des notes ethnographiques ou des fragments de contes (voir sélection enrichie en section 2.12 : fable de la Tortue et des cornes d'emprunt, divination traditionnelle par mygale, pratiques de deuil des veuves, croyance sur le "evu"/polype-sorcellerie, chef des mânes Zaméyo et nouvel épisode de sa fille convoitée par la Tortue via le colibri-devin, rituel funéraire d'interpellation collective, ordalie traditionnelle par l'écorce de l'arbre "elon", jeu d'enfants traditionnel "etá", proverbes et devinettes nombreux). Un échantillonnage encore plus poussé (notamment sur la seconde moitié de l'ouvrage, lettres M à Z) resterait possible dans une session future si Yannick le souhaite.
+- **800587173-Dictionnaire-Ewondo-francais-Tsala-1955.pdf** (720 pages, dictionnaire du R.P. Thomas Tsala) : **échantillonné par 62 sondages répartis sur toute la longueur de l'ouvrage** (densité renforcée sur cette 6e session, 16 nouveaux sondages intercalés dans la seconde moitié de l'ouvrage, lettres M à Z), du tout début (avant-propos, table des préfixes) jusqu'à la toute fin de l'alphabet (lettre Z). Pages PDF lues, dans l'ordre du livre : 9-18 [avant-propos, table des préfixes, orthographe, classification des consonnes, début des entrées A], 19-22, 23-26, 31-34, 40-43, 50-53, 62-65, 73-76, 85-88, 96-99, 109-112, 119-122, 130-133, 142-145, 156-159, 166-169, 178-181, 189-192, 203-206, 213-216, 225-228, 236-239, 250-253, 260-263, 272-275, 283-286, 297-300, 308-311, 320-323, 331-334, 344-347, 356-359, 367-370, 379-382, 391-394, 403-406, 415-418, 427-430, 438-441, 450-453, 462-465, 474-477, 485-488, 497-500, 510-513, 521-524, 532-535, 544-547, 557-560, 569-572, 579-582, 591-594, 604-607, 615-618, 626-629, 638-641, 650-653, 662-665, 673-676, 685-688, 700-703, 710-713. Au total environ 254 pages lues sur 720 (~35%), couvrant les entrées de la lettre A jusqu'à la lettre Z. Les 16 nouveaux sondages de cette session (pages PDF 356-359, 379-382, 403-406, 427-430, 450-453, 474-477, 497-500, 521-524, 544-547, 569-572, 591-594, 615-618, 638-641, 662-665, 685-688, 710-713) sont intercalés entre les sondages précédents sur toute la seconde moitié du livre (lettres M à Z), ramenant l'espacement moyen entre sondages sur cette portion à environ 8-9 pages — **la densification de la seconde moitié est désormais comparable, voire légèrement supérieure, à celle de la première moitié** (pages 9-347, espacement ~11-12 pages). L'ouvrage est maintenant échantillonné de façon homogène sur toute sa longueur. Trop volumineux pour une lecture exhaustive (720 pages de dictionnaire dense, plusieurs entrées par mot avec exemples). Le dictionnaire est nettement plus riche que la grammaire de 1930 : chaque entrée est développée avec plusieurs sens numérotés, des phrases d'exemple en éwondo traduites, et souvent des notes ethnographiques ou des fragments de contes (voir sélection enrichie en section 2.12 et 2.12bis : fable de la Tortue et des cornes d'emprunt, nouveaux fragments du cycle Tortue/Léopard (colibri-devin, cornes de cire, antilope "zib" tabouée aux enfants non circoncis), divination traditionnelle par mygale et son bâtonnet "ovol", pratiques de deuil des veuves et deuil collectif du village, rite de purification/confession "ndongo", rite initiatique "so" et son tunnel à trois branches, technique traditionnelle de production du feu par friction "zig-ndóan" bien documentée par l'auteur, croyance sur le "evu"/polype-sorcellerie, chef des mânes Zaméyo, rituel funéraire d'interpellation collective, ordalie traditionnelle par l'écorce de l'arbre "elon", jeux d'enfants traditionnels ("etá", jonglage aux noix, chatouille rituelle "oveb"), lutte traditionnelle (techniques nommées), note historique sur la grippe de 1918 chez les Ewondo, proverbes et devinettes très nombreux). Une densification supplémentaire (relecture plus fine entre les sondages existants) resterait possible dans une session future si Yannick le souhaite, mais la couverture est désormais large et homogène sur tout l'ouvrage.

@@ -12,15 +12,15 @@ export function Sidebar({ admin }: { admin: AdminUser }) {
   return (
     <aside
       style={{
-        flex: 'none',
         width: 236,
-        minHeight: '100vh',
         background: `linear-gradient(180deg, ${colors.sidebarFrom}, ${colors.sidebarTo})`,
         borderRight: `1px solid ${colors.border}`,
         padding: '22px 14px',
-        position: 'sticky',
+        position: 'fixed',
         top: 0,
+        left: 0,
         height: '100vh',
+        zIndex: 50,
         display: 'flex',
         flexDirection: 'column',
       }}

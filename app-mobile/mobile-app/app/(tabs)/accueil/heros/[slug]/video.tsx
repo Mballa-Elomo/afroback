@@ -210,10 +210,14 @@ function VideoPlayerArea({ uri }: { uri: string }) {
 }
 
 /**
- * Lecteur d'un chapitre vidéo réellement tourné, avec bascule FR/EN quand
- * les deux pistes existent (même bande, langue de narration différente —
- * voir `AudioPlayerBlock` dans audio.tsx pour le même principe). `key={uri}`
- * force le remontage de `VideoPlayerArea` au changement de langue : `useVideoPlayer`
+ * Lecteur d'un chapitre vidéo réellement tourné, avec bascule de langue
+ * quand plusieurs pistes existent (même bande, langue de narration
+ * différente — voir `AudioPlayerBlock` dans audio.tsx pour le même
+ * principe). Les langues affichées viennent de `chapitre.videos` (map code
+ * -> URL), pas d'un FR/EN codé en dur : un chapitre peut avoir 1, 2 ou N
+ * pistes selon ce qui a réellement été produit (voir `lib/langues.ts` côté
+ * back-office pour la liste des langues configurées). `key={uri}` force le
+ * remontage de `VideoPlayerArea` au changement de langue : `useVideoPlayer`
  * ne recharge pas sa source tout seul si l'URL change en prop.
  *
  * Engagement détaillé par chapitre × langue (demande de Yannick le
@@ -221,33 +225,26 @@ function VideoPlayerArea({ uri }: { uri: string }) {
  * (`chapterIdx` change juste la prop `chapitre`, pas de remontage), donc le
  * garde-fou "déjà loggé" est une Set de clés `numero-langue` plutôt qu'un
  * simple booléen — sinon changer de chapitre après avoir déjà écouté le
- * chapitre précédent en FR ne relogerait jamais rien.
+ * chapitre précédent dans une langue ne relogerait jamais rien.
  */
 function VideoChapitrePlayerArea({ heroId, chapitre }: { heroId: string; chapitre: Heros['video_chapitres'][number] }) {
-  const hasBoth = Boolean(chapitre.video_url_fr && chapitre.video_url_en);
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const videos = chapitre.videos ?? {};
+  const codes = Object.keys(videos);
+  const [lang, setLang] = useState<string>(codes[0] ?? '');
   // Même repli qu'AudioPlayerBlock (audio.tsx) : la langue réellement jouée
-  // peut différer du réglage `lang` si une seule des deux pistes existe pour
-  // ce chapitre précis.
-  const actualLang: 'fr' | 'en' =
-    lang === 'fr'
-      ? chapitre.video_url_fr
-        ? 'fr'
-        : 'en'
-      : chapitre.video_url_en
-        ? 'en'
-        : 'fr';
-  const uri = (lang === 'fr' ? chapitre.video_url_fr : chapitre.video_url_en)
-    ?? chapitre.video_url_fr
-    ?? chapitre.video_url_en
-    ?? '';
+  // peut différer du réglage `lang` si la piste choisie n'existe plus pour
+  // ce chapitre précis (ex. langue retirée depuis le back-office).
+  const actualLang = videos[lang] ? lang : (codes[0] ?? '');
+  const uri = videos[actualLang] ?? '';
   const loggedKeysRef = useRef(new Set<string>());
 
   useEffect(() => {
-    setLang('fr');
+    setLang(codes[0] ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapitre.numero]);
 
   useEffect(() => {
+    if (!actualLang) return;
     const key = `${chapitre.numero}-${actualLang}`;
     if (loggedKeysRef.current.has(key)) return;
     loggedKeysRef.current.add(key);
@@ -257,14 +254,13 @@ function VideoChapitrePlayerArea({ heroId, chapitre }: { heroId: string; chapitr
   return (
     <View>
       <VideoPlayerArea key={uri} uri={uri} />
-      {hasBoth && (
+      {codes.length > 1 && (
         <View style={styles.videoLangToggle}>
-          <Pressable onPress={() => setLang('fr')} style={[styles.videoLangPill, lang === 'fr' && styles.videoLangPillActive]}>
-            <Text style={[styles.videoLangLabel, lang === 'fr' && styles.videoLangLabelActive]}>FR</Text>
-          </Pressable>
-          <Pressable onPress={() => setLang('en')} style={[styles.videoLangPill, lang === 'en' && styles.videoLangPillActive]}>
-            <Text style={[styles.videoLangLabel, lang === 'en' && styles.videoLangLabelActive]}>EN</Text>
-          </Pressable>
+          {codes.map((code) => (
+            <Pressable key={code} onPress={() => setLang(code)} style={[styles.videoLangPill, actualLang === code && styles.videoLangPillActive]}>
+              <Text style={[styles.videoLangLabel, actualLang === code && styles.videoLangLabelActive]}>{code.toUpperCase()}</Text>
+            </Pressable>
+          ))}
         </View>
       )}
     </View>

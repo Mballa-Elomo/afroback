@@ -4,10 +4,9 @@ import { getHeroBySlugAdmin, heroHasMedia } from '@/lib/data/heros';
 import { getAudioEngagementDetail, getHeroEngagement, getVideoChapterEngagement } from '@/lib/data/engagement';
 import { StatusBadge } from '@/components/StatusBadge';
 import { MediaUploadSlot } from '@/components/MediaUploadSlot';
-import { ChapterVideoGrid } from '@/components/ChapterVideoGrid';
+import { HeroLanguageContent } from '@/components/HeroLanguageContent';
 import { MetadataForm } from '@/components/MetadataForm';
 import { HeroTopActions, ArchiveHeroButton } from '@/components/HeroDetailActions';
-import { ViewerModal } from '@/components/ViewerModal';
 import { colors, fonts } from '@/lib/theme';
 
 export const dynamic = 'force-dynamic';
@@ -74,21 +73,21 @@ export default async function HeroDetailPage({ params }: { params: Promise<{ slu
           <div style={panelTitleStyle}>MÉDIAS</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <MediaUploadSlot slug={hero.slug} kind="photo" label="Photo catalogue" hint="JPG / PNG / WEBP" present={media.photo} />
-            <MediaUploadSlot slug={hero.slug} kind="audioFr" label="Audio FR" hint="MP3 · narration" present={media.audioFr} engagementCount={audioDetail.fr} />
-            <MediaUploadSlot slug={hero.slug} kind="audioEn" label="Audio EN" hint="MP3 · narration" present={media.audioEn} engagementCount={audioDetail.en} />
           </div>
           {/*
-            Slot "Vidéo (documentaire unique)" retiré le 2026-08-06 (demande
-            de Yannick). Vérifié avant retrait : Martin Paul Samba était le
-            seul héros encore dépendant de `video_url` (video_chapitres vide)
-            — converti au système chapitres (video_url mis à null dans
-            supabase/seed.sql, voir mobile-app/README.md). Le mode chapitres
-            ci-dessous (ChapterVideoGrid) est désormais la seule façon de
-            gérer la vidéo depuis le back-office. La colonne `video_url` et
-            le MediaSlot `'video'` (lib/uploadMedia.ts) restent en base et
-            dans le code — pas retirés, juste plus exposés dans cette UI —
-            au cas où un futur héros ait un jour un documentaire unique non
-            découpé en chapitres.
+            Audio, vidéo par chapitre et récit ont déménagé dans le panneau
+            "CONTENU PAR LANGUE" ci-dessous (HeroLanguageContent, ajouté le
+            2026-08-09) : seule la photo catalogue n'est pas liée à une
+            langue, elle reste ici. Slot "Vidéo (documentaire unique)" retiré
+            le 2026-08-06 (demande de Yannick). Vérifié avant retrait : Martin
+            Paul Samba était le seul héros encore dépendant de `video_url`
+            (video_chapitres vide) — converti au système chapitres
+            (video_url mis à null dans supabase/seed.sql, voir
+            mobile-app/README.md). La colonne `video_url` et le MediaSlot
+            `'video'` (lib/uploadMedia.ts) restent en base et dans le code —
+            pas retirés, juste plus exposés dans cette UI — au cas où un
+            futur héros ait un jour un documentaire unique non découpé en
+            chapitres.
           */}
         </div>
         <div style={panelStyle}>
@@ -98,7 +97,25 @@ export default async function HeroDetailPage({ params }: { params: Promise<{ slu
       </div>
 
       <div style={{ ...panelStyle, marginBottom: 16 }}>
-        <ChapterVideoGrid slug={hero.slug} videoChapitres={hero.video_chapitres ?? []} engagementRows={videoChapterEngagement} />
+        <div style={panelTitleStyle}>CONTENU PAR LANGUE</div>
+        <p style={{ fontSize: 11.5, color: colors.textMuted, lineHeight: 1.5, margin: '0 0 18px' }}>
+          Choisis une langue : l&apos;audio, la vidéo des 4 chapitres et le récit de cette langue apparaissent
+          ensemble. Les récits sont produits par le pipeline éditorial (agents griot/storyboard) — les corriger ici
+          ne touche jamais les fichiers sources du pipeline.
+        </p>
+        <HeroLanguageContent
+          slug={hero.slug}
+          audio={{
+            fr: { present: media.audioFr, engagementCount: audioDetail.fr },
+            en: { present: media.audioEn, engagementCount: audioDetail.en },
+          }}
+          videoChapitres={hero.video_chapitres ?? []}
+          videoEngagementRows={videoChapterEngagement}
+          chapitresStoryboard={hero.chapitres_storyboard ?? []}
+          recitChapitresEn={hero.recit_chapitres_en}
+          recitFr={hero.recit_fr_texte}
+          recitEn={hero.recit_en_texte}
+        />
       </div>
 
       <div style={{ ...panelStyle, marginBottom: 16 }}>
@@ -112,20 +129,8 @@ export default async function HeroDetailPage({ params }: { params: Promise<{ slu
           Chiffres réels, comptés à l&apos;ouverture de l&apos;écran côté app mobile — uniquement quand du vrai
           contenu est montré (jamais un atterrissage sur un état &quot;bientôt disponible&quot;). Pas de compteur
           &quot;likes&quot; : aucun système de réaction n&apos;existe dans le modèle de données. Détail par média :
-          FR/EN sous chaque slot audio ci-dessus, par chapitre × langue sur la grille vidéo ci-dessous.
+          par langue dans le panneau ci-dessus.
         </p>
-      </div>
-
-      <div style={panelStyle}>
-        <div style={panelTitleStyle}>CONTENU (LECTURE SEULE)</div>
-        <p style={{ fontSize: 11.5, color: colors.textMuted, lineHeight: 1.5, margin: '0 0 14px' }}>
-          Les récits sont produits par le pipeline éditorial (agents griot/storyboard). Consultation uniquement —
-          jamais de réécriture depuis cet outil.
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <RawTextRow label="Récit FR" text={hero.recit_fr_texte} />
-          {hero.recit_en_texte && <RawTextRow label="Récit EN" text={hero.recit_en_texte} />}
-        </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginTop: 20 }}>
@@ -144,23 +149,5 @@ function EngagementStat({ icon, value, label }: { icon: string; value: number; l
       </div>
       <div style={{ fontSize: 10, color: colors.textFaint }}>{label}</div>
     </div>
-  );
-}
-
-function ContentRow({ label, available }: { label: string; available: boolean }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: colors.row, border: `1px solid ${colors.border}`, borderRadius: 9, padding: '11px 13px' }}>
-      <span>📖</span>
-      <span style={{ flex: 1, fontSize: 12.5 }}>{label}</span>
-      {available ? <span style={{ color: colors.accentGold }}>›</span> : <StatusBadge label="ABSENT" tone="warning" />}
-    </div>
-  );
-}
-
-function RawTextRow({ label, text }: { label: string; text: string }) {
-  return (
-    <ViewerModal title={label} trigger={<ContentRow label={label} available={!!text} />}>
-      {text || 'Aucun texte enregistré.'}
-    </ViewerModal>
   );
 }

@@ -24,12 +24,19 @@ export function HeroTopActions({ slug, aLaUne, publie }: { slug: string; aLaUne:
     });
   };
 
+  // Un héros dépublié ne peut pas être mis à la une (refusé aussi côté
+  // serveur dans toggleFeatured, voir actions.ts) — le bouton reste
+  // cliquable pour "retirer de la une" (toujours permis) mais pas pour
+  // "mettre à la une" tant que le héros n'est pas publié.
+  const featuredToggleDisabled = pending || (!aLaUne && !publie);
+
   return (
     <div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
       <button
         onClick={() => run(() => toggleFeatured(slug))}
-        disabled={pending}
+        disabled={featuredToggleDisabled}
+        title={!aLaUne && !publie ? 'Dépublié — publie-le avant de le mettre à la une' : undefined}
         style={{
           font: 'inherit',
           fontSize: 12.5,
@@ -39,7 +46,8 @@ export function HeroTopActions({ slug, aLaUne, publie }: { slug: string; aLaUne:
           border: `1px solid ${colors.borderStrong}`,
           background: aLaUne ? 'rgba(240,195,107,.14)' : 'transparent',
           color: colors.accentGold,
-          cursor: pending ? 'default' : 'pointer',
+          cursor: featuredToggleDisabled ? 'default' : 'pointer',
+          opacity: featuredToggleDisabled && !pending ? 0.45 : 1,
         }}
       >
         {aLaUne ? '★ Retirer de la une' : '☆ Mettre à la une'}

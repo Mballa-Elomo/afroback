@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from './supabase/server';
 import { requireAdmin } from './auth';
 import { logActivity } from './activityLog';
 import { getHeroBySlugAdmin, type VideoChapitreAdmin } from './data/heros';
+import { LANGUES_VIDEO } from './langues';
 
 /**
  * Logique d'upload de médias héros, PARTAGÉE entre les Route Handlers
@@ -96,10 +97,11 @@ export async function performMediaUpload(slug: string, kind: MediaSlot, file: Fi
   }
 }
 
-export type VideoLang = 'fr' | 'en';
+/** Code de langue vidéo (ex. `"fr"`, `"en"`) — un des codes configurés dans `lib/langues.ts` (LANGUES_VIDEO), pas un enum fixe. */
+export type VideoLang = string;
 
 export function isVideoLang(v: unknown): v is VideoLang {
-  return v === 'fr' || v === 'en';
+  return typeof v === 'string' && LANGUES_VIDEO.some((l) => l.code === v);
 }
 
 /** Retourne une copie de la liste avec une entrée garantie pour ce numéro de chapitre (créée si absente), triée par numéro. */
@@ -107,7 +109,7 @@ export function upsertChapterEntry(chapters: VideoChapitreAdmin[], numero: numbe
   const list = chapters.map((c) => ({ ...c }));
   let index = list.findIndex((c) => c.numero === numero);
   if (index === -1) {
-    list.push({ numero, titre_chapitre: '' });
+    list.push({ numero, titre_chapitre: '', videos: {} });
     list.sort((a, b) => a.numero - b.numero);
     index = list.findIndex((c) => c.numero === numero);
   }
@@ -139,7 +141,7 @@ export async function performChapterVideoUpload(
 
     const { data: pub } = admin_.storage.from(BUCKET).getPublicUrl(path);
     const { list, index } = upsertChapterEntry(hero.video_chapitres ?? [], chapterNum);
-    list[index] = { ...list[index], [lang === 'fr' ? 'video_url_fr' : 'video_url_en']: pub.publicUrl };
+    list[index] = { ...list[index], videos: { ...(list[index].videos ?? {}), [lang]: pub.publicUrl } };
 
     const { error: dbError } = await admin_.from('heros').update({ video_chapitres: list }).eq('slug', slug);
     if (dbError) return { error: dbError.message };

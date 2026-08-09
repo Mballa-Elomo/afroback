@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { colors, fonts } from '@/lib/theme';
 import { removeChapterVideo, updateChapterTitle } from '@/app/(admin)/heros/[slug]/actions';
 import type { VideoLang } from '@/lib/uploadMedia';
-import type { VideoChapitreAdmin } from '@/lib/data/heros';
+import type { ChapitreStoryboard, RecitChapitre, VideoChapitreAdmin } from '@/lib/data/heros';
 // `import type` uniquement : erasé à la compilation, donc sûr à importer
 // depuis un composant client même si `lib/data/engagement.ts` contient par
 // ailleurs du code serveur (`getSupabaseAdmin`, `next/headers`) — on
@@ -22,45 +22,89 @@ function chapterFor(list: VideoChapitreAdmin[], numero: number): VideoChapitreAd
   return list.find((c) => c.numero === numero) ?? { numero, titre_chapitre: '' };
 }
 
+/**
+ * Liste des 4 chapitres pour UNE langue à la fois — la langue vient d'en
+ * dehors (onglet actif, voir HeroLanguageContent.tsx), ce composant ne
+ * connaît pas `LANGUES_VIDEO` et n'affiche jamais plusieurs langues en même
+ * temps. Avant le 2026-08-09, ce composant affichait toutes les langues
+ * empilées sous chaque chapitre ; ça a été remonté d'un niveau (onglet de
+ * langue partagé avec l'audio et le récit) pour que changer de langue montre
+ * tout le contenu de cette langue au même endroit, plutôt que de forcer à
+ * chercher la bonne colonne dans chaque section séparément.
+ */
 export function ChapterVideoGrid({
   slug,
   videoChapitres,
   engagementRows,
+  chapitresStoryboard,
+  recitChapitresEn,
+  lang,
+  label,
 }: {
   slug: string;
   videoChapitres: VideoChapitreAdmin[];
   /** Ajouté le 2026-08-06 (demande de Yannick) : visionnages réels par chapitre × langue. Tableau vide tant que `schema-engagement-detail.sql` n'est pas exécuté — chaque case affiche alors 0, jamais un chiffre inventé. */
   engagementRows: VideoChapterEngagementRow[];
+  /**
+   * Titres du storyboard (pilier Histoires & Héros, déjà écrits pour les 4
+   * chapitres par le griot/storyboardeur, en français) — sert de valeur par
+   * défaut pour le titre de chapitre vidéo EN FRANÇAIS tant qu'il n'a jamais
+   * été modifié ici. Dès qu'un titre est enregistré via `updateChapterTitle`,
+   * il est stocké dans `video_chapitres[].titre_chapitre` et prend le dessus
+   * pour toujours, quelle que soit la langue affichée (la dernière
+   * modification gagne) — demande de Yannick le 2026-08-09.
+   */
+  chapitresStoryboard: ChapitreStoryboard[];
+  /**
+   * Titres des chapitres du récit EN ANGLAIS (`heros.recit_chapitres_en`) —
+   * mêmes titres que le storyboard par construction (voir le commentaire de
+   * `RecitChapitre` côté app mobile, `mobile-app/src/data/types.ts`), déjà
+   * traduits et relus par le pipeline de traduction. Sert de valeur par
+   * défaut pour l'onglet EN — jamais le titre français utilisé tel quel : si
+   * aucune traduction n'existe encore pour ce chapitre, le champ reste vide
+   * (placeholder) plutôt que d'afficher du français dans un champ "anglais",
+   * ou d'inventer une traduction ici. `null`/absent tant que le récit EN
+   * n'existe pas du tout pour ce héros.
+   */
+  recitChapitresEn: RecitChapitre[] | null;
+  lang: string;
+  label: string;
 }) {
-  const readyCount = videoChapitres.reduce((n, c) => n + (c.video_url_fr ? 1 : 0) + (c.video_url_en ? 1 : 0), 0);
-  const engagementMap = new Map<string, number>();
-  for (const row of engagementRows) engagementMap.set(`${row.chapitre_numero}-${row.langue}`, row.visionnages);
+  const readyCount = videoChapitres.filter((c) => c.videos?.[lang]).length;
+  const engagementMap = new Map<number, number>();
+  for (const row of engagementRows) if (row.langue === lang) engagementMap.set(row.chapitre_numero, row.visionnages);
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-        <div style={{ fontFamily: fonts.display, fontSize: 12, letterSpacing: '.1em', color: colors.accentGoldSoft }}>
-          VIDÉOS — 4 CHAPITRES × 2 LANGUES
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <p style={{ fontSize: 11.5, color: colors.textMuted, lineHeight: 1.5, margin: 0 }}>
+          Chaque histoire est découpée en 4 chapitres ; chaque chapitre peut avoir sa vidéo en {label.toLowerCase()}.
+        </p>
+        <div style={{ fontFamily: fonts.mono, fontSize: 9, color: colors.textMuted, flex: 'none', marginLeft: 12 }}>
+          {readyCount} / {CHAPTERS.length} en ligne
         </div>
-        <div style={{ fontFamily: fonts.mono, fontSize: 9, color: colors.textMuted }}>{readyCount} / 8 en ligne</div>
       </div>
-      <p style={{ fontSize: 11.5, color: colors.textMuted, lineHeight: 1.5, margin: '0 0 14px' }}>
-        Chaque histoire est découpée en 4 chapitres ; chaque chapitre peut avoir sa vidéo en français et en anglais.
-      </p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {CHAPTERS.map((numero) => {
           const chapter = chapterFor(videoChapitres, numero);
+          const titreStoryboardFr = chapitresStoryboard.find((c) => c.numero === numero)?.titre_chapitre ?? '';
+          const titreParDefaut = lang === 'fr' ? titreStoryboardFr : (recitChapitresEn?.find((c) => c.numero === numero)?.titre ?? '');
+          const titre = chapter.titre_chapitre || titreParDefaut;
           return (
             <div key={numero} style={{ background: colors.panelDeep, border: `1px solid ${colors.borderHairline}`, borderRadius: 12, padding: 14 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                 <span style={{ fontFamily: fonts.mono, fontSize: 10, color: colors.accentGoldAlt, flex: 'none' }}>CHAP. {numero}</span>
-                <ChapterTitleInput slug={slug} numero={numero} titre={chapter.titre_chapitre} />
+                <ChapterTitleInput slug={slug} numero={numero} titre={titre} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <ChapterVideoCell slug={slug} numero={numero} lang="fr" label="Français" url={chapter.video_url_fr} visionnages={engagementMap.get(`${numero}-fr`) ?? 0} />
-                <ChapterVideoCell slug={slug} numero={numero} lang="en" label="English" url={chapter.video_url_en} visionnages={engagementMap.get(`${numero}-en`) ?? 0} />
-              </div>
+              <ChapterVideoCell
+                slug={slug}
+                numero={numero}
+                lang={lang}
+                label={label}
+                url={chapter.videos?.[lang]}
+                visionnages={engagementMap.get(numero) ?? 0}
+              />
             </div>
           );
         })}

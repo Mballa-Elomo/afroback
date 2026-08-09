@@ -1,7 +1,17 @@
 import { supabase } from './supabaseClient';
 
 export type EngagementEvent = 'recit' | 'video';
-export type EngagementLangue = 'fr' | 'en';
+/**
+ * Code de langue (ex. `"fr"`, `"en"`). Reste un type générique plutôt qu'un
+ * enum fixe : `recordVideoChapterEngagement` doit accepter tout code
+ * configuré côté back-office (`lib/langues.ts`, LANGUES_VIDEO), pas
+ * seulement FR/EN. `recordAudioEngagement` reste FR/EN dans les faits (seule
+ * la vidéo par chapitre a été étendue à plusieurs langues au 2026-08-09),
+ * mais partage le même type par simplicité — la fonction RPC Supabase
+ * `increment_audio_engagement` continue de rejeter tout code hors FR/EN
+ * côté serveur.
+ */
+export type EngagementLangue = string;
 
 /**
  * Enregistre un vrai événement d'engagement agrégé : lecture du récit

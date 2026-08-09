@@ -179,7 +179,7 @@ export default async function HerosListPage({
               <div>
                 <StatusBadge label={h.statut_publication === 'publie' ? 'Publié' : 'Dépublié'} tone={h.statut_publication === 'publie' ? 'positive' : 'neutral'} />
               </div>
-              <FeaturedStar slug={h.slug} on={h.a_la_une} />
+              <FeaturedStar slug={h.slug} on={h.a_la_une} publie={h.statut_publication === 'publie'} />
               <EngagementCell engagement={engagement} />
               <div style={{ textAlign: 'right' }}>
                 <Link href={`/heros/${h.slug}`} style={{ color: colors.accentGold }}>

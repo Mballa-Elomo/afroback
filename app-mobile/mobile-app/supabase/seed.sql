@@ -189,7 +189,7 @@ If you descend from this land that watched her fight into being, remember this: 
   'https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/audio/reine-nzinga-fr.mp3',
   'https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/audio/reine-nzinga-en.mp3',
   null,
-  '[{"numero":1,"titre_chapitre":"Naître dans un monde qui se referme","video_url_fr":"https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/video/reine-nzinga-chap1-fr.mp4","video_url_en":"https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/video/reine-nzinga-chap1-en.mp4"}]'::jsonb,
+  '[{"numero":1,"titre_chapitre":"Naître dans un monde qui se referme","videos":{"fr":"https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/video/reine-nzinga-chap1-fr.mp4","en":"https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/video/reine-nzinga-chap1-en.mp4"}}]'::jsonb,
   null,
   1
 )

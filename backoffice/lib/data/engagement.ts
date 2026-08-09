@@ -116,7 +116,8 @@ export async function getAudioEngagementDetail(heroId: string): Promise<AudioEng
 
 export interface VideoChapterEngagementRow {
   chapitre_numero: number;
-  langue: 'fr' | 'en';
+  /** Code de langue configuré dans `lib/langues.ts` (LANGUES_VIDEO) — pas un enum fixe. */
+  langue: string;
   visionnages: number;
 }
 

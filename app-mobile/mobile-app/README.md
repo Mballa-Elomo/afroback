@@ -354,4 +354,5 @@ supabase/
   schema-mythologie.sql         schéma + seed du pilier Mythologie (5 mythes) — à exécuter par Yannick dans le SQL Editor Supabase
   schema-engagement.sql         table hero_engagement + fonction increment_hero_engagement (compteurs réels lecture/écoute/visionnage), lu par le back-office — à exécuter par Yannick dans le SQL Editor Supabase
   schema-engagement-detail.sql  détail FR/EN (hero_engagement) + table hero_video_chapter_engagement (chapitre × langue) — dépend de schema-engagement.sql, à exécuter après lui
+  migration-video-chapitres-multilangue.sql  heros.video_chapitres passe du FR/EN fixe à une map "videos" multi-langues arbitraire ; relâche la contrainte de langue de hero_video_chapter_engagement — idempotent, à exécuter par Yannick dans le SQL Editor Supabase (2026-08-09)
 ```

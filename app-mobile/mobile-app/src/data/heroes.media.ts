@@ -13,8 +13,8 @@
 export interface HeroVideoChapitreMedia {
   numero: number;
   titre_chapitre: string;
-  video_url_fr?: string;
-  video_url_en?: string;
+  /** Map code langue -> URL (ex. `{ fr: "...", en: "..." }`) — voir `VideoChapitre` dans `data/types.ts`. */
+  videos?: Record<string, string>;
 }
 
 export interface HeroMediaFields {
@@ -55,8 +55,10 @@ export const HEROES_MEDIA: Record<string, HeroMediaFields> = {
       {
         numero: 1,
         titre_chapitre: 'Naître dans un monde qui se referme',
-        video_url_fr: `${STORAGE_BASE}/video/reine-nzinga-chap1-fr.mp4`,
-        video_url_en: `${STORAGE_BASE}/video/reine-nzinga-chap1-en.mp4`,
+        videos: {
+          fr: `${STORAGE_BASE}/video/reine-nzinga-chap1-fr.mp4`,
+          en: `${STORAGE_BASE}/video/reine-nzinga-chap1-en.mp4`,
+        },
       },
     ],
   },

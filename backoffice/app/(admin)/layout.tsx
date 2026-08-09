@@ -34,9 +34,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: colors.background, fontFamily: "'Manrope', sans-serif", color: colors.textPrimary, display: 'flex' }}>
+    <div style={{ minHeight: '100vh', background: colors.background, fontFamily: "'Manrope', sans-serif", color: colors.textPrimary }}>
       <Sidebar admin={admin} />
-      <div style={{ flex: 1, minWidth: 0, height: '100vh', overflowY: 'auto' }}>
+      {/* marginLeft: 236 compense le sidebar en position:fixed (largeur 236px, hors flux).
+          id ciblé par RecitDrawer.tsx pour couper ce scroll pendant qu'un panneau latéral est ouvert. */}
+      <div id="afa-scroll-container" style={{ marginLeft: 236, height: '100vh', overflowY: 'auto' }}>
         <Topbar />
         <div style={{ padding: 28 }}>
           <div className="afa-fade">{children}</div>

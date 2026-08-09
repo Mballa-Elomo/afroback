@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import type { Heros } from './types';
+import type { Heros, VideoChapitre } from './types';
 
 /**
  * Source de données réelle : table `heros` sur Supabase (voir
@@ -7,6 +7,30 @@ import type { Heros } from './types';
  * consomme que les fonctions exportées ici — c'est le seul fichier à
  * modifier si la source change un jour (ex. ajout d'un cache offline).
  */
+
+/**
+ * Forme brute possible d'un chapitre vidéo en base au moment de cette
+ * transition (2026-08-09, passage FR/EN fixe -> `videos` multi-langues, voir
+ * backoffice/supabase/migration-video-chapitres-multilangue.sql) : selon que
+ * la migration a déjà tourné ou non côté Supabase, une ligne peut encore
+ * porter les anciennes clés `video_url_fr`/`video_url_en` au lieu de
+ * `videos`. Normalisé ici, une seule fois, pour que le reste de l'app ne
+ * connaisse plus que la forme `videos`.
+ */
+interface RawVideoChapitre {
+  numero: number;
+  titre_chapitre: string;
+  videos?: Record<string, string> | null;
+  video_url_fr?: string | null;
+  video_url_en?: string | null;
+}
+
+function normalizeVideoChapitre(raw: RawVideoChapitre): VideoChapitre {
+  const videos: Record<string, string> = { ...(raw.videos ?? {}) };
+  if (raw.video_url_fr && !videos.fr) videos.fr = raw.video_url_fr;
+  if (raw.video_url_en && !videos.en) videos.en = raw.video_url_en;
+  return { numero: raw.numero, titre_chapitre: raw.titre_chapitre, videos };
+}
 
 let cache: Heros[] | null = null;
 let inflight: Promise<Heros[]> | null = null;
@@ -19,7 +43,10 @@ async function fetchHeroes(): Promise<Heros[]> {
   if (error) {
     throw new Error(`Impossible de charger les héros depuis Supabase : ${error.message}`);
   }
-  const heroes = (data ?? []) as Heros[];
+  const heroes = (data ?? []).map((row) => ({
+    ...row,
+    video_chapitres: ((row.video_chapitres ?? []) as RawVideoChapitre[]).map(normalizeVideoChapitre),
+  })) as Heros[];
   // Filtré côté client, pas dans la requête Supabase : reste compatible même
   // si backoffice/supabase/schema-admin-heros.sql n'a pas encore été exécuté
   // par Yannick (colonne absente -> traité comme publié, comportement

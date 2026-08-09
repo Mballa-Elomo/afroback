@@ -25,16 +25,48 @@ export interface ChapitreStoryboard {
 /**
  * Miroir de `HeroVideoChapitreMedia` (mobile-app/src/data/heroes.media.ts) et
  * de la colonne jsonb `heros.video_chapitres` (déjà en base, voir
- * supabase/seed.sql). Un héros peut n'avoir aucune entrée (tableau vide,
- * cas de 8 des 9 héros à ce jour) ou une entrée par chapitre réellement
- * produit — pas forcément les 4. `video_url_fr`/`video_url_en` sont
- * indépendants : un chapitre peut avoir la FR sans l'EN.
+ * supabase/seed.sql). Un héros peut n'avoir aucune entrée (tableau vide) ou
+ * une entrée par chapitre réellement produit — pas forcément les 4.
+ * `videos` est une map code langue -> URL (ex. `{ fr: "...", en: "..." }`),
+ * pas des colonnes fixes `video_url_fr`/`video_url_en` : le nombre de
+ * langues gérées est piloté par `lib/langues.ts` (LANGUES_VIDEO), pas par le
+ * schéma. Chaque code de langue est indépendant des autres (un chapitre peut
+ * avoir le FR sans l'EN, etc.).
  */
 export interface VideoChapitreAdmin {
   numero: number;
   titre_chapitre: string;
-  video_url_fr?: string;
-  video_url_en?: string;
+  videos?: Record<string, string>;
+}
+
+/**
+ * Forme brute possible d'un chapitre vidéo tant que
+ * `mobile-app/supabase/migration-video-chapitres-multilangue.sql` n'a pas
+ * été exécutée par Yannick : encore les anciennes clés fixes
+ * `video_url_fr`/`video_url_en` au lieu de `videos`. Sans cette
+ * normalisation à la lecture, `heroHasMedia`/`ChapterVideoGrid` ne
+ * regardaient QUE `videos` (absent tant que la migration n'a pas tourné) et
+ * affichaient "À PRODUIRE" pour des vidéos pourtant bien en ligne — bug
+ * réel constaté par Yannick le 2026-08-09, corrigé ici en miroir de
+ * `normalizeVideoChapitre` côté app mobile (heroesRepository.ts).
+ */
+interface RawVideoChapitreAdmin {
+  numero: number;
+  titre_chapitre: string;
+  videos?: Record<string, string> | null;
+  video_url_fr?: string | null;
+  video_url_en?: string | null;
+}
+
+function normalizeVideoChapitreAdmin(raw: RawVideoChapitreAdmin): VideoChapitreAdmin {
+  const videos: Record<string, string> = { ...(raw.videos ?? {}) };
+  if (raw.video_url_fr && !videos.fr) videos.fr = raw.video_url_fr;
+  if (raw.video_url_en && !videos.en) videos.en = raw.video_url_en;
+  return { numero: raw.numero, titre_chapitre: raw.titre_chapitre, videos };
+}
+
+function normalizeHeroVideoChapitres<T extends { video_chapitres?: unknown }>(row: T): T {
+  return { ...row, video_chapitres: ((row.video_chapitres ?? []) as RawVideoChapitreAdmin[]).map(normalizeVideoChapitreAdmin) };
 }
 
 export interface HerosAdmin {
@@ -85,13 +117,13 @@ const LIST_COLUMNS =
 export async function getHeroesAdmin(): Promise<HerosListItem[]> {
   const { data, error } = await getSupabaseAdmin().from('heros').select(LIST_COLUMNS).order('ordre_affichage', { ascending: true });
   if (error) throw new Error(`Impossible de charger les héros : ${error.message}`);
-  return (data ?? []) as unknown as HerosListItem[];
+  return ((data ?? []) as unknown as HerosListItem[]).map(normalizeHeroVideoChapitres);
 }
 
 export async function getHeroBySlugAdmin(slug: string): Promise<HerosAdmin | null> {
   const { data, error } = await getSupabaseAdmin().from('heros').select('*').eq('slug', slug).maybeSingle();
   if (error) throw new Error(`Impossible de charger ce héros : ${error.message}`);
-  return (data as HerosAdmin | null) ?? null;
+  return data ? normalizeHeroVideoChapitres(data as HerosAdmin) : null;
 }
 
 /**
@@ -124,7 +156,7 @@ export function heroHasMedia(h: HerosListItem) {
   // "chapitres") — les deux modèles s'excluent côté app (voir video.tsx),
   // mais côté statut de production, les deux comptent comme "il y a une
   // vidéo à voir".
-  const hasChapterVideo = (h.video_chapitres ?? []).some((c) => c.video_url_fr || c.video_url_en);
+  const hasChapterVideo = (h.video_chapitres ?? []).some((c) => Object.values(c.videos ?? {}).some(Boolean));
   return {
     recitFr: !!h.recit_fr_texte,
     recitEn: !!h.recit_en_texte,

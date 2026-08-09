@@ -78,14 +78,20 @@ export interface RecitChapitre {
  * `chapitres_storyboard` (l'avant-goût dessiné, toujours disponible pour les
  * 9 héros). Un héros peut avoir 1 à 4 chapitres vidéo produits sans avoir
  * les 4 : `video_chapitres` ne contient que ceux qui existent réellement.
- * Une seule URL par langue (pas de doublon de texte à traduire comme pour
- * `RecitChapitre`) : la vidéo est la même bande, seule la piste diffère.
+ * `videos` est une map code langue -> URL (ex. `{ fr: "...", en: "..." }`),
+ * pas des colonnes fixes FR/EN — le nombre de langues gérées grandit sans
+ * changement de schéma (voir backoffice/lib/langues.ts, LANGUES_VIDEO). Une
+ * seule URL par langue par chapitre (pas de doublon de texte à traduire
+ * comme pour `RecitChapitre`) : la vidéo est la même bande, seule la piste
+ * diffère. `heroesRepository.ts` normalise à la lecture les lignes encore au
+ * format historique (`video_url_fr`/`video_url_en`) vers `videos` — ce type
+ * ne représente que la forme déjà normalisée, consommée par le reste de
+ * l'app.
  */
 export interface VideoChapitre {
   numero: number;
   titre_chapitre: string;
-  video_url_fr?: string | null;
-  video_url_en?: string | null;
+  videos?: Record<string, string> | null;
 }
 
 export interface Heros {

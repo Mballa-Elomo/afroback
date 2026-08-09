@@ -8,11 +8,11 @@ import { getHeroBySlugAdmin } from '@/lib/data/heros';
 import { SLOT_COLUMN, describeError, upsertChapterEntry, type MediaSlot, type VideoLang } from '@/lib/uploadMedia';
 
 /**
- * Server Actions restantes pour la fiche héros : métadonnées, retrait de
- * média, titre de chapitre — tous des payloads courts (texte/JSON), jamais
- * un fichier. L'upload de fichier réel (photo/audio/vidéo) est passé en
- * Route Handler (`app/api/heros/[slug]/media/route.ts` et
- * `.../chapter-video/route.ts`, logique dans `lib/uploadMedia.ts`) — voir
+ * Server Actions restantes pour la fiche héros : métadonnées, récit,
+ * retrait de média, titre de chapitre — tous des payloads courts
+ * (texte/JSON), jamais un fichier. L'upload de fichier réel (photo/audio/
+ * vidéo) est passé en Route Handler (`app/api/heros/[slug]/media/route.ts`
+ * et `.../chapter-video/route.ts`, logique dans `lib/uploadMedia.ts`) — voir
  * backoffice/README.md pour la raison (bug d'upload via Server Action
  * multipart, corrigé le 2026-08-06).
  */
@@ -47,6 +47,38 @@ export async function saveMetadata(slug: string, formData: FormData): Promise<{ 
   } catch (e) {
     return { error: describeError(e) };
   }
+}
+
+/**
+ * Corrige le texte publié d'un récit (FR ou EN) depuis la fiche héros. Le
+ * pipeline éditorial (agents griot/storyboard, `Récits africains/*.md`) reste
+ * la source de création — cette action ne touche que la version stockée dans
+ * `heros.recit_fr_texte`/`recit_en_texte` (celle réellement affichée par
+ * l'app mobile), jamais les fichiers du pipeline.
+ */
+export async function saveRecit(slug: string, lang: 'fr' | 'en', texte: string): Promise<{ error: string | null }> {
+  const admin = await requireAdmin();
+  if (!admin) return { error: 'Non autorisé.' };
+
+  const trimmed = texte.trim();
+  if (lang === 'fr' && !trimmed) return { error: 'Le récit FR ne peut pas être vide.' };
+
+  const hero = await getHeroBySlugAdmin(slug);
+  if (!hero) return { error: 'Héros introuvable.' };
+
+  const column = lang === 'fr' ? 'recit_fr_texte' : 'recit_en_texte';
+  const value = lang === 'en' && !trimmed ? null : trimmed;
+
+  const { error } = await getSupabaseAdmin()
+    .from('heros')
+    .update({ [column]: value })
+    .eq('slug', slug);
+  if (error) return { error: error.message };
+
+  await logActivity(admin.email, `A modifié le récit ${lang.toUpperCase()} de « ${hero.nom_affiche} »`);
+  revalidatePath(`/heros/${slug}`);
+  revalidatePath('/heros');
+  return { error: null };
 }
 
 /**
@@ -94,8 +126,9 @@ export async function removeChapterVideo(slug: string, chapterNum: number, lang:
   const index = list.findIndex((c) => c.numero === chapterNum);
   if (index === -1) return;
 
-  if (lang === 'fr') delete list[index].video_url_fr;
-  else delete list[index].video_url_en;
+  const videos = { ...(list[index].videos ?? {}) };
+  delete videos[lang];
+  list[index] = { ...list[index], videos };
 
   const { error } = await getSupabaseAdmin().from('heros').update({ video_chapitres: list }).eq('slug', slug);
   if (error) throw new Error(error.message);

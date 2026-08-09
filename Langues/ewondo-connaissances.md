@@ -807,7 +807,7 @@ Phrases utiles (dialogue "La maladie") : Makon = je suis malade. Makon á nlò, 
 
 Note : ce tableau récapitule le §1.10bis (numéraux avec accord de classe complet) sous forme de radicaux nus, pour un accès rapide lors des traductions.
 
-### 2.12 Notes culturelles et vocabulaire glanés dans le dictionnaire Tsala (1955), échantillonnage p.21-700 (couvre tout l'alphabet, de A à Z)
+### 2.12 Notes culturelles et vocabulaire glanés dans le dictionnaire Tsala (1955), échantillonnage p.9-703 (couvre tout l'alphabet, de A à Z)
 
 Le dictionnaire Tsala est beaucoup plus riche que la Grammaire 1930 : chaque entrée est accompagnée d'exemples de phrases et souvent de notes ethnographiques. Quelques éléments notables trouvés lors de l'échantillonnage (voir répartition exacte en section 4) :
 
@@ -883,6 +883,178 @@ Le dictionnaire Tsala est beaucoup plus riche que la Grammaire 1930 : chaque ent
 | Goût / nostalgie | Zám | Zám nnam : nostalgie, littéralement "goût de chez soi". Très évocateur pour le thème racines/patrimoine d'AFROBACK. | Tsala 1955, p.697-700 |
 | Raphia | Zam | Palmier dont les feuilles servent à tresser des nattes de toiture ; la branche sert aussi à fabriquer un instrument de musique à cordes. | Tsala 1955, p.697-700 |
 | Milieu / minuit | Zăń | A zăń : au beau milieu. Ai zăń na : à minuit. | Tsala 1955, p.697-700 |
+
+Nouvelles entrées (densification de l'échantillonnage, sondages intercalaires) :
+
+| Français | Éwondo | Note | Source |
+|---|---|---|---|
+| Nouveau village / campement de pêche | Aban | Singulier rare de "meban". | Tsala 1955, p.19 |
+| Omoplate | Aban | Os de l'épaule (homonyme du précédent, classe différente). | Tsala 1955, p.19 |
+| Iroco (arbre à bois de meuble) / loutre | Abań | Confirme l'iroco déjà relevé dans la Grammaire 1930 (a-bañ, §34). Le même mot désigne aussi la loutre, et par néologisme le "village". | Tsala 1955, p.19 |
+| Jalousie / amour inquiet | Abán | Suń abán : jalouser. Fam abán yabō mam ané móngō : le mari jaloux fait comme un enfant. | Tsala 1955, p.19 |
+| Campement de chasse ou de pêche (hutte provisoire) | Abanda | Hutte où les chasseurs ou pêcheurs couchent et font sécher la viande ou le poisson aussi longtemps qu'ils restent en brousse. | Tsala 1955, p.19-20 |
+| Invitation | Abándá | — | Tsala 1955, p.20 |
+| Genou | Abóń | Kud abóń : faire la génuflexion ; par extension, faire des platitudes, s'appliquer de son mieux. | Tsala 1955, p.29 |
+| Source (d'un cours d'eau) | Aboń | Nlōn óné aboń á Abóng-Mbań : le Nyong a sa source à Abong-Mbang. | Tsala 1955, p.29 |
+| Gris-gris / talisman | Abub | — | Tsala 1955, p.29 |
+| Ventre / grossesse | Abum | Ngál ané abum : sa femme est enceinte. Bíné abum da : nous sommes de même mère (litt. "nous sommes du même ventre"). | Tsala 1955, p.30 |
+| Retour / rentrée chez soi | Abúlán | — | Tsala 1955, p.30 |
+| Nourriture du bétail / pâturage | Adíga | Kë ai biyém á adíga : amener les bestiaux au pâturage. | Tsala 1955, p.31 |
+| Procès / conflit | Adzò | Búg adzò : calomnier. Kúli adzò : réviser un procès, en appeler à un tribunal supérieur. | Tsala 1955, p.32 |
+| Mariage | Alúg | Alúg mvōl : mariage d'échange. | Tsala 1955, p.48 |
+| Joue | Amáń | Olún mémán : colère sans effet (litt. colère de la joue). | Tsala 1955, p.49 |
+| Jour / journée | Amoó / Amōs | Sóndō abelë memŏs bísié mé saman : la semaine a six jours de travail. | Tsala 1955, p.49 |
+| Amitié | Amvóé | Ángátári á ngul ávōd : l'amitié a pour point de départ un petit service rendu. | Tsala 1955, p.50 |
+| Stoïcisme / courage inébranlable | Amvën | Dérivé de mven (courage). Ebumeñén, adzogó a mfóm ndóan, te tad : courage stoïque qui ne gémit devant nulle calamité. | Tsala 1955, p.50 |
+| Treillage mortuaire | Anág | Où l'on dépose des objets censés pouvoir servir au défunt. | Tsala 1955, p.50 |
+| Salive | Anden | Kōbō anden te ku a si : parler sans arrêt (litt. "sans que la salive tombe à terre"). | Tsala 1955, p.50-51 |
+| Manguier | Andōg | Genre d'anacardiacées "mangifera indica". Ebuma andōg : mangue. | Tsala 1955, p.51 |
+| Filet de pêche / piège | Aya | Piège quelconque. | Tsala 1955, p.71 |
+| Difficulté | Ayé | Áně ayé nâ mod adzoge nnom fúlú : il est difficile de se corriger d'une vieille coutume. | Tsala 1955, p.72 |
+| Deuil | Ayeb | — | Tsala 1955, p.72 |
+| Visite (mercantile) / voyage | Ayĕń | — | Tsala 1955, p.73 |
+| Amitié / reconnaissance | Ayemán | Lálod avúman : l'amitié l'emporte sur la parenté. | Tsala 1955, p.73 |
+| Vieillesse | Ayŏm | Ósíki ai mebálá : on ne soigne pas la vieillesse, pas de médicament contre la vieillesse. | Tsala 1955, p.74 |
+| Clan | Ayom | Groupe social de plusieurs familles ; tribu dont les descendants sont issus d'un même ancêtre peu lointain. | Tsala 1955, p.74 |
+| Tribu / nation / pays | Ayōń | Aussi : espèce, sorte. | Tsala 1955, p.74 |
+| Amertume | Ayol | Ayol mboń : manioc amer. | Tsala 1955, p.74 |
+| Bible / Écriture Sainte | Bíbel | Aně födzoe nâ Mfufub Ntilán : la Bible est aussi appelée l'Écriture Sainte. | Tsala 1955, p.94 |
+| Perfidie / déloyauté | Bidzabí | Mod bidzabí te sóan mgba : l'homme déloyal ne saurait être bon ami. | Tsala 1955, p.95 |
+| Pardon | Bidzugá | Dérivé de dzu (pardonner). | Tsala 1955, p.96 |
+| Enfanter / engendrer | Bié | Maria angá bié Yesu : Marie enfanta Jésus. Yákob angábié bón 12 : Jacob engendra douze fils. | Tsala 1955, p.96 |
+| Puiser (de l'eau) | Bied | Bied mendim á osóé : puiser l'eau à la rivière. | Tsala 1955, p.96 |
+| Rhum / boisson alcoolisée | Bilám | Emprunt à l'anglais "rum" ; désigne l'alcool de traite. | Tsala 1955, p.97 |
+| Cadeau | Dás | Dázi : donner, faire un cadeau. | Tsala 1955, p.119 |
+| Chance / aubaine | Deg | Yen deg : avoir de la chance ; être mis en appétit. | Tsala 1955, p.119 |
+| Œil | Di | Aussi "grain" (di fon : grain de maïs) et "foyer" (télě mvié á di : mettre une marmite au foyer). Confirme le "Dis" déjà relevé (Grammaire 1930, §2.7). | Tsala 1955, p.120 |
+| Cher / d'un prix élevé | Dia | Emprunt à l'anglais "dear". | Tsala 1955, p.120 |
+| Se manger mutuellement (entre bêtes de même espèce) | Dian | Zě zě yákar ki dian : les léopards ne se mangent pas entre eux. | Tsala 1955, p.120 |
+| Nom | Dzoe | Onë dzoa yá ? : quel est ton nom ? (homonyme de "nez", même mot). | Tsala 1955, p.140 |
+| Nager | Dzōg | Kōs ya dzōg á mendím : le poisson nage dans l'eau. | Tsala 1955, p.140 |
+| Laisser / abandonner / renoncer | Dzoge | — ai mvus mō : abandonner complètement. | Tsala 1955, p.140 |
+| Chose / article de commerce / poison | Dzōm | Biem binë á bifatsilá abui : beaucoup d'articles de commerce se trouvent dans les boutiques. Bengávë ñe dzōm á meyōg : on lui a donné du poison dans le vin de palme. | Tsala 1955, p.141 |
+| Réserve de chasse (portion de brousse encerclée par des rabatteurs) | Dzu | — | Tsala 1955, p.143 |
+| Plaider / plaidoyer | Dzōs | Emprunt à l'anglais "sue" (poursuivre en justice). | Tsala 1955, p.143 |
+| Souris | Edu | Edu ngila : cochon d'Inde, cobaye. | Tsala 1955, p.164 |
+| Robe | Edud | Edud fada : soutane. | Tsala 1955, p.164 |
+| Bruit / vacarme | Edũń | Zōg yaduń a nka, nkoe : chant de victoire au jeu de sōngō. | Tsala 1955, p.165 |
+| Enterrement | Edzeb mbim | — | Tsala 1955, p.165 |
+| Grande pêche organisée (traditionnelle) | Edzeñeń | Pour la faire, on reste dans un campement après avoir accroché, le long d'un cours d'eau, des hameçons qu'on va inspecter de temps à autre. | Tsala 1955, p.165 |
+| Autorité / commandement | Edzóe | Dérivé de dzoe (commander). | Tsala 1955, p.166 |
+| Cadeau / présent / don | Efâ | — | Tsala 1955, p.166 |
+| Factorerie / boutique | Efatsilá | — | Tsala 1955, p.167 |
+| Emplacement (d'un édifice, village ou domicile disparu) | Elig | Elig nda : l'ancienne place d'une case. | Tsala 1955, p.187 |
+| Île | Elŏn | Fernando-Poo ane elŏn : Fernando-Poo est une île. | Tsala 1955, p.189 |
+| Anneau / bague / alliance | Elondé | Elondé alug : alliance (bague de mariage). | Tsala 1955, p.189 |
+| Musc | Elud | Substance très odorante que l'animal vulgairement dit "zoe" (civette) porte dans une poche sous le ventre. | Tsala 1955, p.189 |
+| Appartement privé (d'une épouse favorite) | Elum | Mkpĕg mininga wō fém tōbō a elum : la femme favorite d'un polygame reste d'habitude dans un appartement privé. | Tsala 1955, p.190 |
+| Oppression / injustice | Emân | Dérivé de mân (opprimer). | Tsala 1955, p.190 |
+| Chasse à l'affût | Etág | On se camoufle sur un arbre pour mieux tirer sur les animaux qui viennent en manger les fruits en dessous. | Tsala 1955, p.212 |
+| Source | Etam | — | Tsala 1955, p.212 |
+| Solitude / seul | Etám | — | Tsala 1955, p.212 |
+| Lac | Etetag | Mendim metemë a etetag : l'eau est stagnante dans le lac. | Tsala 1955, p.214 |
+| Mare (d'eau) | Etembég | Etembég mendim : mare d'eau. | Tsala 1955, p.214 |
+| Cheptel confié à l'entretien d'un autre | Etele | Mise des bestiaux à l'entretien d'un autre. Syn. Etié. | Tsala 1955, p.214 |
+| Multitude | Etib | — | Tsala 1955, p.214 |
+| Fois / compagnon, ami | Eyōń | Biyōń biawulu eyōń : les amis marchent ensemble. Kë biyōń bi kundug : aller un à un. | Tsala 1955, p.234 |
+| Vaine gloire / ostentation | Ezamba | Bedzedză be bod babō bizamba : les plats personnages se rendent coupables de vaine gloire. | Tsala 1955, p.234 |
+| Milieu | Ezézań | A ezézań nsamba : au milieu du rang. | Tsala 1955, p.235 |
+| Douceur / doux / sucré | Ezezōg | Woe onë ezezōg : le miel est sucré. Ezezōg nkōbō : langage séduisant. | Tsala 1955, p.235-236 |
+| Caisse / malle / cercueil | Ezímbi | Ezímbi mbim : cercueil. | Tsala 1955, p.236 |
+| Sabre d'abatis / machette / coupe-coupe | Fa | Emprunt au sango "fa" (couper). | Tsala 1955, p.236 |
+| Commun / consanguinité | Fulá | Meki fulá : consanguinité. | Tsala 1955, p.258 |
+| Coutume / habitude | Fúlú | Eyegan fúlú yawoe biyōń : l'ignorance des coutumes détruit les amitiés. Aussi : manie, tic. | Tsala 1955, p.258 |
+| Kolatier / noix de kola | Góró | Emprunt au haoussa "goro" ; introduit dans le territoire des Ewondo par les Haoussa (aussi appelé "abel awusa"). | Tsala 1955, p.259-260 |
+| Rive / bord d'un cours d'eau | Kíndig | — | Tsala 1955, p.281 |
+| Persévérance / application | Kó | Ve kó : persévérer, s'appliquer. | Tsala 1955, p.281 |
+| Croix | Klos | Emprunt à l'allemand "kreuz". Bede klos : faire le signe de croix. | Tsala 1955, p.281 |
+| Rassembler / se réunir | Kóan | Kóan akuma : amasser des richesses. Bod ba kóan a nseń : les hommes se réunissent à la cour. | Tsala 1955, p.282 |
+| Tasse | Kōb | Emprunt à l'anglais "cup". Ntom kōb : casquette. | Tsala 1955, p.282 |
+| Armoire | Kōbōdō | Emprunt à l'anglais "cupboard". | Tsala 1955, p.283 |
+| Lire / compter | Láń | Láń kalara : lire un livre. Láń mes : dire la messe. Láń bōngō be zikulu : compter les écoliers. | Tsala 1955, p.308 |
+| Persévérer | Lañan | Abui beengeles benga lañan betoa mbeń : beaucoup d'anges ont persévéré dans le bien. | Tsala 1955, p.308 |
+| Raconter (des histoires) | Lê | Lê minlañ : raconter des histoires. Mot particulièrement pertinent pour le pilier Histoires & Héros, à rapprocher de "Nlań" (histoire/récit) déjà relevé. | Tsala 1955, p.309 |
+| Bercer / endormir | Lē | Lē mōn a oyoa : endormir un enfant. | Tsala 1955, p.309 |
+| Deviser / s'entretenir familièrement | Léan | Mfañ mod wakar ki léan ai akukud : un homme sérieux ne s'entretient pas familièrement avec les hommes mal équilibrés. | Tsala 1955, p.309 |
+| Conseiller / exhorter | Léb | Léb zen : indiquer le chemin. | Tsala 1955, p.309 |
+| Médecin | Mbébálá | Litt. "l'homme aux médicaments". | Tsala 1955, p.329 |
+| Padouk (arbre à bois de cœur rouge vif corail) | Mbel | Les Ewondo en tirent une poudre rouge dite "bâ", d'un usage fréquent dans les fétiches. | Tsala 1955, p.329-330 |
+| Mort naturelle (par opposition à la mort tragique, dite "awu eka") | Mbembé | — | Tsala 1955, p.330 |
+| Héros | Mbén | Homme de grande valeur. Mot directement pertinent pour le pilier Histoires & Héros. | Tsala 1955, p.330 |
+| Bonté / beauté | Mbëń | — | Tsala 1955, p.330 |
+| Cri de triomphe / invocation | Mbéngé | Par ce cri, on fait hommage à l'être interpellé, de l'action éclatante qu'on vient d'accomplir. Aussi : invocation dans la douleur. | Tsala 1955, p.331 |
+| Sorcier / guérisseur | Mbibián | Dérivé de bi (tenir) et bián (recette magique). | Tsala 1955, p.332 |
+| Guide | Mbigili | — | Tsala 1955, p.332 |
+
+Proverbe relevé sous l'entrée "abum" (ventre, p.30) : "Okónón á abum ; oyemeń ó dzom odi" = tout mal de ventre doit pouvoir s'expliquer. Sens donné par le dictionnaire : la conviction de la culpabilité adoucit les rigueurs des sanctions encourues.
+
+Proverbe relevé sous l'entrée "abub" (gris-gris, p.29) : "Mbán nsom óngáwóě măn ngŏm mebub á añu" = une application exagérée à la chasse a tué un petit porc-épic à la barbe hirsute. Sens donné par le dictionnaire : une trop grande contention crée des ennuis.
+
+Proverbe relevé sous l'entrée "adzúg" (trouble, p.32) : "É ototóñ óně adzúg ñu, ye zōg ené á akoé" = pareil effet suppose une grande cause.
+
+Proverbe relevé sous l'entrée "amáń" (joue, p.49) : "Afúb mémán, tō oné átěg, vë okúlú nsöl" = il n'y a pas de paresseux à table.
+
+Formule rituelle relevée sous l'entrée "aluga" (p.48), tradition orale non vérifiée : formule de bénédiction que les femmes prononcent à la naissance d'un enfant, pour lui souhaiter chance et prospérité : "Asô, aluga, hé héé... hē" = qu'on vienne de partout, qu'on se retire, répandant en tout lieu ta bonne nouvelle. À recouper avant tout usage éditorial (pilier Découverte).
+
+Expression relevée sous l'entrée "andié" (poteau, p.51) : "Ye biabegë andié nkōl" = nous ne sommes pas tenus à marcher toujours ensemble (litt. "sommes-nous attachés à un poteau télégraphique ?").
+
+Proverbe relevé sous l'entrée "ayĕń" (visite, voyage, p.73) : "Bombo te dígan á ayĕń" = la guêpe n'attaque pas lorsqu'elle voyage. Sens donné par le dictionnaire : on ne doit pas se montrer exigeant dans un lieu de passage.
+
+Proverbe relevé sous l'entrée "ayol" (amertume, p.74) : "Mod ăwog mboń ayol á éză añu" = on s'inquiète peu de la mauvaise situation du voisin.
+
+Proverbe relevé sous l'entrée "bidza" (critique, p.95) : "Mboán dzam óně aye, bidza ebubu" = la critique est aisée, l'art difficile. Équivalent exact du proverbe français bien connu.
+
+Expression relevée sous l'entrée "bidzo" (reproches, p.95-96) : "Mod âbebegë bidzo á mvús, bingásó obegë á nló, nñie ané bádzudzumelan ai wa, otsáñéndá á si" = il ne faut pas porter les reproches sur le dos (à l'aide de bretelles difficiles à enlever), mais sur la tête, de façon à les rejeter à la première observation, avant que tout le monde ait eu le temps de vous identifier.
+
+Expression relevée sous l'entrée "bíe" (suivre, p.96) : "Mendim má bíe mbăn akŏg" = bon chien chasse de race (litt. "l'eau qui suit chasse le porc-épic de race").
+
+Proverbe relevé sous l'entrée "di" (manger, p.120) : "Mvu éngámán ntu avōd ngaman ai ntu ekob" = si le plus fort est ainsi traité, que sera-t-il du faible.
+
+Proverbe relevé sous l'entrée "dzoge" (laisser/abandonner, p.140) : "Bâ dzoge măn kub, afónán" = on ne doit pas renoncer à une entreprise tant qu'il y a encore une once d'espoir. Belle maxime de persévérance, candidate pour une section sagesse du site AFROBACK.
+
+Proverbe relevé sous l'entrée "edu" (souris, p.164) : "edaña osoe, entoa nkanañ" = on se révèle petit en dehors de sa spécialité.
+
+Proverbe relevé sous l'entrée "eféb" (contrôle/expérimentation, p.167) : "ngul éngatari a bivoé" = c'est par les jeux qu'on expérimente la force de son ami.
+
+Note ethnographique (pratique historique rapportée par le dictionnaire, avec référence bibliographique externe citée par l'auteur : A. M. Vergiat, "Les rites secrets des primitifs de l'Oubangui", p.67 et 161 ; à recouper avant tout usage éditorial, sujet sensible) : l'entrée "elon" (arbre à bois très dur, "erythrophlaeum guineense", p.188-189) décrit un arbre d'usage fréquent chez les féticheurs/sorciers (feuilles réduites en poudre utilisées comme tabac à priser par les néophytes lors des rites, gui suspendu à la porte pour effrayer l'esprit sorcier). L'auteur rapporte aussi que, chez les Ewondo, l'écorce vénéneuse de cet arbre était employée en ordalie (épreuve judiciaire) : celui qui niait le crime dont on l'accusait devait avaler des boulettes de cette écorce ; s'il vomissait, on proclamait son innocence et le plaignant devait le payer pour calomnie ; s'il ne vomissait pas, il était déclaré coupable et traité en conséquence.
+
+Note ethnographique (coutume rapportée par le dictionnaire, tradition orale non vérifiée) : l'entrée "elōm-zōg" (p.188) mentionne une danse des braves appelée elōm-zōg, et rapporte que, "sous le système du droit du plus fort", on ne pouvait traverser la cour où se dansait l'elōm-zōg sans avoir payé un droit de passage.
+
+Note ethnographique (jeu d'enfants traditionnel décrit par le dictionnaire) : l'entrée "etá" (p.212) décrit un jeu où deux enfants trépignent à petits pas l'un devant l'autre ; à un signal, l'attaquant lève le pied et marque un point si l'attaqué ne lève pas le pied qui lui fait face ; l'attaqué perd la partie après trois victoires consécutives de l'attaquant. Bonne piste pour une fiche "jeux traditionnels" du pilier Découverte.
+
+Expression relevée sous l'entrée "été" (dans/dedans, p.213) : "man kub awōag a ebalega bikōn, ngë bedi bikōn ai dze" = si un poulet n'était pas mort au nettoyage des bananiers, avec quoi aurait-on mangé des bananes ? Sens donné par le dictionnaire : qu'aurait-on fait sans cet événement opportun ?
+
+Note ethnographique (confirme et prolonge la note déjà relevée sous "evin", tradition orale non vérifiée, sujet sensible) : l'entrée "etĕg" (boue, terre humide, p.213) illustre le mot par "Minkus miawōbō etĕg" = des veuves se vautrent dans la boue, en écho à la pratique de deuil des veuves déjà notée plus haut dans ce fichier.
+
+Proverbe relevé sous l'entrée "fa" (machette, p.236) : "yăbaba nkel woe" = nul n'est bon juge dans sa propre cause. Équivalent de la maxime latine "Nemo judex in causa sua", bon candidat pour une section sagesse du site AFROBACK.
+
+Maximes relevées sous l'entrée "eyōń" (compagnon/ami, p.234) : "eyōń mvén ban ntoto" = amitié factice où l'on ne cherche que l'occasion de nuire plus sûrement ; "eyōń bod bela, nwom mesol mbōg" = toute société admet la hiérarchie.
+
+Expression relevée sous l'entrée "ezezōg" (douceur/sucré, p.236) : "etoa engawoe Bidzana-bi-si-loo" = l'abus de bonnes choses est nuisible.
+
+Proverbe relevé sous l'entrée "fúlú" (coutume/habitude, p.258) : "Eyegan fúlú yawoe biyōń" = l'ignorance des coutumes détruit les amitiés.
+
+Note ethnographique (fragment de rituel oral rapporté par le dictionnaire sous l'interjection "he", p.261, tradition orale non vérifiée, probablement liée à une annonce funéraire) : dialogue rituel d'interpellation collective : "A Ewondo ya miyada a mbë si, miwog a ?" = Ô vous tous, hommes de la tribu Ewondo qui êtes sous l'auvent, me comprenez-vous ? — réponse unanime : "Adzebe" (oui). Puis : "wō ontag ; wō ontag" = il est enterré, et pour sûr, il est enterré, et pour sûr. Que la main se réjouisse, que la main soit dans la joie. À recouper avec une source ethnographique dédiée avant tout usage éditorial (pilier Découverte, rites funéraires).
+
+Proverbe relevé sous l'entrée "kíndig" (rive, p.281) : "osoe ebë yakeke mbōdōg" = la réconciliation est impossible quand chacun des deux plaignants ne veut aucune concession.
+
+Proverbe relevé en tête de page 281 (entrée précédente non capturée dans cet échantillon) : "obem ban ngal" = une contradiction implique une fausseté, un mensonge.
+
+Proverbe relevé sous l'entrée "mbel" (padouk, p.330) : "Mebai me mbel, ovon meki, mbel meki" = la victoire sur un ennemi redoutable suppose des pertes de part et d'autre.
+
+Proverbe relevé sous l'entrée "mbéndé" (ordre/exhortation, p.331) : "Ongatari a olōń" = de grandes choses commencent petitement.
+
+Note mythologique (tradition orale non vérifiée) : l'entrée "mbekón" (p.329) définit, "en mythologie", une âme réduite à une seule action complète. Terme technique à recouper avec une source ethnographique dédiée avant tout usage éditorial.
+
+Nouveau fragment du cycle de la Tortue, complète les fragments déjà relevés sous "nlag", "dzálan" et "zaméyo" (tradition orale non vérifiée) : l'entrée "mbiámndzótsóli" (colibri, "bec-fleurs", p.331) rapporte que dans les fables indigènes, cet oiseau passe pour un féticheur, un devin, un grand diseur d'avenir qu'on doit consulter sur les moyens à prendre pour le dénouement de graves difficultés. "C'est ainsi que la tortue alla le consulter sur les moyens de réaliser les conditions indispensables pour pouvoir se marier avec la fille de Zameyo-Mebenga." Ce fragment relie directement le personnage de Zaméyo (chef des mânes, déjà repéré p.699) à un nouvel épisode du cycle de la Tortue : la quête matrimoniale auprès de la fille de Zameyo-Mebenga, avec consultation préalable du colibri-devin. Piste solide pour l'agent griot si un conte de la Tortue est développé.
+
+Note ethnographique (confirme et prolonge la note déjà relevée sous "sô", tradition orale non vérifiée, sujet sensible) : l'entrée "mbíbín" (profane/non initié, p.332) illustre le mot par "mbíbín të yem mam ya esam" = le non initié ne sait pas ce qui se passe dans le camp des initiés, confirmant l'existence d'un système d'initiation à degrés et de secret déjà noté.
+
+Fragment de fable non contextualisé sous l'entrée "afăb" (aile, p.32, coupé en fin de page) : à propos de l'expression "dzoge — dugú" (accorder une légère victoire pour entraîner l'ennemi dans une impasse), le dictionnaire rapporte qu'"on dit que la pie feint la mort, laisse son aile traînante..." (suite non capturée dans cet échantillon, probablement une fable animalière). Piste à recouper si un échantillonnage futur couvre la page 33.
+
+Expression relevée sous l'entrée "abám" (planche, p.18) : "á nda dzoe —, á éză nda, zozoa" = chez toi, tu es comme un épi en formation (modeste), chez autrui, tu te fais un épi développé bien mûr (tu te donnes des grands airs). Expression sur la vantardise, bon candidat pour une section proverbes/expressions du site AFROBACK.
+
+Note ethnographique (pratique médicinale traditionnelle rapportée par le dictionnaire, tradition orale non vérifiée) : l'entrée "abayag" (p.20) décrit un arbrisseau médicinal ("anthocleista vogelii") employé traditionnellement pour plusieurs affections : la raclure de son écorce sur les plaies fraîches, sa moelle légèrement chauffée et pressée sur les yeux contre la conjonctivite, le macéré de son écorce en potion contre la blennorragie, et la raclure de son écorce sur les morsures de serpent. À recouper avec une source ethnobotanique avant tout usage éditorial.
 
 Note ethnographique (à manier avec prudence, tradition orale/pratique ancienne rapportée par le dictionnaire, non vérifiée par recoupement) : l'entrée "sô" (p.575-576) décrit une association traditionnelle d'initiation villageoise réservée aux hommes ("so"), avec plusieurs degrés d'initiation, un lien fort avec le secret et l'organisation sociale du village ; à recouper avec une source ethnographique dédiée avant tout usage éditorial (voir aussi l'agent `afroback-decouverte` pour ce type de contenu, hors périmètre traduction de cette fiche).
 
@@ -1026,4 +1198,4 @@ Phrases complètes tirées du dictionnaire de l'éducation (source : Dictionnair
 - **707330349-Dictionnaire-de-l-education-francais-ewondo.pdf** : lu intégralement (480 entrées numérotées sur 16 pages, copie dupliquée `(1).pdf` ignorée comme demandé). Vocabulaire très majoritairement scolaire/administratif (inspecteur, bulletin, tableau, MINESEC...) ; seule une sélection pertinente pour AFROBACK a été reprise dans le lexique ci-dessus (famille, culture, langues, verbes courants, phrases complètes). Sources citées par ce dictionnaire lui-même : Essono J.M. "Langue et culture ewondo" (2012), Mialaret G. "Vocabulaire de l'éducation" (1979), De Lansheree G. "Dictionnaire de l'évaluation et de la recherche en éducation" (1979), A. Garcia "Dictionnaire savant de l'éducation" (2009).
 - **9782402210997.pdf** : identifié (premières 18 pages lues). Il s'agit de "Nama l'Ewondo", roman d'aventures pour la jeunesse de Jean Kerlyve (1959, Éditions Debresse), qui se déroule dans un village ewondo fictif du Cameroun colonial. **Ce n'est pas un ouvrage linguistique** : aucune grammaire, aucun lexique éwondo, uniquement un récit en français (avec les stéréotypes coloniaux typiques de l'époque sur les populations africaines, à noter si ce texte est un jour réutilisé). Le mot "ewondé"/"ewondo" n'y apparaît que pour désigner la langue/l'ethnie du village. Aucune contribution linguistique retenue de cette source ; lecture non poursuivie au-delà de la vérification de sa nature, le temps de lecture étant mieux investi sur les vrais ouvrages de langue.
 - **800587642-Grammaire-Ewondo-1930.pdf** (219 pages) : **lu en quasi-intégralité** sur les 3 sessions de travail (reprises après coupures réseau). Couverture : phonétique et tons (§7-16), 6 classes nominales (§17-45), toute la morphologie (démonstratifs, possessifs, qualificatifs, numéraux, indéfinis, interrogatifs, pronoms sous toutes leurs formes, §46-74), toute la conjugaison verbale (personnes, temps, modes : indicatif, impératif, subjonctif, continuatif, inceptif, itératif, participe, infinitif, négation, dérivation verbale, §75-100), tous les adverbes/prépositions/conjonctions (§100-111), toute la syntaxe (accord du verbe, article, substantif, adjectif qualificatif/comparatif/superlatif, propositions indépendantes et emploi des modes, proposition relative, complétives, interrogation indirecte, verbes d'opinion/volonté/conseil/désir/défense/crainte/mouvement, propositions circonstancielles complètes : causale, finale, consécutive, concessive, conditionnelle (5 types + négatif), temporelle (antériorité/simultanéité/postériorité), comparative, §112-234), le supplément à la syntaxe (particularités de style, règles de tons dans la conversation, tambour d'appel nkú, ekigá, §235-242). Non retranscrit en détail dans cette fiche (hors périmètre grammaire/lexique, mais lu et localisé pour référence future) : l'appendice littéraire (proverbes, devinettes, fables de la Tortue, poésie, chants, p.161-172). **Intégralement dépouillés et versés au lexique thématique (section 2)** : les 9 dialogues bilingues "Conversations ewondo" (rencontre, visite, voyage, école, travail, repas, service de la maison, marché, maladie, p.173-184) et le lexique Ewondo-Français final (p.185-198, environ 700 entrées, lu intégralement de A à Z). Le lexique inverse Français-Ewondo (p.199-213) n'a pas été relu mot à mot : il contient le même vocabulaire que le lexique Ewondo-Français déjà dépouillé, simplement trié dans l'autre sens.
-- **800587173-Dictionnaire-Ewondo-francais-Tsala-1955.pdf** (720 pages, dictionnaire du R.P. Thomas Tsala) : **échantillonné par 31 sondages répartis sur toute la longueur de l'ouvrage** (densité doublée sur cette 4e session), du tout début (avant-propos, table des préfixes) jusqu'à la toute fin de l'alphabet (lettre Z). Pages PDF lues, dans l'ordre du livre : 9-18 [avant-propos, table des préfixes, orthographe, classification des consonnes, début des entrées A], 23-26, 40-43, 62-65, 85-88, 109-112, 130-133, 156-159, 178-181, 203-206, 225-228, 250-253, 272-275, 297-300, 320-323, 344-347, 367-370, 391-394, 415-418, 438-441, 462-465, 485-488, 510-513, 532-535, 557-560, 579-582, 604-607, 626-629, 650-653, 673-676, 700-703. Au total environ 130 pages lues sur 720 (~18%), couvrant les entrées de la lettre A jusqu'à la lettre Z (nouveaux points de sondage sur cette session, en pages du livre imprimé : 21-24, 38-41, 83-86, 128-131, 176-179, 223-226, 270-273, 318-320+début M, 365-368, 413-416, 460-463, 508-511, 555-558, 600-603, 646-649, 697-700). La toute fin de l'ouvrage (lettre Z, autour de la page 697-700) est désormais couverte, y compris la confirmation du mot Zambá (Dieu) en toute fin d'alphabet. Trop volumineux pour une lecture exhaustive (720 pages de dictionnaire dense, plusieurs entrées par mot avec exemples). Le dictionnaire est nettement plus riche que la grammaire de 1930 : chaque entrée est développée avec plusieurs sens numérotés, des phrases d'exemple en éwondo traduites, et souvent des notes ethnographiques ou des fragments de contes (voir sélection enrichie en section 2.12 : fable de la Tortue et des cornes d'emprunt, divination traditionnelle par mygale, pratiques de deuil des veuves, croyance sur le "evu"/polype-sorcellerie, chef des mânes Zaméyo, proverbes et devinettes). Un échantillonnage encore plus poussé resterait possible dans une session future si Yannick le souhaite, mais la couverture actuelle (environ un cinquième de l'ouvrage, répartie sur tout l'alphabet) donne déjà un aperçu large et représentatif du vocabulaire courant et du contenu ethnographique du dictionnaire.
+- **800587173-Dictionnaire-Ewondo-francais-Tsala-1955.pdf** (720 pages, dictionnaire du R.P. Thomas Tsala) : **échantillonné par 46 sondages répartis sur toute la longueur de l'ouvrage** (densité renforcée sur cette 5e session, 15 nouveaux sondages intercalés dans la première moitié de l'ouvrage), du tout début (avant-propos, table des préfixes) jusqu'à la toute fin de l'alphabet (lettre Z). Pages PDF lues, dans l'ordre du livre : 9-18 [avant-propos, table des préfixes, orthographe, classification des consonnes, début des entrées A], 19-22, 23-26, 31-34, 40-43, 50-53, 62-65, 73-76, 85-88, 96-99, 109-112, 119-122, 130-133, 142-145, 156-159, 166-169, 178-181, 189-192, 203-206, 213-216, 225-228, 236-239, 250-253, 260-263, 272-275, 283-286, 297-300, 308-311, 320-323, 331-334, 344-347, 367-370, 391-394, 415-418, 438-441, 462-465, 485-488, 510-513, 532-535, 557-560, 579-582, 604-607, 626-629, 650-653, 673-676, 700-703. Au total environ 190 pages lues sur 720 (~26%), couvrant les entrées de la lettre A jusqu'à la lettre Z. Les 15 nouveaux sondages de cette session (pages PDF 19-22, 31-34, 50-53, 73-76, 96-99, 119-122, 142-145, 166-169, 189-192, 213-216, 236-239, 260-263, 283-286, 308-311, 331-334) sont intercalés entre les sondages précédents, du début de l'alphabet (lettre A) jusqu'au début de la lettre M, ramenant l'espacement moyen entre sondages à environ 11-12 pages sur cette portion du livre (pages 9 à 347 environ) ; le reste de l'ouvrage (pages 347-720, lettres M à Z) conserve l'espacement plus large (~22-23 pages) des sessions précédentes et reste la priorité pour une densification future. Trop volumineux pour une lecture exhaustive (720 pages de dictionnaire dense, plusieurs entrées par mot avec exemples). Le dictionnaire est nettement plus riche que la grammaire de 1930 : chaque entrée est développée avec plusieurs sens numérotés, des phrases d'exemple en éwondo traduites, et souvent des notes ethnographiques ou des fragments de contes (voir sélection enrichie en section 2.12 : fable de la Tortue et des cornes d'emprunt, divination traditionnelle par mygale, pratiques de deuil des veuves, croyance sur le "evu"/polype-sorcellerie, chef des mânes Zaméyo et nouvel épisode de sa fille convoitée par la Tortue via le colibri-devin, rituel funéraire d'interpellation collective, ordalie traditionnelle par l'écorce de l'arbre "elon", jeu d'enfants traditionnel "etá", proverbes et devinettes nombreux). Un échantillonnage encore plus poussé (notamment sur la seconde moitié de l'ouvrage, lettres M à Z) resterait possible dans une session future si Yannick le souhaite.

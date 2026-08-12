@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /**
  * Génère src/data/mythologie.generated.json à partir des 5 récits mythologiques
- * déjà écrits par l'agent griot (livrables/sites-web/afroback/Récits africains/,
- * fichiers "mythe-...md") et de leurs storyboards (dossier "Récits africains
- * storyboards/").
+ * déjà écrits par l'agent griot (livrables/sites-web/afroback/Mythologie/[slug]/fr.md)
+ * et de leurs storyboards (dossier "Récits africains storyboards/").
  *
  * Contrairement au pipeline héros (build-heroes-data.mjs + heroes.curated.ts,
  * pensé pour 9 récits longs et appelé à grossir), ce pilier ne compte que 5
@@ -33,7 +32,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const RECITS_DIR = join(__dirname, '..', '..', '..', 'Récits africains');
+const MYTHOLOGIE_DIR = join(__dirname, '..', '..', '..', 'Mythologie');
 const OUT_FILE = join(__dirname, '..', 'src', 'data', 'mythologie.generated.json');
 
 const STORAGE_BASE = 'https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/mythologie';
@@ -156,7 +155,7 @@ function parseParagraphs(md) {
 const slugs = Object.keys(MYTHES_CONFIG).sort();
 
 const items = slugs.map((slug, index) => {
-  const filePath = join(RECITS_DIR, `${slug}.md`);
+  const filePath = join(MYTHOLOGIE_DIR, slug, 'fr.md');
   const md = readFileSync(filePath, 'utf8');
   const config = MYTHES_CONFIG[slug];
 
@@ -190,7 +189,7 @@ const items = slugs.map((slug, index) => {
     image_url: MYTHES_MEDIA[slug] ?? null,
     narration_audio_url: null,
     ordre_affichage: index,
-    fichier_source: `livrables/sites-web/afroback/Récits africains/${slug}.md`,
+    fichier_source: `livrables/sites-web/afroback/Mythologie/${slug}/fr.md`,
   };
 
   const missing = ['titre', 'sous_titre', 'peuple', 'region', 'epoque', 'theme'].filter((k) => !item[k]);

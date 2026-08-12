@@ -30,11 +30,11 @@ export const NAV_GROUPS: NavGroup[] = [
     group: 'CONTENU',
     items: [
       { id: 'heroes', icon: '★', label: 'Histoires & Héros', href: '/heros', enabled: true },
-      { id: 'discover', icon: '🧭', label: 'Découverte', enabled: false, lot: 2 },
-      { id: 'mythology', icon: '🌙', label: 'Mythologie', enabled: false, lot: 2 },
-      { id: 'ecole', icon: '🏅', label: 'École des Héros', enabled: false, lot: 2 },
+      { id: 'discover', icon: '🧭', label: 'Découverte', href: '/decouverte', enabled: true },
+      { id: 'mythology', icon: '🌙', label: 'Mythologie', href: '/mythologie', enabled: true },
+      { id: 'ecole', icon: '🏅', label: 'École des Héros', href: '/ecole-heros', enabled: true },
       { id: 'media', icon: '🖼', label: 'Bibliothèque médias', href: '/media', enabled: true },
-      { id: 'translation', icon: '🌐', label: 'Traduction', enabled: false, lot: 2 },
+      { id: 'translation', icon: '🌐', label: 'Traduction', href: '/traduction', enabled: true },
     ],
   },
   {

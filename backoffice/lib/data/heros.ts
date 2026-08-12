@@ -65,7 +65,7 @@ function normalizeVideoChapitreAdmin(raw: RawVideoChapitreAdmin): VideoChapitreA
   return { numero: raw.numero, titre_chapitre: raw.titre_chapitre, videos };
 }
 
-function normalizeHeroVideoChapitres<T extends { video_chapitres?: unknown }>(row: T): T {
+export function normalizeHeroVideoChapitres<T extends { video_chapitres?: unknown }>(row: T): T {
   return { ...row, video_chapitres: ((row.video_chapitres ?? []) as RawVideoChapitreAdmin[]).map(normalizeVideoChapitreAdmin) };
 }
 

@@ -51,7 +51,7 @@ export async function saveMetadata(slug: string, formData: FormData): Promise<{ 
 
 /**
  * Corrige le texte publié d'un récit (FR ou EN) depuis la fiche héros. Le
- * pipeline éditorial (agents griot/storyboard, `Récits africains/*.md`) reste
+ * pipeline éditorial (agents griot/storyboard, `Héros/[slug]/fr.md` et `en.md`) reste
  * la source de création — cette action ne touche que la version stockée dans
  * `heros.recit_fr_texte`/`recit_en_texte` (celle réellement affichée par
  * l'app mobile), jamais les fichiers du pipeline.

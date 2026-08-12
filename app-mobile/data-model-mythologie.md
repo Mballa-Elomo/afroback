@@ -1,6 +1,6 @@
 # Modèle de données — Pilier Mythologie (app mobile AFROBACK)
 
-> Rédigé le 2026-08-05. Construit à partir des 5 récits mythologiques déjà écrits par l'agent griot (`livrables/sites-web/afroback/Récits africains/mythe-*.md`) et de leurs storyboards (`Récits africains storyboards/mythe-*/`), jamais branchés à l'app jusqu'ici. Périmètre : Cameroun uniquement, comme le pilier Découverte.
+> Rédigé le 2026-08-05. Construit à partir des 5 récits mythologiques déjà écrits par l'agent griot (`livrables/sites-web/afroback/Mythologie/[nom-du-mythe]/fr.md`) et de leurs storyboards (`Récits africains storyboards/mythe-*/`), jamais branchés à l'app jusqu'ici. Périmètre : Cameroun uniquement, comme le pilier Découverte.
 
 ---
 

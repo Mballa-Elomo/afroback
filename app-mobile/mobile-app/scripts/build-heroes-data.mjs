@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Génère src/data/heroes.generated.json à partir des récits du griot
- * (livrables/sites-web/afroback/Récits africains/*.md et *-EN.md).
+ * (livrables/sites-web/afroback/Héros/[slug]/fr.md et en.md).
  *
  * Ne parse QUE ce qui est mécaniquement fiable et vérifiable :
  * - le texte intégral du récit (FR + EN)
@@ -24,7 +24,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const RECITS_DIR = join(__dirname, '..', '..', '..', 'Récits africains');
+const RECITS_DIR = join(__dirname, '..', '..', '..', 'Héros');
 const STORYBOARDS_DIR = join(__dirname, '..', '..', '..', 'Récits africains storyboards');
 const OUT_FILE = join(__dirname, '..', 'src', 'data', 'heroes.generated.json');
 
@@ -354,8 +354,8 @@ function splitIntoChapters(texte, anchors, titres, slug, langue) {
 }
 
 function buildOne({ slug }) {
-  const frFile = join(RECITS_DIR, `${slug}.md`);
-  const enFile = join(RECITS_DIR, `${slug}-EN.md`);
+  const frFile = join(RECITS_DIR, slug, 'fr.md');
+  const enFile = join(RECITS_DIR, slug, 'en.md');
 
   const frRaw = readFileSync(frFile, 'utf8');
   const enRaw = readFileSync(enFile, 'utf8');
@@ -380,9 +380,9 @@ function buildOne({ slug }) {
   return {
     slug,
     recit_fr_texte,
-    recit_fr_fichier_source: `livrables/sites-web/afroback/Récits africains/${slug}.md`,
+    recit_fr_fichier_source: `livrables/sites-web/afroback/Héros/${slug}/fr.md`,
     recit_en_texte,
-    recit_en_fichier_source: `livrables/sites-web/afroback/Récits africains/${slug}-EN.md`,
+    recit_en_fichier_source: `livrables/sites-web/afroback/Héros/${slug}/en.md`,
     recit_chapitres_fr: splitIntoChapters(recit_fr_texte, anchors.fr, titres, slug, 'FR'),
     recit_chapitres_en: splitIntoChapters(recit_en_texte, anchors.en, titres, slug, 'EN'),
     frise_chronologique: parseFrise(frRaw),
@@ -396,8 +396,12 @@ function main() {
   const available = new Set(readdirSync(RECITS_DIR));
   const result = {};
   for (const { slug } of KNOWN_SLUGS) {
-    if (!available.has(`${slug}.md`) || !available.has(`${slug}-EN.md`)) {
-      throw new Error(`Fichiers manquants pour le slug "${slug}" dans ${RECITS_DIR}`);
+    if (!available.has(slug)) {
+      throw new Error(`Dossier manquant pour le slug "${slug}" dans ${RECITS_DIR}`);
+    }
+    const filesInSlugDir = new Set(readdirSync(join(RECITS_DIR, slug)));
+    if (!filesInSlugDir.has('fr.md') || !filesInSlugDir.has('en.md')) {
+      throw new Error(`Fichiers fr.md/en.md manquants pour le slug "${slug}" dans ${join(RECITS_DIR, slug)}`);
     }
     result[slug] = buildOne({ slug });
     const frise = result[slug].frise_chronologique.length;

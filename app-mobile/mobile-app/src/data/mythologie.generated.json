@@ -40,7 +40,7 @@
     "image_url": "https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/mythologie/mythe-miengu-esprits-eau-sawa.jpg",
     "narration_audio_url": null,
     "ordre_affichage": 0,
-    "fichier_source": "livrables/sites-web/afroback/Récits africains/mythe-miengu-esprits-eau-sawa.md"
+    "fichier_source": "livrables/sites-web/afroback/Mythologie/mythe-miengu-esprits-eau-sawa/fr.md"
   },
   {
     "slug": "mythe-nchare-yen-bamoun",
@@ -84,7 +84,7 @@
     "image_url": "https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/mythologie/mythe-nchare-yen-bamoun.jpg",
     "narration_audio_url": null,
     "ordre_affichage": 1,
-    "fichier_source": "livrables/sites-web/afroback/Récits africains/mythe-nchare-yen-bamoun.md"
+    "fichier_source": "livrables/sites-web/afroback/Mythologie/mythe-nchare-yen-bamoun/fr.md"
   },
   {
     "slug": "mythe-ngan-medza-beti",
@@ -128,7 +128,7 @@
     "image_url": "https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/mythologie/mythe-ngan-medza-beti.jpg",
     "narration_audio_url": null,
     "ordre_affichage": 2,
-    "fichier_source": "livrables/sites-web/afroback/Récits africains/mythe-ngan-medza-beti.md"
+    "fichier_source": "livrables/sites-web/afroback/Mythologie/mythe-ngan-medza-beti/fr.md"
   },
   {
     "slug": "mythe-ngog-lituba-bassa",
@@ -173,7 +173,7 @@
     "image_url": "https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/mythologie/mythe-ngog-lituba-bassa.jpg",
     "narration_audio_url": null,
     "ordre_affichage": 3,
-    "fichier_source": "livrables/sites-web/afroback/Récits africains/mythe-ngog-lituba-bassa.md"
+    "fichier_source": "livrables/sites-web/afroback/Mythologie/mythe-ngog-lituba-bassa/fr.md"
   },
   {
     "slug": "mythe-sao-geants-kotoko",
@@ -218,6 +218,6 @@
     "image_url": "https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/mythologie/mythe-sao-geants-kotoko.jpg",
     "narration_audio_url": null,
     "ordre_affichage": 4,
-    "fichier_source": "livrables/sites-web/afroback/Récits africains/mythe-sao-geants-kotoko.md"
+    "fichier_source": "livrables/sites-web/afroback/Mythologie/mythe-sao-geants-kotoko/fr.md"
   }
 ]

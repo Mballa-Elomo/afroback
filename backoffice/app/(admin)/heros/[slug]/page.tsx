@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getHeroBySlugAdmin, heroHasMedia } from '@/lib/data/heros';
-import { getAudioEngagementDetail, getHeroEngagement, getVideoChapterEngagement } from '@/lib/data/engagement';
+import { heroHasMedia } from '@/lib/data/heros';
+import { getHeroAdminDetail } from '@/lib/data/heroDetail';
 import { StatusBadge } from '@/components/StatusBadge';
 import { MediaUploadSlot } from '@/components/MediaUploadSlot';
 import { HeroLanguageContent } from '@/components/HeroLanguageContent';
@@ -16,17 +16,11 @@ const panelTitleStyle: React.CSSProperties = { fontFamily: fonts.display, fontSi
 
 export default async function HeroDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const hero = await getHeroBySlugAdmin(slug);
-  if (!hero) notFound();
+  const detail = await getHeroAdminDetail(slug);
+  if (!detail) notFound();
+  const { hero, engagement, audioDetail, videoChapterEngagement } = detail;
 
   const media = heroHasMedia(hero);
-  // 3 lectures indépendantes (aucune ne dépend d'une autre) — en parallèle,
-  // même principe que le reste des optimisations du 2026-08-06.
-  const [engagement, audioDetail, videoChapterEngagement] = await Promise.all([
-    getHeroEngagement(hero.id),
-    getAudioEngagementDetail(hero.id),
-    getVideoChapterEngagement(hero.id),
-  ]);
 
   return (
     <div>

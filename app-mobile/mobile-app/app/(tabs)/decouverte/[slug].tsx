@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { DecouverteItemRow } from '../../../src/components/DecouverteItemRow';
 import { FaitsList } from '../../../src/components/FaitsList';
 import { SourcesList } from '../../../src/components/SourcesList';
@@ -11,7 +12,9 @@ import { RelatedHeroes } from '../../../src/components/RelatedHeroes';
 import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
 import { useDecouverteItem, useRelatedDecouverteItems } from '../../../src/data/useDecouverteData';
 import { getHeroBySlug } from '../../../src/data/heroesRepository';
+import { recordDecouverteConsultation, recordDecouverteVideoEngagement } from '../../../src/data/engagementRepository';
 import type { Heros } from '../../../src/data/types';
+import type { DecouverteItem } from '../../../src/data/decouverteTypes';
 import { DECOUVERTE_TYPE_LABEL } from '../../../src/data/decouverteDisplay';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
 
@@ -33,6 +36,16 @@ export default function DecouverteDetailScreen() {
   const item = itemState.status === 'ready' ? itemState.data : undefined;
   const relatedItems = useRelatedDecouverteItems(item);
   const [relatedHeroes, setRelatedHeroes] = useState<Heros[]>([]);
+  const [langue, setLangue] = useState<'fr' | 'en'>('fr');
+  const consultationLoggedRef = useRef<string | null>(null);
+
+  // Engagement réel (consultation de la fiche) : une fois par ouverture d'un
+  // item donné, même principe que recordHeroEngagement('recit') côté héros.
+  useEffect(() => {
+    if (!item || consultationLoggedRef.current === item.id) return;
+    consultationLoggedRef.current = item.id;
+    recordDecouverteConsultation(item.id);
+  }, [item]);
 
   useEffect(() => {
     if (!item || item.heros_lies.length === 0) {
@@ -71,7 +84,10 @@ export default function DecouverteDetailScreen() {
   // test Yannick, 2026-08-05). En-tête sobre (texte) uniquement en
   // fallback honnête pour un item sans aucune photo à ce jour.
   const immersive = Boolean(item.image_url);
-  const paragraphs = item.contenu_fr_texte.split(/\n{2,}/).filter((p) => p.trim().length > 0);
+  const hasEnglish = Boolean(item.contenu_en_texte);
+  const texteActuel = langue === 'en' && item.contenu_en_texte ? item.contenu_en_texte : item.contenu_fr_texte;
+  const paragraphs = texteActuel.split(/\n{2,}/).filter((p) => p.trim().length > 0);
+  const videoCodes = Object.keys(item.videos ?? {});
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -119,12 +135,31 @@ export default function DecouverteDetailScreen() {
         <View style={styles.body}>
           <Text style={styles.subtitle}>{item.sous_titre}</Text>
 
-          <SectionTitle title="En détail" />
+          <View style={styles.sectionHeaderRow}>
+            <SectionTitle title="En détail" />
+            {hasEnglish && (
+              <View style={styles.langToggle}>
+                <Pressable onPress={() => setLangue('fr')} style={[styles.langBtn, langue === 'fr' && styles.langBtnActive]}>
+                  <Text style={[styles.langLabel, langue === 'fr' && styles.langLabelActive]}>FR</Text>
+                </Pressable>
+                <Pressable onPress={() => setLangue('en')} style={[styles.langBtn, langue === 'en' && styles.langBtnActive]}>
+                  <Text style={[styles.langLabel, langue === 'en' && styles.langLabelActive]}>EN</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
           {paragraphs.map((p, i) => (
             <Text key={i} style={styles.paragraph}>
               {p}
             </Text>
           ))}
+
+          {videoCodes.length > 0 && (
+            <View style={styles.videoSection}>
+              <SectionTitle title="Regarder" />
+              <DecouverteVideoPlayer itemId={item.id} videos={item.videos} />
+            </View>
+          )}
 
           <FaitsList faits={item.statut_fait_legende} />
           <SourcesList sources={item.sources} />
@@ -146,6 +181,40 @@ export default function DecouverteDetailScreen() {
   );
 }
 
+/** Lecteur vidéo d'une fiche Découverte : au plus une vidéo par langue (pas de chapitres), même principe que VideoChapitrePlayerArea côté héros. */
+function DecouverteVideoPlayer({ itemId, videos }: { itemId: string; videos: Record<string, string> }) {
+  const codes = Object.keys(videos);
+  const [lang, setLang] = useState<string>(codes[0] ?? '');
+  const actualLang = videos[lang] ? lang : (codes[0] ?? '');
+  const uri = videos[actualLang] ?? '';
+  const loggedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!actualLang || loggedRef.current === actualLang) return;
+    loggedRef.current = actualLang;
+    recordDecouverteVideoEngagement(itemId, actualLang);
+  }, [itemId, actualLang]);
+
+  const player = useVideoPlayer(uri, (p) => {
+    p.loop = false;
+  });
+
+  return (
+    <View>
+      <VideoView key={uri} style={styles.videoArea} player={player} allowsFullscreen allowsPictureInPicture nativeControls />
+      {codes.length > 1 && (
+        <View style={styles.videoLangToggle}>
+          {codes.map((code) => (
+            <Pressable key={code} onPress={() => setLang(code)} style={[styles.langBtn, actualLang === code && styles.langBtnActive]}>
+              <Text style={[styles.langLabel, actualLang === code && styles.langLabelActive]}>{code.toUpperCase()}</Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
@@ -153,6 +222,52 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: spacing.xl,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  langToggle: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 8,
+  },
+  langBtn: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+  },
+  langBtnActive: {
+    backgroundColor: colors.accentGoldSoft,
+    borderColor: colors.accentGoldSoft,
+  },
+  langLabel: {
+    fontFamily: typography.monoBold,
+    fontSize: 10.5,
+    letterSpacing: 0.6,
+    color: colors.textMuted,
+  },
+  langLabelActive: {
+    color: colors.ctaTextOnGold,
+  },
+  videoSection: {
+    marginBottom: spacing.lg,
+  },
+  videoArea: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: colors.placeholderStripeDark,
+  },
+  videoLangToggle: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 10,
   },
   immersiveHeader: {
     height: 280,

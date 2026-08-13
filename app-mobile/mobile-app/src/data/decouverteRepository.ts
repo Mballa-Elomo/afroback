@@ -23,7 +23,17 @@ async function fetchDecouverteItems(): Promise<DecouverteItem[]> {
   if (error) {
     throw new Error(`Impossible de charger le contenu Découverte depuis Supabase : ${error.message}`);
   }
-  return (data ?? []) as DecouverteItem[];
+  const items = (data ?? []).map((row) => ({
+    ...row,
+    statut_publication: row.statut_publication ?? 'publie',
+    a_la_une: row.a_la_une ?? false,
+    videos: row.videos ?? {},
+  })) as DecouverteItem[];
+  // Filtré côté client, pas dans la requête : reste compatible même si
+  // schema-decouverte-extended.sql n'a pas encore été exécuté par Yannick
+  // (colonne absente -> traité comme publié), même principe que
+  // heroesRepository.ts.
+  return items.filter((it) => (it.statut_publication ?? 'publie') !== 'depublie');
 }
 
 export async function getDecouverteItems(): Promise<DecouverteItem[]> {
@@ -39,6 +49,13 @@ export async function getDecouverteItems(): Promise<DecouverteItem[]> {
       });
   }
   return itemsInflight;
+}
+
+/** Force un vrai aller-retour Supabase, en ignorant le cache — même usage que refreshHeroes() (rafraîchissement auto après une action back-office). */
+export async function refreshDecouverteItems(): Promise<DecouverteItem[]> {
+  const items = await fetchDecouverteItems();
+  itemsCache = items;
+  return items;
 }
 
 export async function getDecouverteItemBySlug(slug: string): Promise<DecouverteItem | undefined> {

@@ -33,6 +33,10 @@ export interface DecouverteItem {
   items_lies: string[];
   statut_contenu: StatutContenuDecouverte;
   ordre_affichage: number;
+  statut_publication: 'publie' | 'depublie';
+  a_la_une: boolean;
+  /** Vidéo par langue (pas de chapitres pour une fiche Découverte), ajouté le 2026-08-12 — parité Héros/Mythologie. */
+  videos: Record<string, string>;
 }
 
 export interface DecouvertePays {

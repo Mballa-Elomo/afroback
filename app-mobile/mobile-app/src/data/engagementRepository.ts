@@ -81,3 +81,55 @@ export async function recordVideoChapterEngagement(heroId: string, chapitreNumer
     // Best-effort, même raison que recordHeroEngagement ci-dessus.
   }
 }
+
+/**
+ * Engagement Découverte (schema-decouverte-extended.sql, 2026-08-12) : une
+ * fiche n'a ni chapitres ni narration audio, donc seulement 2 événements —
+ * consultation de la fiche, et visionnage de la vidéo (avec langue, comme
+ * l'audio héros) si une vidéo existe pour cet item.
+ */
+export async function recordDecouverteConsultation(itemId: string): Promise<void> {
+  try {
+    await supabase.rpc('increment_decouverte_consultation', { p_item_id: itemId });
+  } catch {
+    // Best-effort, même raison que recordHeroEngagement ci-dessus.
+  }
+}
+
+export async function recordDecouverteVideoEngagement(itemId: string, langue: EngagementLangue): Promise<void> {
+  try {
+    await supabase.rpc('increment_decouverte_video', { p_item_id: itemId, p_langue: langue });
+  } catch {
+    // Best-effort, même raison que recordHeroEngagement ci-dessus.
+  }
+}
+
+/**
+ * Engagement Mythologie (schema-mythologie-extended.sql, 2026-08-12) : même
+ * forme que l'engagement héros (récit/audio détaillé FR-EN/vidéo par
+ * chapitre × langue), tables et fonctions RPC dédiées côté Supabase
+ * (`mythe_engagement`, `mythe_video_chapter_engagement`).
+ */
+export async function recordMytheEngagement(mytheId: string, event: 'recit' | 'video'): Promise<void> {
+  try {
+    await supabase.rpc('increment_mythe_engagement', { p_mythe_id: mytheId, p_event: event });
+  } catch {
+    // Best-effort, même raison que recordHeroEngagement ci-dessus.
+  }
+}
+
+export async function recordMytheAudioEngagement(mytheId: string, langue: EngagementLangue): Promise<void> {
+  try {
+    await supabase.rpc('increment_mythe_audio_engagement', { p_mythe_id: mytheId, p_langue: langue });
+  } catch {
+    // Best-effort, même raison que recordHeroEngagement ci-dessus.
+  }
+}
+
+export async function recordMytheVideoChapterEngagement(mytheId: string, chapitreNumero: number, langue: EngagementLangue): Promise<void> {
+  try {
+    await supabase.rpc('increment_mythe_video_chapter_engagement', { p_mythe_id: mytheId, p_chapitre: chapitreNumero, p_langue: langue });
+  } catch {
+    // Best-effort, même raison que recordHeroEngagement ci-dessus.
+  }
+}

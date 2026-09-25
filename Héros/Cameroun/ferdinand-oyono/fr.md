@@ -1,0 +1,83 @@
+# Ferdinand Oyono
+
+Écrivain, diplomate et homme d'État camerounais, auteur d'« Une vie de boy » (1956), l'un des réquisitoires littéraires les plus marquants contre la colonisation française en Afrique, devenu ensuite l'un des plus hauts serviteurs de l'État camerounais indépendant.
+
+---
+
+## Le récit du griot
+
+Écoute.
+
+Cameroun, fin des années 1920. Le pays n'est pas une colonie française au sens plein du terme, c'est un territoire sous mandat de la Société des Nations, confié à la France après la défaite allemande de la Première Guerre mondiale, mais pour les paysans qui vivent entre Sanaga et Nyong, la nuance ne change pas grand-chose au quotidien : il y a toujours un commandant blanc à qui obéir, un impôt à payer, une hiérarchie à respecter sous peine de coups. C'est dans ce monde-là, le 14 septembre 1929, à Ngoulemakong, un petit village de forêts et de cacaoyères près d'Ebolowa, dans le Sud camerounais, que naît un enfant qui deviendra, sans que personne ne puisse alors l'imaginer, l'une des voix les plus lues de toute la littérature africaine francophone : Ferdinand Léopold Oyono.
+
+Retiens ce nom de village, Ngoulemakong, car c'est de cette terre-là, de cette forêt-là, que viendra plus tard toute la matière première d'un livre qui allait faire trembler les certitudes coloniales.
+
+L'enfance d'Oyono se déroule à Ebolowa, dans une région que l'administration française tient alors fermement, entre missions catholiques et postes administratifs. Le garçon est brillant, on le remarque, et comme cela arrivait parfois pour une poignée d'enfants africains jugés prometteurs par le système colonial lui-même, on l'envoie poursuivre ses études d'abord au lycée général Leclerc de Yaoundé, puis, plus loin encore, en France, au lycée de Provins. Imagine ce que cela représente, pour un adolescent né dans un village de cacaoyères sous administration coloniale, que de se retrouver du jour au lendemain dans un lycée de province française, à des milliers de kilomètres de chez lui, à devoir apprendre à vivre entre deux mondes qui, officiellement, ne sont censés n'en former qu'un seul, l'Empire, mais qui en réalité n'ont presque rien en commun.
+
+À Paris, dans les années 1950, le jeune Oyono ne se contente pas des bancs de la faculté. Il touche au théâtre, à la télévision naissante, joue de petits rôles, se frotte au monde du spectacle parisien tout en poursuivant des études de droit à la Sorbonne. Puis il franchit une porte que presque aucun jeune Africain de sa génération n'a franchie avant lui : il entre à l'École nationale d'administration, dans la section diplomatique, la fabrique même des hauts fonctionnaires de l'État français. Comprends ce que cela signifie : au moment où il écrit ce qui deviendra son œuvre la plus célèbre, Oyono se forme, dans le même temps, dans l'école qui produit les cadres de la puissance qu'il critique dans ses livres. Cette tension-là, il faut la garder en tête, elle traverse toute sa vie.
+
+Car c'est justement pendant ces années d'études parisiennes, en 1956, que paraissent coup sur coup deux romans signés Ferdinand Oyono. Le premier s'appelle *Une vie de boy*. Il prend la forme d'un journal intime, celui d'un jeune Camerounais nommé Toundi Ondoua, recueilli enfant par un père missionnaire après avoir fui la maison paternelle, qui apprend à lire et à écrire à la mission, puis devient, à la mort de ce père, le boy, c'est-à-dire le domestique, d'un commandant de l'administration coloniale française. Page après page, avec un mélange d'ironie mordante et de naïveté apparente qui rend le procédé plus dévastateur encore, Toundi consigne ce qu'il voit dans l'intimité de la maison du commandant : les petitesses, les hypocrisies, les cruautés ordinaires d'un système qui se prétend porteur de civilisation. Le roman se referme sur un dénouement tragique : accusé à tort, torturé en prison par le régisseur pénitentiaire, Toundi finit par s'enfuir vers la Guinée espagnole voisine, où la mort l'attend. Ce n'est pas un hasard si le livre s'ouvre déjà sur l'annonce de cette mort : Oyono construit son récit comme une tragédie annoncée, celle d'un homme brisé par un système qu'il a eu le tort de trop bien observer.
+
+Le second roman de cette même année, *Le Vieux Nègre et la médaille*, raconte l'histoire de Meka, un vieil homme qui a donné deux de ses fils à l'armée coloniale française et une partie de ses terres à la mission catholique, et à qui l'administration décide, un jour de 14 juillet, de remettre une médaille en récompense de sa loyauté. La cérémonie tourne à l'humiliation : reçu avec de grands discours, Meka repart de la fête sans même qu'on lui offre de quoi rentrer chez lui, contraint de passer la nuit en prison faute de transport, découvrant avec amertume que les honneurs coloniaux ne valent au fond pas grand-chose face au mépris ordinaire qu'ils dissimulent mal.
+
+Ces deux livres, il faut le dire clairement, ne sont pas des pamphlets criards. Les critiques littéraires de l'époque, comme le poète David Diop, ont salué chez Oyono un esprit comique redoutable, servi par un réalisme d'une grande intensité. D'autres commentateurs, comme le critique Gerald Moore, ont noté que sous l'humour perçait une intensité proprement tragique. C'est précisément cette manière de faire rire pour mieux faire voir l'horreur qui a donné à *Une vie de boy* sa force de frappe, et qui en fait aujourd'hui encore l'un des textes fondateurs, avec ceux de Mongo Beti, d'une génération d'écrivains camerounais qui ont mis la littérature au service de la dénonciation du fait colonial, dans la mouvance plus large de la négritude et de la conscience anticoloniale montante des années 1950. Selon un témoignage rapporté par la critique de l'époque, Oyono aurait lui-même résumé sa mission d'écrivain camerounais en ces termes, lors d'un débat sur la littérature noire africaine : le Cameroun aurait longtemps été un pays recouvert d'un rideau de fantasmagorie, et l'écrivain camerounais devrait, avant toute autre chose, essayer de lever ce rideau. Cette phrase circule largement dans les biographies d'Oyono, mais sans qu'on puisse la rattacher à une date ou à un document précis : elle doit donc être reçue comme un écho fidèle de sa pensée plutôt que comme une citation strictement datée.
+
+En 1960, encore étudiant, Oyono publie un troisième roman, *Chemin d'Europe*, le récit plus complexe et plus ambigu d'un jeune Camerounais prêt à toutes les compromissions pour accéder à l'Europe et à ses privilèges. Puis, cette même année 1960, le Cameroun devient indépendant. Et là, écoute bien, car c'est le tournant le plus vertigineux de cette histoire : Oyono rentre au pays, entre dans la carrière diplomatique camerounaise, et n'écrira plus jamais de roman. Trois livres en quatre ans, puis plus rien, pendant cinquante ans, jusqu'à sa mort. Les historiens de la littérature camerounaise parlent, à propos de ce silence, d'un silence assourdissant, qui a longtemps déçu les lecteurs d'un écrivain dont on attendait tant d'autres livres. Ce silence-là fait partie intégrante de son histoire, et il serait malhonnête de le passer sous silence à son tour.
+
+Car la suite de la vie d'Oyono se joue désormais ailleurs, dans les chancelleries plutôt que dans les librairies. En 1961 et 1962, il est envoyé spécial du jeune État camerounais en Guinée, au Mali, au Sénégal et au Maroc. De 1963 à 1975, il devient ambassadeur, successivement ou simultanément, au Liberia, auprès des pays du Benelux et de la Communauté économique européenne, en France, en Italie, en Tunisie, au Maroc et en Algérie. De 1974 à 1982, il représente le Cameroun comme ambassadeur permanent auprès des Nations unies à New York, où il préside même le Conseil de sécurité en décembre 1975, tout en présidant, en 1977 et 1978, le conseil d'administration de l'UNICEF. Puis, de 1984 à 1985, il est ambassadeur du Cameroun au Royaume-Uni et dans les pays scandinaves. Vingt années durant, sous la présidence d'Ahmadou Ahidjo puis dans les tout premiers temps de celle de Paul Biya, l'ancien romancier anticolonial devient l'un des visages diplomatiques les plus constants de l'État camerounais indépendant.
+
+Le tournant suivant se joue à Yaoundé même. À partir du milieu des années 1980, Oyono quitte les ambassades pour entrer au cœur du pouvoir camerounais : secrétaire général à la présidence de la République sous Paul Biya, puis ministre de l'Urbanisme et de l'Habitat à partir de 1987. Écarté du gouvernement en 1990, il revient aux affaires deux ans plus tard, et occupe, du 27 novembre 1992 au 8 décembre 1997, le poste de ministre des Relations extérieures du Cameroun, avant de devenir, du 8 décembre 1997 au 7 septembre 2007, ministre d'État chargé de la Culture, poste qu'il utilise notamment pour mettre en place les sociétés camerounaises de gestion des droits d'auteur. Il termine sa vie publique comme ambassadeur itinérant du Cameroun, à partir de 2009.
+
+Voilà donc l'homme dans toute sa complexité, et il faut la regarder en face plutôt que de la lisser : le jeune romancier qui, à peine sorti de l'adolescence, avait su montrer au monde entier, par les yeux d'un simple boy de maison, toute la brutalité ordinaire et l'hypocrisie du système colonial français, est devenu, des décennies plus tard, un pilier de l'appareil d'État camerounais postcolonial, fidèle serviteur de deux présidents successifs pendant près d'un demi-siècle, sans jamais reprendre la plume pour raconter, de l'intérieur cette fois, ce que le pouvoir donne à voir à celui qui le sert. Certains y voient la trajectoire logique d'un lettré d'exception mis au service de la construction d'un État jeune et fragile, qui avait besoin de diplomates aguerris plus que de romans. D'autres y voient le silence pesant d'un homme qui, ayant su dénoncer la brutalité d'un pouvoir, a choisi ensuite de servir loyalement d'autres pouvoirs sans plus jamais interroger publiquement, par l'écriture, ce que le service de l'État peut coûter à une conscience. Les deux lectures s'appuient sur les mêmes faits, et l'histoire d'Oyono, comme beaucoup d'histoires africaines du vingtième siècle, ne se raconte pas en noir et blanc.
+
+Ferdinand Oyono meurt le 10 juin 2010 à Yaoundé, à quatre-vingts ans, pris d'un malaise lors d'une réception officielle, alors que la ville accueille la visite du secrétaire général des Nations unies Ban Ki-moon, et il s'éteint en chemin vers l'hôpital. Des obsèques officielles sont organisées, et il est inhumé, quelques jours plus tard, à Ngoazip, près d'Ebolowa, non loin de la terre où tout avait commencé quatre-vingts ans plus tôt.
+
+Alors retiens ceci. Ce qu'Oyono a écrit à vingt-six ans n'a pas besoin de son silence ultérieur, ni de sa carrière ministérielle, pour rester vrai. *Une vie de boy* continue, aujourd'hui encore, à être lu dans les écoles et les universités de toute l'Afrique francophone et au-delà, comme l'un des textes qui ont dit, avec le plus de force et le moins de complaisance, ce que la colonisation faisait vraiment aux hommes qu'elle prétendait éduquer. Qu'un jeune Camerounais né dans un village de cacaoyères ait pu, depuis les bancs d'une université française, écrire un livre capable de faire vaciller, au fond, la légitimité morale de tout un empire, cela seul mérite d'être raconté et retenu. Le reste de sa vie, ses honneurs comme ses silences, appartient à l'histoire plus large, plus difficile, de ce que devient un pays qui accède à l'indépendance sans que tout, d'un coup, y devienne simple. Tiens-toi droit. Ce livre-là, écrit contre le mépris, vient aussi de chez toi.
+
+---
+
+## Fiche structurée
+
+**Ferdinand Léopold Oyono**
+
+- **Époque** : colonial (œuvre littéraire, 1929-1960) puis indépendances et contemporain (carrière diplomatique et politique, 1960-2010)
+- **Région** : Afrique Centrale (Cameroun, région d'Ebolowa, Sud Cameroun ; rayonnement diplomatique international)
+- **Thème** : art (littérature anticoloniale) et politique (diplomatie, gouvernement)
+
+**Frise chronologique**
+
+- 14 septembre 1929 : naissance à Ngoulemakong, près d'Ebolowa (Sud Cameroun, alors territoire sous mandat français)
+- Années 1950 : études en France (lycée de Provins), droit à la Sorbonne, École nationale d'administration (section diplomatique) à Paris, activité de comédien de théâtre et de télévision
+- 1956 : publication d'*Une vie de boy* et du *Vieux Nègre et la médaille*, deux romans qui dénoncent avec ironie la brutalité et l'hypocrisie du système colonial français
+- 1960 : publication de *Chemin d'Europe* (dernier roman) ; indépendance du Cameroun ; retour au pays et entrée dans la carrière diplomatique, début d'un silence littéraire qui durera jusqu'à sa mort
+- 1963-1985 : ambassadeur du Cameroun dans de nombreux pays (Liberia, Benelux, Communauté économique européenne, France, Italie, Tunisie, Maroc, Algérie, Royaume-Uni, pays scandinaves) puis représentant permanent aux Nations unies (1974-1982), président du Conseil de sécurité de l'ONU (décembre 1975), président du conseil d'administration de l'UNICEF (1977-1978)
+- 1987-2007 : secrétaire général à la présidence puis ministre camerounais sous Paul Biya : ministre de l'Urbanisme et de l'Habitat (à partir de 1987, écarté en 1990), ministre des Relations extérieures (27 novembre 1992 - 8 décembre 1997), ministre d'État chargé de la Culture (8 décembre 1997 - 7 septembre 2007)
+- 10 juin 2010 : mort à Yaoundé, à 80 ans, après un malaise lors d'une réception officielle ; inhumé à Ngoazip, près d'Ebolowa
+
+**Citations marquantes**
+
+- « Le chien du roi est un roi de chiens » (« I shall be the Chief European's boy. The dog of a king is a king of dogs. ») — *Une vie de boy* (*Houseboy*), 1956, p. 20 de l'édition anglaise citée.
+- « Frère, qu'est-ce que nous sommes ? Qu'est-ce que nous sommes, nous les nègres qu'on appelle français ? » (« Brother, what are we? What are we blackmen who are called French? ») — *Une vie de boy* (*Houseboy*), 1956, p. 4 de l'édition anglaise citée.
+- « La vérité est au-delà des montagnes. Il faut voyager pour la trouver. » (« Truth lies beyond the mountains. You must travel to find it. ») — *Une vie de boy* (*Houseboy*), 1956, p. 57 de l'édition anglaise citée.
+- Une phrase largement rapportée dans les biographies d'Oyono, tenue selon elles lors d'un débat sur la littérature noire africaine : le Cameroun aurait été « un pays sur lequel un rideau de fantasmagorie a été tiré », et l'écrivain camerounais devrait « essayer de lever ce rideau avant de faire quoi que ce soit d'autre ». Cette citation circule de façon cohérente dans plusieurs sources biographiques mais sans référence primaire datée (livre, interview, date précise) : elle est donc rapportée ici avec cette réserve plutôt que comme une citation strictement vérifiée.
+
+**Sources utilisées**
+
+- Encyclopédie Universalis, « Ferdinand Léopold Oyono »
+- Encyclopaedia Britannica, « Ferdinand Léopold Oyono »
+- Larousse, « Ferdinand Oyono »
+- Encyclopedia.com, « Ferdinand Leopold Oyono » (Contemporary Authors)
+- Wikipédia (version française), « Ferdinand Oyono » et « Une vie de boy »
+- Wikipédia (version anglaise), « Ferdinand Oyono » et « Houseboy (novel) »
+- Wikiquote (version anglaise), « Ferdinand Oyono » (citations extraites de *Houseboy* et *The Old Man and the Medal*, avec pages)
+- germinalnewspaper.com, « L'engagement socio-historico-politique de Ferdinand Léopold Oyono revisité au prisme de son œuvre romanesque »
+
+**Légendes associées (si applicable)**
+
+Aucune légende ni tradition orale ne s'attache à la vie de Ferdinand Oyono, dont l'existence, du vingtième au début du vingt-et-unième siècle, est documentée par la presse, les encyclopédies et les archives diplomatiques plutôt que par la mémoire orale. Le seul point qui appelle une prudence particulière est la citation sur le « rideau de fantasmagorie », largement reprise dans les biographies mais sans source primaire datée retrouvée : elle doit être reçue avec cette réserve plutôt que comme une parole strictement authentifiée.
+
+**Héros liés**
+
+- Manu Dibango, autre figure camerounaise du pilier Histoires & Héros relevant du registre culturel (musique) plutôt que de la résistance armée ou politique, comme Oyono relève du registre littéraire
+- Charles Atangana, autre figure camerounaise dont la trajectoire, entre service de l'administration coloniale puis postcoloniale et rôle de bâtisseur, invite à une lecture nuancée comparable, quoique dans un contexte et une époque différents
+- Ruben Um Nyobè, Félix Moumié, Ernest Ouandié, figures de la résistance politique camerounaise (UPC) de la même génération qu'Oyono, offrant un contraste marquant avec le choix qu'il a fait de servir l'État plutôt que de le combattre après l'indépendance

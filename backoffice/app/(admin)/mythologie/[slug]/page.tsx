@@ -7,6 +7,7 @@ import { MythologieMediaSlot } from '@/components/MythologieMediaSlot';
 import { MytheMetadataForm } from '@/components/MytheMetadataForm';
 import { MythologieLanguageContent } from '@/components/MythologieLanguageContent';
 import { MytheTopActions } from '@/components/MytheTopActions';
+import { IntegrityPanel } from '@/components/IntegrityPanel';
 import { colors, fonts } from '@/lib/theme';
 
 export const dynamic = 'force-dynamic';
@@ -126,6 +127,17 @@ export default async function MytheDetailPage({ params }: { params: Promise<{ sl
             </ul>
           </div>
         )}
+      </div>
+
+      <div style={{ ...panelStyle, marginTop: 16 }}>
+        <div style={panelTitleStyle}>INTÉGRITÉ DU CONTENU</div>
+        <IntegrityPanel
+          tableName="mythes"
+          rowId={mythe.id}
+          contenuHash={mythe.contenu_hash}
+          contenuSignature={mythe.contenu_signature}
+          integriteCalculeeLe={mythe.integrite_calculee_le}
+        />
       </div>
     </div>
   );

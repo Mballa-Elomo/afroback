@@ -4,6 +4,7 @@ import { requireAdmin } from './auth';
 import { logActivity } from './activityLog';
 import { getHeroBySlugAdmin, type VideoChapitreAdmin } from './data/heros';
 import { LANGUES_VIDEO } from './langues';
+import { applyWatermark } from './watermark';
 
 /**
  * Logique d'upload de médias héros, PARTAGÉE entre les Route Handlers
@@ -76,7 +77,14 @@ export async function performMediaUpload(slug: string, kind: MediaSlot, file: Fi
   try {
     const path = `${SLOT_PATH_PREFIX[kind]}/${slug}${SLOT_SUFFIX[kind]}.${ext}`;
     const admin_ = getSupabaseAdmin();
-    const { error: uploadError } = await admin_.storage.from(BUCKET).upload(path, file, { upsert: true, contentType: file.type || undefined });
+    // Filigrane discret (lot cybersécurité, 2026-09-25) : uniquement sur les
+    // photos, jamais sur audio/vidéo. Voir lib/watermark.ts pour la limite
+    // connue (webp non supporté, passe alors tel quel).
+    const uploadBody =
+      kind === 'photo'
+        ? (await applyWatermark(Buffer.from(await file.arrayBuffer()), file.type || 'image/jpeg')).buffer
+        : file;
+    const { error: uploadError } = await admin_.storage.from(BUCKET).upload(path, uploadBody, { upsert: true, contentType: file.type || undefined });
     if (uploadError) return { error: `Échec de l'upload : ${uploadError.message}` };
 
     const { data: pub } = admin_.storage.from(BUCKET).getPublicUrl(path);

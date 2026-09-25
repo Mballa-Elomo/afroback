@@ -5,6 +5,7 @@ import { logActivity } from './activityLog';
 import { getDecouverteItemBySlugAdmin } from './data/decouverte';
 import { LANGUES_VIDEO } from './langues';
 import { describeError } from './uploadMedia';
+import { applyWatermark } from './watermark';
 
 /**
  * Upload de médias Découverte — même principe que `uploadMedia.ts` (héros) :
@@ -36,7 +37,8 @@ export async function performDecouvertePhotoUpload(slug: string, file: File): Pr
   try {
     const path = `images/decouverte/${slug}.${ext}`;
     const admin_ = getSupabaseAdmin();
-    const { error: uploadError } = await admin_.storage.from(BUCKET).upload(path, file, { upsert: true, contentType: file.type || undefined });
+    const watermarked = await applyWatermark(Buffer.from(await file.arrayBuffer()), file.type || 'image/jpeg');
+    const { error: uploadError } = await admin_.storage.from(BUCKET).upload(path, watermarked.buffer, { upsert: true, contentType: file.type || undefined });
     if (uploadError) return { error: `Échec de l'upload : ${uploadError.message}` };
 
     const { data: pub } = admin_.storage.from(BUCKET).getPublicUrl(path);

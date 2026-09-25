@@ -40,7 +40,11 @@ export default function RootLayout() {
 
 /**
  * Grille d'accès : sans session → onboarding (splash 3D, connexion,
- * inscription) ; session mais assistant post-inscription pas terminé →
+ * inscription) ; session mais MFA activée et pas encore vérifiée pour cette
+ * connexion → porte de vérification (lot cybersécurité du 2026-09-25,
+ * prioritaire sur tout le reste : un compte protégé par 2FA n'accède à rien,
+ * pas même à l'assistant post-inscription, tant que le code n'est pas
+ * validé) ; session mais assistant post-inscription pas terminé →
  * langue/usage/forfait/bienvenue ; session + assistant terminé → module
  * Parent/Enfant (`ActiveProfileProvider`, ajouté le 2026-07-31) qui décide
  * entre le sélecteur de profil "Qui est-ce ?", le mode enfant plein écran,
@@ -51,14 +55,20 @@ export default function RootLayout() {
  * sélecteur comme l'Espace Parent y renvoient tous les deux).
  */
 function RootNavigator() {
-  const { session, onboardingComplete } = useAuth();
+  const { session, onboardingComplete, mfaStatus } = useAuth();
   const { state: profileState } = useActiveProfile();
 
   // session === undefined tant que la lecture de la session locale (AsyncStorage) n'est pas terminée.
   if (session === undefined) return null;
+  // mfaStatus === 'unknown' tant que le niveau d'assurance n'a pas été vérifié auprès de Supabase.
+  if (!!session && mfaStatus === 'unknown') return null;
   // profileState.status === 'checking' tant que la liste des profils enfants n'a pas été chargée
   // (voir ActiveProfileProvider) — évite un flash d'écran vide entre les deux.
   if (!!session && onboardingComplete && profileState.status === 'checking') return null;
+
+  // Une fois 'unknown' écarté ci-dessus, seul 'challenge_required' bloque encore l'accès —
+  // 'not_enrolled' (pas de 2FA activée) et 'satisfied' (2FA validée) se comportent pareil.
+  const mfaOk = !session || mfaStatus !== 'challenge_required';
 
   return (
     // Chaque écran construit son propre en-tête (retour, titre) pour coller
@@ -70,17 +80,20 @@ function RootNavigator() {
         <Stack.Screen name="onboarding/login" />
         <Stack.Screen name="onboarding/signup" />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && !onboardingComplete}>
+      <Stack.Protected guard={!!session && !mfaOk}>
+        <Stack.Screen name="onboarding/mfa-challenge" />
+      </Stack.Protected>
+      <Stack.Protected guard={!!session && mfaOk && !onboardingComplete}>
         <Stack.Screen name="onboarding/language" />
         <Stack.Screen name="onboarding/usage" />
         <Stack.Screen name="onboarding/plan" />
         <Stack.Screen name="onboarding/payment" />
         <Stack.Screen name="onboarding/welcome" />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && onboardingComplete && profileState.status === 'selecting'}>
+      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && profileState.status === 'selecting'}>
         <Stack.Screen name="profils/selection" />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && onboardingComplete && profileState.status === 'child'}>
+      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && profileState.status === 'child'}>
         <Stack.Screen name="enfant/accueil" />
         <Stack.Screen name="enfant/histoire" />
         <Stack.Screen name="enfant/carnet/index" />
@@ -92,14 +105,15 @@ function RootNavigator() {
         <Stack.Screen name="enfant/ecole/niveau-suivant" />
         <Stack.Screen name="enfant/ecole/collection" />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && onboardingComplete && profileState.status === 'adult'}>
+      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && profileState.status === 'adult'}>
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && onboardingComplete}>
+      <Stack.Protected guard={!!session && mfaOk && onboardingComplete}>
         <Stack.Screen name="profils/ajouter" />
         <Stack.Screen name="profils/parent" />
         <Stack.Screen name="don/index" />
         <Stack.Screen name="don/montant" />
+        <Stack.Screen name="profil/mfa" />
       </Stack.Protected>
     </Stack>
   );

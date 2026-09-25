@@ -7,6 +7,7 @@ import { DecouvertePhotoSlot } from '@/components/DecouvertePhotoSlot';
 import { DecouverteMetadataForm } from '@/components/DecouverteMetadataForm';
 import { DecouverteLanguageContent } from '@/components/DecouverteLanguageContent';
 import { DecouverteTopActions } from '@/components/DecouverteTopActions';
+import { IntegrityPanel } from '@/components/IntegrityPanel';
 import { colors, fonts } from '@/lib/theme';
 
 export const dynamic = 'force-dynamic';
@@ -170,6 +171,17 @@ export default async function DecouverteDetailPage({ params }: { params: Promise
           )}
         </div>
       )}
+
+      <div style={{ ...panelStyle, marginTop: 16 }}>
+        <div style={panelTitleStyle}>INTÉGRITÉ DU CONTENU</div>
+        <IntegrityPanel
+          tableName="decouverte_items"
+          rowId={item.id}
+          contenuHash={item.contenu_hash}
+          contenuSignature={item.contenu_signature}
+          integriteCalculeeLe={item.integrite_calculee_le}
+        />
+      </div>
     </div>
   );
 }

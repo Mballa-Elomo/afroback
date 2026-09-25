@@ -50,6 +50,10 @@ export interface DecouverteItemDetailAdmin extends DecouverteItem {
   sources: string[];
   heros_lies: string[];
   items_lies: string[];
+  /** Intégrité du contenu (lot cybersécurité, 2026-09-25) — voir supabase/schema-integrite-contenu.sql. */
+  contenu_hash: string | null;
+  contenu_signature: string | null;
+  integrite_calculee_le: string | null;
 }
 
 const LIST_COLUMNS =

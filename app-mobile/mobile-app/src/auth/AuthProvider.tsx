@@ -10,6 +10,14 @@ import { supabase } from '../data/supabaseClient';
  * confirmation automatique activée (pas de vérification SMS), sans quoi
  * `signUpWithPhone` crée bien le compte mais aucune session n'est ouverte
  * (voir le message d'erreur renvoyé dans ce cas).
+ *
+ * Authentification à deux facteurs (MFA/2FA, lot cybersécurité du 2026-09-25) :
+ * TOTP uniquement (app d'authentification type Google Authenticator/Authy),
+ * jamais SMS — même raison que ci-dessus, pas de fournisseur SMS payant à
+ * gérer. Optionnelle, activée volontairement par l'utilisateur depuis son
+ * Profil (voir `app/profil/mfa.tsx`). Le second facteur est géré nativement
+ * par Supabase Auth (`supabase.auth.mfa`), aucune table applicative
+ * supplémentaire nécessaire pour le stocker.
  */
 
 export interface OnboardingChoices {
@@ -21,11 +29,26 @@ export interface OnboardingChoices {
   paymentStatus?: 'none' | 'simulated';
 }
 
+/**
+ * Statut MFA (2FA), lot cybersécurité du 2026-09-25 : distinct de la session
+ * elle-même. Une session peut exister (mot de passe correct) sans avoir
+ * encore franchi le niveau d'assurance requis (`aal2`) si l'utilisateur a
+ * activé un facteur TOTP — voir `refreshMfaStatus`. TOTP choisi plutôt que
+ * SMS (coût récurrent déjà écarté le 2026-07-30 pour l'auth téléphone elle-même).
+ */
+export type MfaStatus =
+  | 'unknown' // pas encore vérifié
+  | 'not_enrolled' // aucun facteur MFA activé sur ce compte
+  | 'challenge_required' // facteur activé, session pas encore montée à aal2
+  | 'satisfied'; // pas de MFA, ou MFA déjà validé pour cette session
+
 interface AuthState {
   /** undefined tant que la session initiale n'a pas été lue depuis le stockage local. */
   session: Session | null | undefined;
   /** true une fois l'assistant post-inscription (langue/usage/forfait) terminé — voir completeOnboarding. */
   onboardingComplete: boolean;
+  mfaStatus: MfaStatus;
+  refreshMfaStatus: () => Promise<void>;
   signUpWithPhone: (params: {
     phone: string;
     password: string;
@@ -41,6 +64,22 @@ const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [mfaStatus, setMfaStatus] = useState<MfaStatus>('unknown');
+
+  const refreshMfaStatus = async () => {
+    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (error || !data) {
+      setMfaStatus('not_enrolled');
+      return;
+    }
+    if (data.nextLevel === 'aal2' && data.currentLevel !== data.nextLevel) {
+      setMfaStatus('challenge_required');
+    } else if (data.nextLevel === 'aal1' || !data.nextLevel) {
+      setMfaStatus('not_enrolled');
+    } else {
+      setMfaStatus('satisfied');
+    }
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -50,12 +89,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (session) {
+      refreshMfaStatus();
+    } else {
+      setMfaStatus('unknown');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id]);
+
   const onboardingComplete = session?.user?.user_metadata?.onboarding_complete === true;
 
   const value = useMemo<AuthState>(
     () => ({
       session,
       onboardingComplete,
+      mfaStatus,
+      refreshMfaStatus,
       async signUpWithPhone({ phone, password, prenom, pays }) {
         if (!isLikelyValidE164(phone)) {
           return { error: 'Numéro de téléphone invalide. Vérifie le pays et le numéro saisis.' };
@@ -81,7 +131,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!isLikelyValidE164(phone)) {
           return { error: 'Numéro de téléphone invalide. Vérifie le pays et le numéro saisis.' };
         }
+        // Protection brute force (lot cybersécurité du 2026-09-25) : verrou
+        // appliqué côté application, voir la limite documentée en tête de
+        // supabase/schema-security-auth.sql (n'empêche pas un appel direct à
+        // l'API Supabase en contournant l'app, seulement un brute force fait
+        // à travers l'app elle-même — la cible réaliste ici).
+        const { data: lockout } = await supabase.rpc('check_login_lockout', { p_phone: phone });
+        if (lockout?.locked) {
+          const until = new Date(lockout.locked_until as string);
+          return {
+            error: `Trop de tentatives échouées. Réessaie après ${until.toLocaleTimeString('fr-FR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}.`,
+          };
+        }
         const { error } = await supabase.auth.signInWithPassword({ phone, password });
+        await supabase.rpc('record_login_attempt', { p_phone: phone, p_success: !error });
+        if (!error) await refreshMfaStatus();
         return { error: error ? translateAuthError(error.message) : null };
       },
       async completeOnboarding(choices) {
@@ -98,10 +165,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error ? translateAuthError(error.message) : null };
       },
       async signOut() {
-        await supabase.auth.signOut();
+        // scope 'global' explicite (gestion de session, lot cybersécurité du
+        // 2026-09-25) : révoque la session sur TOUS les appareils connectés
+        // avec ce compte, pas seulement celui-ci — comportement déjà celui
+        // par défaut du SDK, rendu explicite plutôt qu'implicite.
+        await supabase.auth.signOut({ scope: 'global' });
       },
     }),
-    [session, onboardingComplete]
+    [session, onboardingComplete, mfaStatus]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -121,6 +192,8 @@ function translateAuthError(message: string): string {
     'Phone not confirmed': "Ce numéro n'est pas confirmé. Vérifie la configuration du provider Phone dans Supabase.",
     'Unsupported phone provider': "L'authentification par téléphone n'est pas encore activée côté Supabase.",
     'Signups not allowed for this instance': 'Les inscriptions ne sont pas autorisées pour le moment.',
+    'Invalid TOTP code entered': 'Code incorrect. Vérifie l’heure de ton téléphone et réessaie.',
+    'Invalid MFA code': 'Code incorrect. Vérifie l’heure de ton téléphone et réessaie.',
   };
   return known[message] ?? message;
 }

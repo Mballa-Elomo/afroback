@@ -9,9 +9,11 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0F0B08",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.afroback.mobile"
     },
     "android": {
+      "package": "com.afroback.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#0F0B08",
         "foregroundImage": "./assets/android-icon-foreground.png",

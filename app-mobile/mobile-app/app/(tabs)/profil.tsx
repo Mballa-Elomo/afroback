@@ -58,6 +58,11 @@ export default function ProfilScreen() {
         </View>
 
         <View style={styles.card}>
+          <Pressable style={styles.menuRow} onPress={() => router.push('/profil/mfa')}>
+            <Text style={styles.menuLabel}>Sécurité (vérification en 2 étapes)</Text>
+            <Text style={styles.menuChevron}>›</Text>
+          </Pressable>
+          <Separator />
           <Pressable style={styles.menuRow} onPress={() => router.push('/don')}>
             <Text style={styles.menuLabel}>Faire un don</Text>
             <Text style={styles.menuChevron}>›</Text>

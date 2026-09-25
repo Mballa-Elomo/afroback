@@ -5,6 +5,7 @@ import { logActivity } from './activityLog';
 import { getMytheBySlugAdmin, type VideoChapitreAdmin } from './data/mythologie';
 import { LANGUES_VIDEO } from './langues';
 import { describeError, upsertChapterEntry } from './uploadMedia';
+import { applyWatermark } from './watermark';
 
 /**
  * Upload de médias Mythologie — même principe que `uploadMedia.ts` (héros),
@@ -63,7 +64,11 @@ export async function performMythologieMediaUpload(slug: string, kind: Mythologi
   try {
     const path = `${SLOT_PATH_PREFIX[kind]}/${slug}${SLOT_SUFFIX[kind]}.${ext}`;
     const admin_ = getSupabaseAdmin();
-    const { error: uploadError } = await admin_.storage.from(BUCKET).upload(path, file, { upsert: true, contentType: file.type || undefined });
+    const uploadBody =
+      kind === 'photo'
+        ? (await applyWatermark(Buffer.from(await file.arrayBuffer()), file.type || 'image/jpeg')).buffer
+        : file;
+    const { error: uploadError } = await admin_.storage.from(BUCKET).upload(path, uploadBody, { upsert: true, contentType: file.type || undefined });
     if (uploadError) return { error: `Échec de l'upload : ${uploadError.message}` };
 
     const { data: pub } = admin_.storage.from(BUCKET).getPublicUrl(path);

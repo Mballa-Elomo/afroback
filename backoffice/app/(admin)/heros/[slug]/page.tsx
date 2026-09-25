@@ -7,6 +7,7 @@ import { MediaUploadSlot } from '@/components/MediaUploadSlot';
 import { HeroLanguageContent } from '@/components/HeroLanguageContent';
 import { MetadataForm } from '@/components/MetadataForm';
 import { HeroTopActions, ArchiveHeroButton } from '@/components/HeroDetailActions';
+import { IntegrityPanel } from '@/components/IntegrityPanel';
 import { colors, fonts } from '@/lib/theme';
 
 export const dynamic = 'force-dynamic';
@@ -125,6 +126,17 @@ export default async function HeroDetailPage({ params }: { params: Promise<{ slu
           &quot;likes&quot; : aucun système de réaction n&apos;existe dans le modèle de données. Détail par média :
           par langue dans le panneau ci-dessus.
         </p>
+      </div>
+
+      <div style={{ ...panelStyle, marginBottom: 16 }}>
+        <div style={panelTitleStyle}>INTÉGRITÉ DU CONTENU</div>
+        <IntegrityPanel
+          tableName="heros"
+          rowId={hero.id}
+          contenuHash={hero.contenu_hash}
+          contenuSignature={hero.contenu_signature}
+          integriteCalculeeLe={hero.integrite_calculee_le}
+        />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginTop: 20 }}>

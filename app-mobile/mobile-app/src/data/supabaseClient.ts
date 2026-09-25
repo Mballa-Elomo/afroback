@@ -1,6 +1,14 @@
-import 'react-native-url-polyfill/auto';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
+
+// Ce polyfill comble une lacune de l'environnement JS de React Native (Hermes).
+// Sur le web, le navigateur a déjà une implémentation native complète de URL/fetch :
+// forcer ce polyfill là aussi peut interférer avec fetch (piste d'un bug "Load failed"
+// rencontré lors du premier test web, 2026-09-25). Appliqué uniquement sur natif.
+if (Platform.OS !== 'web') {
+  require('react-native-url-polyfill/auto');
+}
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;

@@ -129,6 +129,10 @@ export interface MytheDetailAdmin {
   fichier_source: string | null;
   statut_publication: 'publie' | 'depublie';
   a_la_une: boolean;
+  /** Intégrité du contenu (lot cybersécurité, 2026-09-25) — voir supabase/schema-integrite-contenu.sql. */
+  contenu_hash: string | null;
+  contenu_signature: string | null;
+  integrite_calculee_le: string | null;
 }
 
 export async function getMytheBySlugAdmin(slug: string): Promise<MytheDetailAdmin | null> {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Génère src/data/mythologie.generated.json à partir des 5 récits mythologiques
- * déjà écrits par l'agent griot (livrables/sites-web/afroback/Mythologie/[slug]/fr.md)
+ * déjà écrits par l'agent griot (livrables/sites-web/afroback/Mythologie/[pays]/[slug]/fr.md)
  * et de leurs storyboards (dossier "Récits africains storyboards/").
  *
  * Contrairement au pipeline héros (build-heroes-data.mjs + heroes.curated.ts,
@@ -64,6 +64,7 @@ const PALETTE = ['#E9BE77', '#A0522D', '#8B5A2B', '#C99A5B', '#E3A277'];
  */
 const MYTHES_CONFIG = {
   'mythe-miengu-esprits-eau-sawa': {
+    pays: 'Cameroun',
     zone: 'Littoral',
     chapitres: [
       { titre: 'Origines : le monde sous les eaux', paragraphes: [0, 1] },
@@ -73,6 +74,7 @@ const MYTHES_CONFIG = {
     ],
   },
   'mythe-nchare-yen-bamoun': {
+    pays: 'Cameroun',
     zone: 'Ouest (Grassfields)',
     chapitres: [
       { titre: 'Rifum, trois héritiers pour un seul trône', paragraphes: [0, 1] },
@@ -82,6 +84,7 @@ const MYTHES_CONFIG = {
     ],
   },
   'mythe-ngan-medza-beti': {
+    pays: 'Cameroun',
     zone: 'Centre',
     chapitres: [
       { titre: 'Nanga et les enfants de la savane (Origines)', paragraphes: [0] },
@@ -91,6 +94,7 @@ const MYTHES_CONFIG = {
     ],
   },
   'mythe-ngog-lituba-bassa': {
+    pays: 'Cameroun',
     zone: 'Littoral',
     chapitres: [
       { titre: 'Le rocher et la traque', paragraphes: [0] },
@@ -100,6 +104,7 @@ const MYTHES_CONFIG = {
     ],
   },
   'mythe-sao-geants-kotoko': {
+    pays: 'Cameroun',
     zone: 'Extrême-Nord',
     chapitres: [
       { titre: 'La légende des géants', paragraphes: [0, 1] },
@@ -155,9 +160,9 @@ function parseParagraphs(md) {
 const slugs = Object.keys(MYTHES_CONFIG).sort();
 
 const items = slugs.map((slug, index) => {
-  const filePath = join(MYTHOLOGIE_DIR, slug, 'fr.md');
-  const md = readFileSync(filePath, 'utf8');
   const config = MYTHES_CONFIG[slug];
+  const filePath = join(MYTHOLOGIE_DIR, config.pays, slug, 'fr.md');
+  const md = readFileSync(filePath, 'utf8');
 
   const titreMatch = md.match(/^#\s+(.+)$/m);
   const titre = titreMatch ? titreMatch[1].trim() : null;
@@ -189,7 +194,7 @@ const items = slugs.map((slug, index) => {
     image_url: MYTHES_MEDIA[slug] ?? null,
     narration_audio_url: null,
     ordre_affichage: index,
-    fichier_source: `livrables/sites-web/afroback/Mythologie/${slug}/fr.md`,
+    fichier_source: `livrables/sites-web/afroback/Mythologie/${config.pays}/${slug}/fr.md`,
   };
 
   const missing = ['titre', 'sous_titre', 'peuple', 'region', 'epoque', 'theme'].filter((k) => !item[k]);

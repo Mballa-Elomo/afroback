@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Génère src/data/heroes.generated.json à partir des récits du griot
- * (livrables/sites-web/afroback/Héros/[slug]/fr.md et en.md).
+ * (livrables/sites-web/afroback/Héros/[pays]/[slug]/fr.md et en.md).
  *
  * Ne parse QUE ce qui est mécaniquement fiable et vérifiable :
  * - le texte intégral du récit (FR + EN)
@@ -29,16 +29,18 @@ const STORYBOARDS_DIR = join(__dirname, '..', '..', '..', 'Récits africains sto
 const OUT_FILE = join(__dirname, '..', 'src', 'data', 'heroes.generated.json');
 
 const KNOWN_SLUGS = [
-  { slug: 'reine-nzinga', names: ['Reine Nzinga', 'Njinga', 'Nzinga Mbandi'] },
-  { slug: 'martin-paul-samba', names: ['Martin Paul Samba', 'Martin-Paul Samba', 'Mebenga'] },
-  { slug: 'rudolf-douala-manga-bell', names: ['Rudolf Douala Manga Bell', 'Rudolf Duala Manga Bell', 'Manga Bell'] },
-  { slug: 'sultan-njoya', names: ['Sultan Njoya', 'Ibrahim Njoya', 'Njoya'] },
-  { slug: 'ruben-um-nyobe', names: ['Ruben Um Nyobè', 'Um Nyobè', 'Um Nyobe'] },
-  { slug: 'charles-atangana', names: ['Charles Atangana', 'Atangana', 'Ntsama'] },
-  { slug: 'felix-moumie', names: ['Félix-Roland Moumié', 'Félix Moumié', 'Moumié'] },
-  { slug: 'ernest-ouandie', names: ['Ernest Ouandié', 'Ouandié'] },
-  { slug: 'manu-dibango', names: ['Manu Dibango', 'Dibango'] },
+  { slug: 'reine-nzinga', pays: 'Angola', names: ['Reine Nzinga', 'Njinga', 'Nzinga Mbandi'] },
+  { slug: 'martin-paul-samba', pays: 'Cameroun', names: ['Martin Paul Samba', 'Martin-Paul Samba', 'Mebenga'] },
+  { slug: 'rudolf-douala-manga-bell', pays: 'Cameroun', names: ['Rudolf Douala Manga Bell', 'Rudolf Duala Manga Bell', 'Manga Bell'] },
+  { slug: 'sultan-njoya', pays: 'Cameroun', names: ['Sultan Njoya', 'Ibrahim Njoya', 'Njoya'] },
+  { slug: 'ruben-um-nyobe', pays: 'Cameroun', names: ['Ruben Um Nyobè', 'Um Nyobè', 'Um Nyobe'] },
+  { slug: 'charles-atangana', pays: 'Cameroun', names: ['Charles Atangana', 'Atangana', 'Ntsama'] },
+  { slug: 'felix-moumie', pays: 'Cameroun', names: ['Félix-Roland Moumié', 'Félix Moumié', 'Moumié'] },
+  { slug: 'ernest-ouandie', pays: 'Cameroun', names: ['Ernest Ouandié', 'Ouandié'] },
+  { slug: 'manu-dibango', pays: 'Cameroun', names: ['Manu Dibango', 'Dibango'] },
 ];
+
+const PAYS_PAR_SLUG = Object.fromEntries(KNOWN_SLUGS.map((h) => [h.slug, h.pays]));
 
 function extractSection(markdown, startHeadingRegex) {
   const lines = markdown.split('\n');
@@ -354,8 +356,9 @@ function splitIntoChapters(texte, anchors, titres, slug, langue) {
 }
 
 function buildOne({ slug }) {
-  const frFile = join(RECITS_DIR, slug, 'fr.md');
-  const enFile = join(RECITS_DIR, slug, 'en.md');
+  const pays = PAYS_PAR_SLUG[slug];
+  const frFile = join(RECITS_DIR, pays, slug, 'fr.md');
+  const enFile = join(RECITS_DIR, pays, slug, 'en.md');
 
   const frRaw = readFileSync(frFile, 'utf8');
   const enRaw = readFileSync(enFile, 'utf8');
@@ -380,9 +383,9 @@ function buildOne({ slug }) {
   return {
     slug,
     recit_fr_texte,
-    recit_fr_fichier_source: `livrables/sites-web/afroback/Héros/${slug}/fr.md`,
+    recit_fr_fichier_source: `livrables/sites-web/afroback/Héros/${pays}/${slug}/fr.md`,
     recit_en_texte,
-    recit_en_fichier_source: `livrables/sites-web/afroback/Héros/${slug}/en.md`,
+    recit_en_fichier_source: `livrables/sites-web/afroback/Héros/${pays}/${slug}/en.md`,
     recit_chapitres_fr: splitIntoChapters(recit_fr_texte, anchors.fr, titres, slug, 'FR'),
     recit_chapitres_en: splitIntoChapters(recit_en_texte, anchors.en, titres, slug, 'EN'),
     frise_chronologique: parseFrise(frRaw),
@@ -393,15 +396,19 @@ function buildOne({ slug }) {
 }
 
 function main() {
-  const available = new Set(readdirSync(RECITS_DIR));
+  const availablePays = new Set(readdirSync(RECITS_DIR));
   const result = {};
-  for (const { slug } of KNOWN_SLUGS) {
-    if (!available.has(slug)) {
-      throw new Error(`Dossier manquant pour le slug "${slug}" dans ${RECITS_DIR}`);
+  for (const { slug, pays } of KNOWN_SLUGS) {
+    if (!availablePays.has(pays)) {
+      throw new Error(`Dossier pays manquant "${pays}" dans ${RECITS_DIR}`);
     }
-    const filesInSlugDir = new Set(readdirSync(join(RECITS_DIR, slug)));
+    const availableSlugs = new Set(readdirSync(join(RECITS_DIR, pays)));
+    if (!availableSlugs.has(slug)) {
+      throw new Error(`Dossier manquant pour le slug "${slug}" dans ${join(RECITS_DIR, pays)}`);
+    }
+    const filesInSlugDir = new Set(readdirSync(join(RECITS_DIR, pays, slug)));
     if (!filesInSlugDir.has('fr.md') || !filesInSlugDir.has('en.md')) {
-      throw new Error(`Fichiers fr.md/en.md manquants pour le slug "${slug}" dans ${join(RECITS_DIR, slug)}`);
+      throw new Error(`Fichiers fr.md/en.md manquants pour le slug "${slug}" dans ${join(RECITS_DIR, pays, slug)}`);
     }
     result[slug] = buildOne({ slug });
     const frise = result[slug].frise_chronologique.length;

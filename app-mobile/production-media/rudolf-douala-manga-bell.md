@@ -128,7 +128,7 @@ Les lignes de voix off ci-dessous sont reprises telles quelles du storyboard, pl
 Le script ci-dessus est en français, calé planche par planche sur le storyboard vidéo. Le storyboardeur n'a produit aucun script anglais équivalent. Deux options pour produire la version EN, à trancher par Yannick ou le prestataire :
 
 1. **(Recommandé)** Traduire directement ce script FR planche par planche, pour garder la synchronisation exacte avec les plans vidéo.
-2. Redécouper le récit anglais déjà existant (`Héros/rudolf-douala-manga-bell/en.md`) en segments correspondant aux mêmes 96 beats narratifs — plus long à faire, mais permet un anglais plus naturel.
+2. Redécouper le récit anglais déjà existant (`Héros/Cameroun/rudolf-douala-manga-bell/en.md`) en segments correspondant aux mêmes 96 beats narratifs — plus long à faire, mais permet un anglais plus naturel.
 
 Aucun script anglais improvisé n'a été fabriqué ici : ce choix revient à Yannick / au prestataire.
 

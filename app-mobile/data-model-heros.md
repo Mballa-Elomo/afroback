@@ -2,7 +2,7 @@
 
 > Document produit pour la Phase 0 du développement de l'app mobile native (React Native). Sert de base au pôle dev de Madou Consulting pour l'écran "catalogue héros", la "fiche héros", le "lecteur de récit" et le "lecteur audio/vidéo".
 >
-> Sources : 9 récits du griot AFROBACK (`livrables/sites-web/afroback/Héros/[nom-du-héros]/`) et leurs storyboards vidéo associés (`livrables/sites-web/afroback/Récits africains storyboards/`). Aucune information n'est inventée au-delà de ce qui est lu dans ces fichiers.
+> Sources : 9 récits du griot AFROBACK (`livrables/sites-web/afroback/Héros/[Pays]/[nom-du-héros]/`) et leurs storyboards vidéo associés (`livrables/sites-web/afroback/Récits africains storyboards/`). Aucune information n'est inventée au-delà de ce qui est lu dans ces fichiers.
 
 ---
 
@@ -22,7 +22,7 @@
 | `annee_naissance_indicative` | `text` | Année ou période de naissance, texte libre car plusieurs héros ont des dates incertaines/débattues dans les sources (ex. "v. 1583", "12 décembre 1933") | Optionnel |
 | `annee_mort_indicative` | `text` | Idem pour le décès, `null` non applicable si figure encore vivante (aucun cas ici) | Optionnel |
 | `recit_fr_texte` | `text` (ou clé de stockage objet si fichier long) | Texte intégral du récit narré par le griot, version française, section "Le récit du griot" | Oui |
-| `recit_fr_fichier_source` | `text` | Chemin du fichier source FR (ex. `livrables/sites-web/afroback/Héros/reine-nzinga/fr.md`) | Oui |
+| `recit_fr_fichier_source` | `text` | Chemin du fichier source FR (ex. `livrables/sites-web/afroback/Héros/Angola/reine-nzinga/fr.md`) | Oui |
 | `recit_en_texte` | `text` | Texte intégral du récit, version anglaise | Oui (si dispo) |
 | `recit_en_fichier_source` | `text` | Chemin du fichier source EN | Oui (si dispo) |
 | `frise_chronologique` | `jsonb` | Tableau d'objets `{date, evenement}` repris de la section "Frise chronologique" de la fiche structurée | Oui |
@@ -62,7 +62,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) |
-| Fichiers sources | `Héros/reine-nzinga/fr.md`, `en.md` ; `Récits africains storyboards/reine-nzinga/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Angola/reine-nzinga/fr.md`, `en.md` ; `Récits africains storyboards/reine-nzinga/chapitre-1.md` à `chapitre-4.md` |
 
 ### 2. Martin Paul Samba (Mebenga m'Ebono)
 
@@ -79,7 +79,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) |
-| Fichiers sources | `Héros/martin-paul-samba/fr.md`, `en.md` ; `Récits africains storyboards/martin-paul-samba/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Cameroun/martin-paul-samba/fr.md`, `en.md` ; `Récits africains storyboards/martin-paul-samba/chapitre-1.md` à `chapitre-4.md` |
 
 ### 3. Rudolf Douala Manga Bell
 
@@ -96,7 +96,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) |
-| Fichiers sources | `Héros/rudolf-douala-manga-bell/fr.md`, `en.md` ; `Récits africains storyboards/rudolf-douala-manga-bell/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Cameroun/rudolf-douala-manga-bell/fr.md`, `en.md` ; `Récits africains storyboards/rudolf-douala-manga-bell/chapitre-1.md` à `chapitre-4.md` |
 
 ### 4. Sultan Njoya (Ibrahim Njoya)
 
@@ -113,7 +113,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) |
-| Fichiers sources | `Héros/sultan-njoya/fr.md`, `en.md` ; `Récits africains storyboards/sultan-njoya/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Cameroun/sultan-njoya/fr.md`, `en.md` ; `Récits africains storyboards/sultan-njoya/chapitre-1.md` à `chapitre-4.md` |
 
 ### 5. Ruben Um Nyobè (le Mpodol)
 
@@ -130,7 +130,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) |
-| Fichiers sources | `Héros/ruben-um-nyobe/fr.md`, `en.md` ; `Récits africains storyboards/ruben-um-nyobe/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Cameroun/ruben-um-nyobe/fr.md`, `en.md` ; `Récits africains storyboards/ruben-um-nyobe/chapitre-1.md` à `chapitre-4.md` |
 
 ### 6. Charles Atangana (Ntsama, dit Karl)
 
@@ -147,7 +147,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) — ce storyboard comporte en plus un "Avertissement de lecture" explicite en tête de chapitre 1, à reprendre dans l'app comme bandeau contextuel sur la fiche héros |
-| Fichiers sources | `Héros/charles-atangana/fr.md`, `en.md` ; `Récits africains storyboards/charles-atangana/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Cameroun/charles-atangana/fr.md`, `en.md` ; `Récits africains storyboards/charles-atangana/chapitre-1.md` à `chapitre-4.md` |
 
 ### 7. Félix-Roland Moumié
 
@@ -164,7 +164,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) |
-| Fichiers sources | `Héros/felix-moumie/fr.md`, `en.md` ; `Récits africains storyboards/felix-moumie/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Cameroun/felix-moumie/fr.md`, `en.md` ; `Récits africains storyboards/felix-moumie/chapitre-1.md` à `chapitre-4.md` |
 
 ### 8. Ernest Ouandié
 
@@ -181,7 +181,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) |
-| Fichiers sources | `Héros/ernest-ouandie/fr.md`, `en.md` ; `Récits africains storyboards/ernest-ouandie/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Cameroun/ernest-ouandie/fr.md`, `en.md` ; `Récits africains storyboards/ernest-ouandie/chapitre-1.md` à `chapitre-4.md` |
 
 ### 9. Manu Dibango
 
@@ -198,7 +198,7 @@
 | Statut récit texte | Prêt (FR + EN) |
 | Statut narration audio | À produire |
 | Statut vidéo | Storyboard prêt (96 planches) |
-| Fichiers sources | `Héros/manu-dibango/fr.md`, `en.md` ; `Récits africains storyboards/manu-dibango/chapitre-1.md` à `chapitre-4.md` |
+| Fichiers sources | `Héros/Cameroun/manu-dibango/fr.md`, `en.md` ; `Récits africains storyboards/manu-dibango/chapitre-1.md` à `chapitre-4.md` |
 
 ---
 

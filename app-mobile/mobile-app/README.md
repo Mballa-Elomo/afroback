@@ -40,7 +40,7 @@ Alternative sans téléphone : `npx expo start --web` ouvre l'app dans le naviga
 
 Les données ne s'éditent **jamais directement en base**. Le pipeline complet :
 
-1. **Auto-extrait** (`scripts/build-heroes-data.mjs`, mécanique et fiable) : texte intégral du récit FR/EN, frise chronologique, sources, héros liés, chapitres du storyboard **avec le détail des 24 planches par chapitre** (texte à l'écran, voix off, cadrage, décor, ambiance, durée, transition — alimente `StoryboardSlideshow`) — lu directement dans `../../Héros/[nom-du-héros]/` et `../../Récits africains storyboards/`. Régénère `src/data/heroes.generated.json`.
+1. **Auto-extrait** (`scripts/build-heroes-data.mjs`, mécanique et fiable) : texte intégral du récit FR/EN, frise chronologique, sources, héros liés, chapitres du storyboard **avec le détail des 24 planches par chapitre** (texte à l'écran, voix off, cadrage, décor, ambiance, durée, transition — alimente `StoryboardSlideshow`) — lu directement dans `../../Héros/[Pays]/[nom-du-héros]/` et `../../Récits africains storyboards/`. Régénère `src/data/heroes.generated.json`.
 2. **Curaté à la main** (`src/data/heroes.curated.ts`) : résumé catalogue, thème, citations avec leur statut d'attestation, légendes, avertissement de lecture. Volontairement **pas auto-extrait** : ces champs demandent un jugement éditorial (ex. distinguer une citation attestée d'une citation rapportée), qu'un parseur générique risquerait de mal classer. À éditer à la main pour un nouveau héros.
 3. **Génération du SQL** (`scripts/generate-supabase-seed.mjs`) : fusionne les deux sources et produit `supabase/seed.sql`.
 4. **Vérification mécanique** (`scripts/verify-seed-sql.mjs`) : compare, pour chaque héros, le nombre de colonnes déclarées au nombre de valeurs fournies, et vérifie l'équilibre des guillemets/parenthèses sur tout le fichier — **à lancer systématiquement avant de coller quoi que ce soit dans le SQL Editor** (voir "Corrections de test (2026-07-31)", point 2bis : un vrai bug de ce type est passé inaperçu une fois).
@@ -216,7 +216,7 @@ La maquette (`KID HOME`) montrait un "Jeu du jour", "Apprendre l'ewondo" et une 
 
 ## Pilier Mythologie (2026-08-05)
 
-> 5 récits mythologiques déjà écrits par l'agent griot (`Mythologie/mythe-*/fr.md`), jamais branchés à l'app jusqu'ici. Détail complet du modèle de données dans `app-mobile/data-model-mythologie.md`.
+> 5 récits mythologiques déjà écrits par l'agent griot (`Mythologie/Cameroun/mythe-*/fr.md`), jamais branchés à l'app jusqu'ici. Détail complet du modèle de données dans `app-mobile/data-model-mythologie.md`.
 
 - **Vérification faite avant de coder** : Yannick pensait avoir "déjà mis les histoires et les images". Les 5 récits texte existent bien, mais **aucune image ni narration audio n'a été retrouvée** pour ce pilier (recherché dans `app-mobile/` et `context/import/`) — `image_url`/`narration_audio_url` restent `null` pour les 5 mythes, état "bientôt disponible" comme partout ailleurs sur ce projet quand un média manque.
 - **Pipeline de données plus simple que celui des héros** : un seul script mécanique (`scripts/build-mythologie-data.mjs`) extrait les champs de la fiche structurée de chaque `.md` et découpe le récit en 4 chapitres, avec des titres repris verbatim des vrais storyboards (`## Chapitre N/4 — ...`) et un regroupement de paragraphes fixé à la main par mythe (`MYTHES_CONFIG`, comme `CHAPITRE_ANCHORS` pour les héros) — 5 éléments seulement, pas besoin d'une couche curatée séparée. `scripts/generate-mythologie-seed.mjs` génère `supabase/schema-mythologie.sql`.
@@ -340,7 +340,7 @@ scripts/
   generate-supabase-seed.mjs   génère supabase/seed.sql à partir de cet export
   build-decouverte-data.mjs    régénère decouverte.generated.json depuis livrables/.../Découverte/*.md
   generate-decouverte-seed.mjs génère supabase/seed-decouverte.sql à partir de decouverte.generated.json
-  build-mythologie-data.mjs    régénère mythologie.generated.json depuis livrables/.../Mythologie/mythe-*/fr.md + leurs storyboards
+  build-mythologie-data.mjs    régénère mythologie.generated.json depuis livrables/.../Mythologie/Cameroun/mythe-*/fr.md + leurs storyboards
   generate-mythologie-seed.mjs génère supabase/schema-mythologie.sql à partir de mythologie.generated.json
 supabase/
   seed.sql                     schéma + seed complet, exécuté dans Supabase (héros) — ⚠️ à réexécuter (2026-08-06, video_url de Martin Paul Samba retiré — lien mort)

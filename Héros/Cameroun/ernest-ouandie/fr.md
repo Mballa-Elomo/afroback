@@ -50,7 +50,7 @@ Alors retiens ceci. Ernest Ouandié n'a pas commencé sa vie en héros auréolé
 - Novembre 1943 : obtient le diplôme de moniteur indigène à l'École primaire supérieure de Yaoundé, devient instituteur
 - 1948 : adhère à l'UPC ; élu vice-président du parti en 1952
 - 13 juillet 1955 : l'UPC est interdite par l'administration française, le parti entre dans la clandestinité et l'action armée commence
-- 1958-1964 : assassinat de Ruben Um Nyobè (13 septembre 1958), empoisonnement de Félix-Roland Moumié (mort le 4 novembre 1960), mort en exil d'Abel Kingué (16 juin 1964) : Ouandié devient, dans cet ordre, dirigeant puis dernier chef historique survivant de l'UPC, à la tête de la lutte armée depuis son retour clandestin au Cameroun en juillet 1961
+- 1958-1964 : assassinat de Ruben Um Nyobè (13 septembre 1958), empoisonnement de Félix-Roland Moumié (mort le 4 novembre 1960), mort en exil d'Abel Kingué (16 avril 1964) : Ouandié devient, dans cet ordre, dirigeant puis dernier chef historique survivant de l'UPC, à la tête de la lutte armée depuis son retour clandestin au Cameroun en juillet 1961
 - 19 août 1970 : capturé près de Mbanga après une décennie de maquis, à la suite de la médiation ratée de Mgr Albert Ndongmo et de la trahison d'un catéchiste
 - 15 janvier 1971 : exécuté publiquement par un peloton de soldats camerounais commandé par un officier français, sur la place du marché de Bafoussam, devant environ 40 000 personnes, aux côtés de Gabriel Tabeu et Raphaël Fotsing
 - 16 décembre 1991 : réhabilité et déclaré héros national par la loi n° 91/022 (après le vote de l'Assemblée nationale camerounaise du 27 juin 1991)
@@ -82,7 +82,7 @@ Aucune parole d'Ernest Ouandié au moment de son exécution n'est confirmée à 
 
 - Ruben Um Nyobè, fondateur de l'UPC, tué par les forces françaises le 13 septembre 1958 dans la forêt de la Sanaga-Maritime
 - Félix-Roland Moumié, deuxième dirigeant de l'UPC, empoisonné au thallium par un agent des services secrets français, mort à Genève le 4 novembre 1960
-- Abel Kingué, vice-président de l'UPC aux côtés d'Ouandié, mort en exil au Caire le 16 juin 1964
+- Abel Kingué, vice-président de l'UPC aux côtés d'Ouandié, mort en exil au Caire le 16 avril 1964
 - Mgr Albert Ndongmo, évêque bamiléké, médiateur puis co-accusé dans le procès de 1970-1971, condamné à mort puis gracié en 1976
 - Martin Paul Samba (Mebenga m'Ebono), chef bulu exécuté par les Allemands en 1914, déjà couvert dans le pilier Histoires & Héros pour le même thème de résistance à la domination coloniale sur le sol camerounais
 - Reine Nzinga (Njinga a Mbande), reine de Ndongo et de Matamba, déjà couverte dans le pilier Histoires & Héros pour le même thème de résistance à la colonisation

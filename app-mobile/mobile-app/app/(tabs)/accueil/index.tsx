@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -48,12 +48,26 @@ function pickFeatured(heroes: Heros[]): Heros | undefined {
   return pool[dayOfYear % pool.length];
 }
 
+/** Pas de défilement fixe : ~2 cartes (135px + 14px de gap) par appui sur ‹ ›, utile surtout au clavier/souris (export web Vercel). */
+const POUR_TOI_SCROLL_STEP = 149 * 2;
+
 export default function AccueilScreen() {
   const router = useRouter();
   const { session } = useAuth();
   const heroesState = useHeroesList();
   const heroes = heroesState.status === 'ready' ? heroesState.data : [];
   const [reading, setReading] = useState<ReadingProgress | null>(null);
+  const pourToiRef = useRef<ScrollView>(null);
+  const pourToiOffset = useRef(0);
+
+  const scrollPourToiBy = (delta: number) => {
+    const next = Math.max(0, pourToiOffset.current + delta);
+    pourToiOffset.current = next;
+    pourToiRef.current?.scrollTo({ x: next, animated: true });
+  };
+  const onPourToiScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    pourToiOffset.current = e.nativeEvent.contentOffset.x;
+  };
 
   const prenom = ((session?.user?.user_metadata?.prenom as string | undefined) ?? '').toUpperCase();
 
@@ -108,24 +122,6 @@ export default function AccueilScreen() {
           <Text style={styles.searchPlaceholder}>Rechercher un héros, un lieu, un objet...</Text>
         </Pressable>
 
-        <Pressable style={styles.donBanner} onPress={() => router.push('/don')}>
-          <Text style={styles.donIcon}>🙏</Text>
-          <View style={styles.donBody}>
-            <Text style={styles.donTitle}>Soutenir AFROBACK</Text>
-            <Text style={styles.donSub}>Aide à financer les prochains récits, audios et vidéos</Text>
-          </View>
-          <Text style={styles.donChevron}>›</Text>
-        </Pressable>
-
-        <Pressable style={styles.mythBanner} onPress={() => router.push('/accueil/mythologie')}>
-          <Text style={styles.mythIcon}>📖</Text>
-          <View style={styles.mythBody}>
-            <Text style={styles.mythTitle}>Découvrir la mythologie africaine</Text>
-            <Text style={styles.mythSub}>5 mythes fondateurs, par peuple — lire, écouter, BD</Text>
-          </View>
-          <Text style={styles.mythChevron}>›</Text>
-        </Pressable>
-
         {featured && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>HISTOIRE DU JOUR</Text>
@@ -178,11 +174,34 @@ export default function AccueilScreen() {
           <View style={styles.section}>
             <View style={styles.sectionRow}>
               <Text style={styles.sectionLabel}>POUR TOI</Text>
-              <Pressable onPress={() => router.push('/accueil/histoires-heros')}>
-                <Text style={styles.seeAll}>Tout voir →</Text>
-              </Pressable>
+              <View style={styles.pourToiActions}>
+                <Pressable
+                  onPress={() => scrollPourToiBy(-POUR_TOI_SCROLL_STEP)}
+                  hitSlop={6}
+                  style={styles.scrollArrow}
+                >
+                  <Text style={styles.scrollArrowLabel}>‹</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => scrollPourToiBy(POUR_TOI_SCROLL_STEP)}
+                  hitSlop={6}
+                  style={styles.scrollArrow}
+                >
+                  <Text style={styles.scrollArrowLabel}>›</Text>
+                </Pressable>
+                <Pressable onPress={() => router.push('/accueil/histoires-heros')}>
+                  <Text style={styles.seeAll}>Tout voir →</Text>
+                </Pressable>
+              </View>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pourToiRow}>
+            <ScrollView
+              ref={pourToiRef}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              onScroll={onPourToiScroll}
+              scrollEventThrottle={32}
+              contentContainerStyle={styles.pourToiRow}
+            >
               {pourToi.map((h) => (
                 <Pressable key={h.slug} style={styles.pourToiItem} onPress={() => router.push(`/accueil/heros/${h.slug}`)}>
                   <HeroPlaceholder style={styles.pourToiThumb} radius={14} imageUrl={h.image_carte_catalogue} />
@@ -194,6 +213,42 @@ export default function AccueilScreen() {
             </ScrollView>
           </View>
         )}
+
+        {/*
+         * La maquette prévoit ici une bannière "ESPACE PARTENAIRE · SPONSORISÉ"
+         * (emplacement publicitaire générique). Volontairement non construite :
+         * aucun partenaire réel n'existe à ce jour, et afficher une bannière
+         * "Emplacement publicitaire" vide serait un faux contenu, contraire à
+         * la règle du projet (jamais un élément qui a l'air fonctionnel sans
+         * l'être). À construire seulement le jour où un vrai partenaire existe.
+         */}
+
+        <Pressable style={styles.marketBanner} onPress={() => router.push('/marche')}>
+          <Text style={styles.marketIcon}>🪘</Text>
+          <View style={styles.marketBody}>
+            <Text style={styles.marketTitle}>Explorer le Marketplace</Text>
+            <Text style={styles.marketSub}>Artisanat authentique, vendu directement par les artisans</Text>
+          </View>
+          <Text style={styles.marketChevron}>›</Text>
+        </Pressable>
+
+        <Pressable style={styles.mythBanner} onPress={() => router.push('/accueil/mythologie')}>
+          <Text style={styles.mythIcon}>📖</Text>
+          <View style={styles.mythBody}>
+            <Text style={styles.mythTitle}>Découvrir la mythologie africaine</Text>
+            <Text style={styles.mythSub}>5 mythes fondateurs, par peuple — lire, écouter, BD</Text>
+          </View>
+          <Text style={styles.mythChevron}>›</Text>
+        </Pressable>
+
+        <Pressable style={styles.donBanner} onPress={() => router.push('/don')}>
+          <Text style={styles.donIcon}>🙏</Text>
+          <View style={styles.donBody}>
+            <Text style={styles.donTitle}>Soutenir AFROBACK</Text>
+            <Text style={styles.donSub}>Aide à financer les prochains récits, audios et vidéos</Text>
+          </View>
+          <Text style={styles.donChevron}>›</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -316,6 +371,58 @@ const styles = StyleSheet.create({
   },
   mythChevron: {
     fontSize: 18,
+    color: colors.accentGold,
+  },
+  marketBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.placeholderStripeDark,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 14,
+  },
+  marketIcon: {
+    fontSize: 20,
+  },
+  marketBody: {
+    flex: 1,
+  },
+  marketTitle: {
+    fontFamily: typography.bodySemiBold,
+    fontSize: 13.5,
+    color: colors.textPrimary,
+  },
+  marketSub: {
+    fontFamily: typography.body,
+    fontSize: 11,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+  marketChevron: {
+    fontSize: 18,
+    color: colors.accentGold,
+  },
+  pourToiActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  scrollArrow: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scrollArrowLabel: {
+    fontFamily: typography.bodySemiBold,
+    fontSize: 13,
     color: colors.accentGold,
   },
   section: {

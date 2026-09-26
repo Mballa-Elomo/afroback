@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -24,8 +24,13 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayoutRootView}>
+  // Sur web, l'app (pensée pour un écran de téléphone) s'étirait sur toute
+  // la largeur du navigateur — retour de test de Yannick le 2026-09-26
+  // ("obligé de dézoomer pour tout voir"). Cadre centré à une largeur de
+  // téléphone (max 480px) sur web uniquement ; iOS/Android inchangés (déjà
+  // plein écran, comportement natif normal).
+  const content = (
+    <>
       <StatusBar style="light" />
       <AuthProvider>
         <WizardStateProvider>
@@ -34,9 +39,38 @@ export default function RootLayout() {
           </ActiveProfileProvider>
         </WizardStateProvider>
       </AuthProvider>
+    </>
+  );
+
+  if (Platform.OS !== 'web') {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background }} onLayout={onLayoutRootView}>
+        {content}
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.webOuter} onLayout={onLayoutRootView}>
+      <View style={[styles.webFrame, { backgroundColor: colors.background }]}>{content}</View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  webOuter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#050302',
+  },
+  webFrame: {
+    width: '100%',
+    maxWidth: 480,
+    height: '100%',
+    overflow: 'hidden',
+  },
+});
 
 /**
  * Grille d'accès : sans session → onboarding (splash 3D, connexion,
@@ -84,11 +118,23 @@ function RootNavigator() {
         <Stack.Screen name="onboarding/mfa-challenge" />
       </Stack.Protected>
       <Stack.Protected guard={!!session && mfaOk && !onboardingComplete}>
+        {/* mfa-proposal en premier : "Protège ton compte" s'affiche juste
+            après l'inscription, avant tout le reste de l'assistant — voir
+            app-mobile/cdc-mfa-inscription.md (Option B, suggéré jamais
+            forcé). L'ordre des <Stack.Screen> dans un groupe qui vient de
+            devenir actif détermine l'écran affiché par défaut. */}
+        <Stack.Screen name="onboarding/mfa-proposal" />
         <Stack.Screen name="onboarding/language" />
         <Stack.Screen name="onboarding/usage" />
         <Stack.Screen name="onboarding/plan" />
         <Stack.Screen name="onboarding/payment" />
         <Stack.Screen name="onboarding/welcome" />
+      </Stack.Protected>
+      {/* profil/mfa joignable dès que la session est prête, pas seulement
+          une fois l'onboarding terminé — mfa-proposal doit pouvoir y
+          naviguer avant que `onboardingComplete` ne soit vrai. */}
+      <Stack.Protected guard={!!session && mfaOk}>
+        <Stack.Screen name="profil/mfa" />
       </Stack.Protected>
       <Stack.Protected guard={!!session && mfaOk && onboardingComplete && profileState.status === 'selecting'}>
         <Stack.Screen name="profils/selection" />
@@ -113,7 +159,6 @@ function RootNavigator() {
         <Stack.Screen name="profils/parent" />
         <Stack.Screen name="don/index" />
         <Stack.Screen name="don/montant" />
-        <Stack.Screen name="profil/mfa" />
       </Stack.Protected>
     </Stack>
   );

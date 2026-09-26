@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../src/auth/AuthProvider';
@@ -8,49 +8,36 @@ import { colors, spacing, typography } from '../../src/theme/tokens';
 
 /**
  * Porte de vérification MFA, affichée par RootNavigator (app/_layout.tsx)
- * quand une session existe mais que le niveau d'assurance requis (aal2)
- * n'est pas encore atteint — voir AuthProvider.tsx (`mfaStatus`). Le mot de
- * passe seul ne suffit plus à entrer dans l'app pour un compte qui a activé
- * la vérification en 2 étapes.
+ * quand une session existe mais que le code TOTP n'a pas encore été validé
+ * pour cette session — voir `AuthProvider.tsx` (`mfaStatus`). Réécrit le
+ * 2026-09-26 pour utiliser `mfa_totp_verify_challenge` (TOTP maison) au
+ * lieu de `supabase.auth.mfa.challengeAndVerify` (module natif cassé).
  */
 export default function MfaChallengeScreen() {
-  const { refreshMfaStatus, signOut } = useAuth();
-  const [factorId, setFactorId] = useState<string | null>(null);
+  const { confirmMfaChallengePassed, signOut } = useAuth();
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    supabase.auth.mfa.listFactors().then(({ data }) => {
-      const totp = data?.totp.find((f) => f.status === 'verified');
-      setFactorId(totp?.id ?? null);
-    });
-  }, []);
-
   const onSubmit = async () => {
-    if (!factorId) {
-      setError("Impossible de retrouver ta configuration de vérification. Déconnecte-toi et réessaie.");
-      return;
-    }
     if (!/^\d{6}$/.test(code)) {
       setError('Entre le code à 6 chiffres affiché dans ton application d’authentification.');
       return;
     }
     setError(null);
     setBusy(true);
-    try {
-      const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
-      setBusy(false);
-      if (verifyError) {
+    const { data, error: rpcError } = await supabase.rpc('mfa_totp_verify_challenge', { p_code: code });
+    setBusy(false);
+    if (rpcError || !data?.ok) {
+      if (data?.error === 'verrouille') {
+        setError('Trop de tentatives échouées. Réessaie dans quelques minutes.');
+      } else {
         setError('Code incorrect. Vérifie l’heure de ton téléphone et réessaie.');
-        return;
       }
-      await refreshMfaStatus();
-      // Succès : mfaStatus passe à 'satisfied', RootNavigator laisse entrer dans l'app.
-    } catch (e) {
-      setBusy(false);
-      setError(e instanceof Error ? e.message : 'Erreur réseau inattendue. Réessaie.');
+      return;
     }
+    confirmMfaChallengePassed();
+    // Succès : mfaStatus passe à 'satisfied', RootNavigator laisse entrer dans l'app.
   };
 
   return (

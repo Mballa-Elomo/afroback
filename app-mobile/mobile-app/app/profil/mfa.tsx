@@ -2,66 +2,57 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SvgXml } from 'react-native-svg';
+import QRCode from 'react-native-qrcode-svg';
 import { useAuth } from '../../src/auth/AuthProvider';
 import { supabase } from '../../src/data/supabaseClient';
 import { GoldButton, GhostButton } from '../../src/components/Buttons';
 import { colors, spacing, typography } from '../../src/theme/tokens';
 
 /**
- * Activation/désactivation de la vérification en 2 étapes (MFA/TOTP), lot
- * cybersécurité du 2026-09-25. Écran atteint depuis Profil, jamais imposé —
- * l'utilisateur choisit de l'activer. Voir AuthProvider.tsx pour le détail
- * du choix TOTP (pas SMS) et le fonctionnement de la porte de connexion.
+ * Activation/désactivation de la vérification en 2 étapes (MFA/TOTP).
+ * Réécrit le 2026-09-26 pour utiliser le TOTP maison (voir
+ * `supabase/schema-totp-custom.sql` et la note en tête d'`AuthProvider.tsx`)
+ * plutôt que le module MFA natif de Supabase (bug serveur confirmé,
+ * "Error generating QR Code"). Le QR code est maintenant généré et rendu
+ * entièrement côté app (`react-native-qrcode-svg`), plus par le serveur.
  */
 
-type FactorSummary = { id: string; friendlyName: string | null; status: string };
-
 type EnrollState = {
-  factorId: string;
-  qrSvg: string | null;
-  secret: string;
+  otpauthUri: string;
+  secretBase32: string;
 };
 
 export default function MfaSetupScreen() {
   const router = useRouter();
-  const { refreshMfaStatus } = useAuth();
+  const { refreshMfaStatus, confirmMfaChallengePassed } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [verifiedFactor, setVerifiedFactor] = useState<FactorSummary | null>(null);
+  const [enabled, setEnabled] = useState(false);
   const [enroll, setEnroll] = useState<EnrollState | null>(null);
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadFactors = async () => {
+  const loadStatus = async () => {
     setLoading(true);
-    const { data, error: listError } = await supabase.auth.mfa.listFactors();
-    if (!listError && data) {
-      const totp = data.totp.find((f) => f.status === 'verified');
-      setVerifiedFactor(totp ? { id: totp.id, friendlyName: totp.friendly_name ?? null, status: totp.status } : null);
-    }
+    const { data } = await supabase.rpc('mfa_totp_status');
+    setEnabled(!!data?.enabled);
     setLoading(false);
   };
 
   useEffect(() => {
-    loadFactors();
+    loadStatus();
   }, []);
 
   const startEnroll = async () => {
     setError(null);
     setBusy(true);
-    try {
-      const { data, error: enrollError } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
-      setBusy(false);
-      if (enrollError || !data) {
-        setError(describeMfaError(enrollError));
-        return;
-      }
-      setEnroll({ factorId: data.id, qrSvg: extractSvgXml(data.totp.qr_code), secret: data.totp.secret });
-    } catch (e) {
-      setBusy(false);
-      setError(describeMfaError(e));
+    const { data, error: rpcError } = await supabase.rpc('mfa_totp_enroll');
+    setBusy(false);
+    if (rpcError || !data?.ok) {
+      setError(rpcError?.message ?? "Impossible de démarrer la configuration. Réessaie.");
+      return;
     }
+    setEnroll({ otpauthUri: data.otpauth_uri, secretBase32: data.secret_base32 });
   };
 
   const confirmEnroll = async () => {
@@ -72,39 +63,32 @@ export default function MfaSetupScreen() {
     }
     setError(null);
     setBusy(true);
-    try {
-      const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({
-        factorId: enroll.factorId,
-        code,
-      });
-      setBusy(false);
-      if (verifyError) {
-        setError('Code incorrect. Vérifie l’heure de ton téléphone et réessaie.');
-        return;
-      }
-      setEnroll(null);
-      setCode('');
-      await refreshMfaStatus();
-      await loadFactors();
-      Alert.alert('Activée', 'La vérification en 2 étapes est maintenant active sur ton compte.');
-    } catch (e) {
-      setBusy(false);
-      setError(describeMfaError(e instanceof Error ? e.message : String(e)));
+    const { data, error: rpcError } = await supabase.rpc('mfa_totp_confirm', { p_code: code });
+    setBusy(false);
+    if (rpcError || !data?.ok) {
+      setError('Code incorrect. Vérifie l’heure de ton téléphone et réessaie.');
+      return;
     }
+    setEnroll(null);
+    setCode('');
+    // Le code qu'on vient de vérifier ici satisfait déjà le défi MFA de
+    // cette session — éviter de redemander immédiatement le même code sur
+    // l'écran de connexion juste après (voir AuthProvider.tsx).
+    confirmMfaChallengePassed();
+    await loadStatus();
+    Alert.alert('Activée', 'La vérification en 2 étapes est maintenant active sur ton compte.');
   };
 
-  const cancelEnroll = async () => {
-    // Un facteur "unverified" laissé en base gênerait une future tentative — on le retire proprement.
-    if (enroll) {
-      await supabase.auth.mfa.unenroll({ factorId: enroll.factorId }).catch(() => {});
-    }
+  const cancelEnroll = () => {
+    // Un facteur non confirmé sera simplement écrasé par la prochaine
+    // tentative d'activation (mfa_totp_enroll fait un upsert) — rien à
+    // nettoyer explicitement côté serveur.
     setEnroll(null);
     setCode('');
     setError(null);
   };
 
   const disableMfa = () => {
-    if (!verifiedFactor) return;
     Alert.alert(
       'Désactiver la vérification en 2 étapes ?',
       'Ton compte sera de nouveau protégé par le mot de passe seul.',
@@ -115,19 +99,14 @@ export default function MfaSetupScreen() {
           style: 'destructive',
           onPress: async () => {
             setBusy(true);
-            try {
-              const { error: unenrollError } = await supabase.auth.mfa.unenroll({ factorId: verifiedFactor.id });
-              setBusy(false);
-              if (unenrollError) {
-                Alert.alert('Erreur', "La désactivation n'a pas fonctionné. Réessaie.");
-                return;
-              }
-              await refreshMfaStatus();
-              await loadFactors();
-            } catch {
-              setBusy(false);
+            const { error: rpcError } = await supabase.rpc('mfa_totp_disable');
+            setBusy(false);
+            if (rpcError) {
               Alert.alert('Erreur', "La désactivation n'a pas fonctionné. Réessaie.");
+              return;
             }
+            await refreshMfaStatus();
+            await loadStatus();
           },
         },
       ]
@@ -153,16 +132,12 @@ export default function MfaSetupScreen() {
           ) : enroll ? (
             <View style={styles.card}>
               <Text style={styles.step}>1. Scanne ce code avec ton application d’authentification</Text>
-              {enroll.qrSvg ? (
-                <View style={styles.qrWrap}>
-                  <SvgXml xml={enroll.qrSvg} width={200} height={200} />
-                </View>
-              ) : (
-                <Text style={styles.error}>QR code indisponible — utilise la saisie manuelle ci-dessous.</Text>
-              )}
+              <View style={styles.qrWrap}>
+                <QRCode value={enroll.otpauthUri} size={200} />
+              </View>
               <Text style={styles.step}>Ou saisis ce code manuellement :</Text>
               <Text style={styles.secret} selectable>
-                {enroll.secret}
+                {enroll.secretBase32}
               </Text>
               <Text style={styles.step}>2. Entre le code à 6 chiffres affiché</Text>
               <TextInput
@@ -181,7 +156,7 @@ export default function MfaSetupScreen() {
                 <GhostButton label="Annuler" onPress={cancelEnroll} />
               </View>
             </View>
-          ) : verifiedFactor ? (
+          ) : enabled ? (
             <View style={styles.card}>
               <Text style={styles.statusOn}>✅ Activée</Text>
               <Text style={styles.statusDetail}>
@@ -206,48 +181,6 @@ export default function MfaSetupScreen() {
       </SafeAreaView>
     </View>
   );
-}
-
-/**
- * Le SDK peut renvoyer un message d'erreur inexploitable tel quel (ex. le
- * corps JSON brut sérialisé, littéralement "{}") — bug rencontré au premier
- * test réel (2026-09-25), TOTP pourtant déjà activé côté dashboard Supabase
- * (piste écartée). Construit un diagnostic aussi précis que possible
- * (statut HTTP, code d'erreur, nom) plutôt que de deviner à l'aveugle —
- * temporaire, à retirer une fois la vraie cause identifiée.
- */
-function describeMfaError(err: unknown): string {
-  if (err && typeof err === 'object') {
-    const e = err as { message?: string; status?: number; code?: string; name?: string };
-    const parts = [
-      e.message?.trim() && e.message.trim() !== '{}' ? e.message.trim() : null,
-      e.status ? `statut HTTP ${e.status}` : null,
-      e.code ? `code "${e.code}"` : null,
-      e.name ? `(${e.name})` : null,
-    ].filter(Boolean);
-    if (parts.length > 0) return parts.join(' — ');
-    try {
-      const raw = JSON.stringify(err);
-      if (raw && raw !== '{}') return `Erreur inattendue : ${raw}`;
-    } catch {
-      // ignore
-    }
-  }
-  return 'Erreur inattendue, sans détail exploitable renvoyé par le serveur. Réessaie, ou vérifie ta connexion réseau.';
-}
-
-/** Le SDK renvoie le QR code en data URI SVG (`data:image/svg+xml;utf-8,<svg>...`). */
-function extractSvgXml(qrCode: string): string | null {
-  const match = qrCode.match(/^data:image\/svg\+xml;utf-8,(.+)$/s);
-  if (match) {
-    try {
-      return decodeURIComponent(match[1]);
-    } catch {
-      return match[1];
-    }
-  }
-  if (qrCode.trim().startsWith('<svg')) return qrCode;
-  return null;
 }
 
 const styles = StyleSheet.create({

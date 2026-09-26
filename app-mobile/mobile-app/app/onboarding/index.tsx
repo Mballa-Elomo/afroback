@@ -1,22 +1,43 @@
-import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { GoldButton } from '../../src/components/Buttons';
+import { OnboardingScene3D } from '../../src/components/OnboardingScene3D';
 import { colors, typography } from '../../src/theme/tokens';
 
 /**
- * Splash/onboarding — 3 slides. La maquette Claude Design (`AFROBACK
- * Mobile.dc.html`) utilise une scène three.js (canvas WebGL) pour l'animation
- * d'intro : ce contenu précis (géométrie, shaders) n'a pas pu être récupéré
- * (fichier de maquette tronqué à 256 Kio côté outil de lecture, cette section
- * tombait après la coupure). Le layout, les couleurs, la typographie et la
- * structure (logo, titre, texte, pagination, boutons) restent fidèles à la
- * maquette ; l'animation est remplacée par un halo pulsé + anneau rotatif en
- * pur React Native (Animated), sans dépendance WebGL supplémentaire — à
- * remplacer par une vraie scène 3D (expo-gl + three.js) si Yannick veut la
- * fidélité exacte du prototype sur ce point précis.
+ * Splash/onboarding — refonte du 2026-09-26, fidèle au markup verbatim de
+ * la maquette (`AFROBACK Mobile.dc.html`, section `<!-- ==== ONBOARDING
+ * (3D) ==== -->`, lignes 68-93, lue via DesignSync le même jour) : fond en
+ * dégradé chaud montant du bas de l'écran, halo, logo, wordmark, et une
+ * zone de scène 3D (`<canvas id="afb-onb">` dans la maquette) entre le logo
+ * et le titre.
+ *
+ * **Vraie scène 3D** (demande explicite de Yannick, pas une imitation 2D) :
+ * `expo-gl` + `three.js`, voir `src/components/OnboardingScene3D.tsx` — le
+ * script exact de la maquette (WebGL/Three.js chargé via CDN) est hors de
+ * portée de la lecture à 256 Kio de `AFROBACK Mobile.dc.html`, remplacé par
+ * une composition originale cohérente avec l'identité de marque (particules
+ * dorées, anneaux filaires, cœur lumineux pulsé) plutôt qu'une copie du
+ * script introuvable.
+ *
+ * Simplification assumée restante : **wordmark en dégradé texte**
+ * (`background-clip:text` CSS, non supporté nativement par RN sans
+ * `@react-native-masked-view`, pas ajouté) — approximé par une couleur
+ * pleine, le ton le plus clair du dégradé (`accentGoldPale`).
  */
+
+// Couleurs extraites verbatim de cette section de la maquette — pas encore
+// dans theme/tokens.ts (qui vient d'autres écrans), locales à ce fichier.
+const MOCKUP = {
+  gradientTop: '#0d0805',
+  gradientMidLow: '#160d06',
+  gradientMidHigh: '#3a1d0a',
+  gradientBottom: '#7a3d12',
+  bodyText: '#E7D6BE',
+};
 
 const SLIDES = [
   {
@@ -39,24 +60,29 @@ export default function OnboardingIntroScreen() {
   const isLast = step === SLIDES.length - 1;
 
   const goLogin = () => router.replace('/onboarding/login');
-
-  const next = () => {
-    if (isLast) {
-      goLogin();
-    } else {
-      setStep((s) => s + 1);
-    }
-  };
+  const next = () => (isLast ? goLogin() : setStep((s) => s + 1));
 
   return (
     <View style={styles.wrap}>
-      <View style={styles.glowBlob} />
+      {/* Dégradé radial(150% 70% at 50% 118%, ...) approximé par un dégradé
+          vertical — RN n'a pas de radial-gradient natif, la lecture visuelle
+          (sombre en haut, chaud en bas) reste fidèle sur un écran portrait. */}
+      <LinearGradient
+        colors={[MOCKUP.gradientTop, MOCKUP.gradientMidLow, MOCKUP.gradientMidHigh, MOCKUP.gradientBottom]}
+        locations={[0, 0.42, 0.72, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={styles.glowBlob} pointerEvents="none" />
+
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.content}>
-          <Image source={require('../../assets/icon.png')} style={styles.logo} />
+          <View style={styles.logoWrap}>
+            <View style={styles.logoGlow} />
+            <Image source={require('../../assets/icon.png')} style={styles.logo} />
+          </View>
           <Text style={styles.brand}>AFROBACK</Text>
 
-          <OnboardingMotif />
+          <OnboardingScene3D height={250} />
 
           <View style={styles.spacer} />
 
@@ -84,64 +110,22 @@ export default function OnboardingIntroScreen() {
   );
 }
 
-/** Halo pulsé + anneau rotatif, tient lieu de scène 3D (voir note en tête de fichier). */
-function OnboardingMotif() {
-  const pulse = useRef(new Animated.Value(0)).current;
-  const rotate = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: 1800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0, duration: 1800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-      ])
-    ).start();
-    Animated.loop(
-      Animated.timing(rotate, { toValue: 1, duration: 14000, easing: Easing.linear, useNativeDriver: true })
-    ).start();
-  }, []);
-
-  const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] });
-  const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.55, 1] });
-  const spin = rotate.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
-
-  return (
-    <View style={styles.motifWrap}>
-      <Animated.View style={[styles.motifGlow, { opacity, transform: [{ scale }] }]} />
-      <Animated.View style={[styles.motifRing, { transform: [{ rotate: spin }] }]}>
-        {Array.from({ length: 10 }, (_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.motifDot,
-              {
-                transform: [
-                  { rotate: `${(360 / 10) * i}deg` },
-                  { translateY: -78 },
-                ],
-              },
-            ]}
-          />
-        ))}
-      </Animated.View>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   wrap: {
     flex: 1,
-    backgroundColor: colors.backgroundPlayerTo,
+    backgroundColor: MOCKUP.gradientTop,
+    overflow: 'hidden',
   },
   glowBlob: {
     position: 'absolute',
     left: '50%',
     bottom: -180,
-    marginLeft: -190,
     width: 380,
     height: 380,
+    marginLeft: -190,
     borderRadius: 190,
-    backgroundColor: 'rgba(210,120,45,.18)',
+    backgroundColor: 'rgba(255,205,120,.22)',
   },
   safe: {
     flex: 1,
@@ -150,46 +134,33 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingHorizontal: 30,
-    paddingTop: 20,
-    paddingBottom: 24,
+    paddingTop: 30,
+    paddingBottom: 34,
+  },
+  logoWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoGlow: {
+    position: 'absolute',
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: 'rgba(240,195,107,.3)',
   },
   logo: {
     width: 52,
     height: 52,
     borderRadius: 26,
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.4)',
   },
   brand: {
     fontFamily: typography.displayExtraBold,
-    letterSpacing: 3.5,
     fontSize: 13,
-    color: colors.accentGoldBright,
+    letterSpacing: 2.9,
+    color: colors.accentGoldPale,
     marginTop: 12,
-  },
-  motifWrap: {
-    width: '100%',
-    height: 220,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  motifGlow: {
-    position: 'absolute',
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(240,195,107,.28)',
-  },
-  motifRing: {
-    width: 1,
-    height: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  motifDot: {
-    position: 'absolute',
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: colors.accentGold,
   },
   spacer: {
     flex: 1,
@@ -197,19 +168,27 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: typography.display,
     fontSize: 27,
+    fontWeight: '700',
     color: colors.textHeading,
-    textAlign: 'center',
     lineHeight: 31,
+    textAlign: 'center',
+    maxWidth: 290,
+    textShadowColor: 'rgba(0,0,0,.6)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 18,
   },
   text: {
     fontFamily: typography.body,
     fontSize: 14,
     lineHeight: 22,
-    color: colors.textQuote,
+    color: MOCKUP.bodyText,
     textAlign: 'center',
-    marginTop: 14,
     maxWidth: 275,
+    marginTop: 14,
     alignSelf: 'center',
+    textShadowColor: 'rgba(0,0,0,.55)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 10,
   },
   bottom: {
     width: '100%',
@@ -224,18 +203,18 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.placeholderStripeLight,
+    backgroundColor: 'rgba(240,195,107,.25)',
   },
   dotActive: {
     backgroundColor: colors.accentGold,
   },
   skip: {
-    marginTop: 14,
     alignItems: 'center',
+    marginTop: 14,
   },
   skipLabel: {
     fontFamily: typography.body,
     fontSize: 12.5,
-    color: colors.textMuted,
+    color: colors.textMutedAlt,
   },
 });

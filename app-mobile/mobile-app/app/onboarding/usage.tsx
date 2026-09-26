@@ -15,13 +15,13 @@ const USAGE_OPTIONS = [
   },
   {
     id: 'enfants',
-    icon: '👦',
+    icon: '🧒',
     title: 'Créer des profils pour mes enfants',
     subtitle: 'Espace enfant sécurisé, façon Netflix',
   },
   {
     id: 'vendeur',
-    icon: '🏆',
+    icon: '🪘',
     title: 'Vendre mes créations sur la Marketplace',
     subtitle: 'Espace vendeur · abonnement séparé',
   },
@@ -45,11 +45,14 @@ export default function UsageStepScreen() {
 
           <View style={styles.list}>
             {USAGE_OPTIONS.map((opt) => {
-              const selected = usages.includes(opt.id);
+              // "decouverte" est l'usage grand public de base, toujours actif (voir maquette : pas de
+              // onClick sur cette carte, coche non désélectionnable) — les 2 autres restent librement togglables.
+              const isFixed = opt.id === 'decouverte';
+              const selected = isFixed || usages.includes(opt.id);
               return (
                 <Pressable
                   key={opt.id}
-                  onPress={() => toggleUsage(opt.id)}
+                  onPress={isFixed ? undefined : () => toggleUsage(opt.id)}
                   style={[styles.card, selected && styles.cardSelected]}
                 >
                   <Text style={styles.cardIcon}>{opt.icon}</Text>

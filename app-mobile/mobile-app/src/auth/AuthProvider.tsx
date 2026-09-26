@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../data/supabaseClient';
 
@@ -11,13 +11,24 @@ import { supabase } from '../data/supabaseClient';
  * `signUpWithPhone` crée bien le compte mais aucune session n'est ouverte
  * (voir le message d'erreur renvoyé dans ce cas).
  *
- * Authentification à deux facteurs (MFA/2FA, lot cybersécurité du 2026-09-25) :
- * TOTP uniquement (app d'authentification type Google Authenticator/Authy),
- * jamais SMS — même raison que ci-dessus, pas de fournisseur SMS payant à
- * gérer. Optionnelle, activée volontairement par l'utilisateur depuis son
- * Profil (voir `app/profil/mfa.tsx`). Le second facteur est géré nativement
- * par Supabase Auth (`supabase.auth.mfa`), aucune table applicative
- * supplémentaire nécessaire pour le stocker.
+ * Authentification à deux facteurs (MFA/2FA, lot cybersécurité du 2026-09-25,
+ * revu le 2026-09-26) : TOTP uniquement (app d'authentification type Google
+ * Authenticator/Authy), jamais SMS — même raison que ci-dessus, pas de
+ * fournisseur SMS payant à gérer. Proposée activement juste après
+ * l'inscription (`app/onboarding/mfa-proposal.tsx`), jamais obligatoire —
+ * voir `app-mobile/cdc-mfa-inscription.md`.
+ *
+ * **TOTP maison, pas le module MFA natif de Supabase Auth** : ce dernier
+ * échoue à 100% côté serveur (`"Error generating QR Code"`, bug confirmé le
+ * 2026-09-25, hors de notre contrôle). Remplacé par une implémentation
+ * conforme au RFC 6238, calculée et vérifiée en PL/pgSQL
+ * (`supabase/schema-totp-custom.sql`) via des fonctions RPC
+ * (`mfa_totp_enroll`, `mfa_totp_confirm`, `mfa_totp_status`,
+ * `mfa_totp_verify_challenge`, `mfa_totp_disable`) — jamais
+ * `supabase.auth.mfa.*`. Le niveau d'assurance de session (AAL) n'existe
+ * plus côté Supabase pour ce facteur : `mfaChallengeSatisfiedRef` ci-dessous
+ * en tient lieu, en mémoire seulement (jamais persisté), ce qui a le même
+ * effet voulu — revalider le code à chaque nouveau lancement de l'app.
  */
 
 export interface OnboardingChoices {
@@ -30,17 +41,15 @@ export interface OnboardingChoices {
 }
 
 /**
- * Statut MFA (2FA), lot cybersécurité du 2026-09-25 : distinct de la session
- * elle-même. Une session peut exister (mot de passe correct) sans avoir
- * encore franchi le niveau d'assurance requis (`aal2`) si l'utilisateur a
- * activé un facteur TOTP — voir `refreshMfaStatus`. TOTP choisi plutôt que
- * SMS (coût récurrent déjà écarté le 2026-07-30 pour l'auth téléphone elle-même).
+ * Statut MFA (2FA) : distinct de la session elle-même. Une session peut
+ * exister (mot de passe correct) sans avoir encore passé le défi TOTP de
+ * cette session — voir `refreshMfaStatus`/`confirmMfaChallengePassed`.
  */
 export type MfaStatus =
   | 'unknown' // pas encore vérifié
   | 'not_enrolled' // aucun facteur MFA activé sur ce compte
-  | 'challenge_required' // facteur activé, session pas encore montée à aal2
-  | 'satisfied'; // pas de MFA, ou MFA déjà validé pour cette session
+  | 'challenge_required' // facteur activé, code pas encore saisi pour cette session
+  | 'satisfied'; // pas de MFA, ou code déjà validé pour cette session
 
 interface AuthState {
   /** undefined tant que la session initiale n'a pas été lue depuis le stockage local. */
@@ -49,6 +58,8 @@ interface AuthState {
   onboardingComplete: boolean;
   mfaStatus: MfaStatus;
   refreshMfaStatus: () => Promise<void>;
+  /** Appelée par l'écran de défi (`app/onboarding/mfa-challenge.tsx`) après un code validé — fait passer `mfaStatus` à 'satisfied' pour le reste de cette session app. */
+  confirmMfaChallengePassed: () => void;
   signUpWithPhone: (params: {
     phone: string;
     password: string;
@@ -65,20 +76,23 @@ const AuthContext = createContext<AuthState | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [mfaStatus, setMfaStatus] = useState<MfaStatus>('unknown');
+  // En mémoire seulement (jamais persisté) : se réinitialise à chaque
+  // lancement de l'app, donc le défi MFA est revalidé une fois par session
+  // app — comportement voulu, équivalent à ce que faisait l'AAL Supabase.
+  const mfaChallengeSatisfiedRef = useRef(false);
 
   const refreshMfaStatus = async () => {
-    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (error || !data) {
+    const { data, error } = await supabase.rpc('mfa_totp_status');
+    if (error || !data?.enabled) {
       setMfaStatus('not_enrolled');
       return;
     }
-    if (data.nextLevel === 'aal2' && data.currentLevel !== data.nextLevel) {
-      setMfaStatus('challenge_required');
-    } else if (data.nextLevel === 'aal1' || !data.nextLevel) {
-      setMfaStatus('not_enrolled');
-    } else {
-      setMfaStatus('satisfied');
-    }
+    setMfaStatus(mfaChallengeSatisfiedRef.current ? 'satisfied' : 'challenge_required');
+  };
+
+  const confirmMfaChallengePassed = () => {
+    mfaChallengeSatisfiedRef.current = true;
+    setMfaStatus('satisfied');
   };
 
   useEffect(() => {
@@ -106,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       onboardingComplete,
       mfaStatus,
       refreshMfaStatus,
+      confirmMfaChallengePassed,
       async signUpWithPhone({ phone, password, prenom, pays }) {
         if (!isLikelyValidE164(phone)) {
           return { error: 'Numéro de téléphone invalide. Vérifie le pays et le numéro saisis.' };
@@ -169,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // 2026-09-25) : révoque la session sur TOUS les appareils connectés
         // avec ce compte, pas seulement celui-ci — comportement déjà celui
         // par défaut du SDK, rendu explicite plutôt qu'implicite.
+        mfaChallengeSatisfiedRef.current = false;
         await supabase.auth.signOut({ scope: 'global' });
       },
     }),
@@ -192,8 +208,6 @@ function translateAuthError(message: string): string {
     'Phone not confirmed': "Ce numéro n'est pas confirmé. Vérifie la configuration du provider Phone dans Supabase.",
     'Unsupported phone provider': "L'authentification par téléphone n'est pas encore activée côté Supabase.",
     'Signups not allowed for this instance': 'Les inscriptions ne sont pas autorisées pour le moment.',
-    'Invalid TOTP code entered': 'Code incorrect. Vérifie l’heure de ton téléphone et réessaie.',
-    'Invalid MFA code': 'Code incorrect. Vérifie l’heure de ton téléphone et réessaie.',
   };
   return known[message] ?? message;
 }

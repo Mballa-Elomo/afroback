@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
+import { AppState } from 'react-native';
 import { supabase } from '../data/supabaseClient';
+import { getDeviceId, getDeviceName } from '../security/device';
 import i18n, { currentLanguage } from '../i18n';
 import { LEGAL_VERSION } from '../legal/documents';
 
@@ -63,6 +65,15 @@ export type MfaStatus =
   | 'challenge_required' // facteur activé, code pas encore saisi pour cette session
   | 'satisfied'; // pas de MFA, ou code déjà validé pour cette session
 
+/**
+ * Appareil (cdc-appareil-unique.md) : un compte = un appareil actif, et un
+ * appareil inconnu doit prouver l'identité avant d'accéder à l'app.
+ */
+export type DeviceStatus =
+  | 'unknown' // vérification en cours
+  | 'ok' // appareil de confiance et actif (ou fonction serveur pas encore installée)
+  | 'a_verifier'; // appareil inconnu : écran "Nouvel appareil détecté"
+
 interface AuthState {
   /** undefined tant que la session initiale n'a pas été lue depuis le stockage local. */
   session: Session | null | undefined;
@@ -95,6 +106,16 @@ interface AuthState {
   exitGuestMode: () => void;
   completeOnboarding: (choices: OnboardingChoices) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
+  deviceStatus: DeviceStatus;
+  /** 'autre_appareil' : cet appareil vient d'être déconnecté parce que le compte a été validé ailleurs. */
+  sessionEndedReason: 'autre_appareil' | null;
+  clearSessionEndedReason: () => void;
+  /** Envoie le code "nouvel appareil" à l'email du compte. */
+  requestDeviceCode: () => Promise<{ error: string | null }>;
+  /** Valide l'appareil avec le code reçu par email. */
+  verifyDeviceWithEmailCode: (code: string) => Promise<{ error: string | null }>;
+  /** Valide l'appareil avec le code de l'application d'authentification (vérifié côté serveur). */
+  verifyDeviceWithTotp: (code: string) => Promise<{ error: string | null; locked?: boolean }>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -111,6 +132,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // AVANT que le nouveau mot de passe soit enregistré. On ne la publie pas
   // tout de suite, sinon la navigation quitterait l'écran en plein milieu.
   const recoveringRef = useRef(false);
+  // Appareil : "connexion fraîche" (mot de passe ou code juste saisi ici) →
+  // cet appareil peut prendre la main ; sinon (app rouverte avec une session
+  // mémorisée) on se contente de vérifier qu'il est toujours l'actif.
+  const [deviceStatus, setDeviceStatus] = useState<DeviceStatus>('unknown');
+  const [sessionEndedReason, setSessionEndedReason] = useState<'autre_appareil' | null>(null);
+  const freshLoginRef = useRef(false);
+  const revokeOthersAfterActivationRef = useRef(false);
 
   const refreshMfaStatus = async () => {
     const { data, error } = await supabase.rpc('mfa_totp_status');
@@ -144,6 +172,78 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id]);
 
+  /** Fin de session parce qu'un autre appareil a pris la main : déconnexion locale + message. */
+  const endSessionReplaced = async () => {
+    mfaChallengeSatisfiedRef.current = false;
+    setSessionEndedReason('autre_appareil');
+    await supabase.auth.signOut({ scope: 'local' });
+  };
+
+  /** Réponse serveur "appareil actif" : déconnecte les autres sessions et prévient par email si nouvel appareil. */
+  const onDeviceActivated = async (res: { nouveau?: boolean; alerte?: boolean; autre_appareil_deconnecte?: boolean }) => {
+    setDeviceStatus('ok');
+    setSessionEndedReason(null);
+    if (res.nouveau || res.autre_appareil_deconnecte) {
+      await supabase.auth.signOut({ scope: 'others' }).catch(() => {});
+    }
+    if (revokeOthersAfterActivationRef.current) {
+      revokeOthersAfterActivationRef.current = false;
+      await supabase.rpc('revoquer_autres_appareils', { p_device_id: await getDeviceId() });
+    }
+    if (res.alerte) {
+      // Email d'alerte (seulement si le compte avait déjà un autre appareil) (fonction serveur "alerte-connexion") : best-effort, ne bloque jamais.
+      supabase.functions
+        .invoke('alerte-connexion', { body: { appareil: getDeviceName(), langue: currentLanguage() } })
+        .catch(() => {});
+    }
+  };
+
+  const checkDevice = async () => {
+    const fresh = freshLoginRef.current;
+    freshLoginRef.current = false;
+    const deviceId = await getDeviceId();
+    const { data, error } = await supabase.rpc(fresh ? 'ouvrir_session_appareil' : 'etat_appareil', {
+      p_device_id: deviceId,
+      p_nom: getDeviceName(),
+    });
+    if (error) {
+      // Script serveur pas encore exécuté (ou réseau) : fonctionnalité inactive, on ne bloque jamais l'accès.
+      setDeviceStatus('ok');
+      return;
+    }
+    const etat = (data as { etat?: string })?.etat;
+    if (etat === 'actif') return onDeviceActivated(data as { nouveau?: boolean; autre_appareil_deconnecte?: boolean });
+    if (etat === 'remplace') return endSessionReplaced();
+    setDeviceStatus(etat === 'a_verifier' ? 'a_verifier' : 'ok');
+  };
+
+  useEffect(() => {
+    if (session) {
+      checkDevice();
+    } else {
+      setDeviceStatus('unknown');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id]);
+
+  // L'ancien appareil découvre qu'il a été remplacé : toutes les 60 s et à chaque retour sur l'app (D2).
+  useEffect(() => {
+    if (!session || deviceStatus !== 'ok') return;
+    const poll = async () => {
+      const { data, error } = await supabase.rpc('etat_appareil', { p_device_id: await getDeviceId() });
+      if (!error && (data as { etat?: string })?.etat === 'remplace') endSessionReplaced();
+    };
+    const id = setInterval(poll, 60_000);
+    const sub = AppState.addEventListener('change', (st) => {
+      if (st === 'active') poll();
+    });
+    return () => {
+      clearInterval(id);
+      sub.remove();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id, deviceStatus]);
+
   const onboardingComplete = session?.user?.user_metadata?.onboarding_complete === true;
   // Une session ouverte (inscription ou connexion depuis le mode invité) met fin au mode invité.
   const isGuest = guestMode && !session;
@@ -172,7 +272,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }),
       };
     }
+    freshLoginRef.current = true;
     const { error } = await supabase.auth.signInWithPassword(credentials);
+    if (error) freshLoginRef.current = false;
     // Email non confirmé : Supabase ne le signale qu'après un mot de passe correct,
     // ce n'est donc pas un échec de connexion au sens du verrouillage.
     const unconfirmed = !!error && (error.code === 'email_not_confirmed' || error.message === 'Email not confirmed');
@@ -190,6 +292,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshMfaStatus,
       confirmMfaChallengePassed,
       isGuest,
+      deviceStatus,
+      sessionEndedReason,
+      clearSessionEndedReason: () => setSessionEndedReason(null),
+      async requestDeviceCode() {
+        const email = session?.user?.email;
+        if (!email) return { error: i18n.t('device.noEmail') };
+        const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+        return { error: error ? translateAuthError(error.message) : null };
+      },
+      async verifyDeviceWithEmailCode(code) {
+        const email = session?.user?.email;
+        if (!email) return { error: i18n.t('device.noEmail') };
+        // Le code ouvre une session dont le jeton porte la preuve "otp", que le serveur vérifie.
+        const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
+        if (error) return { error: translateAuthError(error.message) };
+        const { data, error: rpcError } = await supabase.rpc('valider_appareil', {
+          p_device_id: await getDeviceId(),
+          p_nom: getDeviceName(),
+        });
+        if (rpcError || (data as { etat?: string })?.etat !== 'actif') return { error: i18n.t('device.failed') };
+        await onDeviceActivated(data as { nouveau?: boolean; autre_appareil_deconnecte?: boolean });
+        return { error: null };
+      },
+      async verifyDeviceWithTotp(code) {
+        const { data, error } = await supabase.rpc('valider_appareil', {
+          p_device_id: await getDeviceId(),
+          p_nom: getDeviceName(),
+          p_code_totp: code,
+        });
+        const res = data as { etat?: string; erreur?: string } | null;
+        if (error || res?.etat !== 'actif') {
+          const locked = res?.erreur === 'verrouille';
+          return { error: locked ? i18n.t('mfa.errors.locked') : i18n.t('mfa.errors.codeWrong'), locked };
+        }
+        // Le même code vaut aussi pour la vérification en 2 étapes de cette session.
+        confirmMfaChallengePassed();
+        await onDeviceActivated(res as { nouveau?: boolean; autre_appareil_deconnecte?: boolean });
+        return { error: null };
+      },
       enterGuestMode: () => setGuestMode(true),
       exitGuestMode: () => setGuestMode(false),
       async signUpWithEmail({ email, password, prenom, telephone }) {
@@ -238,11 +379,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: null, needsVerification: !data.session };
       },
       async verifySignupCode({ email, code }) {
+        freshLoginRef.current = true;
         const { error } = await supabase.auth.verifyOtp({
           email: email.trim().toLowerCase(),
           token: code,
           type: 'email',
         });
+        if (error) freshLoginRef.current = false;
         return { error: error ? translateAuthError(error.message) : null };
       },
       async resendSignupCode(email) {
@@ -259,13 +402,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       async resetPasswordWithCode({ email, code, password }) {
         recoveringRef.current = true;
+        // Nouveau mot de passe : cet appareil devient l'actif et les autres perdent la confiance (règle D3).
+        freshLoginRef.current = true;
+        revokeOthersAfterActivationRef.current = true;
         try {
           const { error: verifyError } = await supabase.auth.verifyOtp({
             email: email.trim().toLowerCase(),
             token: code,
             type: 'recovery',
           });
-          if (verifyError) return { error: translateAuthError(verifyError.message) };
+          if (verifyError) {
+            freshLoginRef.current = false;
+            revokeOthersAfterActivationRef.current = false;
+            return { error: translateAuthError(verifyError.message) };
+          }
           const { error: updateError } = await supabase.auth.updateUser({ password });
           if (updateError) {
             // Code valide mais mot de passe refusé : on referme la session ouverte par le code.
@@ -321,7 +471,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await supabase.auth.signOut({ scope: 'global' });
       },
     }),
-    [session, onboardingComplete, mfaStatus, isGuest]
+    [session, onboardingComplete, mfaStatus, isGuest, deviceStatus, sessionEndedReason]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

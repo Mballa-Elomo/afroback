@@ -14,11 +14,14 @@ import { BootScreen } from '../src/components/BootScreen';
  * adulte comme avant.
  */
 export default function Index() {
-  const { session, onboardingComplete, isGuest, mfaStatus } = useAuth();
+  const { session, onboardingComplete, isGuest, mfaStatus, deviceStatus } = useAuth();
   const { state: profileState } = useActiveProfile();
 
   if (session === undefined) return <BootScreen />;
   if (!session) return <Redirect href={isGuest ? '/accueil' : '/onboarding'} />;
+  // Appareil inconnu (cdc-appareil-unique.md) : prouver l'identité d'abord.
+  if (deviceStatus === 'unknown') return <BootScreen />;
+  if (deviceStatus === 'a_verifier') return <Redirect href="/onboarding/nouvel-appareil" />;
   // Vérification en 2 étapes : tant que le code n'est pas saisi, seul l'écran
   // de code est accessible — rediriger ailleurs donnait un écran noir
   // (constaté le 2026-09-29 après un changement de mot de passe).

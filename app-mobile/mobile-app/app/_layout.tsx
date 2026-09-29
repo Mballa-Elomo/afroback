@@ -103,20 +103,26 @@ const styles = StyleSheet.create({
  * sélecteur comme l'Espace Parent y renvoient tous les deux).
  */
 function RootNavigator() {
-  const { session, onboardingComplete, mfaStatus, isGuest } = useAuth();
+  const { session, onboardingComplete, mfaStatus, isGuest, deviceStatus } = useAuth();
   const { state: profileState } = useActiveProfile();
 
   // session === undefined tant que la lecture de la session locale (AsyncStorage) n'est pas terminée.
   if (session === undefined) return <BootScreen />;
   // mfaStatus === 'unknown' tant que le niveau d'assurance n'a pas été vérifié auprès de Supabase.
   if (!!session && mfaStatus === 'unknown') return <BootScreen />;
+  // Appareil (cdc-appareil-unique.md) : vérification en cours.
+  if (!!session && deviceStatus === 'unknown') return <BootScreen />;
   // profileState.status === 'checking' tant que la liste des profils enfants n'a pas été chargée
   // (voir ActiveProfileProvider) — évite un flash d'écran vide entre les deux.
   if (!!session && onboardingComplete && profileState.status === 'checking') return <BootScreen />;
 
+  // Appareil inconnu : seul l'écran "Nouvel appareil détecté" est accessible,
+  // avant même la vérification en 2 étapes (son code peut servir de preuve).
+  const deviceOk = !session || deviceStatus === 'ok';
   // Une fois 'unknown' écarté ci-dessus, seul 'challenge_required' bloque encore l'accès —
   // 'not_enrolled' (pas de 2FA activée) et 'satisfied' (2FA validée) se comportent pareil.
-  const mfaOk = !session || mfaStatus !== 'challenge_required';
+  const mfaPassed = !session || mfaStatus !== 'challenge_required';
+  const mfaOk = deviceOk && mfaPassed;
 
   return (
     // Chaque écran construit son propre en-tête (retour, titre) pour coller
@@ -136,7 +142,10 @@ function RootNavigator() {
         <Stack.Screen name="onboarding/verification-email" />
         <Stack.Screen name="onboarding/mot-de-passe-oublie" />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && !mfaOk}>
+      <Stack.Protected guard={!!session && !deviceOk}>
+        <Stack.Screen name="onboarding/nouvel-appareil" />
+      </Stack.Protected>
+      <Stack.Protected guard={!!session && deviceOk && !mfaPassed}>
         <Stack.Screen name="onboarding/mfa-challenge" />
       </Stack.Protected>
       <Stack.Protected guard={!!session && mfaOk && !onboardingComplete}>

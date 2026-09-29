@@ -13,6 +13,7 @@ import {
 import { AnimatedTitleBlock } from '../../src/onboarding/AnimatedText';
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
+import { SessionEndedNotice } from '../../src/security/SessionEndedNotice';
 
 /**
  * Écran 6 — "Bienvenue dans ton voyage" (maquette de Yannick, 2026-09-29).
@@ -46,6 +47,7 @@ export default function BienvenueScreen() {
         </View>
 
         <View style={styles.bottom}>
+          <SessionEndedNotice />
           <AnimatedTitleBlock
             line1={t('bienvenue.line1')}
             line2={t('bienvenue.line2')}

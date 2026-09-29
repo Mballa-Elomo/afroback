@@ -8,6 +8,7 @@ import { FormField } from '../../src/onboarding/FormField';
 import { BrandMark, MotifFrieze, ONBOARDING_BG, PillButton } from '../../src/onboarding/ui';
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
+import { SessionEndedNotice } from '../../src/security/SessionEndedNotice';
 
 /**
  * Connexion — restylée aux couleurs de la maquette du 2026-09-29.
@@ -75,6 +76,9 @@ export default function LoginScreen() {
             </Pressable>
 
             <BrandMark layout="inline" />
+            <View style={{ marginTop: 16 }}>
+              <SessionEndedNotice />
+            </View>
             <Text style={styles.title} accessibilityRole="header">
               {t('login.title')}
             </Text>

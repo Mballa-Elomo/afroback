@@ -1,0 +1,56 @@
+<!--
+  Modèle d'email "Magic Link" d'AFROBACK : sert au code "Nouvel appareil
+  détecté" (cdc-appareil-unique.md). À coller dans Supabase :
+  Authentication → Emails → Magic Link → onglet "Source".
+  Sujet conseillé : AFROBACK · Confirme ce nouvel appareil / Confirm this new device
+
+  Variables utilisées plus bas : .Token (code à 6 chiffres), .Data.prenom,
+  .Data.langue ("fr" ou "en"). Même mise en page que confirm-signup.html.
+-->
+<!DOCTYPE html>
+<html>
+  <body style="margin:0;padding:0;background:#0B0906;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0B0906;padding:32px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#15100B;border:1px solid #4A3818;border-radius:18px;">
+            <tr>
+              <td align="center" style="padding:34px 28px 8px 28px;">
+                <img src="https://afroback-test.vercel.app/email/afroback-logo.png" width="72" height="72" alt="AFROBACK" style="display:block;width:72px;height:72px;border:0;margin:0 auto 14px auto;" />
+                <div style="font-family:Georgia,'Times New Roman',serif;font-size:28px;font-weight:bold;letter-spacing:5px;color:#F0C36B;">AFROBACK</div>
+                <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#C9B8A4;margin-top:6px;">
+                  {{ if eq .Data.langue "en" }}Back to our roots{{ else }}Retour aux origines{{ end }}
+                </div>
+                <div style="height:1px;background:#4A3818;margin:24px 0 0 0;"></div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:22px 28px 6px 28px;font-family:Arial,Helvetica,sans-serif;color:#EDE3D4;">
+                <p style="font-size:17px;margin:0 0 12px 0;">
+                  {{ if eq .Data.langue "en" }}Hello {{ .Data.prenom }},{{ else }}Bonjour {{ .Data.prenom }},{{ end }}
+                </p>
+                <p style="font-size:15px;line-height:23px;margin:0;color:#D6C6B2;">
+                  {{ if eq .Data.langue "en" }}Someone is logging in to your AFROBACK account from a new device. If it is you, enter this code in the app:{{ else }}Une connexion à ton compte AFROBACK a lieu depuis un nouvel appareil. Si c'est toi, saisis ce code dans l'application :{{ end }}
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:22px 28px;">
+                <div style="display:inline-block;background:#0B0906;border:1px solid #F0C36B;border-radius:14px;padding:16px 26px;font-family:'Courier New',Courier,monospace;font-size:36px;font-weight:bold;letter-spacing:10px;color:#F7D98B;">{{ .Token }}</div>
+                <p style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#9A8870;margin:14px 0 0 0;">
+                  {{ if eq .Data.langue "en" }}Valid for 15 minutes.{{ else }}Valable 15 minutes.{{ end }}
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:6px 28px 30px 28px;font-family:Arial,Helvetica,sans-serif;font-size:12.5px;line-height:19px;color:#E3A277;">
+                {{ if eq .Data.langue "en" }}It is not you? Do not share this code with anyone and change your password right away with "Forgot password?" in the app.{{ else }}Ce n'est pas toi ? Ne donne ce code à personne et change ton mot de passe tout de suite avec "Mot de passe oublié ?" dans l'application.{{ end }}
+              </td>
+            </tr>
+          </table>
+          <p style="font-family:Arial,Helvetica,sans-serif;font-size:11.5px;color:#6F5F4D;margin:18px 0 0 0;">AFROBACK · Yaoundé, Cameroun</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -78,6 +78,24 @@ Passer à un nom de domaine à toi (ex. `bonjour@afroback.com`) donnera une imag
 |---|---|
 | `mobile-app/supabase/schema-acces-abonnement.sql` | Contenus gratuits / réservés aux abonnés |
 | `mobile-app/supabase/schema-telephone-inscription.sql` | Numéro de téléphone saisi à l'inscription = identifiant de connexion |
+| `mobile-app/supabase/schema-appareil-unique.sql` | Vérification des nouveaux appareils, un seul appareil connecté à la fois |
 
-Les deux sont sans risque à relancer.
+Tous sont sans risque à relancer.
+
+## Nouvel appareil : modèle d'email "Magic Link"
+
+1. **Authentication → Emails → Templates → Magic Link**.
+2. Champ **Subject** : `AFROBACK · Confirme ce nouvel appareil / Confirm this new device`
+3. Onglet **Source** : Ctrl+A puis colle le contenu de `mobile-app/supabase/email-templates/magic-link.html`.
+4. Enregistre. Sans ce modèle, l'email du "Nouvel appareil détecté" ne contient pas le code.
+
+## Email d'alerte "Nouvelle connexion" (fonction serveur)
+
+1. Supabase → **Edge Functions** → **Deploy a new function** → **Via Editor**.
+2. Nom de la fonction : `alerte-connexion` (exactement).
+3. Remplace le code proposé par le contenu de `mobile-app/supabase/functions/alerte-connexion/index.ts`, puis **Deploy**.
+4. **Edge Functions → Secrets** : ajoute
+   - `GMAIL_USER` = `afroback3d@gmail.com`
+   - `GMAIL_APP_PASSWORD` = le mot de passe d'application Google (le même qu'à l'étape 2, sans espaces).
+5. Sans cette fonction, tout le reste marche : seul l'email d'alerte ne part pas.
 

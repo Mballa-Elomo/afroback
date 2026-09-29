@@ -1,3 +1,5 @@
+import i18n, { currentLanguage } from '../i18n';
+
 /** Source unique des tarifs des forfaits — évite que plan.tsx et payment.tsx divergent sur un montant. */
 export const PLAN_PRICES_FCFA_MONTHLY = {
   racines: 1500,
@@ -21,7 +23,9 @@ export function planPriceFcfa(plan: PaidPlan, billing: Billing): number {
   return billing === 'monthly' ? monthly : Math.round(monthly * 12 * YEARLY_DISCOUNT);
 }
 
+/** Prix affiché dans la langue courante de l'app (ex. "1 500 FCFA/mois" / "1,500 FCFA/month"). */
 export function formatPlanPrice(plan: PaidPlan, billing: Billing): string {
-  const amount = planPriceFcfa(plan, billing).toLocaleString('fr-FR');
-  return billing === 'monthly' ? `${amount} FCFA/mois` : `${amount} FCFA/an`;
+  const lang = currentLanguage();
+  const amount = planPriceFcfa(plan, billing).toLocaleString(lang === 'en' ? 'en-US' : 'fr-FR');
+  return i18n.t(billing === 'monthly' ? 'pricing.perMonth' : 'pricing.perYear', { amount });
 }

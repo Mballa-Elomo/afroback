@@ -3,6 +3,7 @@ import type { DecouverteItem } from '../data/decouverteTypes';
 import { DECOUVERTE_TYPE_LABEL } from '../data/decouverteDisplay';
 import { colors, radii, typography } from '../theme/tokens';
 import { HeroPlaceholder } from './HeroVisual';
+import { AccessBadge } from '../access/Access';
 
 /** Ligne de liste (catalogue Découverte, hub pays) — fidèle à la maquette : photo 60x60, catégorie·région, nom, résumé tronqué. */
 export function DecouverteItemRow({ item, onPress }: { item: DecouverteItem; onPress: () => void }) {
@@ -20,6 +21,7 @@ export function DecouverteItemRow({ item, onPress }: { item: DecouverteItem; onP
           {item.resume_liste}
         </Text>
       </View>
+      <AccessBadge type="decouverte" slug={item.slug} inline />
       <Text style={styles.chevron}>›</Text>
     </Pressable>
   );

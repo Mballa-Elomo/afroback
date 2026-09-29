@@ -23,7 +23,7 @@ export default function LanguageStepScreen() {
     <View style={styles.wrap}>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.scroll}>
-          <StepHeader step={2} onBack={() => router.back()} />
+          <StepHeader step={1} total={1} onBack={() => router.back()} />
 
           <Text style={styles.title}>Langue de l'interface</Text>
           <Text style={styles.subtitle}>Tu pourras la changer à tout moment dans les paramètres.</Text>

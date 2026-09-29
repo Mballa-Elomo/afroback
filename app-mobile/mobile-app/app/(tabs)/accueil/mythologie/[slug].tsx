@@ -10,6 +10,9 @@ import { useMythe } from '../../../../src/data/useMythologieData';
 import { recordMytheAudioEngagement, recordMytheEngagement, recordMytheVideoChapterEngagement } from '../../../../src/data/engagementRepository';
 import type { Mythe, VideoChapitre } from '../../../../src/data/mythologieTypes';
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
+import { useRequireAccount } from '../../../../src/auth/AccountWall';
+import { LockedDetailScreen } from '../../../../src/access/Access';
+import { useI18n } from '../../../../src/i18n';
 
 type Onglet = 'lire' | 'ecouter' | 'regarder';
 type Langue = 'fr' | 'en';
@@ -32,7 +35,9 @@ type Langue = 'fr' | 'en';
 export default function MytheDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const requireAccount = useRequireAccount();
   const mytheState = useMythe(slug);
+  const { lang } = useI18n();
   const mythe = mytheState.status === 'ready' ? mytheState.data : undefined;
   const [onglet, setOnglet] = useState<Onglet>('lire');
   const [chapitreIdx, setChapitreIdx] = useState(0);
@@ -65,6 +70,18 @@ export default function MytheDetailScreen() {
     );
   }
   if (!mythe) return <Redirect href="/accueil/mythologie" />;
+
+  if (mythe.acces?.verrouille) {
+    return (
+      <LockedDetailScreen
+        title={mythe.titre}
+        subtitle={mythe.sous_titre}
+        imageUrl={mythe.image_url}
+        apercu={(lang === 'en' && mythe.acces.apercu_en ? mythe.acces.apercu_en : mythe.acces.apercu_fr)}
+        reason="mythe"
+      />
+    );
+  }
 
   const hasEnglishRecit = mythe.recit_chapitres_en.length > 0;
   const chapitres = langue === 'en' && hasEnglishRecit ? mythe.recit_chapitres_en : mythe.recit_chapitres_fr;
@@ -110,10 +127,10 @@ export default function MytheDetailScreen() {
             <Pressable onPress={() => setOnglet('lire')} style={[styles.tab, onglet === 'lire' && styles.tabActive]}>
               <Text style={[styles.tabLabel, onglet === 'lire' && styles.tabLabelActive]}>Lire</Text>
             </Pressable>
-            <Pressable onPress={() => setOnglet('ecouter')} style={[styles.tab, onglet === 'ecouter' && styles.tabActive]}>
+            <Pressable onPress={() => requireAccount(() => setOnglet('ecouter'), 'audio')} style={[styles.tab, onglet === 'ecouter' && styles.tabActive]}>
               <Text style={[styles.tabLabel, onglet === 'ecouter' && styles.tabLabelActive]}>▶ Écouter</Text>
             </Pressable>
-            <Pressable onPress={() => setOnglet('regarder')} style={[styles.tab, onglet === 'regarder' && styles.tabActive]}>
+            <Pressable onPress={() => requireAccount(() => setOnglet('regarder'), 'video')} style={[styles.tab, onglet === 'regarder' && styles.tabActive]}>
               <Text style={[styles.tabLabel, onglet === 'regarder' && styles.tabLabelActive]}>🎬 Regarder</Text>
             </Pressable>
             <Pressable onPress={openBd} style={styles.tabBd}>

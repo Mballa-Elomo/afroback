@@ -1,17 +1,30 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography } from '../theme/tokens';
+import { BrandMark } from './ui';
+import { useI18n } from '../i18n';
 
-/** En-tête commun des écrans de l'assistant post-inscription : retour + "ÉTAPE X / 5" + barre de progression. */
-export function StepHeader({ step, total = 5, onBack }: { step: number; total?: number; onBack: () => void }) {
+/**
+ * En-tête commun des écrans forfait/paiement : retour (optionnel) + "ÉTAPE X / N" + barre de progression.
+ * Sans `onBack` : pas de bouton retour (ex. premier écran d'une étape dont les précédentes sont validées).
+ */
+export function StepHeader({ step, total = 2, onBack }: { step: number; total?: number; onBack?: () => void }) {
+  const { t } = useI18n();
   return (
     <>
-      <Pressable onPress={onBack} hitSlop={10} style={styles.back}>
-        <Text style={styles.backIcon}>‹</Text>
-      </Pressable>
+      <View style={styles.logo}>
+        <BrandMark layout="inline" />
+      </View>
+      {onBack ? (
+        <Pressable onPress={onBack} hitSlop={10} style={styles.back} accessibilityRole="button" accessibilityLabel={t('common.back')}>
+          <Text style={styles.backIcon}>‹</Text>
+        </Pressable>
+      ) : (
+        <View style={styles.backSpacer} />
+      )}
       <View style={styles.row}>
         <Text style={styles.label}>
-          ÉTAPE {step} / {total}
+          {t('steps.label', { step, total })}
         </Text>
         <View style={styles.track}>
           <LinearGradient
@@ -29,6 +42,12 @@ export function StepHeader({ step, total = 5, onBack }: { step: number; total?: 
 const styles = StyleSheet.create({
   back: {
     marginBottom: 6,
+  },
+  logo: {
+    marginBottom: 14,
+  },
+  backSpacer: {
+    height: 18,
   },
   backIcon: {
     fontSize: 22,

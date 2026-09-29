@@ -43,7 +43,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: 'community', icon: '💬', label: 'Communauté', enabled: false, lot: 3 },
       { id: 'market', icon: '🛍', label: 'Marketplace', enabled: false, lot: 3 },
       { id: 'dons', icon: '🤲', label: 'Dons', enabled: false, lot: 3 },
-      { id: 'revenue', icon: '◈', label: 'Abonnements', enabled: false, lot: 3 },
+      { id: 'revenue', icon: '◈', label: 'Abonnements', href: '/abonnements', enabled: true },
       { id: 'sponsors', icon: '🤝', label: 'Sponsors', enabled: false, lot: 3 },
     ],
   },

@@ -9,6 +9,8 @@ import { createReport } from '../../../src/data/communityRepository';
 import { useOwnProfile } from '../../../src/data/useCommunityData';
 import type { CommunityReportMotif, CommunityReportTargetType } from '../../../src/data/communityTypes';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { withAccount } from '../../../src/auth/AccountWall';
+import { withSubscription } from '../../../src/access/Access';
 
 const REASONS: { id: CommunityReportMotif; label: string }[] = [
   { id: 'contenu_inapproprie', label: 'Contenu inapproprié' },
@@ -24,7 +26,7 @@ const REASONS: { id: CommunityReportMotif; label: string }[] = [
  * signalements, même par le signalant, voir data-model-communaute.md §6) :
  * le message de confirmation reste honnête sur l'absence de suivi visible.
  */
-export default function ReportScreen() {
+function ReportScreen() {
   const { targetType, targetId, label } = useLocalSearchParams<{
     targetType: CommunityReportTargetType;
     targetId: string;
@@ -244,3 +246,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+// Invité → "Crée ton compte" ; compte gratuit → abonnement (cdc-acces-gratuit-abonnement.md).
+export default withAccount(withSubscription(ReportScreen, 'report'), 'report');

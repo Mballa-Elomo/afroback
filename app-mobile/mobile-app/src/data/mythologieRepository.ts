@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import type { Mythe, VideoChapitre } from './mythologieTypes';
+import { getContentDetail } from './contentAccess';
 
 /**
  * Source de données réelle : table `mythes` sur Supabase (voir
@@ -24,22 +25,30 @@ function normalizeVideoChapitre(raw: RawVideoChapitre): VideoChapitre {
   return { numero: raw.numero, titre_chapitre: raw.titre_chapitre, videos };
 }
 
+/** Colonnes publiques du catalogue ; le récit et les médias passent par `get_mythe_detail` (voir heroesRepository.ts). */
+const MYTHES_CATALOGUE =
+  'id,slug,titre,sous_titre,peuple,region,zone,epoque,type_contenu,theme,couleur,image_url,ordre_affichage,statut_publication,a_la_une';
+
 let cache: Mythe[] | null = null;
 let inflight: Promise<Mythe[]> | null = null;
 
 async function fetchMythes(): Promise<Mythe[]> {
-  const { data, error } = await supabase.from('mythes').select('*').order('ordre_affichage', { ascending: true });
+  const { data, error } = await supabase.from('mythes').select(MYTHES_CATALOGUE).order('ordre_affichage', { ascending: true });
   if (error) {
     throw new Error(`Impossible de charger la mythologie depuis Supabase : ${error.message}`);
   }
-  const mythes = (data ?? []).map((row) => ({
+  const mythes = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+    recit_chapitres_fr: [],
+    recit_chapitres_en: [],
+    sources: [],
+    narration_audio_url: null,
+    narration_audio_url_en: null,
+    video_chapitres: [],
+    fichier_source: null,
     ...row,
-    recit_chapitres_en: row.recit_chapitres_en ?? [],
-    narration_audio_url_en: row.narration_audio_url_en ?? null,
-    video_chapitres: ((row.video_chapitres ?? []) as RawVideoChapitre[]).map(normalizeVideoChapitre),
     statut_publication: row.statut_publication ?? 'publie',
     a_la_une: row.a_la_une ?? false,
-  })) as Mythe[];
+  })) as unknown as Mythe[];
   // Filtré côté client, pas dans la requête : reste compatible même si
   // schema-mythologie-extended.sql n'a pas encore été exécuté par Yannick
   // (colonne absente -> traité comme publié), même principe que
@@ -69,9 +78,25 @@ export async function refreshMythes(): Promise<Mythe[]> {
   return mythes;
 }
 
+/** Mythe complet (récit, sources, médias) si autorisé, sinon catalogue + aperçu et `acces.verrouille`. */
 export async function getMytheBySlug(slug: string): Promise<Mythe | undefined> {
   const mythes = await getMythes();
-  return mythes.find((m) => m.slug === slug);
+  const base = mythes.find((m) => m.slug === slug);
+  if (!base) return undefined;
+  const detail = await getContentDetail('mythe', slug);
+  if (!detail) return undefined;
+  if (detail.verrouille) {
+    return { ...base, acces: { verrouille: true, apercu_fr: detail.apercu_fr, apercu_en: detail.apercu_en } };
+  }
+  const row = detail.row;
+  return {
+    ...base,
+    ...(row as unknown as Mythe),
+    recit_chapitres_en: (row.recit_chapitres_en as Mythe['recit_chapitres_en']) ?? [],
+    narration_audio_url_en: (row.narration_audio_url_en as string | null) ?? null,
+    video_chapitres: ((row.video_chapitres ?? []) as RawVideoChapitre[]).map(normalizeVideoChapitre),
+    acces: { verrouille: false },
+  };
 }
 
 /** Mythes groupés par zone, dans l'ordre où chaque zone apparaît en base (ordre_affichage). */

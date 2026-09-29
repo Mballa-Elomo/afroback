@@ -1,5 +1,7 @@
 # Cahier des charges — Traduction effective de l'application mobile
 
+> **Lot 1 livré le 2026-09-29** (demande de Yannick : choix de la langue dès l'écran 1). Infrastructure `i18next` posée pour toute l'app, FR/EN seulement (décision du 2026-09-29), parcours d'entrée traduit à 100 %. Reste : extraire les autres écrans par lots dans `src/i18n/fr.ts` / `en.ts`. Détail dans `mobile-app/README.md`.
+
 > Rédigé le 2026-09-26, avant tout développement. À valider par Yannick avant de passer aux devs.
 
 ## 1. Constat actuel (vérifié dans le code, pas supposé)

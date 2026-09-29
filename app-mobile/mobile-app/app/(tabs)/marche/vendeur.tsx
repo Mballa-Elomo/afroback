@@ -17,6 +17,8 @@ import {
 import { formatFcfa, MARKETPLACE_CATEGORIE_LABEL } from '../../../src/data/marketplaceDisplay';
 import type { MarketplaceOrder, MarketplaceOrderStatut, MarketplaceProduct } from '../../../src/data/marketplaceTypes';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { withAccount } from '../../../src/auth/AccountWall';
+import { withSubscription } from '../../../src/access/Access';
 
 type VendorTab = 'dash' | 'products' | 'orders' | 'reviews' | 'revenue' | 'plans';
 
@@ -39,7 +41,7 @@ const ORDER_STATUT_LABEL: Record<MarketplaceOrderStatut, string> = {
  * "Points bloquants"). Cette section affiche les commandes réelles
  * enregistrées, jamais des revenus/versements fictifs.
  */
-export default function VendorSpaceScreen() {
+function VendorSpaceScreen() {
   const router = useRouter();
   const [vendorState, refreshVendor] = useOwnVendor();
   const [tab, setTab] = useState<VendorTab>('dash');
@@ -924,3 +926,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+// Invité → "Crée ton compte" ; compte gratuit → abonnement (cdc-acces-gratuit-abonnement.md).
+export default withAccount(withSubscription(VendorSpaceScreen, 'vendor'), 'vendor');

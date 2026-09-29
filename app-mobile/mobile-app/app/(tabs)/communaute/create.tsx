@@ -8,6 +8,8 @@ import { PhotoPicker } from '../../../src/components/PhotoPicker';
 import { createPost } from '../../../src/data/communityRepository';
 import { useOwnProfile } from '../../../src/data/useCommunityData';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { withAccount } from '../../../src/auth/AccountWall';
+import { withSubscription } from '../../../src/access/Access';
 
 const MAX_LEN = 500;
 
@@ -19,7 +21,7 @@ const MAX_LEN = 500;
  * section "Lier un contenu" reste omise (aucune colonne de liaison
  * post↔contenu dans le schéma actuel).
  */
-export default function CreatePostScreen() {
+function CreatePostScreen() {
   const router = useRouter();
   const [ownProfileState, refreshOwnProfile] = useOwnProfile();
   const [text, setText] = useState('');
@@ -200,3 +202,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+// Invité → "Crée ton compte" ; compte gratuit → abonnement (cdc-acces-gratuit-abonnement.md).
+export default withAccount(withSubscription(CreatePostScreen, 'publish'), 'publish');

@@ -1,3 +1,5 @@
+import type { AccesContenu } from './contentAccess';
+
 /**
  * Types miroir du schéma Postgres (voir supabase/seed.sql et
  * app-mobile/data-model-heros.md). Les champs optionnels sont typés
@@ -97,6 +99,12 @@ export interface VideoChapitre {
 export interface Heros {
   id: string;
   slug: string;
+  /**
+   * Droit d'accès au contenu complet, renseigné seulement sur le détail
+   * (cdc-acces-gratuit-abonnement.md). `verrouille` : contenu réservé aux
+   * abonnés, seul un aperçu est fourni. Absent sur les listes (catalogue).
+   */
+  acces?: AccesContenu;
   nom_affiche: string;
   nom_complet: string;
   sous_titre: string;

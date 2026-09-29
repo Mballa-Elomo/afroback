@@ -6,6 +6,7 @@ import { StepHeader } from '../../src/onboarding/StepHeader';
 import { useWizardState } from '../../src/onboarding/WizardState';
 import { formatPlanPrice } from '../../src/onboarding/pricing';
 import { colors, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
 
 /**
  * Étape 4/5 — fidèle à la maquette "CHOISIS TON FORFAIT". Racines et
@@ -19,6 +20,7 @@ import { colors, typography } from '../../src/theme/tokens';
 export default function PlanStepScreen() {
   const router = useRouter();
   const { billing, setBilling, setForfait } = useWizardState();
+  const { t } = useI18n();
 
   const priceLabel = (plan: 'racines' | 'heritage') => formatPlanPrice(plan, billing);
 
@@ -36,26 +38,24 @@ export default function PlanStepScreen() {
     <View style={styles.wrap}>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.scroll}>
-          <StepHeader step={4} onBack={() => router.back()} />
+          <StepHeader step={1} />
 
-          <Text style={styles.title}>Choisis ton forfait</Text>
-          <Text style={styles.subtitle}>
-            Pour ton usage personnel — tu pourras ajouter des profils enfants plus tard.
-          </Text>
+          <Text style={styles.title}>{t('plan.title')}</Text>
+          <Text style={styles.subtitle}>{t('plan.subtitle')}</Text>
 
           <View style={styles.toggle}>
             <Pressable
               onPress={() => setBilling('monthly')}
               style={[styles.togglePill, billing === 'monthly' && styles.togglePillActive]}
             >
-              <Text style={[styles.toggleLabel, billing === 'monthly' && styles.toggleLabelActive]}>Mensuel</Text>
+              <Text style={[styles.toggleLabel, billing === 'monthly' && styles.toggleLabelActive]}>{t('plan.monthly')}</Text>
             </Pressable>
             <Pressable
               onPress={() => setBilling('yearly')}
               style={[styles.togglePill, billing === 'yearly' && styles.togglePillActive]}
             >
               <Text style={[styles.toggleLabel, billing === 'yearly' && styles.toggleLabelActive]}>
-                Annuel · -17%
+                {t('plan.yearly')}
               </Text>
             </Pressable>
           </View>
@@ -64,13 +64,13 @@ export default function PlanStepScreen() {
             <View style={[styles.card, styles.cardHighlight]}>
               <View style={styles.cardHeaderRow}>
                 <Text style={styles.planName}>Découverte</Text>
-                <Text style={styles.planPrice}>Gratuit</Text>
+                <Text style={styles.planPrice}>{t('plan.free')}</Text>
               </View>
               <Text style={styles.planDesc}>
-                Héros en accès limité · Découverte complète · 1 langue · Communauté en lecture · 1 profil enfant
+                {t('plan.decouverteDesc')}
               </Text>
               <Pressable style={styles.outlineBtn} onPress={startFree}>
-                <Text style={styles.outlineBtnLabel}>Commencer gratuitement</Text>
+                <Text style={styles.outlineBtnLabel}>{t('plan.startFree')}</Text>
               </Pressable>
             </View>
 
@@ -80,24 +80,23 @@ export default function PlanStepScreen() {
                 <Text style={styles.planPrice}>{priceLabel('racines')}</Text>
               </View>
               <Text style={styles.planDesc}>
-                Héros en accès complet · 4 langues camerounaises · -5% Marketplace · Publication + badge membre
+                {t('plan.racinesDesc')}
               </Text>
-              <GradientBtn label="Choisir Racines" onPress={() => choosePaid('racines')} />
+              <GradientBtn label={t('plan.choose', { plan: 'Racines' })} onPress={() => choosePaid('racines')} />
             </View>
 
             <View style={[styles.card, styles.cardHighlight]}>
               <View style={styles.recommendedBadge}>
-                <Text style={styles.recommendedLabel}>RECOMMANDÉ</Text>
+                <Text style={styles.recommendedLabel}>{t('plan.recommended')}</Text>
               </View>
               <View style={styles.cardHeaderRow}>
                 <Text style={styles.planName}>Héritage</Text>
                 <Text style={styles.planPrice}>{priceLabel('heritage')}</Text>
               </View>
               <Text style={styles.planDesc}>
-                Tout Racines + contenus exclusifs · avant-première musées 360° · suivi langues avancé · -10%
-                Marketplace · badge premium + accès prioritaire
+                {t('plan.heritageDesc')}
               </Text>
-              <GradientBtn label="Choisir Héritage" onPress={() => choosePaid('heritage')} />
+              <GradientBtn label={t('plan.choose', { plan: 'Héritage' })} onPress={() => choosePaid('heritage')} />
             </View>
           </View>
         </ScrollView>

@@ -11,12 +11,16 @@ import { SectionTitle } from '../../../src/components/SectionTitle';
 import { RelatedHeroes } from '../../../src/components/RelatedHeroes';
 import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
 import { useDecouverteItem, useRelatedDecouverteItems } from '../../../src/data/useDecouverteData';
-import { getHeroBySlug } from '../../../src/data/heroesRepository';
+import { getHeroCatalogueBySlug } from '../../../src/data/heroesRepository';
 import { recordDecouverteConsultation, recordDecouverteVideoEngagement } from '../../../src/data/engagementRepository';
 import type { Heros } from '../../../src/data/types';
 import type { DecouverteItem } from '../../../src/data/decouverteTypes';
 import { DECOUVERTE_TYPE_LABEL } from '../../../src/data/decouverteDisplay';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { useAuth } from '../../../src/auth/AuthProvider';
+import { LockedActionCard } from '../../../src/auth/AccountWall';
+import { LockedDetailScreen } from '../../../src/access/Access';
+import { useI18n } from '../../../src/i18n';
 
 /**
  * Fiche détail Découverte — fidèle à design-reference-decouverte.dc.excerpt.html,
@@ -31,8 +35,10 @@ import { colors, spacing, typography } from '../../../src/theme/tokens';
 export default function DecouverteDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const { isGuest } = useAuth();
   const insets = useSafeAreaInsets();
   const itemState = useDecouverteItem(slug);
+  const { lang } = useI18n();
   const item = itemState.status === 'ready' ? itemState.data : undefined;
   const relatedItems = useRelatedDecouverteItems(item);
   const [relatedHeroes, setRelatedHeroes] = useState<Heros[]>([]);
@@ -53,7 +59,7 @@ export default function DecouverteDetailScreen() {
       return;
     }
     let alive = true;
-    Promise.all(item.heros_lies.map((s) => getHeroBySlug(s))).then((heroes) => {
+    Promise.all(item.heros_lies.map((s) => getHeroCatalogueBySlug(s))).then((heroes) => {
       if (alive) setRelatedHeroes(heroes.filter((h): h is Heros => Boolean(h)));
     });
     return () => {
@@ -76,6 +82,18 @@ export default function DecouverteDetailScreen() {
     );
   }
   if (!item) return <Redirect href="/decouverte" />;
+
+  if (item.acces?.verrouille) {
+    return (
+      <LockedDetailScreen
+        title={item.titre}
+        subtitle={item.sous_titre}
+        imageUrl={item.image_url}
+        apercu={(lang === 'en' && item.acces.apercu_en ? item.acces.apercu_en : item.acces.apercu_fr)}
+        reason="decouverte"
+      />
+    );
+  }
 
   // En-tête immersif (grande photo) dès qu'une vraie photo existe pour cet
   // item, quel que soit son type (personnage/coutume/fait inclus) — plutôt
@@ -157,7 +175,11 @@ export default function DecouverteDetailScreen() {
           {videoCodes.length > 0 && (
             <View style={styles.videoSection}>
               <SectionTitle title="Regarder" />
-              <DecouverteVideoPlayer itemId={item.id} videos={item.videos} />
+              {isGuest ? (
+                <LockedActionCard label="video" reason={'video'} />
+              ) : (
+                <DecouverteVideoPlayer itemId={item.id} videos={item.videos} />
+              )}
             </View>
           )}
 

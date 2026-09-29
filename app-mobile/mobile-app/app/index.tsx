@@ -1,6 +1,7 @@
 import { Redirect } from 'expo-router';
 import { useAuth } from '../src/auth/AuthProvider';
 import { useActiveProfile } from '../src/profils/ActiveProfileProvider';
+import { BootScreen } from '../src/components/BootScreen';
 
 /**
  * Point d'entrée réel de l'app (route "/"). Aucun écran de contenu ici :
@@ -13,13 +14,18 @@ import { useActiveProfile } from '../src/profils/ActiveProfileProvider';
  * adulte comme avant.
  */
 export default function Index() {
-  const { session, onboardingComplete } = useAuth();
+  const { session, onboardingComplete, isGuest, mfaStatus } = useAuth();
   const { state: profileState } = useActiveProfile();
 
-  if (session === undefined) return null;
-  if (!session) return <Redirect href="/onboarding" />;
-  if (!onboardingComplete) return <Redirect href="/onboarding/language" />;
-  if (profileState.status === 'checking') return null;
+  if (session === undefined) return <BootScreen />;
+  if (!session) return <Redirect href={isGuest ? '/accueil' : '/onboarding'} />;
+  // Vérification en 2 étapes : tant que le code n'est pas saisi, seul l'écran
+  // de code est accessible — rediriger ailleurs donnait un écran noir
+  // (constaté le 2026-09-29 après un changement de mot de passe).
+  if (mfaStatus === 'unknown') return <BootScreen />;
+  if (mfaStatus === 'challenge_required') return <Redirect href="/onboarding/mfa-challenge" />;
+  if (!onboardingComplete) return <Redirect href="/onboarding/profil" />;
+  if (profileState.status === 'checking') return <BootScreen />;
   if (profileState.status === 'selecting') return <Redirect href="/profils/selection" />;
   if (profileState.status === 'child') return <Redirect href="/enfant/accueil" />;
   return <Redirect href="/accueil" />;

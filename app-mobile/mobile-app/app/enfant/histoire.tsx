@@ -5,6 +5,8 @@ import { ErrorState, LoadingState } from '../../src/components/LoadingState';
 import { HeroPlaceholder } from '../../src/components/HeroVisual';
 import { useHero } from '../../src/data/useHeroesData';
 import { colors, radii, spacing, typography } from '../../src/theme/tokens';
+import { LockedDetailScreen } from '../../src/access/Access';
+import { useI18n } from '../../src/i18n';
 
 /**
  * "Histoire du jour" côté enfant — traitement volontairement simplifié
@@ -22,6 +24,7 @@ export default function HistoireEnfantScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const herosState = useHero(slug);
+  const { lang } = useI18n();
 
   if (herosState.status === 'loading') {
     return (
@@ -39,6 +42,18 @@ export default function HistoireEnfantScreen() {
   }
   const heros = herosState.data;
   if (!heros) return <Redirect href="/enfant/accueil" />;
+
+  if (heros.acces?.verrouille) {
+    return (
+      <LockedDetailScreen
+        title={heros.nom_affiche}
+        imageUrl={heros.image_carte_catalogue}
+        apercu={(lang === 'en' && heros.acces.apercu_en ? heros.acces.apercu_en : heros.acces.apercu_fr)}
+        reason="heros"
+        child
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>

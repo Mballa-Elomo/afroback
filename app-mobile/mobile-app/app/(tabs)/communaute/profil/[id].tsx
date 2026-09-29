@@ -7,6 +7,7 @@ import { ErrorState, LoadingState } from '../../../../src/components/LoadingStat
 import { getPostsByAuthor, getPublicProfileById } from '../../../../src/data/communityRepository';
 import type { CommunityPost, CommunityProfilePublic } from '../../../../src/data/communityTypes';
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
+import { ProfileAvatar, presetKey } from '../../../../src/components/ProfileAvatar';
 
 type State =
   | { status: 'loading' }
@@ -70,7 +71,9 @@ export default function MemberProfileScreen() {
         </Pressable>
 
         <View style={styles.header}>
-          {profile.avatar_url ? (
+          {presetKey(profile.avatar_url) ? (
+            <ProfileAvatar value={profile.avatar_url} size={80} />
+          ) : profile.avatar_url ? (
             <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
           ) : (
             <HeroPlaceholder style={styles.avatar} radius={40} />

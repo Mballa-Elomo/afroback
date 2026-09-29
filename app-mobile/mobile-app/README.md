@@ -272,6 +272,72 @@ La maquette (`KID HOME`) montrait un "Jeu du jour", "Apprendre l'ewondo" et une 
 - **Back-office** : le slot "Vidéo (documentaire unique)" est retiré de la fiche héros (voir `backoffice/README.md`) — Samba étant converti, plus aucun héros ne dépend de `video_url` via l'UI back-office.
 - **Vérifié** : `npx tsc --noEmit` propre, `npx expo-doctor` (18/18), `npx expo export --platform ios` et `--platform android` propres.
 
+## Onboarding et création de compte, refonte (2026-09-29, Module 1)
+
+Cahier des charges : `../cdc-onboarding.md` (v3). Référence visuelle : maquette 10 écrans fournie par Yannick, qui remplace l'onboarding 3D de `AFROBACK Mobile.dc.html`.
+
+**Parcours** : splash (1,2 à 2 s) → 3 écrans de présentation (swipe + boutons, "Passer") → transition → "Bienvenue dans ton voyage" → inscription (prénom, email, mot de passe, case "18 ans ou plus") → code reçu par email → "Comment vas-tu vivre AfroBack ?" → "Ton compte est créé !" → "Protège ton compte" (MFA) → forfait → paiement → "Bienvenue dans AfroBack !". L'écran de langue est sorti du parcours (fichier conservé pour le chantier i18n).
+
+**Mémoire "intro déjà vue"** : `src/onboarding/introSeen.ts` (AsyncStorage). Après une déconnexion, le splash mène directement à "Bienvenue dans ton voyage".
+
+**Authentification** (`src/auth/AuthProvider.tsx`) : inscription par email avec confirmation par code à 6 chiffres (`verifyOtp`, type `email`). Connexion par email **ou** téléphone (les comptes créés avant le 2026-09-29 gardent le téléphone). La protection brute force réutilise `check_login_lockout`/`record_login_attempt` avec l'email en minuscules comme identifiant, sans migration.
+
+**Mode invité** ("Explorer sans compte") : `src/auth/AccountWall.tsx`. État local, jamais persisté, aucun compte côté serveur. Lecture libre des contenus publics (vérifié en direct : 7 tables lisibles sans compte). Protégés : narrations audio et vidéos (Héros, Mythologie, Découverte), publier, commenter, signaler, panier, commande, espace vendeur, don, profil. `useRequireAccount()` pour un bouton, `withAccount(Écran, raison)` pour une route entière.
+
+**Retiré** : `three`, `@types/three`, `expo-gl` et `OnboardingScene3D.tsx` (ne servaient qu'à l'onboarding). Bundle web 2,68 → 1,81 Mo, iOS/Android ≈5,4 → 4,5 Mo. Les 6 photos de héros de `assets/onboarding/` sont remplacées par les 6 illustrations de la maquette (JPEG, 1,6 Mo au total). Les originaux des photos restent dans `AFROBACK CONTENT/Photos/heroes-renamed/`.
+
+**À faire côté Supabase par Yannick** :
+1. *Authentication → Emails → Confirm signup* : le modèle doit contenir `{{ .Token }}` (le code à 6 chiffres). Sans ça, l'email contient seulement un lien et l'écran de code ne peut pas être utilisé.
+2. Le serveur d'email par défaut de Supabase est limité (quelques emails par heure, et seulement vers les adresses des membres de l'équipe du projet). Pour tester, utiliser **son propre email**. Le vrai fournisseur (Resend sur le domaine AFROBACK) est l'objet du Module 2.
+
+**Texte animé** (demande de Yannick, même jour) : `src/onboarding/AnimatedText.tsx`. Titres mot par mot (fondu + glissement), 2e ligne dorée avec zoom et halo, texte courant déroulé juste après, rejoué à chaque écran du carrousel ; "AFROBACK" lettre par lettre sur le splash. Coupé si "Réduire les animations" est actif ; lu d'une traite par le lecteur d'écran.
+
+**Retours de Yannick intégrés (même jour)** : splash affiché 3,8 s à la première ouverture (2 s ensuite, toucher pour passer) ; polices agrandies (titres ≈32, texte 17) ; parallaxe : image plus lente et texte plus rapide que l'écran pendant le glissement (`PARALLAX = 0.12` dans `app/onboarding/index.tsx`), et dérive lente continue de chaque illustration (`IllustratedBackground`, prop `drift`). Tout est coupé si "Réduire les animations" est actif.
+
+**Deuxième série de retours (même jour)** : splash avec logo agrandi (`BrandMark size="xl"`, halo doré pulsé, voile sombre derrière le nom) ; titres du carrousel à 38, texte à 19 ; parallaxe de glissement passée à `PARALLAX = 0.5` sans zoom (la partie visible d'un écran qui entre ou sort reste toujours couverte par son image pour toute valeur ≤ 1) ; dérive continue plus ample ; logo AFROBACK sur chaque écran du parcours (en haut du carrousel, version compacte `layout="inline"` sur les écrans de formulaire, forfait et paiement).
+
+**Troisième série de retours (même jour)** : l'écran du logo n'a plus de durée d'affichage, on y **choisit sa langue** (Français / English) puis on appuie sur "Commencer". Le choix est mémorisé sur l'appareil (`afroback:language`) et enregistré dans le compte à la fin de l'inscription (`user_metadata.langue_interface`).
+
+**Sélecteur de langue** (retour de Yannick) : menu déroulant compact en haut à droite de l'écran 1 (`src/i18n/LanguageDropdown.tsx`), drapeau + langue + flèche, menu animé avec coche. Drapeaux dessinés en SVG (les emojis drapeaux s'affichent en lettres sous Windows). Le menu n'est rendu que lorsqu'il est ouvert.
+
+**Boutons modernes** (retour de Yannick : boutons jugés basiques) : `PremiumButton` dans `src/components/Buttons.tsx`, dégradé or avec reflet, halo doré, pastille sombre avec icône à droite (`src/components/Icons.tsx` : flèche, coche, connexion, ajout de compte, bouclier, boussole, étincelle…), reflet qui traverse le bouton, enfoncement au toucher, indicateur de chargement dans la pastille. Variante verre sombre. `GoldButton`/`GhostButton`/`OutlineButton` gardent leurs props mais adoptent ce style dans toute l'app. `TextLinkButton` pour les liens type "Passer".
+
+**Traduction (i18n)** : `i18next` + `react-i18next` + `expo-localization` (langue du téléphone au premier lancement). Dictionnaires `src/i18n/fr.ts` et `src/i18n/en.ts` : TypeScript impose que l'anglais ait exactement les mêmes clés que le français, et que chaque raison de la fenêtre invité existe. Traduit : tout le parcours d'entrée (logo, présentation, transition, Bienvenue, inscription, code email, connexion, choix du pays, "Comment vas-tu vivre AfroBack ?", compte créé, protection du compte et écran d'activation, défi de connexion, forfait, paiement, bienvenue finale), la fenêtre et le bandeau du mode invité, les messages d'erreur d'authentification, les prix (format anglais en anglais). **Pas encore traduit** : le reste de l'app (onglets, héros, marché, communauté, profil…), à extraire par lots dans les mêmes fichiers (`cdc-i18n-app.md`). Les noms de forfaits (Découverte, Racines, Héritage) restent des noms de marque.
+
+**Simplifications assumées** : logo actuel en médaillon (la version dorée sur fond transparent n'a pas été fournie) ; icônes dorées à la place des 3 portraits de l'écran "Je suis" ; titres en Cinzel (décision D7) ; écrans forfait/paiement non restylés (reconstruits au Module 4).
+
+**Vérifié** : `tsc --noEmit` propre, `expo-doctor` 18/18, `expo export` iOS + Android + web. Parcours testé dans un navigateur headless (390 x 844) : splash, carrousel, transition, Bienvenue, erreurs du formulaire d'inscription, mémoire "intro déjà vue", mode invité (accueil chargé sans compte, bandeau, fenêtre de compte, onglet Profil, retour vers l'inscription). Deux défauts trouvés et corrigés pendant ce test : écrans du carrousel écrasés sur web (hauteur non fixée) et logo peu lisible sur ciel clair. **Non testé** : les écrans après inscription (ils demandent un vrai compte confirmé par email) et le rendu sur un vrai téléphone.
+
+## Création de compte, Module 2 (2026-09-29)
+
+Cahier des charges : `../cdc-inscription.md`. Guide de mise en service : `../guide-email-gmail-supabase.md`.
+
+- **Emails** envoyés depuis `afroback3d@gmail.com` via le SMTP de Gmail branché dans Supabase (mot de passe d'application Google, saisi par Yannick dans Supabase uniquement). Modèle bilingue noir et or : `supabase/email-templates/confirm-signup.html` (français ou anglais selon `user_metadata.langue`). Code valable 15 minutes.
+- **Inscription** : règle de mot de passe (8 caractères minimum, une lettre et un chiffre) et indicateur de solidité (`src/onboarding/PasswordStrength.tsx`). Preuve du consentement (`consent_at`, `consent_version`) et `langue` enregistrés dans `user_metadata`. Si l'email existe déjà : lien "Se connecter avec cet e-mail", email prérempli.
+- **Code** : "Modifier l'adresse", pause de 5 minutes après 5 codes faux (confort d'utilisation ; la vraie limite reste celle de Supabase côté serveur).
+- **Compte jamais confirmé** : à la connexion par email, un nouveau code part automatiquement et l'écran de saisie s'ouvre (`signInWithEmail` renvoie `unconfirmed`).
+- **"Ton profil"** (`app/onboarding/profil.tsx`, première étape après la confirmation) : pseudo obligatoire avec vérification de disponibilité en direct (`isPseudoAvailable`), photo (bucket `user-uploads`, dossier `avatars-communaute`) ou l'un des 8 avatars dessinés (`src/components/ProfileAvatar.tsx`, stockés sous la forme `avatar:<clé>` dans `community_profiles.avatar_url`, affichés partout dans la Communauté).
+- **Vérifié** : `tsc`, `expo-doctor` 18/18, export web, iOS et Android, rendu en navigateur (indicateur de solidité, écran profil via un aperçu local temporaire jamais publié, email rendu en FR et EN). **Non testé de bout en bout** : l'envoi réel de l'email et la création réelle d'un profil, qui demandent les réglages Gmail et Supabase de Yannick.
+
+## Accès gratuit / abonnés, lot A (2026-09-29)
+
+Cahier des charges : `../cdc-acces-gratuit-abonnement.md`. Script serveur : `supabase/schema-acces-abonnement.sql` (**à exécuter par Yannick**).
+
+- **Barrière côté serveur** : les catalogues (`heros`, `mythes`, `decouverte_items`) ne sont plus lisibles qu'en colonnes publiques ; le contenu complet passe par `get_heros_detail` / `get_mythe_detail` / `get_decouverte_detail`, qui renvoient tout si le contenu est gratuit ou si la personne a un abonnement actif, sinon un aperçu de 600 caractères et `verrouille: true`. Table `subscriptions` écrite uniquement côté serveur ; table `contenus_gratuits` (Reine Nzinga, Ngan Medza, Palais royal de Foumban, Ebolowa) modifiable depuis le back-office.
+- **App** : `src/data/contentAccess.ts` (détail + cache vidé à chaque changement de session), `src/access/Access.tsx` (fournisseur d'accès, fenêtre "Réservé aux abonnés", `withSubscription`, `LockedDetailScreen`, `LockedContent`, `AccessBadge`, `PremiumActionCard`, `UpgradeBanner`), écran `app/abonnement.tsx`. Cadenas dorés et badges "Gratuit" sur les cartes ; aperçu qui s'estompe + présentation de l'abonnement sur les fiches réservées (héros, récit, audio, vidéo, mythe, lieu, espace enfant) ; Marché : achat libre pour les comptes, vente et avis réservés aux abonnés ; Communauté : lecture libre, publier/commenter/signaler réservés. Le forfait choisi à l'inscription n'ouvre plus aucun droit (paiement encore inexistant) : conservé comme `forfait_souhaite`.
+- **Transition** : tant que le script n'est pas exécuté, `get_*_detail` n'existe pas (code `PGRST202`) → lecture directe comme avant, aucun cadenas affiché. Vérifié le 2026-09-29.
+- **Back-office** : page `Abonnements` (offrir un abonnement à un compte existant, retirer, gérer la liste des contenus gratuits).
+- **Vérifié** : `tsc` (app et back-office), `expo-doctor` 18/18, export web/iOS/Android ; rendu contrôlé sur un aperçu local simulant le système actif (badges, fiche réservée), jamais publié. **Non testé en réel** : dépend de l'exécution du script SQL.
+- **Limite connue (lot C)** : fichiers audio/vidéo encore dans un espace de stockage public.
+
+## Téléphone à l'inscription, conditions lisibles, mot de passe oublié (2026-09-29)
+
+- **Téléphone** : champ pays + numéro dans `app/onboarding/signup.tsx`, envoyé dans `user_metadata.telephone`. Le trigger `supabase/schema-telephone-inscription.sql` (**à exécuter par Yannick**) le recopie dans `auth.users.phone` (sans vérification SMS, même choix que depuis le 2026-07-30) : connexion possible par e-mail ou par téléphone. `telephone_disponible()` évite l'erreur technique si le numéro est déjà pris.
+- **Conditions et confidentialité** : `src/legal/documents.ts` (FR/EN, **version provisoire à faire relire par un juriste**, mentions "[à compléter]" pour la raison sociale, l'adresse et la région d'hébergement), écran `app/legal/[doc].tsx` accessible dans tous les états. `consent_version` = `LEGAL_VERSION`.
+- **Mot de passe oublié** : `app/onboarding/mot-de-passe-oublie.tsx` (e-mail → code à 6 chiffres + nouveau mot de passe sur le même écran), `requestPasswordReset` / `resetPasswordWithCode` dans `AuthProvider` (la session ouverte par le code n'est publiée qu'une fois le nouveau mot de passe enregistré). Modèle d'email `supabase/email-templates/reset-password.html` à coller dans Supabase. Réponse neutre qu'un compte existe ou non ; pause de 5 min après 5 codes faux ; comptes sans e-mail (anciens comptes téléphone) : contact indiqué.
+- **Bug corrigé (test de Yannick, même jour)** : écran noir après un changement de mot de passe. Cause trouvée : l'aiguillage `app/index.tsx` ignorait la vérification en 2 étapes et envoyait un compte protégé vers une page encore verrouillée. Corrigé (redirection vers `mfa-challenge`), retour explicite à l'aiguillage après la réinitialisation, et `BootScreen` (indicateur doré) à la place des écrans vides de chargement. Le même défaut touchait la connexion normale d'un compte protégé.
+- **Vérifié** : `tsc`, `expo-doctor` 18/18, export web/iOS/Android, rendu en navigateur (inscription avec téléphone, conditions, étape 1 du mot de passe oublié). **Non testé en réel** : l'envoi du code de réinitialisation et la connexion par téléphone d'un nouveau compte (dépendent du script SQL et du modèle d'email).
+
 ## Comment la maquette a été lue (DesignSync indisponible dans cette session)
 
 `DesignSync` n'a jamais été accessible dans les sessions ayant construit ces six chantiers (Découverte, Communauté, Marketplace, Don, École des Héros, Mythologie), malgré plusieurs tentatives et un déblocage confirmé côté compte Yannick. Pour ne pas bloquer indéfiniment sur cet écart d'outillage, Yannick a lu lui-même les sections concernées de `AFROBACK Mobile.dc.html` dans une session où l'outil fonctionnait, et en a extrait le markup + styles inline + bindings d'origine, **verbatim, sans reformulation**, dans des fichiers de référence lisibles directement :

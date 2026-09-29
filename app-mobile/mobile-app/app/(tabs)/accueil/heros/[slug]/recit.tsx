@@ -17,6 +17,8 @@ import { saveReadingProgress } from '../../../../../src/data/readingProgress';
 import { recordHeroEngagement } from '../../../../../src/data/engagementRepository';
 import type { RecitChapitre } from '../../../../../src/data/types';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
+import { LockedDetailScreen } from '../../../../../src/access/Access';
+import { useI18n } from '../../../../../src/i18n';
 
 type Langue = 'fr' | 'en';
 type TailleTexte = 'S' | 'M' | 'L';
@@ -38,6 +40,7 @@ export default function LecteurDeRecitScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const herosState = useHero(slug);
+  const { lang } = useI18n();
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
   const [langue, setLangue] = useState<Langue>('fr');
   const [taille, setTaille] = useState<TailleTexte>('M');
@@ -93,6 +96,18 @@ export default function LecteurDeRecitScreen() {
       <SafeAreaView style={styles.safe} edges={['bottom']}>
         <ErrorState />
       </SafeAreaView>
+    );
+  }
+
+  if (heros?.acces?.verrouille) {
+    return (
+      <LockedDetailScreen
+        title={heros.nom_affiche}
+        subtitle={heros.sous_titre}
+        imageUrl={heros.image_carte_catalogue}
+        apercu={(lang === 'en' && heros.acces.apercu_en ? heros.acces.apercu_en : heros.acces.apercu_fr)}
+        reason="heros"
+      />
     );
   }
 

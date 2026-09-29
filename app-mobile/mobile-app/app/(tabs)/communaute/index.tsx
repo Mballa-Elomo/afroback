@@ -6,6 +6,7 @@ import { PostCard } from '../../../src/components/PostCard';
 import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
 import { useFeedPosts } from '../../../src/data/useCommunityData';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { useAccess } from '../../../src/access/Access';
 
 type Sort = 'recent' | 'popular';
 
@@ -20,6 +21,7 @@ type Sort = 'recent' | 'popular';
  */
 export default function CommunauteScreen() {
   const router = useRouter();
+  const { requireSubscription } = useAccess();
   const [feedState, refresh] = useFeedPosts();
   const posts = feedState.status === 'ready' ? feedState.data : [];
   const [sort, setSort] = useState<Sort>('recent');
@@ -90,7 +92,12 @@ export default function CommunauteScreen() {
         </View>
       </ScrollView>
 
-      <Pressable style={styles.fab} onPress={() => router.push('/communaute/create')}>
+      <Pressable
+        style={styles.fab}
+        onPress={() => requireSubscription(() => router.push('/communaute/create'), 'publish')}
+        accessibilityRole="button"
+        accessibilityLabel="Publier"
+      >
         <Text style={styles.fabIcon}>+</Text>
       </Pressable>
     </SafeAreaView>

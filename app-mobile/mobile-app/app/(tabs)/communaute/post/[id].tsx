@@ -10,6 +10,10 @@ import { useOwnProfile } from '../../../../src/data/useCommunityData';
 import { relativeTime } from '../../../../src/data/relativeTime';
 import type { CommunityCommentWithAuthor, CommunityPostWithAuthor } from '../../../../src/data/communityTypes';
 import { colors, radii, spacing, typography } from '../../../../src/theme/tokens';
+import { useAuth } from '../../../../src/auth/AuthProvider';
+import { LockedActionCard } from '../../../../src/auth/AccountWall';
+import { ProfileAvatar, presetKey } from '../../../../src/components/ProfileAvatar';
+import { PremiumActionCard, useAccess } from '../../../../src/access/Access';
 
 type State =
   | { status: 'loading' }
@@ -20,6 +24,8 @@ type State =
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { isGuest } = useAuth();
+  const { systemActive, isSubscribed } = useAccess();
   const [state, setState] = useState<State>({ status: 'loading' });
   const [ownProfileState, refreshOwnProfile] = useOwnProfile();
   const [draft, setDraft] = useState('');
@@ -110,7 +116,9 @@ export default function PostDetailScreen() {
 
         <View style={styles.authorRow}>
           <Pressable onPress={() => post.author && router.push(`/communaute/profil/${post.author.id}`)}>
-            {post.author?.avatar_url ? (
+            {presetKey(post.author?.avatar_url) ? (
+              <ProfileAvatar value={post.author?.avatar_url} size={44} />
+            ) : post.author?.avatar_url ? (
               <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} />
             ) : (
               <HeroPlaceholder style={styles.avatar} radius={22} />
@@ -136,7 +144,9 @@ export default function PostDetailScreen() {
         <View style={styles.commentsList}>
           {comments.map((c) => (
             <View key={c.id} style={styles.commentRow}>
-              {c.author?.avatar_url ? (
+              {presetKey(c.author?.avatar_url) ? (
+                <ProfileAvatar value={c.author?.avatar_url} size={32} />
+              ) : c.author?.avatar_url ? (
                 <Image source={{ uri: c.author.avatar_url }} style={styles.commentAvatar} />
               ) : (
                 <HeroPlaceholder style={styles.commentAvatar} radius={16} />
@@ -150,7 +160,14 @@ export default function PostDetailScreen() {
           {comments.length === 0 && <Text style={styles.noComments}>Aucun commentaire pour l'instant.</Text>}
         </View>
 
-        {ownProfileState.status === 'ready' && !ownProfileState.data ? (
+        {isGuest ? (
+          <LockedActionCard
+            label="comment"
+            reason='comment'
+          />
+        ) : systemActive && !isSubscribed ? (
+          <PremiumActionCard reason="comment" />
+        ) : ownProfileState.status === 'ready' && !ownProfileState.data ? (
           <CreateProfileForm onCreated={refreshOwnProfile} />
         ) : (
           <View style={styles.commentInputRow}>

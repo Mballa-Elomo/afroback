@@ -7,6 +7,7 @@ import { ErrorState, LoadingState } from '../../../../src/components/LoadingStat
 import { useMythesGroupedByZone } from '../../../../src/data/useMythologieData';
 import type { Mythe } from '../../../../src/data/mythologieTypes';
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
+import { AccessBadge } from '../../../../src/access/Access';
 
 /**
  * Liste Mythologie, groupée par zone — fidèle à
@@ -123,6 +124,7 @@ function MytheCard({ mythe, onPress }: { mythe: Mythe; onPress: () => void }) {
         />
         {!mythe.image_url && <Text style={styles.coverLabel}>ILLUSTRATION</Text>}
         <View style={[styles.coverDot, { backgroundColor: mythe.couleur }]} />
+        <AccessBadge type="mythe" slug={mythe.slug} style={{ top: 10, right: 10 }} />
         <Text style={styles.coverPeuple}>{mythe.peuple.split(/[,(]/)[0].trim().toUpperCase()}</Text>
       </View>
       <View style={styles.cardBody}>

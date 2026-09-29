@@ -1,154 +1,203 @@
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../src/auth/AuthProvider';
-import { GoldButton } from '../../src/components/Buttons';
-import { COUNTRIES, CountryPicker, type Country } from '../../src/components/CountryPicker';
+import { FormField, GoldCheckbox } from '../../src/onboarding/FormField';
+import { BrandMark, MotifFrieze, ONBOARDING_BG, PillButton } from '../../src/onboarding/ui';
 import { colors, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
+import { PasswordStrength, meetsPasswordRule } from '../../src/onboarding/PasswordStrength';
+import { COUNTRIES, CountryPicker, type Country } from '../../src/components/CountryPicker';
 
 /**
- * Inscription — Prénom, Pays, Téléphone, Mot de passe (décision de Yannick
- * du 2026-07-30 : authentification uniquement par téléphone + mot de passe,
- * plus d'email ni de Google/Facebook). La maquette d'origine prévoyait
- * d'autres étapes après l'inscription (langue d'interface, usage, profils
- * enfants, forfaits...) qui appartiennent aux phases suivantes du produit,
- * pas à ce chantier.
+ * Écran 7 — "Crée ton compte", identique à la maquette de Yannick du
+ * 2026-09-29 (décision D2) : prénom, email, mot de passe. Pas de Google ni
+ * d'Apple (décision D3). Un enfant ne crée jamais de compte (D1) : la case
+ * obligatoire confirme la majorité, sans ajouter de champ date de naissance.
+ *
+ * Si Supabase exige la confirmation de l'email (réglage actuel), l'écran
+ * `verification-email` prend le relais pour saisir le code reçu. Sinon, la
+ * session s'ouvre et Stack.Protected enchaîne seul sur la suite du parcours.
  */
+type Errors = Partial<Record<'prenom' | 'email' | 'phone' | 'password' | 'accepted' | 'form', string>>;
+
 export default function SignupScreen() {
   const router = useRouter();
-  const { signUpWithPhone } = useAuth();
+  const { signUpWithEmail } = useAuth();
+  const { t } = useI18n();
   const [prenom, setPrenom] = useState('');
+  const [email, setEmail] = useState('');
+  // Téléphone : second identifiant de connexion (demande de Yannick du 2026-09-29).
   const [country, setCountry] = useState<Country>(COUNTRIES[0]);
   const [phoneLocal, setPhoneLocal] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Errors>({});
+  const [emailExists, setEmailExists] = useState(false);
 
-  const onSubmit = async () => {
-    if (!prenom || !phoneLocal || !password) {
-      setError('Tous les champs sont obligatoires.');
-      return;
-    }
-    if (password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères.');
-      return;
-    }
-    if (!accepted) {
-      setError("Tu dois accepter les conditions d'utilisation pour continuer.");
-      return;
-    }
-    setError(null);
-    setLoading(true);
-    const phone = country.dialCode + phoneLocal.replace(/\D/g, '').replace(/^0+/, '');
-    const { error: authError } = await signUpWithPhone({ phone, password, prenom: prenom.trim(), pays: country.name });
-    setLoading(false);
-    if (authError) setError(authError);
-    // Si succès : le AuthProvider met à jour la session, Stack.Protected redirige automatiquement.
+  // Numéro complet au format international : indicatif du pays + numéro sans le 0 initial.
+  const fullPhone = () => country.dialCode + phoneLocal.replace(/\D/g, '').replace(/^0+/, '');
+
+  const validate = (): Errors => {
+    const e: Errors = {};
+    if (!prenom.trim()) e.prenom = t('signup.errors.firstName');
+    if (!email.trim()) e.email = t('signup.errors.emailEmpty');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) e.email = t('signup.errors.emailInvalid');
+    if (!/^\+[1-9]\d{7,14}$/.test(fullPhone())) e.phone = t('signup.errors.phone');
+    if (!meetsPasswordRule(password)) e.password = t('signup.errors.passwordShort');
+    if (!accepted) e.accepted = t('signup.errors.consent');
+    return e;
   };
 
-  const showLegalDoc = (docName: string) =>
-    Alert.alert('Bientôt disponible', `${docName} n'est pas encore publiée dans l'app.`);
+  const onSubmit = async () => {
+    if (loading) return;
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length > 0) return;
+    setLoading(true);
+    setEmailExists(false);
+    const res = await signUpWithEmail({ email, password, prenom: prenom.trim(), telephone: fullPhone() });
+    setLoading(false);
+    if (res.error) {
+      setErrors(res.phoneTaken ? { phone: res.error } : { form: res.error });
+      setEmailExists(!!res.emailExists);
+      return;
+    }
+    if (res.needsVerification) {
+      router.push({ pathname: '/onboarding/verification-email', params: { email: email.trim().toLowerCase() } });
+    }
+    // Sinon : session ouverte, Stack.Protected enchaîne automatiquement.
+  };
+
+  const openLegal = (doc: 'cgu' | 'confidentialite') => router.push({ pathname: '/legal/[doc]', params: { doc } });
+
+  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/onboarding/bienvenue'));
 
   return (
     <View style={styles.wrap}>
+      <View style={styles.frieze}>
+        <MotifFrieze width={150} height={16} opacity={0.4} />
+      </View>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-          <Pressable onPress={() => router.replace('/onboarding')} hitSlop={10} style={styles.back}>
-            <Text style={styles.backIcon}>‹</Text>
-          </Pressable>
+        <KeyboardAvoidingView style={styles.safe} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+            <Pressable onPress={goBack} hitSlop={14} style={styles.back} accessibilityRole="button" accessibilityLabel={t('common.back')}>
+              <Text style={styles.backIcon}>‹</Text>
+            </Pressable>
 
-          <View style={styles.header}>
-            <View style={styles.logoDot} />
-            <Text style={styles.title}>Crée ton compte</Text>
-            <Text style={styles.subtitle}>C'est toujours un adulte qui crée le compte principal.</Text>
-          </View>
+            <BrandMark layout="inline" />
+            <Text style={styles.title} accessibilityRole="header">
+              {t('signup.title')}
+            </Text>
+            <Text style={styles.subtitle}>{t('signup.subtitle')}</Text>
 
-          <View style={styles.form}>
-            <Field label="PRÉNOM">
-              <TextInput
+            <View style={styles.form}>
+              <FormField
+                icon="user"
+                placeholder={t('signup.firstName')}
                 value={prenom}
                 onChangeText={setPrenom}
-                placeholder="Yannick"
-                placeholderTextColor={colors.textMuted}
-                style={styles.input}
+                autoComplete="given-name"
+                textContentType="givenName"
+                autoCapitalize="words"
+                returnKeyType="next"
+                error={errors.prenom}
               />
-            </Field>
-            <Field label="PAYS">
-              <CountryPicker value={country} onChange={setCountry} />
-            </Field>
-            <Field label="TÉLÉPHONE">
-              <View style={styles.phoneRow}>
-                <View style={styles.phonePrefix}>
-                  <Text style={styles.phonePrefixLabel}>{country.dialCode}</Text>
-                </View>
-                <TextInput
+              <FormField
+                icon="mail"
+                placeholder={t('signup.email')}
+                value={email}
+                onChangeText={setEmail}
+                autoComplete="email"
+                textContentType="emailAddress"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                error={errors.email}
+              />
+              <View style={styles.phoneGroup}>
+                <CountryPicker value={country} onChange={setCountry} />
+                <FormField
+                  icon="phone"
+                  placeholder={t('signup.phone')}
+                  accessibilityLabel={t('signup.phone')}
                   value={phoneLocal}
                   onChangeText={setPhoneLocal}
-                  placeholder="690 00 00 00"
-                  placeholderTextColor={colors.textMuted}
                   keyboardType="phone-pad"
-                  style={[styles.input, styles.phoneInput]}
+                  textContentType="telephoneNumber"
+                  autoComplete="tel"
+                  leading={<Text style={styles.dial}>{country.dialCode}</Text>}
+                  error={errors.phone}
                 />
               </View>
-            </Field>
-            <Field label="MOT DE PASSE">
-              <View style={styles.passwordWrap}>
-                <TextInput
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="8 caractères minimum"
-                  placeholderTextColor={colors.textMuted}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                  style={[styles.input, styles.inputPassword]}
-                />
-                <Pressable onPress={() => setShowPassword((v) => !v)} style={styles.eye} hitSlop={8}>
-                  <Text style={styles.eyeIcon}>{showPassword ? '🙈' : '👁'}</Text>
-                </Pressable>
-              </View>
-            </Field>
-            <Pressable onPress={() => setAccepted((v) => !v)} style={styles.terms}>
-              <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
-                {accepted && <Text style={styles.checkboxTick}>✓</Text>}
-              </View>
-              <Text style={styles.termsText}>
-                J'accepte les{' '}
-                <Text style={styles.termsLink} onPress={() => showLegalDoc('Les conditions d’utilisation')}>
-                  conditions d'utilisation
-                </Text>{' '}
-                et la{' '}
-                <Text style={styles.termsLink} onPress={() => showLegalDoc('La politique de confidentialité')}>
-                  politique de confidentialité
-                </Text>{' '}
-                d'AFROBACK.
+              <FormField
+                icon="lock"
+                placeholder={t('signup.password')}
+                accessibilityLabel={t('signup.passwordA11y')}
+                hint={t('signup.passwordHint')}
+                value={password}
+                onChangeText={setPassword}
+                secure
+                autoComplete="new-password"
+                textContentType="newPassword"
+                autoCapitalize="none"
+                returnKeyType="done"
+                onSubmitEditing={onSubmit}
+                error={errors.password}
+              />
+              <PasswordStrength password={password} />
+
+              <GoldCheckbox checked={accepted} onToggle={() => setAccepted((v) => !v)} error={errors.accepted}>
+                <Text style={styles.termsText}>
+                  {t('signup.consentStart')}{' '}
+                  <Text style={styles.termsLink} onPress={() => openLegal('cgu')}>
+                    {t('signup.terms')}
+                  </Text>{' '}
+                  {t('signup.and')}{' '}
+                  <Text style={styles.termsLink} onPress={() => openLegal('confidentialite')}>
+                    {t('signup.privacy')}
+                  </Text>
+                  .
+                </Text>
+              </GoldCheckbox>
+            </View>
+
+            {!!errors.form && <Text style={styles.formError}>{errors.form}</Text>}
+            {emailExists && (
+              <Pressable
+                onPress={() => router.replace({ pathname: '/onboarding/login', params: { email: email.trim().toLowerCase() } })}
+                style={styles.existsLink}
+                hitSlop={8}
+                accessibilityRole="button"
+              >
+                <Text style={styles.switchLink}>{t('signup.emailExistsLink')} ›</Text>
+              </Pressable>
+            )}
+
+            <View style={styles.cta}>
+              <PillButton label={t('signup.submit')} icon="userPlus" onPress={onSubmit} loading={loading} />
+            </View>
+
+            <Text style={styles.childNote}>
+              {t('signup.childNote')}
+            </Text>
+
+            <Pressable
+              onPress={() => router.replace('/onboarding/login')}
+              style={styles.switch}
+              hitSlop={8}
+              accessibilityRole="button"
+            >
+              <Text style={styles.switchLabel}>
+                {t('signup.haveAccount')} <Text style={styles.switchLink}>{t('signup.login')}</Text>
               </Text>
             </Pressable>
-          </View>
-
-          {error && <Text style={styles.error}>{error}</Text>}
-
-          <View style={styles.cta}>
-            <GoldButton label={loading ? 'Création...' : 'Créer mon compte'} onPress={onSubmit} />
-          </View>
-          <Pressable onPress={() => router.replace('/onboarding/login')} style={styles.switch}>
-            <Text style={styles.switchLabel}>
-              J'ai déjà un compte · <Text style={styles.switchLink}>Se connecter</Text>
-            </Text>
-          </Pressable>
-        </ScrollView>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
-    </View>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <View style={styles.field}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      {children}
     </View>
   );
 }
@@ -156,160 +205,102 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const styles = StyleSheet.create({
   wrap: {
     flex: 1,
-    backgroundColor: colors.backgroundPlayerTo,
+    backgroundColor: ONBOARDING_BG,
+  },
+  frieze: {
+    position: 'absolute',
+    bottom: 18,
+    right: -20,
+    transform: [{ rotate: '-8deg' }],
   },
   safe: {
     flex: 1,
   },
   scroll: {
-    paddingHorizontal: 26,
-    paddingTop: 14,
-    paddingBottom: 40,
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    paddingBottom: 36,
   },
   back: {
-    marginBottom: 6,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    marginLeft: -6,
   },
   backIcon: {
-    fontSize: 22,
+    fontSize: 30,
     color: colors.accentGold,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  logoDot: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.placeholderStripeDark,
-    borderWidth: 1,
-    borderColor: 'rgba(240,195,107,.4)',
   },
   title: {
     fontFamily: typography.display,
-    fontSize: 24,
+    fontSize: 28,
     color: colors.textHeading,
-    marginTop: 14,
-    textAlign: 'center',
+    marginTop: 10,
   },
   subtitle: {
     fontFamily: typography.body,
-    fontSize: 13,
-    color: colors.textMuted,
+    fontSize: 15,
+    color: colors.textBody,
     marginTop: 6,
-    textAlign: 'center',
   },
   form: {
     gap: 14,
-  },
-  field: {},
-  fieldLabel: {
-    fontFamily: typography.mono,
-    fontSize: 11,
-    letterSpacing: 1,
-    color: colors.textMuted,
-    marginBottom: 6,
-  },
-  input: {
-    fontFamily: typography.body,
-    fontSize: 14,
-    padding: 14,
-    borderRadius: 13,
-    borderWidth: 1,
-    borderColor: 'rgba(240,195,107,.2)',
-    backgroundColor: colors.placeholderStripeDark,
-    color: colors.textPrimary,
-  },
-  phoneRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  phonePrefix: {
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-    borderRadius: 13,
-    borderWidth: 1,
-    borderColor: 'rgba(240,195,107,.2)',
-    backgroundColor: colors.placeholderStripeDark,
-  },
-  phonePrefixLabel: {
-    fontFamily: typography.mono,
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  phoneInput: {
-    flex: 1,
-  },
-  passwordWrap: {
-    position: 'relative',
-    justifyContent: 'center',
-  },
-  inputPassword: {
-    paddingRight: 44,
-  },
-  eye: {
-    position: 'absolute',
-    right: 14,
-  },
-  eyeIcon: {
-    fontSize: 15,
-  },
-  terms: {
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'flex-start',
-    marginTop: 2,
-  },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: colors.accentGold,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 1,
-  },
-  checkboxChecked: {
-    backgroundColor: colors.accentGold,
-  },
-  checkboxTick: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: colors.ctaTextOnGold,
+    marginTop: 28,
   },
   termsText: {
-    flex: 1,
     fontFamily: typography.body,
-    fontSize: 11.5,
-    lineHeight: 17,
-    color: colors.textMuted,
+    fontSize: 13,
+    lineHeight: 20,
+    color: colors.textBody,
   },
   termsLink: {
-    color: colors.accentGold,
-    fontFamily: typography.bodyBold,
+    color: colors.accentGoldPale,
+    fontFamily: typography.bodySemiBold,
     textDecorationLine: 'underline',
   },
-  error: {
+  formError: {
     fontFamily: typography.body,
-    fontSize: 12.5,
+    fontSize: 13,
+    lineHeight: 19,
     color: colors.terracottaText,
-    marginTop: 14,
+    marginTop: 16,
+  },
+  phoneGroup: {
+    gap: 10,
+  },
+  dial: {
+    fontFamily: typography.mono,
+    fontSize: 14,
+    color: colors.textPrimary,
+  },
+  existsLink: {
+    marginTop: 8,
+    paddingVertical: 4,
   },
   cta: {
-    marginTop: 20,
+    marginTop: 24,
+  },
+  childNote: {
+    fontFamily: typography.body,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: colors.textMutedAlt,
+    textAlign: 'center',
+    marginTop: 14,
   },
   switch: {
-    marginTop: 14,
+    marginTop: 22,
     alignItems: 'center',
+    paddingVertical: 8,
   },
   switchLabel: {
     fontFamily: typography.body,
-    fontSize: 12.5,
-    color: colors.textMuted,
+    fontSize: 14,
+    color: colors.textBodyAlt,
   },
   switchLink: {
-    color: colors.accentGold,
+    color: colors.accentGoldPale,
     fontFamily: typography.bodySemiBold,
+    textDecorationLine: 'underline',
   },
 });

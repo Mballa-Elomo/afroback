@@ -7,6 +7,7 @@ import { getOwnBuyerOrders } from '../../../src/data/marketplaceRepository';
 import type { MarketplaceOrder, MarketplaceOrderStatut } from '../../../src/data/marketplaceTypes';
 import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { withAccount } from '../../../src/auth/AccountWall';
 
 const STATUT_LABEL: Record<MarketplaceOrderStatut, string> = {
   en_attente_paiement: 'En attente de paiement',
@@ -23,7 +24,7 @@ const STATUT_COLOR: Record<MarketplaceOrderStatut, string> = {
 };
 
 /** Mes commandes (acheteur) — écran ajouté pour que "Suivre ma commande" (checkout) ait une vraie destination fonctionnelle, non prévu explicitement dans l'extrait de maquette fourni. */
-export default function MyOrdersScreen() {
+function MyOrdersScreen() {
   const router = useRouter();
   const [state, setState] = useState<{ status: 'loading' | 'error' | 'ready'; orders: MarketplaceOrder[] }>({
     status: 'loading',
@@ -157,3 +158,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+export default withAccount(MyOrdersScreen, 'orders');

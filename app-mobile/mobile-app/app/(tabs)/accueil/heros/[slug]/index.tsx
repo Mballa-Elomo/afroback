@@ -11,10 +11,15 @@ import { GoldButton, OutlineButton } from '../../../../../src/components/Buttons
 import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
 import { useHero, useRelatedHeroes } from '../../../../../src/data/useHeroesData';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
+import { useRequireAccount } from '../../../../../src/auth/AccountWall';
+import { LockedContent } from '../../../../../src/access/Access';
+import { useI18n } from '../../../../../src/i18n';
 
 export default function FicheHerosScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const { lang } = useI18n();
+  const requireAccount = useRequireAccount();
   const herosState = useHero(slug);
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
   const related = useRelatedHeroes(heros);
@@ -45,26 +50,35 @@ export default function FicheHerosScreen() {
         <View style={styles.body}>
           {heros.avertissement_lecture && <WarningBanner text={heros.avertissement_lecture} />}
 
-          <View style={styles.actions}>
-            <View style={styles.goldFlex}>
-              <GoldButton label="Lire le récit" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
-            </View>
-            <OutlineButton
-              label={heros.statut_narration_audio === 'pret' ? '▶ Écouter' : '▶ Écouter'}
-              onPress={() => router.push(`/accueil/heros/${heros.slug}/audio`)}
-            />
-            <OutlineButton
-              label={heros.statut_video === 'pret' ? '▷ Regarder' : '▷ Regarder'}
-              onPress={() => router.push(`/accueil/heros/${heros.slug}/video`)}
-            />
-          </View>
+          {heros.acces?.verrouille ? (
+            <>
+              <Text style={styles.resume}>{heros.resume_catalogue}</Text>
+              <LockedContent apercu={(lang === 'en' && heros.acces.apercu_en ? heros.acces.apercu_en : heros.acces.apercu_fr)} reason="heros" style={{ marginTop: 18 }} />
+            </>
+          ) : (
+            <>
+              <View style={styles.actions}>
+                <View style={styles.goldFlex}>
+                  <GoldButton label="Lire le récit" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
+                </View>
+                <OutlineButton
+                  label={heros.statut_narration_audio === 'pret' ? '▶ Écouter' : '▶ Écouter'}
+                  onPress={() => requireAccount(() => router.push(`/accueil/heros/${heros.slug}/audio`), 'audio')}
+                />
+                <OutlineButton
+                  label={heros.statut_video === 'pret' ? '▷ Regarder' : '▷ Regarder'}
+                  onPress={() => requireAccount(() => router.push(`/accueil/heros/${heros.slug}/video`), 'video')}
+                />
+              </View>
 
-          <Text style={styles.resume}>{heros.resume_catalogue}</Text>
+              <Text style={styles.resume}>{heros.resume_catalogue}</Text>
 
-          <TimelineList evenements={heros.frise_chronologique} />
-          <SourcesList sources={heros.sources} />
-          <CitationsSection citations={heros.citations} />
-          <LegendesSection legendes={heros.legendes_associees} />
+              <TimelineList evenements={heros.frise_chronologique} />
+              <SourcesList sources={heros.sources} />
+              <CitationsSection citations={heros.citations} />
+              <LegendesSection legendes={heros.legendes_associees} />
+            </>
+          )}
           <RelatedHeroes heroes={related} title="De la même époque" />
         </View>
       </ScrollView>

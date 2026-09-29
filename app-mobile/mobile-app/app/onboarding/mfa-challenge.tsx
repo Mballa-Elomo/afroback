@@ -5,6 +5,7 @@ import { useAuth } from '../../src/auth/AuthProvider';
 import { supabase } from '../../src/data/supabaseClient';
 import { GoldButton } from '../../src/components/Buttons';
 import { colors, spacing, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
 
 /**
  * Porte de vérification MFA, affichée par RootNavigator (app/_layout.tsx)
@@ -15,13 +16,14 @@ import { colors, spacing, typography } from '../../src/theme/tokens';
  */
 export default function MfaChallengeScreen() {
   const { confirmMfaChallengePassed, signOut } = useAuth();
+  const { t } = useI18n();
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async () => {
     if (!/^\d{6}$/.test(code)) {
-      setError('Entre le code à 6 chiffres affiché dans ton application d’authentification.');
+      setError(t('mfa.errors.codeFormat'));
       return;
     }
     setError(null);
@@ -30,9 +32,9 @@ export default function MfaChallengeScreen() {
     setBusy(false);
     if (rpcError || !data?.ok) {
       if (data?.error === 'verrouille') {
-        setError('Trop de tentatives échouées. Réessaie dans quelques minutes.');
+        setError(t('mfa.errors.locked'));
       } else {
-        setError('Code incorrect. Vérifie l’heure de ton téléphone et réessaie.');
+        setError(t('mfa.errors.codeWrong'));
       }
       return;
     }
@@ -44,10 +46,8 @@ export default function MfaChallengeScreen() {
     <View style={styles.wrap}>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.content}>
-          <Text style={styles.title}>Vérification en 2 étapes</Text>
-          <Text style={styles.subtitle}>
-            Entre le code à 6 chiffres affiché dans ton application d’authentification.
-          </Text>
+          <Text style={styles.title}>{t('mfa.title')}</Text>
+          <Text style={styles.subtitle}>{t('mfaChallenge.subtitle')}</Text>
 
           <TextInput
             value={code}
@@ -63,11 +63,11 @@ export default function MfaChallengeScreen() {
           {error && <Text style={styles.error}>{error}</Text>}
 
           <View style={styles.cta}>
-            <GoldButton label={busy ? 'Vérification...' : 'Valider'} onPress={onSubmit} disabled={busy} />
+            <GoldButton label={busy ? t('mfa.verifying') : t('common.validate')} onPress={onSubmit} disabled={busy} />
           </View>
 
           <Pressable onPress={() => signOut()} style={styles.switch}>
-            <Text style={styles.switchLabel}>Perdu ton téléphone d’authentification&nbsp;? · Se déconnecter</Text>
+            <Text style={styles.switchLabel}>{t('mfaChallenge.lost')}</Text>
           </Pressable>
         </View>
       </SafeAreaView>

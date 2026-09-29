@@ -41,7 +41,8 @@
         {
           "photosPermission": "AFROBACK a besoin d'accéder à tes photos pour ajouter une image à un post, un produit ou ton profil."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

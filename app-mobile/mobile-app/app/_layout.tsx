@@ -1,26 +1,35 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider, useAuth } from '../src/auth/AuthProvider';
+import { AccountWallProvider } from '../src/auth/AccountWall';
+import { AccessProvider } from '../src/access/Access';
 import { WizardStateProvider } from '../src/onboarding/WizardState';
 import { ActiveProfileProvider, useActiveProfile } from '../src/profils/ActiveProfileProvider';
 import { useAppFonts } from '../src/theme/useAppFonts';
 import { colors } from '../src/theme/tokens';
+import { loadInitialLanguage } from '../src/i18n';
+import { BootScreen } from '../src/components/BootScreen';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useAppFonts();
+  // Langue (choix mémorisé ou langue du téléphone) chargée avant le premier écran : pas de flash FR → EN.
+  const [langReady, setLangReady] = useState(false);
+  useEffect(() => {
+    loadInitialLanguage().finally(() => setLangReady(true));
+  }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded || fontError) {
+    if ((fontsLoaded || fontError) && langReady) {
       await SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, langReady]);
 
-  if (!fontsLoaded && !fontError) {
+  if ((!fontsLoaded && !fontError) || !langReady) {
     return null;
   }
 
@@ -35,7 +44,11 @@ export default function RootLayout() {
       <AuthProvider>
         <WizardStateProvider>
           <ActiveProfileProvider>
-            <RootNavigator />
+            <AccountWallProvider>
+              <AccessProvider>
+                <RootNavigator />
+              </AccessProvider>
+            </AccountWallProvider>
           </ActiveProfileProvider>
         </WizardStateProvider>
       </AuthProvider>
@@ -73,8 +86,9 @@ const styles = StyleSheet.create({
 });
 
 /**
- * Grille d'accès : sans session → onboarding (splash 3D, connexion,
- * inscription) ; session mais MFA activée et pas encore vérifiée pour cette
+ * Grille d'accès : sans session → onboarding (splash, présentation,
+ * "Bienvenue dans ton voyage", connexion, inscription, code email — refonte
+ * du 2026-09-29, app-mobile/cdc-onboarding.md) ; session mais MFA activée et pas encore vérifiée pour cette
  * connexion → porte de vérification (lot cybersécurité du 2026-09-25,
  * prioritaire sur tout le reste : un compte protégé par 2FA n'accède à rien,
  * pas même à l'assistant post-inscription, tant que le code n'est pas
@@ -89,16 +103,16 @@ const styles = StyleSheet.create({
  * sélecteur comme l'Espace Parent y renvoient tous les deux).
  */
 function RootNavigator() {
-  const { session, onboardingComplete, mfaStatus } = useAuth();
+  const { session, onboardingComplete, mfaStatus, isGuest } = useAuth();
   const { state: profileState } = useActiveProfile();
 
   // session === undefined tant que la lecture de la session locale (AsyncStorage) n'est pas terminée.
-  if (session === undefined) return null;
+  if (session === undefined) return <BootScreen />;
   // mfaStatus === 'unknown' tant que le niveau d'assurance n'a pas été vérifié auprès de Supabase.
-  if (!!session && mfaStatus === 'unknown') return null;
+  if (!!session && mfaStatus === 'unknown') return <BootScreen />;
   // profileState.status === 'checking' tant que la liste des profils enfants n'a pas été chargée
   // (voir ActiveProfileProvider) — évite un flash d'écran vide entre les deux.
-  if (!!session && onboardingComplete && profileState.status === 'checking') return null;
+  if (!!session && onboardingComplete && profileState.status === 'checking') return <BootScreen />;
 
   // Une fois 'unknown' écarté ci-dessus, seul 'challenge_required' bloque encore l'accès —
   // 'not_enrolled' (pas de 2FA activée) et 'satisfied' (2FA validée) se comportent pareil.
@@ -109,26 +123,38 @@ function RootNavigator() {
     // à la maquette — pas d'en-tête natif générique.
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="index" />
+      {/* Conditions et confidentialité : lisibles dans tous les états (inscription, invité, connecté). */}
+      <Stack.Screen name="legal/[doc]" />
+      {/* Reste accessible en mode invité : la fenêtre "Crée ton compte"
+          (AccountWall) y renvoie vers l'inscription ou la connexion. */}
       <Stack.Protected guard={!session}>
         <Stack.Screen name="onboarding/index" />
+        <Stack.Screen name="onboarding/transition" options={{ animation: 'fade' }} />
+        <Stack.Screen name="onboarding/bienvenue" options={{ animation: 'fade' }} />
         <Stack.Screen name="onboarding/login" />
         <Stack.Screen name="onboarding/signup" />
+        <Stack.Screen name="onboarding/verification-email" />
+        <Stack.Screen name="onboarding/mot-de-passe-oublie" />
       </Stack.Protected>
       <Stack.Protected guard={!!session && !mfaOk}>
         <Stack.Screen name="onboarding/mfa-challenge" />
       </Stack.Protected>
       <Stack.Protected guard={!!session && mfaOk && !onboardingComplete}>
-        {/* mfa-proposal en premier : "Protège ton compte" s'affiche juste
-            après l'inscription, avant tout le reste de l'assistant — voir
-            app-mobile/cdc-mfa-inscription.md (Option B, suggéré jamais
-            forcé). L'ordre des <Stack.Screen> dans un groupe qui vient de
-            devenir actif détermine l'écran affiché par défaut. */}
-        <Stack.Screen name="onboarding/mfa-proposal" />
-        <Stack.Screen name="onboarding/language" />
+        {/* Ordre du parcours post-inscription (cdc-onboarding.md, D5) :
+            "Ton profil" (pseudo + photo/avatar, ajouté le 2026-09-29) → "Je suis…" (usage) → "Ton compte est créé !" → "Protège ton
+            compte" (MFA, suggéré jamais forcé) → forfait → paiement →
+            "Bienvenue dans AfroBack". L'ordre des <Stack.Screen> dans un
+            groupe qui vient de devenir actif détermine l'écran affiché par
+            défaut : profil en premier. `language` est hors parcours tant que
+            l'app n'est pas traduite (fichier gardé pour ce chantier). */}
+        <Stack.Screen name="onboarding/profil" />
         <Stack.Screen name="onboarding/usage" />
+        <Stack.Screen name="onboarding/compte-cree" options={{ animation: 'fade' }} />
+        <Stack.Screen name="onboarding/mfa-proposal" />
         <Stack.Screen name="onboarding/plan" />
         <Stack.Screen name="onboarding/payment" />
-        <Stack.Screen name="onboarding/welcome" />
+        <Stack.Screen name="onboarding/welcome" options={{ animation: 'fade' }} />
+        <Stack.Screen name="onboarding/language" />
       </Stack.Protected>
       {/* profil/mfa joignable dès que la session est prête, pas seulement
           une fois l'onboarding terminé — mfa-proposal doit pouvoir y
@@ -151,12 +177,17 @@ function RootNavigator() {
         <Stack.Screen name="enfant/ecole/niveau-suivant" />
         <Stack.Screen name="enfant/ecole/collection" />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && profileState.status === 'adult'}>
+      {/* Invité ("Explorer sans compte") : accès aux onglets en lecture, les
+          actions réservées passent par AccountWall (cdc-onboarding.md, section 4). */}
+      <Stack.Protected
+        guard={(!!session && mfaOk && onboardingComplete && profileState.status === 'adult') || isGuest}
+      >
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>
       <Stack.Protected guard={!!session && mfaOk && onboardingComplete}>
         <Stack.Screen name="profils/ajouter" />
         <Stack.Screen name="profils/parent" />
+        <Stack.Screen name="abonnement" />
         <Stack.Screen name="don/index" />
         <Stack.Screen name="don/montant" />
       </Stack.Protected>

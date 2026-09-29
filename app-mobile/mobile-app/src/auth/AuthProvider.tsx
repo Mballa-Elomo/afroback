@@ -1,15 +1,25 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../data/supabaseClient';
+import i18n, { currentLanguage } from '../i18n';
+import { LEGAL_VERSION } from '../legal/documents';
 
 /**
- * Authentification par téléphone + mot de passe uniquement (décision de
- * Yannick du 2026-07-30) : pas d'email, pas de Google/Facebook, pas de code
- * OTP envoyé par SMS. Ça suppose que le provider "Phone" est activé côté
- * dashboard Supabase (Authentication → Providers → Phone) avec la
- * confirmation automatique activée (pas de vérification SMS), sans quoi
- * `signUpWithPhone` crée bien le compte mais aucune session n'est ouverte
- * (voir le message d'erreur renvoyé dans ce cas).
+ * Authentification — revue le 2026-09-29 (Module 1, `app-mobile/cdc-onboarding.md`) :
+ * - **Inscription par email** (prénom + email + mot de passe, identique à la
+ *   maquette de Yannick). La confirmation d'email est activée côté Supabase
+ *   (`mailer_autoconfirm: false`, vérifié le 2026-09-29) : `signUpWithEmail`
+ *   ne renvoie donc pas de session, l'écran `verification-email.tsx` valide
+ *   le code à 6 chiffres reçu (`verifySignupCode`). Le modèle d'email
+ *   Supabase doit contenir `{{ .Token }}` pour que ce code soit envoyé (voir
+ *   Module 2 : fournisseur SMTP + modèle aux couleurs AFROBACK).
+ * - **Connexion par email ou téléphone** : les comptes créés avant le
+ *   2026-09-29 (téléphone + mot de passe, provider "Phone" en confirmation
+ *   automatique, pas de SMS) doivent pouvoir continuer à se connecter.
+ * - **Mode invité** ("Explorer sans compte") : état local uniquement, aucun
+ *   compte créé côté serveur. Lecture seule des contenus déjà publics (RLS
+ *   vérifiée le 2026-09-29) ; toute action personnelle passe par
+ *   `AccountWall`. Jamais persisté : relancer l'app ramène à l'écran d'entrée.
  *
  * Authentification à deux facteurs (MFA/2FA, lot cybersécurité du 2026-09-25,
  * revu le 2026-09-26) : TOTP uniquement (app d'authentification type Google
@@ -38,6 +48,8 @@ export interface OnboardingChoices {
   billing?: 'monthly' | 'yearly';
   /** 'simulated' tant qu'aucun agrégateur Mobile Money n'est branché (voir payment.tsx) — jamais confondu avec un vrai paiement. */
   paymentStatus?: 'none' | 'simulated';
+  /** Forfait payant choisi pendant l'inscription alors que le paiement n'existe pas encore : indicateur d'intérêt pour Yannick, n'ouvre aucun droit. */
+  forfaitSouhaite?: 'racines' | 'heritage' | null;
 }
 
 /**
@@ -60,13 +72,27 @@ interface AuthState {
   refreshMfaStatus: () => Promise<void>;
   /** Appelée par l'écran de défi (`app/onboarding/mfa-challenge.tsx`) après un code validé — fait passer `mfaStatus` à 'satisfied' pour le reste de cette session app. */
   confirmMfaChallengePassed: () => void;
-  signUpWithPhone: (params: {
-    phone: string;
+  /** Crée le compte ; `needsVerification` = un code a été envoyé par email, aucune session ouverte pour l'instant. */
+  signUpWithEmail: (params: {
+    email: string;
     password: string;
     prenom: string;
-    pays: string;
-  }) => Promise<{ error: string | null }>;
+    /** Format E.164 (+2376…) : recopié côté serveur comme identifiant de connexion (schema-telephone-inscription.sql). */
+    telephone: string;
+  }) => Promise<{ error: string | null; needsVerification: boolean; emailExists?: boolean; phoneTaken?: boolean }>;
+  /** Mot de passe oublié : envoie un code par e-mail (réponse neutre, qu'un compte existe ou non). */
+  requestPasswordReset: (email: string) => Promise<{ error: string | null }>;
+  /** Valide le code reçu et enregistre le nouveau mot de passe ; la personne est ensuite connectée. */
+  resetPasswordWithCode: (params: { email: string; code: string; password: string }) => Promise<{ error: string | null }>;
+  verifySignupCode: (params: { email: string; code: string }) => Promise<{ error: string | null }>;
+  resendSignupCode: (email: string) => Promise<{ error: string | null }>;
+  /** `unconfirmed` : mot de passe correct mais email jamais confirmé — un nouveau code vient d'être envoyé. */
+  signInWithEmail: (params: { email: string; password: string }) => Promise<{ error: string | null; unconfirmed?: boolean }>;
   signInWithPhone: (params: { phone: string; password: string }) => Promise<{ error: string | null }>;
+  /** true quand la personne explore sans compte (jamais en même temps qu'une session). */
+  isGuest: boolean;
+  enterGuestMode: () => void;
+  exitGuestMode: () => void;
   completeOnboarding: (choices: OnboardingChoices) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
@@ -76,10 +102,15 @@ const AuthContext = createContext<AuthState | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [mfaStatus, setMfaStatus] = useState<MfaStatus>('unknown');
+  const [guestMode, setGuestMode] = useState(false);
   // En mémoire seulement (jamais persisté) : se réinitialise à chaque
   // lancement de l'app, donc le défi MFA est revalidé une fois par session
   // app — comportement voulu, équivalent à ce que faisait l'AAL Supabase.
   const mfaChallengeSatisfiedRef = useRef(false);
+  // Pendant "mot de passe oublié" : la validation du code ouvre une session
+  // AVANT que le nouveau mot de passe soit enregistré. On ne la publie pas
+  // tout de suite, sinon la navigation quitterait l'écran en plein milieu.
+  const recoveringRef = useRef(false);
 
   const refreshMfaStatus = async () => {
     const { data, error } = await supabase.rpc('mfa_totp_status');
@@ -98,6 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (recoveringRef.current) return;
       setSession(newSession);
     });
     return () => sub.subscription.unsubscribe();
@@ -113,6 +145,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session?.user?.id]);
 
   const onboardingComplete = session?.user?.user_metadata?.onboarding_complete === true;
+  // Une session ouverte (inscription ou connexion depuis le mode invité) met fin au mode invité.
+  const isGuest = guestMode && !session;
+
+  /**
+   * Connexion commune email/téléphone, avec la protection brute force du lot
+   * cybersécurité (2026-09-25). `identifier` est la clé de verrouillage : le
+   * numéro E.164 ou l'email en minuscules — `login_attempts.phone` est un
+   * simple texte, aucune migration nécessaire. Limite documentée en tête de
+   * supabase/schema-security-auth.sql (n'empêche pas un appel direct à l'API
+   * Supabase, seulement un brute force fait à travers l'app elle-même).
+   */
+  const signInWithPassword = async (
+    identifier: string,
+    credentials: { email: string; password: string } | { phone: string; password: string }
+  ) => {
+    const { data: lockout } = await supabase.rpc('check_login_lockout', { p_phone: identifier });
+    if (lockout?.locked) {
+      const until = new Date(lockout.locked_until as string);
+      return {
+        error: i18n.t('authErrors.lockout', {
+          time: until.toLocaleTimeString(currentLanguage() === 'en' ? 'en-GB' : 'fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+        }),
+      };
+    }
+    const { error } = await supabase.auth.signInWithPassword(credentials);
+    // Email non confirmé : Supabase ne le signale qu'après un mot de passe correct,
+    // ce n'est donc pas un échec de connexion au sens du verrouillage.
+    const unconfirmed = !!error && (error.code === 'email_not_confirmed' || error.message === 'Email not confirmed');
+    await supabase.rpc('record_login_attempt', { p_phone: identifier, p_success: !error || unconfirmed });
+    if (unconfirmed) return { error: null, unconfirmed: true };
+    if (!error) await refreshMfaStatus();
+    return { error: error ? translateAuthError(error.message) : null, unconfirmed: false };
+  };
 
   const value = useMemo<AuthState>(
     () => ({
@@ -121,50 +189,114 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mfaStatus,
       refreshMfaStatus,
       confirmMfaChallengePassed,
-      async signUpWithPhone({ phone, password, prenom, pays }) {
-        if (!isLikelyValidE164(phone)) {
-          return { error: 'Numéro de téléphone invalide. Vérifie le pays et le numéro saisis.' };
+      isGuest,
+      enterGuestMode: () => setGuestMode(true),
+      exitGuestMode: () => setGuestMode(false),
+      async signUpWithEmail({ email, password, prenom, telephone }) {
+        const normalized = email.trim().toLowerCase();
+        if (!isLikelyValidEmail(normalized)) {
+          return { error: i18n.t('authErrors.invalidEmail'), needsVerification: false };
+        }
+        if (!isLikelyValidE164(telephone)) {
+          return { error: i18n.t('signup.errors.phone'), needsVerification: false };
+        }
+        // Numéro déjà utilisé ? Message clair plutôt qu'une erreur technique de la base.
+        // Fonction absente (script pas encore exécuté) : on laisse la base trancher.
+        const dispo = await supabase.rpc('telephone_disponible', { p_telephone: telephone });
+        if (!dispo.error && dispo.data === false) {
+          return { error: i18n.t('signup.errors.phoneTaken'), needsVerification: false, phoneTaken: true };
         }
         const { data, error } = await supabase.auth.signUp({
-          phone,
+          email: normalized,
           password,
-          options: { data: { prenom, pays } },
+          options: {
+            data: {
+              prenom,
+              telephone,
+              // Langue de l'email de confirmation (modèle bilingue côté Supabase) et de l'app.
+              langue: currentLanguage(),
+              // Preuve du consentement (cdc-inscription.md, section 3).
+              consent_at: new Date().toISOString(),
+              consent_version: CONSENT_VERSION,
+            },
+          },
         });
-        if (error) return { error: translateAuthError(error.message) };
-        if (!data.session) {
-          // Le compte est créé côté Supabase mais aucune session n'a été ouverte :
-          // le provider Phone attend probablement une confirmation SMS (auto-confirm
-          // désactivé côté dashboard). Voir la note en tête de fichier.
-          return {
-            error:
-              "Compte créé, mais aucune session n'a été ouverte automatiquement. Vérifie que la confirmation automatique du téléphone est activée dans Supabase (Authentication → Providers → Phone).",
-          };
+        if (error) {
+          // Filet de sécurité : numéro pris entre la vérification et l'inscription.
+          if (/database error saving new user/i.test(error.message)) {
+            return { error: i18n.t('signup.errors.phoneTaken'), needsVerification: false, phoneTaken: true };
+          }
+          return { error: translateAuthError(error.message), needsVerification: false };
         }
-        return { error: null };
+        // Supabase ne renvoie pas d'erreur pour un email déjà inscrit (protection
+        // contre l'énumération de comptes) : il renvoie un utilisateur sans
+        // identité. On le dit honnêtement plutôt que de faire attendre un code
+        // qui n'arrivera jamais.
+        if (data.user?.identities && data.user.identities.length === 0) {
+          return { error: i18n.t('authErrors.emailExists'), needsVerification: false, emailExists: true };
+        }
+        return { error: null, needsVerification: !data.session };
+      },
+      async verifySignupCode({ email, code }) {
+        const { error } = await supabase.auth.verifyOtp({
+          email: email.trim().toLowerCase(),
+          token: code,
+          type: 'email',
+        });
+        return { error: error ? translateAuthError(error.message) : null };
+      },
+      async resendSignupCode(email) {
+        const { error } = await supabase.auth.resend({ type: 'signup', email: email.trim().toLowerCase() });
+        return { error: error ? translateAuthError(error.message) : null };
+      },
+      async requestPasswordReset(email) {
+        const normalized = email.trim().toLowerCase();
+        if (!isLikelyValidEmail(normalized)) return { error: i18n.t('authErrors.invalidEmail') };
+        // Supabase répond sans erreur même si aucun compte n'existe : l'écran reste
+        // volontairement neutre pour ne pas révéler qui est inscrit.
+        const { error } = await supabase.auth.resetPasswordForEmail(normalized);
+        return { error: error ? translateAuthError(error.message) : null };
+      },
+      async resetPasswordWithCode({ email, code, password }) {
+        recoveringRef.current = true;
+        try {
+          const { error: verifyError } = await supabase.auth.verifyOtp({
+            email: email.trim().toLowerCase(),
+            token: code,
+            type: 'recovery',
+          });
+          if (verifyError) return { error: translateAuthError(verifyError.message) };
+          const { error: updateError } = await supabase.auth.updateUser({ password });
+          if (updateError) {
+            // Code valide mais mot de passe refusé : on referme la session ouverte par le code.
+            await supabase.auth.signOut({ scope: 'local' });
+            return { error: translateAuthError(updateError.message) };
+          }
+          return { error: null };
+        } finally {
+          recoveringRef.current = false;
+          // Publie enfin la session (connecté avec le nouveau mot de passe, ou aucune en cas d'échec).
+          const { data } = await supabase.auth.getSession();
+          setSession(data.session);
+        }
+      },
+      async signInWithEmail({ email, password }) {
+        const normalized = email.trim().toLowerCase();
+        if (!isLikelyValidEmail(normalized)) return { error: i18n.t('authErrors.invalidEmail') };
+        const res = await signInWithPassword(normalized, { email: normalized, password });
+        if (res.unconfirmed) {
+          // Inscription jamais terminée (app fermée avant le code) : on renvoie un
+          // code et l'écran de saisie prend le relais, au lieu d'un message d'erreur.
+          await supabase.auth.resend({ type: 'signup', email: normalized });
+          return { error: null, unconfirmed: true };
+        }
+        return { error: res.error };
       },
       async signInWithPhone({ phone, password }) {
         if (!isLikelyValidE164(phone)) {
-          return { error: 'Numéro de téléphone invalide. Vérifie le pays et le numéro saisis.' };
+          return { error: i18n.t('authErrors.invalidPhone') };
         }
-        // Protection brute force (lot cybersécurité du 2026-09-25) : verrou
-        // appliqué côté application, voir la limite documentée en tête de
-        // supabase/schema-security-auth.sql (n'empêche pas un appel direct à
-        // l'API Supabase en contournant l'app, seulement un brute force fait
-        // à travers l'app elle-même — la cible réaliste ici).
-        const { data: lockout } = await supabase.rpc('check_login_lockout', { p_phone: phone });
-        if (lockout?.locked) {
-          const until = new Date(lockout.locked_until as string);
-          return {
-            error: `Trop de tentatives échouées. Réessaie après ${until.toLocaleTimeString('fr-FR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}.`,
-          };
-        }
-        const { error } = await supabase.auth.signInWithPassword({ phone, password });
-        await supabase.rpc('record_login_attempt', { p_phone: phone, p_success: !error });
-        if (!error) await refreshMfaStatus();
-        return { error: error ? translateAuthError(error.message) : null };
+        return signInWithPassword(phone, { phone, password });
       },
       async completeOnboarding(choices) {
         const { error } = await supabase.auth.updateUser({
@@ -175,6 +307,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             forfait: choices.forfait,
             billing: choices.billing ?? null,
             payment_status: choices.paymentStatus ?? 'none',
+            forfait_souhaite: choices.forfaitSouhaite ?? null,
           },
         });
         return { error: error ? translateAuthError(error.message) : null };
@@ -188,7 +321,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await supabase.auth.signOut({ scope: 'global' });
       },
     }),
-    [session, onboardingComplete, mfaStatus]
+    [session, onboardingComplete, mfaStatus, isGuest]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -199,17 +332,33 @@ function isLikelyValidE164(phone: string): boolean {
   return /^\+[1-9]\d{7,14}$/.test(phone);
 }
 
-/** Messages Supabase Auth traduits pour l'UI, sans changer le comportement (mêmes cas d'erreur). */
+/** Version des conditions acceptées à l'inscription (src/legal/documents.ts). */
+const CONSENT_VERSION = LEGAL_VERSION;
+
+function isLikelyValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+
+/** Messages Supabase Auth traduits pour l'UI (langue courante), sans changer le comportement (mêmes cas d'erreur). */
+const AUTH_ERROR_KEYS: Record<string, string> = {
+  'Invalid login credentials': 'authErrors.invalidCredentials',
+  'User already registered': 'authErrors.alreadyRegistered',
+  'Email not confirmed': 'authErrors.emailNotConfirmed',
+  'Token has expired or is invalid': 'authErrors.tokenInvalid',
+  'Email rate limit exceeded': 'authErrors.rateLimit',
+  'email rate limit exceeded': 'authErrors.rateLimit',
+  'Unable to validate email address: invalid format': 'authErrors.invalidEmail',
+  'Password should be at least 6 characters': 'authErrors.passwordShort',
+  'Phone not confirmed': 'authErrors.phoneNotConfirmed',
+  'Unsupported phone provider': 'authErrors.phoneProvider',
+  'Signups not allowed for this instance': 'authErrors.signupsDisabled',
+  'New password should be different from the old password.': 'authErrors.samePassword',
+  'For security purposes, you can only request this once every 60 seconds': 'authErrors.rateLimit',
+};
+
 function translateAuthError(message: string): string {
-  const known: Record<string, string> = {
-    'Invalid login credentials': 'Numéro de téléphone ou mot de passe incorrect.',
-    'User already registered': 'Un compte existe déjà avec ce numéro de téléphone.',
-    'Password should be at least 6 characters': 'Le mot de passe doit contenir au moins 6 caractères.',
-    'Phone not confirmed': "Ce numéro n'est pas confirmé. Vérifie la configuration du provider Phone dans Supabase.",
-    'Unsupported phone provider': "L'authentification par téléphone n'est pas encore activée côté Supabase.",
-    'Signups not allowed for this instance': 'Les inscriptions ne sont pas autorisées pour le moment.',
-  };
-  return known[message] ?? message;
+  const key = AUTH_ERROR_KEYS[message];
+  return key ? i18n.t(key) : message;
 }
 
 export function useAuth(): AuthState {

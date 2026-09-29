@@ -11,6 +11,9 @@ import { useHero, useRelatedHeroes } from '../../../../../src/data/useHeroesData
 import { recordHeroEngagement, recordVideoChapterEngagement } from '../../../../../src/data/engagementRepository';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import type { Heros } from '../../../../../src/data/types';
+import { withAccount } from '../../../../../src/auth/AccountWall';
+import { LockedDetailScreen } from '../../../../../src/access/Access';
+import { useI18n } from '../../../../../src/i18n';
 
 /**
  * Lecteur vidéo plein écran. Dès qu'une URL de documentaire existe
@@ -24,10 +27,11 @@ import type { Heros } from '../../../../../src/data/types';
  * d'onglets basse est volontairement masquée ici via BottomTabBar (lecteur
  * plein écran immersif).
  */
-export default function LecteurVideoScreen() {
+function LecteurVideoScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const herosState = useHero(slug);
+  const { lang } = useI18n();
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
   const related = useRelatedHeroes(heros);
   const [chapterIdx, setChapterIdx] = useState(0);
@@ -67,6 +71,18 @@ export default function LecteurVideoScreen() {
       <SafeAreaView style={styles.safe}>
         <ErrorState />
       </SafeAreaView>
+    );
+  }
+
+  if (heros?.acces?.verrouille) {
+    return (
+      <LockedDetailScreen
+        title={heros.nom_affiche}
+        subtitle={heros.sous_titre}
+        imageUrl={heros.image_carte_catalogue}
+        apercu={(lang === 'en' && heros.acces.apercu_en ? heros.acces.apercu_en : heros.acces.apercu_fr)}
+        reason="heros"
+      />
     );
   }
 
@@ -462,3 +478,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+export default withAccount(LecteurVideoScreen, 'video');

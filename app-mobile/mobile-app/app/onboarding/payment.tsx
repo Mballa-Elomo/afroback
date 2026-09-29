@@ -8,6 +8,7 @@ import { WarningBanner } from '../../src/components/WarningBanner';
 import { useWizardState } from '../../src/onboarding/WizardState';
 import { formatPlanPrice, PLAN_NAMES, type PaidPlan } from '../../src/onboarding/pricing';
 import { colors, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
 
 type Method = 'orange' | 'mtn' | 'card';
 
@@ -27,6 +28,7 @@ type Method = 'orange' | 'mtn' | 'card';
 export default function PaymentStepScreen() {
   const router = useRouter();
   const { forfait, billing } = useWizardState();
+  const { t } = useI18n();
   const [method, setMethod] = useState<Method>('orange');
   const [loading, setLoading] = useState(false);
 
@@ -48,34 +50,34 @@ export default function PaymentStepScreen() {
     <View style={styles.wrap}>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.scroll}>
-          <StepHeader step={4} onBack={() => router.back()} />
+          <StepHeader step={2} onBack={() => router.back()} />
 
-          <Text style={styles.title}>Paiement</Text>
-          <Text style={styles.subtitle}>Vérifie ton récapitulatif avant de confirmer.</Text>
+          <Text style={styles.title}>{t('payment.title')}</Text>
+          <Text style={styles.subtitle}>{t('payment.subtitle')}</Text>
 
           <WarningBanner
-            title="Mode démonstration"
-            text="Aucun paiement réel n'est débité. L'intégration Mobile Money réelle sera activée dès qu'un compte agrégateur sera ouvert."
+            title={t('payment.demoTitle')}
+            text={t('payment.demoText')}
           />
 
           <View style={styles.recap}>
             <View style={styles.recapRow}>
-              <Text style={styles.recapLabel}>Forfait {planLabel}</Text>
+              <Text style={styles.recapLabel}>{t('payment.planLine', { plan: planLabel })}</Text>
               <Text style={styles.recapValue}>{total}</Text>
             </View>
             <View style={[styles.recapRow, styles.recapTotalRow]}>
-              <Text style={styles.recapTotalLabel}>Total</Text>
+              <Text style={styles.recapTotalLabel}>{t('payment.total')}</Text>
               <Text style={styles.recapTotalValue}>{total}</Text>
             </View>
           </View>
 
-          <Text style={styles.sectionLabel}>MOYEN DE PAIEMENT</Text>
+          <Text style={styles.sectionLabel}>{t('payment.methods')}</Text>
           <View style={styles.methods}>
             <MethodRow
               badge="OM"
               badgeBg="#F60"
               badgeColor="#fff"
-              label="Orange Money"
+              label={t('payment.orange')}
               selected={method === 'orange'}
               onPress={() => setMethod('orange')}
             />
@@ -83,7 +85,7 @@ export default function PaymentStepScreen() {
               badge="MoMo"
               badgeBg="#FC0"
               badgeColor="#1a1109"
-              label="MTN Mobile Money"
+              label={t('payment.mtn')}
               selected={method === 'mtn'}
               onPress={() => setMethod('mtn')}
             />
@@ -91,7 +93,7 @@ export default function PaymentStepScreen() {
               badge="💳"
               badgeBg="#223"
               badgeColor="#fff"
-              label="Carte bancaire"
+              label={t('payment.card')}
               selected={method === 'card'}
               onPress={() => setMethod('card')}
             />
@@ -107,11 +109,11 @@ export default function PaymentStepScreen() {
               {loading ? (
                 <ActivityIndicator color={colors.ctaTextOnGold} />
               ) : (
-                <Text style={styles.payBtnLabel}>Payer {total}</Text>
+                <Text style={styles.payBtnLabel}>{t('payment.continueFree')}</Text>
               )}
             </LinearGradient>
           </Pressable>
-          <Text style={styles.disclaimer}>🔒 Paiement sécurisé · résiliable à tout moment</Text>
+          <Text style={styles.disclaimer}>{t('payment.disclaimer')}</Text>
         </ScrollView>
       </SafeAreaView>
     </View>

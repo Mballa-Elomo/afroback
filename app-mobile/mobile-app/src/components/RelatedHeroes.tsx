@@ -4,6 +4,7 @@ import type { Heros } from '../data/types';
 import { colors, spacing, typography } from '../theme/tokens';
 import { SectionTitle } from './SectionTitle';
 import { HeroPlaceholder } from './HeroVisual';
+import { AccessBadge } from '../access/Access';
 
 export function RelatedHeroes({ heroes, title = 'Héros liés' }: { heroes: Heros[]; title?: string }) {
   const router = useRouter();
@@ -14,7 +15,9 @@ export function RelatedHeroes({ heroes, title = 'Héros liés' }: { heroes: Hero
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
         {heroes.map((h) => (
           <Pressable key={h.slug} style={styles.item} onPress={() => router.push(`/accueil/heros/${h.slug}`)}>
-            <HeroPlaceholder style={styles.visual} radius={14} imageUrl={h.image_carte_catalogue} />
+            <HeroPlaceholder style={styles.visual} radius={14} imageUrl={h.image_carte_catalogue}>
+              <AccessBadge type="heros" slug={h.slug} style={{ top: 6, right: 6 }} />
+            </HeroPlaceholder>
             <Text style={styles.name} numberOfLines={2}>
               {h.nom_affiche}
             </Text>

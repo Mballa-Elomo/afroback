@@ -20,6 +20,8 @@ import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { useCart } from '../../../src/marketplace/CartProvider';
 import { useAuth } from '../../../src/auth/AuthProvider';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { useRequireAccount } from '../../../src/auth/AccountWall';
+import { useAccess } from '../../../src/access/Access';
 
 /**
  * Fiche produit — fidèle à design-reference-marketplace.dc.excerpt.html
@@ -32,6 +34,8 @@ import { colors, spacing, typography } from '../../../src/theme/tokens';
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const requireAccount = useRequireAccount();
+  const { requireSubscription } = useAccess();
   const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const productState = useMarketplaceProduct(id);
@@ -79,8 +83,10 @@ export default function ProductDetailScreen() {
 
   const addToCart = () => {
     if (!product || product.statut !== 'en_ligne') return;
-    cart.addItem(product);
-    setToast(true);
+    requireAccount(() => {
+      cart.addItem(product);
+      setToast(true);
+    }, 'cart');
   };
 
   const sendReview = async () => {
@@ -174,7 +180,7 @@ export default function ProductDetailScreen() {
           <View style={styles.reviewsHeader}>
             <SectionTitle title="Avis" />
             {session && (
-              <Pressable onPress={() => setReviewOpen((v) => !v)}>
+              <Pressable onPress={() => requireSubscription(() => setReviewOpen((v) => !v), 'review')}>
                 <Text style={styles.addReviewLink}>{reviewOpen ? 'Annuler' : '+ Laisser un avis'}</Text>
               </Pressable>
             )}

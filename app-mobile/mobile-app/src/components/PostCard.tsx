@@ -3,6 +3,7 @@ import type { FeedItem } from '../data/useCommunityData';
 import { relativeTime } from '../data/relativeTime';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { HeroPlaceholder } from './HeroVisual';
+import { ProfileAvatar, presetKey } from './ProfileAvatar';
 
 /**
  * Carte de post du fil — fidèle à design-reference-communaute.dc.excerpt.html
@@ -30,7 +31,9 @@ export function PostCard({
     <View style={styles.card}>
       <View style={styles.headerRow}>
         <Pressable onPress={onOpenAuthor} hitSlop={6}>
-          {post.author?.avatar_url ? (
+          {presetKey(post.author?.avatar_url) ? (
+            <ProfileAvatar value={post.author?.avatar_url} size={38} />
+          ) : post.author?.avatar_url ? (
             <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} />
           ) : (
             <HeroPlaceholder style={styles.avatar} radius={19} />

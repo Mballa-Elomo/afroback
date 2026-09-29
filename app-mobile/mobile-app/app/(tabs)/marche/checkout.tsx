@@ -8,6 +8,7 @@ import type { MarketplaceOrderItem, MarketplacePaymentMethod } from '../../../sr
 import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { useCart } from '../../../src/marketplace/CartProvider';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { withAccount } from '../../../src/auth/AccountWall';
 
 const PAYMENT_METHODS: { id: MarketplacePaymentMethod; icon: string; name: string; sub: string }[] = [
   { id: 'mtn_momo', icon: '📱', name: 'MTN Mobile Money', sub: 'Confirmation par le vendeur' },
@@ -23,7 +24,7 @@ const PAYMENT_METHODS: { id: MarketplacePaymentMethod; icon: string; name: strin
  * l'écran de confirmation ne prétendent jamais qu'un paiement a réussi —
  * contrairement au "✅ Commande confirmée !" de la maquette d'origine.
  */
-export default function CheckoutScreen() {
+function CheckoutScreen() {
   const router = useRouter();
   const cart = useCart();
   const [nomComplet, setNomComplet] = useState('');
@@ -333,3 +334,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+export default withAccount(CheckoutScreen, 'order');

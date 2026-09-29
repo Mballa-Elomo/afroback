@@ -1,3 +1,5 @@
+import type { AccesContenu } from './contentAccess';
+
 /**
  * Types miroir du schéma Postgres du pilier Découverte (voir
  * supabase/seed-decouverte.sql et app-mobile/data-model-decouverte.md).
@@ -18,6 +20,12 @@ export interface AffirmationStatuee {
 export interface DecouverteItem {
   id: string;
   slug: string;
+  /**
+   * Droit d'accès au contenu complet, renseigné seulement sur le détail
+   * (cdc-acces-gratuit-abonnement.md). `verrouille` : contenu réservé aux
+   * abonnés, seul un aperçu est fourni. Absent sur les listes (catalogue).
+   */
+  acces?: AccesContenu;
   type: DecouverteType;
   pays: string;
   region_ethnie: string;

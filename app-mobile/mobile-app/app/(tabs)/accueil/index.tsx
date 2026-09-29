@@ -10,6 +10,8 @@ import { useHeroesList } from '../../../src/data/useHeroesData';
 import { getReadingProgress, type ReadingProgress } from '../../../src/data/readingProgress';
 import type { Heros } from '../../../src/data/types';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { GuestBanner, useRequireAccount } from '../../../src/auth/AccountWall';
+import { AccessBadge, UpgradeBanner } from '../../../src/access/Access';
 
 /** Salutation selon l'heure réelle de l'appareil — pas figée sur "Bonsoir" comme dans la capture de la maquette. */
 function greeting(): string {
@@ -54,6 +56,7 @@ const POUR_TOI_SCROLL_STEP = 149 * 2;
 export default function AccueilScreen() {
   const router = useRouter();
   const { session } = useAuth();
+  const requireAccount = useRequireAccount();
   const heroesState = useHeroesList();
   const heroes = heroesState.status === 'ready' ? heroesState.data : [];
   const [reading, setReading] = useState<ReadingProgress | null>(null);
@@ -107,12 +110,19 @@ export default function AccueilScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <GuestBanner />
+        <UpgradeBanner />
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>{greeting()},</Text>
             <Text style={styles.name}>{prenom || 'TOI'}</Text>
           </View>
-          <Pressable onPress={() => router.push('/profil')} hitSlop={8}>
+          <Pressable
+            onPress={() => requireAccount(() => router.push('/profil'), 'profile')}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Mon profil"
+          >
             <HeroPlaceholder style={styles.avatar} radius={22} />
           </Pressable>
         </View>
@@ -132,6 +142,7 @@ export default function AccueilScreen() {
                   locations={[0, 0.5, 1]}
                   style={StyleSheet.absoluteFill}
                 />
+                <AccessBadge type="heros" slug={featured.slug} style={{ top: 12, right: 12 }} />
                 <View style={styles.featuredContent}>
                   {featured.theme[0] && <TagBadge label={featured.theme[0].toUpperCase()} />}
                   <Text style={styles.featuredTitle}>{featured.nom_affiche}</Text>
@@ -204,7 +215,9 @@ export default function AccueilScreen() {
             >
               {pourToi.map((h) => (
                 <Pressable key={h.slug} style={styles.pourToiItem} onPress={() => router.push(`/accueil/heros/${h.slug}`)}>
-                  <HeroPlaceholder style={styles.pourToiThumb} radius={14} imageUrl={h.image_carte_catalogue} />
+                  <HeroPlaceholder style={styles.pourToiThumb} radius={14} imageUrl={h.image_carte_catalogue}>
+                    <AccessBadge type="heros" slug={h.slug} style={{ top: 6, right: 6 }} />
+                  </HeroPlaceholder>
                   <Text style={styles.pourToiName} numberOfLines={2}>
                     {h.nom_affiche}
                   </Text>
@@ -241,7 +254,10 @@ export default function AccueilScreen() {
           <Text style={styles.mythChevron}>›</Text>
         </Pressable>
 
-        <Pressable style={styles.donBanner} onPress={() => router.push('/don')}>
+        <Pressable
+          style={styles.donBanner}
+          onPress={() => requireAccount(() => router.push('/don'), 'don')}
+        >
           <Text style={styles.donIcon}>🙏</Text>
           <View style={styles.donBody}>
             <Text style={styles.donTitle}>Soutenir AFROBACK</Text>

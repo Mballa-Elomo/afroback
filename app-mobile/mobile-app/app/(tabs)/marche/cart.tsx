@@ -6,9 +6,10 @@ import { GoldButton, GhostButton } from '../../../src/components/Buttons';
 import { useCart } from '../../../src/marketplace/CartProvider';
 import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { withAccount } from '../../../src/auth/AccountWall';
 
 /** Panier — fidèle à design-reference-marketplace.dc.excerpt.html (section CART). Livraison à 0 FCFA tant qu'aucune grille de frais de port n'est définie (aucun frais inventé). */
-export default function CartScreen() {
+function CartScreen() {
   const router = useRouter();
   const cart = useCart();
 
@@ -216,3 +217,6 @@ const styles = StyleSheet.create({
     color: colors.accentGold,
   },
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+export default withAccount(CartScreen, 'cart');

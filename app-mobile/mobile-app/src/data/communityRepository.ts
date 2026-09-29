@@ -49,6 +49,25 @@ export async function getOwnProfile(): Promise<CommunityProfileOwn | null> {
   return data as CommunityProfileOwn | null;
 }
 
+/**
+ * Pseudo libre ? Vérifié sans tenir compte des majuscules ("Yannick" et
+ * "yannick" sont considérés comme le même pseudo, pour éviter les confusions
+ * et les usurpations). Lit la vue publique, accessible sans compte.
+ * `null` en cas d'erreur réseau : on laisse alors la contrainte unique de la
+ * base trancher à l'enregistrement.
+ */
+export async function isPseudoAvailable(pseudo: string): Promise<boolean | null> {
+  // Les caractères spéciaux de ILIKE (\ % _) sont échappés : comparaison exacte, casse ignorée.
+  const escaped = pseudo.replace(/[\\%_]/g, (c) => `\\${c}`);
+  const { data, error } = await supabase
+    .from('community_profiles_public')
+    .select('id')
+    .ilike('pseudo', escaped)
+    .limit(1);
+  if (error) return null;
+  return (data ?? []).length === 0;
+}
+
 export async function createOwnProfile(params: {
   pseudo: string;
   avatarUrl?: string | null;

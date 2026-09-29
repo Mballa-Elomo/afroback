@@ -11,6 +11,8 @@ import { MARKETPLACE_CATEGORIE_LABEL } from '../../../src/data/marketplaceDispla
 import type { MarketplaceCategorie } from '../../../src/data/marketplaceTypes';
 import { useCart } from '../../../src/marketplace/CartProvider';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { useRequireAccount } from '../../../src/auth/AccountWall';
+import { useAccess } from '../../../src/access/Access';
 
 /**
  * Catalogue Marché — fidèle à design-reference-marketplace.dc.excerpt.html
@@ -21,6 +23,8 @@ import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
  */
 export default function MarketScreen() {
   const router = useRouter();
+  const requireAccount = useRequireAccount();
+  const { requireSubscription } = useAccess();
   const [productsState, refresh] = useMarketplaceProducts();
   const products = productsState.status === 'ready' ? productsState.data : [];
   const cart = useCart();
@@ -75,7 +79,11 @@ export default function MarketScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>Marché</Text>
-          <Pressable onPress={() => router.push('/marche/cart')} style={styles.cartBtn} hitSlop={8}>
+          <Pressable
+            onPress={() => requireAccount(() => router.push('/marche/cart'), 'cart')}
+            style={styles.cartBtn}
+            hitSlop={8}
+          >
             <Text style={styles.cartIcon}>⛾</Text>
             {cart.count > 0 && (
               <View style={styles.cartBadge}>
@@ -85,7 +93,7 @@ export default function MarketScreen() {
           </Pressable>
         </View>
 
-        <Pressable style={styles.vendorBanner} onPress={() => router.push('/marche/vendeur')}>
+        <Pressable style={styles.vendorBanner} onPress={() => requireSubscription(() => router.push('/marche/vendeur'), 'vendor')}>
           <Text style={styles.vendorIcon}>🧑‍🎨</Text>
           <View style={styles.vendorBody}>
             <Text style={styles.vendorTitle}>Espace vendeur</Text>
@@ -135,7 +143,7 @@ export default function MarketScreen() {
                 : `Aucun produit ne correspond à ta recherche.`}
             </Text>
             {products.length === 0 && (
-              <Pressable style={styles.emptyCta} onPress={() => router.push('/marche/vendeur')}>
+              <Pressable style={styles.emptyCta} onPress={() => requireSubscription(() => router.push('/marche/vendeur'), 'vendor')}>
                 <Text style={styles.emptyCtaLabel}>Devenir vendeur</Text>
               </Pressable>
             )}

@@ -11,6 +11,9 @@ import { useHero } from '../../../../../src/data/useHeroesData';
 import { recordAudioEngagement } from '../../../../../src/data/engagementRepository';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import type { Heros } from '../../../../../src/data/types';
+import { withAccount } from '../../../../../src/auth/AccountWall';
+import { LockedDetailScreen } from '../../../../../src/access/Access';
+import { useI18n } from '../../../../../src/i18n';
 
 /**
  * Lecteur audio plein écran. Quand aucune narration n'est disponible pour
@@ -23,10 +26,11 @@ import type { Heros } from '../../../../../src/data/types';
  * plein écran immersif), à la différence de la fiche héros et du récit qui
  * la gardent visible.
  */
-export default function LecteurAudioScreen() {
+function LecteurAudioScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const herosState = useHero(slug);
+  const { lang } = useI18n();
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
 
   // Engagement réel par langue (voir "ENGAGEMENT GLOBAL" et les compteurs
@@ -49,6 +53,18 @@ export default function LecteurAudioScreen() {
       <SafeAreaView style={styles.safe}>
         <ErrorState />
       </SafeAreaView>
+    );
+  }
+
+  if (heros?.acces?.verrouille) {
+    return (
+      <LockedDetailScreen
+        title={heros.nom_affiche}
+        subtitle={heros.sous_titre}
+        imageUrl={heros.image_carte_catalogue}
+        apercu={(lang === 'en' && heros.acces.apercu_en ? heros.acces.apercu_en : heros.acces.apercu_fr)}
+        reason="heros"
+      />
     );
   }
 
@@ -442,3 +458,6 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+export default withAccount(LecteurAudioScreen, 'audio');

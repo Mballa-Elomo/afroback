@@ -7,6 +7,7 @@ import { useAuth } from '../../src/auth/AuthProvider';
 import { supabase } from '../../src/data/supabaseClient';
 import { GoldButton, GhostButton } from '../../src/components/Buttons';
 import { colors, spacing, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
 
 /**
  * Activation/désactivation de la vérification en 2 étapes (MFA/TOTP).
@@ -25,6 +26,7 @@ type EnrollState = {
 export default function MfaSetupScreen() {
   const router = useRouter();
   const { refreshMfaStatus, confirmMfaChallengePassed } = useAuth();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [enabled, setEnabled] = useState(false);
   const [enroll, setEnroll] = useState<EnrollState | null>(null);
@@ -49,7 +51,7 @@ export default function MfaSetupScreen() {
     const { data, error: rpcError } = await supabase.rpc('mfa_totp_enroll');
     setBusy(false);
     if (rpcError || !data?.ok) {
-      setError(rpcError?.message ?? "Impossible de démarrer la configuration. Réessaie.");
+      setError(rpcError?.message ?? t('mfa.errors.start'));
       return;
     }
     setEnroll({ otpauthUri: data.otpauth_uri, secretBase32: data.secret_base32 });
@@ -58,7 +60,7 @@ export default function MfaSetupScreen() {
   const confirmEnroll = async () => {
     if (!enroll) return;
     if (!/^\d{6}$/.test(code)) {
-      setError('Entre le code à 6 chiffres affiché dans ton application d’authentification.');
+      setError(t('mfa.errors.codeFormat'));
       return;
     }
     setError(null);
@@ -66,7 +68,7 @@ export default function MfaSetupScreen() {
     const { data, error: rpcError } = await supabase.rpc('mfa_totp_confirm', { p_code: code });
     setBusy(false);
     if (rpcError || !data?.ok) {
-      setError('Code incorrect. Vérifie l’heure de ton téléphone et réessaie.');
+      setError(t('mfa.errors.codeWrong'));
       return;
     }
     setEnroll(null);
@@ -76,7 +78,7 @@ export default function MfaSetupScreen() {
     // l'écran de connexion juste après (voir AuthProvider.tsx).
     confirmMfaChallengePassed();
     await loadStatus();
-    Alert.alert('Activée', 'La vérification en 2 étapes est maintenant active sur ton compte.');
+    Alert.alert(t('mfa.activatedTitle'), t('mfa.activatedBody'));
   };
 
   const cancelEnroll = () => {
@@ -90,19 +92,19 @@ export default function MfaSetupScreen() {
 
   const disableMfa = () => {
     Alert.alert(
-      'Désactiver la vérification en 2 étapes ?',
-      'Ton compte sera de nouveau protégé par le mot de passe seul.',
+      t('mfa.disableTitle'),
+      t('mfa.disableBody'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Désactiver',
+          text: t('mfa.disable'),
           style: 'destructive',
           onPress: async () => {
             setBusy(true);
             const { error: rpcError } = await supabase.rpc('mfa_totp_disable');
             setBusy(false);
             if (rpcError) {
-              Alert.alert('Erreur', "La désactivation n'a pas fonctionné. Réessaie.");
+              Alert.alert(t('common.error'), t('mfa.errors.disableFailed'));
               return;
             }
             await refreshMfaStatus();
@@ -121,25 +123,22 @@ export default function MfaSetupScreen() {
             <Text style={styles.backIcon}>‹</Text>
           </Pressable>
 
-          <Text style={styles.title}>Vérification en 2 étapes</Text>
-          <Text style={styles.subtitle}>
-            Protège ton compte avec un code temporaire généré par une application d’authentification (Google
-            Authenticator, Authy…), en plus de ton mot de passe.
-          </Text>
+          <Text style={styles.title}>{t('mfa.title')}</Text>
+          <Text style={styles.subtitle}>{t('mfa.subtitle')}</Text>
 
           {loading ? (
             <ActivityIndicator color={colors.accentGold} style={{ marginTop: 30 }} />
           ) : enroll ? (
             <View style={styles.card}>
-              <Text style={styles.step}>1. Scanne ce code avec ton application d’authentification</Text>
+              <Text style={styles.step}>{t('mfa.step1')}</Text>
               <View style={styles.qrWrap}>
                 <QRCode value={enroll.otpauthUri} size={200} />
               </View>
-              <Text style={styles.step}>Ou saisis ce code manuellement :</Text>
+              <Text style={styles.step}>{t('mfa.manual')}</Text>
               <Text style={styles.secret} selectable>
                 {enroll.secretBase32}
               </Text>
-              <Text style={styles.step}>2. Entre le code à 6 chiffres affiché</Text>
+              <Text style={styles.step}>{t('mfa.step2')}</Text>
               <TextInput
                 value={code}
                 onChangeText={setCode}
@@ -151,30 +150,25 @@ export default function MfaSetupScreen() {
               />
               {error && <Text style={styles.error}>{error}</Text>}
               <View style={styles.ctaGroup}>
-                <GoldButton label={busy ? 'Vérification...' : 'Confirmer'} onPress={confirmEnroll} disabled={busy} />
+                <GoldButton label={busy ? t('mfa.verifying') : t('mfa.confirm')} onPress={confirmEnroll} disabled={busy} />
                 <View style={{ height: 10 }} />
-                <GhostButton label="Annuler" onPress={cancelEnroll} />
+                <GhostButton label={t('common.cancel')} onPress={cancelEnroll} />
               </View>
             </View>
           ) : enabled ? (
             <View style={styles.card}>
-              <Text style={styles.statusOn}>✅ Activée</Text>
-              <Text style={styles.statusDetail}>
-                Une application d’authentification est requise à chaque connexion, en plus de ton mot de passe.
-              </Text>
+              <Text style={styles.statusOn}>{t('mfa.statusOn')}</Text>
+              <Text style={styles.statusDetail}>{t('mfa.statusOnDetail')}</Text>
               <View style={{ height: 18 }} />
-              <GhostButton label={busy ? 'Désactivation...' : 'Désactiver'} onPress={disableMfa} />
+              <GhostButton label={busy ? t('mfa.disabling') : t('mfa.disable')} onPress={disableMfa} />
             </View>
           ) : (
             <View style={styles.card}>
-              <Text style={styles.statusOff}>Non activée</Text>
-              <Text style={styles.statusDetail}>
-                Recommandé si tu utilises AFROBACK comme institution culturelle ou contributeur — ça protège ton
-                compte même si ton mot de passe est un jour deviné ou volé.
-              </Text>
+              <Text style={styles.statusOff}>{t('mfa.statusOff')}</Text>
+              <Text style={styles.statusDetail}>{t('mfa.statusOffDetail')}</Text>
               {error && <Text style={styles.error}>{error}</Text>}
               <View style={{ height: 18 }} />
-              <GoldButton label={busy ? 'Préparation...' : 'Activer'} onPress={startEnroll} disabled={busy} />
+              <GoldButton label={busy ? t('mfa.preparing') : t('mfa.activate')} onPress={startEnroll} disabled={busy} />
             </View>
           )}
         </ScrollView>

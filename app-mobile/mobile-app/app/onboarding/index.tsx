@@ -1,108 +1,309 @@
-import { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Easing,
+  FlatList,
+  Platform,
+  StyleSheet,
+  View,
+  type LayoutChangeEvent,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Asset } from 'expo-asset';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GoldButton } from '../../src/components/Buttons';
-import { OnboardingScene3D } from '../../src/components/OnboardingScene3D';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, typography } from '../../src/theme/tokens';
+import { AnimatedTitleBlock } from '../../src/onboarding/AnimatedText';
+import { useI18n } from '../../src/i18n';
+import { LanguageDropdown } from '../../src/i18n/LanguageDropdown';
+import { INTRO_SLIDES } from '../../src/onboarding/content';
+import { hasSeenIntro } from '../../src/onboarding/introSeen';
+import {
+  BrandMark,
+  GoldParticles,
+  IllustratedBackground,
+  ONBOARDING_BG,
+  ONBOARDING_ILLUSTRATIONS,
+  PillButton,
+  useReduceMotion,
+} from '../../src/onboarding/ui';
+import { TextLinkButton } from '../../src/components/Buttons';
 
 /**
- * Splash/onboarding — refonte du 2026-09-26, fidèle au markup verbatim de
- * la maquette (`AFROBACK Mobile.dc.html`, section `<!-- ==== ONBOARDING
- * (3D) ==== -->`, lignes 68-93, lue via DesignSync le même jour) : fond en
- * dégradé chaud montant du bas de l'écran, halo, logo, wordmark, et une
- * zone de scène 3D (`<canvas id="afb-onb">` dans la maquette) entre le logo
- * et le titre.
+ * Écrans 1 à 4 du parcours (maquette de Yannick du 2026-09-29, voir
+ * app-mobile/cdc-onboarding.md) : écran du logo puis carrousel de 3 écrans.
  *
- * **Vraie scène 3D** (demande explicite de Yannick, pas une imitation 2D) :
- * `expo-gl` + `three.js`, voir `src/components/OnboardingScene3D.tsx` — le
- * script exact de la maquette (WebGL/Three.js chargé via CDN) est hors de
- * portée de la lecture à 256 Kio de `AFROBACK Mobile.dc.html`, remplacé par
- * une composition originale cohérente avec l'identité de marque (particules
- * dorées, anneaux filaires, cœur lumineux pulsé) plutôt qu'une copie du
- * script introuvable.
- *
- * Simplification assumée restante : **wordmark en dégradé texte**
- * (`background-clip:text` CSS, non supporté nativement par RN sans
- * `@react-native-masked-view`, pas ajouté) — approximé par une couleur
- * pleine, le ton le plus clair du dégradé (`accentGoldPale`).
+ * - Écran du logo : **aucune durée d'affichage** (demande de Yannick) — on
+ *   y choisit sa langue (français / anglais, tout le parcours d'entrée est
+ *   traduit) puis on appuie sur "Commencer", comme sur les autres écrans.
+ *   Les illustrations se préchargent pendant ce temps.
+ * - Intro déjà vue sur cet appareil (ex. après déconnexion) : "Commencer"
+ *   mène directement à "Bienvenue dans ton voyage", sans repasser le carrousel.
+ * - Carrousel : swipe horizontal et boutons, "Passer" toujours visible.
+ * - Parallaxe : en glissant, l'image avance moins vite que l'écran et le
+ *   texte plus vite (profondeur) ; chaque illustration dérive aussi
+ *   lentement en continu (IllustratedBackground). Tout est coupé si
+ *   "Réduire les animations" est actif.
  */
 
-// Couleurs extraites verbatim de cette section de la maquette — pas encore
-// dans theme/tokens.ts (qui vient d'autres écrans), locales à ce fichier.
-const MOCKUP = {
-  gradientTop: '#0d0805',
-  gradientMidLow: '#160d06',
-  gradientMidHigh: '#3a1d0a',
-  gradientBottom: '#7a3d12',
-  bodyText: '#E7D6BE',
-};
+const USE_NATIVE = Platform.OS !== 'web';
 
-const SLIDES = [
-  {
-    title: 'Retour aux origines',
-    text: "Découvre les récits vrais des héros qui ont façonné l'Afrique, racontés comme des légendes.",
-  },
-  {
-    title: 'Une culture vivante',
-    text: "Villages, traditions, langues, savoirs : explore les richesses d'un continent trop souvent réduit au silence.",
-  },
-  {
-    title: 'Raconte-toi, toi aussi',
-    text: 'Écoute, apprends, partage. Crée ton compte pour commencer ton retour aux origines.',
-  },
-];
+// L'image avance à la moitié de la vitesse de l'écran. Aucun bord vide ne peut
+// apparaître : la partie visible d'un écran qui entre ou sort est toujours
+// couverte par son image (vérifié pour toute valeur ≤ 1), donc pas de zoom.
+const PARALLAX = 0.5;
+
+const FADE_OUT_MS = 380;
+const FADE_IN_MS = 520;
 
 export default function OnboardingIntroScreen() {
   const router = useRouter();
-  const [step, setStep] = useState(0);
-  const isLast = step === SLIDES.length - 1;
+  const reduceMotion = useReduceMotion();
+  const [phase, setPhase] = useState<'splash' | 'intro'>('splash');
+  const [seen, setSeen] = useState<boolean | null>(null);
+  // Fondu entre l'écran 1 et la suite (demande de Yannick : "transition fluide, fondu").
+  const fade = useRef(new Animated.Value(1)).current;
+  const leaving = useRef(false);
 
-  const goLogin = () => router.replace('/onboarding/login');
-  const next = () => (isLast ? goLogin() : setStep((s) => s + 1));
+  useEffect(() => {
+    Asset.loadAsync(Object.values(ONBOARDING_ILLUSTRATIONS)).catch(() => {});
+    hasSeenIntro().then(setSeen);
+  }, []);
+
+  useEffect(() => {
+    if (phase !== 'intro') return;
+    fade.setValue(0);
+    Animated.timing(fade, {
+      toValue: 1,
+      duration: reduceMotion ? 0 : FADE_IN_MS,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: USE_NATIVE,
+    }).start();
+  }, [phase, fade, reduceMotion]);
+
+  const start = () => {
+    if (leaving.current) return;
+    leaving.current = true;
+    // L'écran 1 s'efface vers le noir, puis la suite apparaît en fondu
+    // (carrousel ici, ou "Bienvenue", déclaré en animation 'fade' dans app/_layout.tsx).
+    Animated.timing(fade, {
+      toValue: 0,
+      duration: reduceMotion ? 0 : FADE_OUT_MS,
+      easing: Easing.in(Easing.quad),
+      useNativeDriver: USE_NATIVE,
+    }).start(() => {
+      if (seen) router.replace('/onboarding/bienvenue');
+      else setPhase('intro');
+    });
+  };
 
   return (
-    <View style={styles.wrap}>
-      {/* Dégradé radial(150% 70% at 50% 118%, ...) approximé par un dégradé
-          vertical — RN n'a pas de radial-gradient natif, la lecture visuelle
-          (sombre en haut, chaud en bas) reste fidèle sur un écran portrait. */}
+    <View style={styles.fadeRoot}>
+      <Animated.View style={[styles.fadeRoot, { opacity: fade }]}>
+        {phase === 'splash' ? <Splash onStart={start} ready={seen !== null} /> : <IntroCarousel />}
+      </Animated.View>
+    </View>
+  );
+}
+
+function Splash({ onStart, ready }: { onStart: () => void; ready: boolean }) {
+  const { t } = useI18n();
+  const reduceMotion = useReduceMotion();
+  const appear = useRef(new Animated.Value(reduceMotion ? 1 : 0)).current;
+  const controls = useRef(new Animated.Value(reduceMotion ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(appear, { toValue: 1, duration: 650, easing: Easing.out(Easing.cubic), useNativeDriver: USE_NATIVE }),
+      Animated.delay(700),
+      Animated.timing(controls, { toValue: 1, duration: 500, easing: Easing.out(Easing.cubic), useNativeDriver: USE_NATIVE }),
+    ]).start();
+  }, [appear, controls]);
+
+  return (
+    <IllustratedBackground source={ONBOARDING_ILLUSTRATIONS.splash} fadeFrom={0.5}>
+      {/* Voile sombre diffus derrière le logo : le nom doré se détache du ciel doré. */}
       <LinearGradient
-        colors={[MOCKUP.gradientTop, MOCKUP.gradientMidLow, MOCKUP.gradientMidHigh, MOCKUP.gradientBottom]}
-        locations={[0, 0.42, 0.72, 1]}
+        colors={['rgba(11,9,6,0)', 'rgba(11,9,6,0.62)', 'rgba(11,9,6,0.62)', 'rgba(11,9,6,0)']}
+        locations={[0.02, 0.2, 0.44, 0.62]}
         style={StyleSheet.absoluteFill}
+        pointerEvents="none"
       />
-      <View style={styles.glowBlob} pointerEvents="none" />
+      <GoldParticles count={22} />
+      <SafeAreaView style={styles.splashSafe} edges={['top', 'bottom']}>
+        {/* Sélecteur de langue compact (menu déroulant avec drapeaux), en haut à droite. */}
+        <View style={styles.topBar}>
+          <LanguageDropdown />
+        </View>
+        <Animated.View
+          style={[
+            styles.splashBrand,
+            {
+              opacity: appear,
+              transform: [{ scale: appear.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] }) }],
+            },
+          ]}
+        >
+          <BrandMark size="xl" animated />
+        </Animated.View>
 
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <View style={styles.content}>
-          <View style={styles.logoWrap}>
-            <View style={styles.logoGlow} />
-            <Image source={require('../../assets/icon.png')} style={styles.logo} />
+        <Animated.View
+          style={[
+            styles.splashControls,
+            {
+              opacity: controls,
+              transform: [{ translateY: controls.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }],
+            },
+          ]}
+        >
+          <PillButton label={t('splash.start')} onPress={onStart} disabled={!ready} />
+        </Animated.View>
+      </SafeAreaView>
+    </IllustratedBackground>
+  );
+}
+
+function IntroCarousel() {
+  const router = useRouter();
+  const { t, lang } = useI18n();
+  const reduceMotion = useReduceMotion();
+  const listRef = useRef<FlatList>(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  const { width, height } = size;
+  const [index, setIndex] = useState(0);
+  const isLast = index === INTRO_SLIDES.length - 1;
+
+  // Largeur ET hauteur explicites par écran : sans hauteur fixée, les items
+  // d'une FlatList horizontale s'effondrent sur web (constaté au test du 2026-09-29).
+  const onLayout = (e: LayoutChangeEvent) =>
+    setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height });
+
+  const onMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (!width) return;
+    setIndex(Math.round(e.nativeEvent.contentOffset.x / width));
+  };
+
+  const goTo = (i: number) => {
+    listRef.current?.scrollToOffset({ offset: i * width, animated: !reduceMotion });
+    setIndex(i);
+  };
+
+  const next = () => (isLast ? router.push('/onboarding/transition') : goTo(index + 1));
+  const skip = () => router.replace('/onboarding/bienvenue');
+
+  return (
+    <View style={styles.carousel} onLayout={onLayout}>
+      {width > 0 && (
+        <Animated.FlatList
+          ref={listRef}
+          data={INTRO_SLIDES}
+          keyExtractor={(s) => s.key}
+          extraData={`${index}-${lang}`}
+          horizontal
+          pagingEnabled
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={onMomentumEnd}
+          // Web : pas d'événement "momentum" fiable, on suit la position en continu.
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
+            useNativeDriver: Platform.OS !== 'web',
+            listener:
+              Platform.OS === 'web'
+                ? (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+                    const i = Math.round(e.nativeEvent.contentOffset.x / width);
+                    if (i !== index) setIndex(i);
+                  }
+                : undefined,
+          })}
+          scrollEventThrottle={16}
+          getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
+          renderItem={({ item, index: i }) => {
+            const line1 = t(`intro.${item.key}.line1`);
+            const line2 = t(`intro.${item.key}.line2`);
+            const body = t(`intro.${item.key}.text`);
+            const range = [(i - 1) * width, i * width, (i + 1) * width];
+            // Image plus lente que l'écran, texte plus rapide : effet de profondeur.
+            const parallax = reduceMotion
+              ? undefined
+              : {
+                  transform: [
+                    {
+                      translateX: scrollX.interpolate({
+                        inputRange: range,
+                        outputRange: [-width * PARALLAX, 0, width * PARALLAX],
+                        extrapolate: 'clamp',
+                      }),
+                    },
+                  ],
+                };
+            const textDepth = reduceMotion
+              ? undefined
+              : {
+                  opacity: scrollX.interpolate({ inputRange: range, outputRange: [0, 1, 0], extrapolate: 'clamp' }),
+                  transform: [
+                    {
+                      translateX: scrollX.interpolate({
+                        inputRange: range,
+                        outputRange: [width * 0.35, 0, -width * 0.35],
+                        extrapolate: 'clamp',
+                      }),
+                    },
+                  ],
+                };
+            return (
+              <View
+                style={{ width, height }}
+                accessible
+                accessibilityLabel={`${t('intro.step', { n: i + 1, total: INTRO_SLIDES.length })} ${line1} ${line2}. ${body}`}
+              >
+                <IllustratedBackground
+                  source={item.image}
+                  fadeFrom={0.4}
+                  imageStyle={parallax}
+                >
+                  <SafeAreaView style={styles.slideSafe} edges={['top', 'bottom']}>
+                    <Animated.View style={[styles.slideText, textDepth]}>
+                      {/* Rejoué à chaque fois que l'écran redevient celui affiché. */}
+                      <AnimatedTitleBlock
+                        line1={line1}
+                        line2={line2}
+                        body={body}
+                        active={i === index}
+                        delay={180}
+                        size={38}
+                        bodyStyle={styles.slideBody}
+                      />
+                    </Animated.View>
+                  </SafeAreaView>
+                </IllustratedBackground>
+              </View>
+            );
+          }}
+        />
+      )}
+
+      {/* Logo AFROBACK fixe en haut de chaque écran de présentation. */}
+      <SafeAreaView style={styles.logoSafe} edges={['top']} pointerEvents="none">
+        <BrandMark size="md" />
+      </SafeAreaView>
+
+      <SafeAreaView style={styles.controlsSafe} edges={['bottom']} pointerEvents="box-none">
+        <View style={styles.controls}>
+          <TextLinkButton label={t('common.skip')} onPress={skip} accessibilityLabel={t('intro.skipA11y')} />
+          <View style={styles.dots} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {INTRO_SLIDES.map((s, i) => (
+              <View key={s.key} style={[styles.dot, i === index && styles.dotActive]} />
+            ))}
           </View>
-          <Text style={styles.brand}>AFROBACK</Text>
-
-          <OnboardingScene3D height={250} />
-
-          <View style={styles.spacer} />
-
-          <View>
-            <Text style={styles.title}>{SLIDES[step].title}</Text>
-            <Text style={styles.text}>{SLIDES[step].text}</Text>
-          </View>
-
-          <View style={styles.spacer} />
-
-          <View style={styles.bottom}>
-            <View style={styles.dots}>
-              {SLIDES.map((_, i) => (
-                <View key={i} style={[styles.dot, i === step && styles.dotActive]} />
-              ))}
-            </View>
-            <GoldButton label={isLast ? 'Commencer' : 'Suivant'} onPress={next} />
-            <Pressable onPress={goLogin} style={styles.skip}>
-              <Text style={styles.skipLabel}>Passer l'introduction</Text>
-            </Pressable>
+          <View style={styles.nextWrap}>
+            <PillButton
+              label={isLast ? t('intro.startAdventure') : t('common.continue')}
+              icon={isLast ? 'sparkle' : 'arrowRight'}
+              onPress={next}
+            />
           </View>
         </View>
       </SafeAreaView>
@@ -110,111 +311,82 @@ export default function OnboardingIntroScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
-  wrap: {
+  splashSafe: {
     flex: 1,
-    backgroundColor: MOCKUP.gradientTop,
-    overflow: 'hidden',
+    justifyContent: 'space-between',
+    paddingHorizontal: 28,
   },
-  glowBlob: {
+  fadeRoot: {
+    flex: 1,
+    backgroundColor: ONBOARDING_BG,
+  },
+  topBar: {
+    alignItems: 'flex-end',
+    paddingTop: 8,
+    // Le menu ouvert doit passer au-dessus du logo.
+    zIndex: 10,
+  },
+  splashBrand: {
+    marginTop: '4%',
+  },
+  splashControls: {
+    paddingBottom: 22,
+    gap: 14,
+  },
+  carousel: {
+    flex: 1,
+    backgroundColor: ONBOARDING_BG,
+  },
+  slideSafe: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  slideText: {
+    paddingHorizontal: 26,
+    // Laisse la place à la barre de contrôles fixe (Passer / points / Continuer).
+    paddingBottom: 108,
+  },
+  slideBody: {
+    fontSize: 19,
+    lineHeight: 28,
+  },
+  logoSafe: {
     position: 'absolute',
-    left: '50%',
-    bottom: -180,
-    width: 380,
-    height: 380,
-    marginLeft: -190,
-    borderRadius: 190,
-    backgroundColor: 'rgba(255,205,120,.22)',
-  },
-  safe: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
+    top: 0,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    paddingHorizontal: 30,
-    paddingTop: 30,
-    paddingBottom: 34,
+    paddingTop: 14,
   },
-  logoWrap: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoGlow: {
+  controlsSafe: {
     position: 'absolute',
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    backgroundColor: 'rgba(240,195,107,.3)',
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
-  logo: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 1,
-    borderColor: 'rgba(240,195,107,.4)',
-  },
-  brand: {
-    fontFamily: typography.displayExtraBold,
-    fontSize: 13,
-    letterSpacing: 2.9,
-    color: colors.accentGoldPale,
-    marginTop: 12,
-  },
-  spacer: {
-    flex: 1,
-  },
-  title: {
-    fontFamily: typography.display,
-    fontSize: 27,
-    fontWeight: '700',
-    color: colors.textHeading,
-    lineHeight: 31,
-    textAlign: 'center',
-    maxWidth: 290,
-    textShadowColor: 'rgba(0,0,0,.6)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 18,
-  },
-  text: {
-    fontFamily: typography.body,
-    fontSize: 14,
-    lineHeight: 22,
-    color: MOCKUP.bodyText,
-    textAlign: 'center',
-    maxWidth: 275,
-    marginTop: 14,
-    alignSelf: 'center',
-    textShadowColor: 'rgba(0,0,0,.55)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 10,
-  },
-  bottom: {
-    width: '100%',
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 22,
+    paddingBottom: 22,
+    gap: 12,
   },
   dots: {
     flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    marginBottom: 20,
+    gap: 7,
   },
   dot: {
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: 4,
-    backgroundColor: 'rgba(240,195,107,.25)',
+    backgroundColor: 'rgba(237,227,212,.28)',
   },
   dotActive: {
-    backgroundColor: colors.accentGold,
+    backgroundColor: colors.accentGoldBright,
   },
-  skip: {
-    alignItems: 'center',
-    marginTop: 14,
-  },
-  skipLabel: {
-    fontFamily: typography.body,
-    fontSize: 12.5,
-    color: colors.textMutedAlt,
+  nextWrap: {
+    minWidth: 128,
   },
 });

@@ -8,12 +8,15 @@ import { SourcesList } from '../../../src/components/SourcesList';
 import { DECOUVERTE_TYPE_LABEL } from '../../../src/data/decouverteDisplay';
 import { useDecouverteItem } from '../../../src/data/useDecouverteData';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { LockedDetailScreen } from '../../../src/access/Access';
+import { useI18n } from '../../../src/i18n';
 
 /** Fiche détail du Carnet d'explorateur (enfant) — mêmes composants que la fiche Découverte adulte, chrome simplifié. */
 export default function CarnetItemEnfantScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const itemState = useDecouverteItem(slug);
+  const { lang } = useI18n();
 
   if (itemState.status === 'loading') {
     return (
@@ -31,6 +34,18 @@ export default function CarnetItemEnfantScreen() {
   }
   const item = itemState.data;
   if (!item) return <Redirect href="/enfant/carnet" />;
+
+  if (item.acces?.verrouille) {
+    return (
+      <LockedDetailScreen
+        title={item.titre}
+        imageUrl={item.image_url}
+        apercu={(lang === 'en' && item.acces.apercu_en ? item.acces.apercu_en : item.acces.apercu_fr)}
+        reason="decouverte"
+        child
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>

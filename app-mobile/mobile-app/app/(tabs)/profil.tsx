@@ -8,6 +8,7 @@ import { PinGate } from '../../src/profils/PinGate';
 import { GhostButton } from '../../src/components/Buttons';
 import { HeroPlaceholder } from '../../src/components/HeroVisual';
 import { colors, spacing, typography } from '../../src/theme/tokens';
+import { withAccount } from '../../src/auth/AccountWall';
 
 const FORFAIT_LABELS: Record<string, string> = {
   decouverte: 'Découverte (gratuit)',
@@ -22,7 +23,7 @@ const USAGE_LABELS: Record<string, string> = {
 };
 
 /** Profil — vraies données du compte (Supabase Auth), pas une maquette figée. */
-export default function ProfilScreen() {
+function ProfilScreen() {
   const router = useRouter();
   const { session, signOut } = useAuth();
   const { children, returnToSelector } = useActiveProfile();
@@ -188,3 +189,6 @@ const styles = StyleSheet.create({
   },
   cta: {},
 });
+
+// Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).
+export default withAccount(ProfilScreen, 'profile');

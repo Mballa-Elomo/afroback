@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import type { Heros } from '../data/types';
 import { colors, typography } from '../theme/tokens';
 import { HeroPlaceholder, EraBadge, TagBadge } from './HeroVisual';
+import { AccessBadge } from '../access/Access';
 
 /** Extrait un libellé court de `epoque` (ex. "Colonial (Kamerun allemand, 1884-1916)" → "Colonial") pour le badge de la maquette, sans inventer de donnée. */
 function shortEra(epoque: string) {
@@ -15,6 +16,7 @@ export function HeroCard({ heros, onPress }: { heros: Heros; onPress: () => void
       <HeroPlaceholder style={styles.visual} imageUrl={heros.image_carte_catalogue}>
         <EraBadge label={shortEra(heros.epoque)} />
         {heros.theme[0] && <TagBadge label={heros.theme[0]} />}
+        <AccessBadge type="heros" slug={heros.slug} />
       </HeroPlaceholder>
       <Text style={styles.name} numberOfLines={2}>
         {heros.nom_affiche}

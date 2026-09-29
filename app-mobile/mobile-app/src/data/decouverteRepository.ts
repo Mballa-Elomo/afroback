@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import type { DecouverteItem, DecouvertePays } from './decouverteTypes';
+import { getContentDetail } from './contentAccess';
 
 /**
  * Source de données réelle : tables `decouverte_items` et `decouverte_pays`
@@ -10,6 +11,11 @@ import type { DecouverteItem, DecouvertePays } from './decouverteTypes';
  * exportées ici.
  */
 
+/** Colonnes publiques du catalogue ; le texte, les sources et la vidéo passent par `get_decouverte_detail` (voir heroesRepository.ts). */
+const DECOUVERTE_CATALOGUE =
+  'id,slug,type,pays,region_ethnie,titre,sous_titre,resume_liste,image_url,heros_lies,items_lies,statut_contenu,' +
+  'ordre_affichage,statut_publication,a_la_une';
+
 let itemsCache: DecouverteItem[] | null = null;
 let itemsInflight: Promise<DecouverteItem[]> | null = null;
 let paysCache: DecouvertePays[] | null = null;
@@ -18,17 +24,21 @@ let paysInflight: Promise<DecouvertePays[]> | null = null;
 async function fetchDecouverteItems(): Promise<DecouverteItem[]> {
   const { data, error } = await supabase
     .from('decouverte_items')
-    .select('*')
+    .select(DECOUVERTE_CATALOGUE)
     .order('ordre_affichage', { ascending: true });
   if (error) {
     throw new Error(`Impossible de charger le contenu Découverte depuis Supabase : ${error.message}`);
   }
-  const items = (data ?? []).map((row) => ({
+  const items = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+    contenu_fr_texte: '',
+    contenu_en_texte: null,
+    statut_fait_legende: [],
+    sources: [],
     ...row,
     statut_publication: row.statut_publication ?? 'publie',
     a_la_une: row.a_la_une ?? false,
-    videos: row.videos ?? {},
-  })) as DecouverteItem[];
+    videos: {},
+  })) as unknown as DecouverteItem[];
   // Filtré côté client, pas dans la requête : reste compatible même si
   // schema-decouverte-extended.sql n'a pas encore été exécuté par Yannick
   // (colonne absente -> traité comme publié), même principe que
@@ -58,9 +68,23 @@ export async function refreshDecouverteItems(): Promise<DecouverteItem[]> {
   return items;
 }
 
+/** Fiche complète (texte, faits, sources, vidéo) si autorisée, sinon catalogue + aperçu et `acces.verrouille`. */
 export async function getDecouverteItemBySlug(slug: string): Promise<DecouverteItem | undefined> {
   const items = await getDecouverteItems();
-  return items.find((it) => it.slug === slug);
+  const base = items.find((it) => it.slug === slug);
+  if (!base) return undefined;
+  const detail = await getContentDetail('decouverte', slug);
+  if (!detail) return undefined;
+  if (detail.verrouille) {
+    return { ...base, acces: { verrouille: true, apercu_fr: detail.apercu_fr, apercu_en: detail.apercu_en } };
+  }
+  const row = detail.row;
+  return {
+    ...base,
+    ...(row as unknown as DecouverteItem),
+    videos: (row.videos as Record<string, string>) ?? {},
+    acces: { verrouille: false },
+  };
 }
 
 /** Regroupe par type (village/coutume/objet/personnage/fait) — utile pour la liste et le hub pays. */

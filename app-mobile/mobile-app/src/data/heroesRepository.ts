@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import type { Heros, VideoChapitre } from './types';
+import { getContentDetail } from './contentAccess';
 
 /**
  * Source de données réelle : table `heros` sur Supabase (voir
@@ -32,21 +33,50 @@ function normalizeVideoChapitre(raw: RawVideoChapitre): VideoChapitre {
   return { numero: raw.numero, titre_chapitre: raw.titre_chapitre, videos };
 }
 
+/**
+ * Colonnes publiques du catalogue (supabase/schema-acces-abonnement.sql) :
+ * le contenu complet (récit, frise, sources, médias…) n'est plus lu ici,
+ * seulement via `getHeroBySlug` → fonction serveur `get_heros_detail`.
+ */
+const HEROS_CATALOGUE =
+  'id,slug,nom_affiche,nom_complet,sous_titre,epoque,region,theme,resume_catalogue,annee_naissance_indicative,' +
+  'annee_mort_indicative,image_carte_catalogue,avertissement_lecture,ordre_affichage,statut_publication,a_la_une,' +
+  'statut_recit_texte,statut_narration_audio,statut_video,heros_lies';
+
+/** Champs de contenu vides tant que le détail n'est pas chargé (listes). */
+const HERO_CONTENT_DEFAULTS = {
+  recit_fr_texte: '',
+  recit_fr_fichier_source: '',
+  recit_chapitres_fr: [],
+  recit_en_texte: null,
+  recit_en_fichier_source: null,
+  recit_chapitres_en: [],
+  frise_chronologique: [],
+  citations: [],
+  sources: [],
+  legendes_associees: [],
+  chapitres_storyboard: [],
+  narration_audio_fr_url: null,
+  narration_audio_en_url: null,
+  video_url: null,
+  video_chapitres: [],
+};
+
 let cache: Heros[] | null = null;
 let inflight: Promise<Heros[]> | null = null;
 
 async function fetchHeroes(): Promise<Heros[]> {
   const { data, error } = await supabase
     .from('heros')
-    .select('*')
+    .select(HEROS_CATALOGUE)
     .order('ordre_affichage', { ascending: true });
   if (error) {
     throw new Error(`Impossible de charger les héros depuis Supabase : ${error.message}`);
   }
-  const heroes = (data ?? []).map((row) => ({
+  const heroes = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+    ...HERO_CONTENT_DEFAULTS,
     ...row,
-    video_chapitres: ((row.video_chapitres ?? []) as RawVideoChapitre[]).map(normalizeVideoChapitre),
-  })) as Heros[];
+  })) as unknown as Heros[];
   // Filtré côté client, pas dans la requête Supabase : reste compatible même
   // si backoffice/supabase/schema-admin-heros.sql n'a pas encore été exécuté
   // par Yannick (colonne absente -> traité comme publié, comportement
@@ -84,9 +114,32 @@ export async function refreshHeroes(): Promise<Heros[]> {
   return heroes;
 }
 
-export async function getHeroBySlug(slug: string): Promise<Heros | undefined> {
+/** Entrée de catalogue (sans contenu complet) — pour les cartes et liens. */
+export async function getHeroCatalogueBySlug(slug: string): Promise<Heros | undefined> {
   const heroes = await getHeroes();
   return heroes.find((h) => h.slug === slug);
+}
+
+/**
+ * Héros complet pour les écrans de lecture/écoute/vidéo. Si le contenu est
+ * réservé aux abonnés, renvoie l'entrée de catalogue + `acces.verrouille`
+ * et un aperçu : le récit complet n'est jamais transmis.
+ */
+export async function getHeroBySlug(slug: string): Promise<Heros | undefined> {
+  const base = await getHeroCatalogueBySlug(slug);
+  if (!base) return undefined;
+  const detail = await getContentDetail('heros', slug);
+  if (!detail) return undefined;
+  if (detail.verrouille) {
+    return { ...base, acces: { verrouille: true, apercu_fr: detail.apercu_fr, apercu_en: detail.apercu_en } };
+  }
+  const row = detail.row;
+  return {
+    ...base,
+    ...(row as unknown as Heros),
+    video_chapitres: ((row.video_chapitres ?? []) as RawVideoChapitre[]).map(normalizeVideoChapitre),
+    acces: { verrouille: false },
+  };
 }
 
 export async function getRelatedHeroes(heros: Heros): Promise<Heros[]> {

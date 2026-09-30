@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
+import { BackButton, Collapsible } from '../../../src/ui/modern';
+import { Icon } from '../../../src/components/Icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
@@ -21,6 +24,8 @@ import { useAuth } from '../../../src/auth/AuthProvider';
 import { LockedActionCard } from '../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../src/access/Access';
 import { useI18n } from '../../../src/i18n';
+import { CommentsSection } from '../../../src/comments/CommentsSection';
+import { ContentActions } from '../../../src/stats/ContentActions';
 
 /**
  * Fiche détail Découverte — fidèle à design-reference-decouverte.dc.excerpt.html,
@@ -44,6 +49,9 @@ export default function DecouverteDetailScreen() {
   const [relatedHeroes, setRelatedHeroes] = useState<Heros[]>([]);
   const [langue, setLangue] = useState<'fr' | 'en'>('fr');
   const consultationLoggedRef = useRef<string | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const bodyY = useRef(0);
+  const commentsY = useRef(0);
 
   // Engagement réel (consultation de la fiche) : une fois par ouverture d'un
   // item donné, même principe que recordHeroEngagement('recit') côté héros.
@@ -91,6 +99,7 @@ export default function DecouverteDetailScreen() {
         imageUrl={item.image_url}
         apercu={(lang === 'en' && item.acces.apercu_en ? item.acces.apercu_en : item.acces.apercu_fr)}
         reason="decouverte"
+        footer={<CommentsSection type="decouverte" slug={item.slug} />}
       />
     );
   }
@@ -109,11 +118,11 @@ export default function DecouverteDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {immersive ? (
           <View style={styles.immersiveHeader}>
             {item.image_url ? (
-              <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+              <Image source={{ uri: item.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="memory-disk" />
             ) : (
               <LinearGradient
                 colors={[colors.placeholderStripeLight, colors.placeholderStripeDark]}
@@ -123,26 +132,29 @@ export default function DecouverteDetailScreen() {
               />
             )}
             <LinearGradient
-              colors={['rgba(15,11,8,0.15)', 'rgba(15,11,8,0.1)', colors.background]}
-              locations={[0, 0.4, 1]}
+              colors={['rgba(11,9,6,0.45)', 'rgba(11,9,6,0)', 'rgba(11,9,6,0.55)', '#0B0906']}
+              locations={[0, 0.25, 0.65, 1]}
               style={StyleSheet.absoluteFill}
             />
-            <Pressable onPress={() => router.back()} style={[styles.backBtn, { top: insets.top + 8 }]} hitSlop={10}>
-              <Text style={styles.backIcon}>‹</Text>
-            </Pressable>
+            <View style={[styles.backBtn, { top: insets.top + 8 }]}>
+              <BackButton onPress={() => router.back()} floating />
+            </View>
             <View style={styles.immersiveBottom}>
               <View style={styles.typePill}>
                 <Text style={styles.typePillLabel}>{DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()}</Text>
               </View>
               <Text style={styles.immersiveTitle}>{item.titre}</Text>
-              <Text style={styles.immersiveMeta}>📍 {item.region_ethnie}</Text>
+              <View style={styles.metaRow}>
+                <Icon name="mapPin" size={14} color={colors.accentGoldSoft} />
+                <Text style={styles.immersiveMeta}>{item.region_ethnie}</Text>
+              </View>
             </View>
           </View>
         ) : (
           <View style={styles.flatHeader}>
-            <Pressable onPress={() => router.back()} hitSlop={10} style={styles.flatBack}>
-              <Text style={styles.flatBackIcon}>‹</Text>
-            </Pressable>
+            <View style={styles.flatBack}>
+              <BackButton onPress={() => router.back()} />
+            </View>
             <Text style={styles.flatMeta}>
               {DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()} · {item.region_ethnie}
             </Text>
@@ -150,7 +162,13 @@ export default function DecouverteDetailScreen() {
           </View>
         )}
 
-        <View style={styles.body}>
+        <View style={styles.body} onLayout={(e) => (bodyY.current = e.nativeEvent.layout.y)}>
+          <ContentActions
+            type="decouverte"
+            slug={item.slug}
+            title={item.titre}
+            onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
+          />
           <Text style={styles.subtitle}>{item.sous_titre}</Text>
 
           <View style={styles.sectionHeaderRow}>
@@ -184,7 +202,14 @@ export default function DecouverteDetailScreen() {
           )}
 
           <FaitsList faits={item.statut_fait_legende} />
-          <SourcesList sources={item.sources} />
+          {item.sources.length > 0 && (
+            <Collapsible icon="book" title="Sources" count={`${item.sources.length}`} preview={item.sources[0]}>
+              <SourcesList sources={item.sources} bare />
+            </Collapsible>
+          )}
+          <View onLayout={(e) => (commentsY.current = e.nativeEvent.layout.y)}>
+            <CommentsSection type="decouverte" slug={item.slug} />
+          </View>
           <RelatedHeroes heroes={relatedHeroes} title="Héros liés" />
 
           {relatedItems.length > 0 && (
@@ -292,7 +317,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   immersiveHeader: {
-    height: 280,
+    height: 400,
     overflow: 'hidden',
     backgroundColor: colors.placeholderStripeDark,
   },
@@ -301,16 +326,9 @@ const styles = StyleSheet.create({
     // Yannick du 2026-07-31, cohérence globale avec les autres fiches).
     position: 'absolute',
     top: 12,
-    left: 14,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
+    left: 16,
   },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
   backIcon: {
     fontSize: 18,
     color: colors.accentGold,
@@ -325,31 +343,29 @@ const styles = StyleSheet.create({
   typePill: {
     alignSelf: 'flex-start',
     borderWidth: 1,
-    borderColor: 'rgba(233,161,92,0.4)',
+    borderColor: 'rgba(240,195,107,.4)',
+    backgroundColor: 'rgba(8,6,4,.55)',
     borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginBottom: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginBottom: 10,
   },
   typePillLabel: {
-    fontFamily: typography.mono,
-    fontSize: 9.5,
-    letterSpacing: 1,
-    color: colors.terracottaTextAlt,
+    fontFamily: typography.bodySemiBold,
+    fontSize: 11,
+    letterSpacing: 0.6,
+    color: colors.accentGoldPale,
   },
   immersiveTitle: {
     fontFamily: typography.display,
-    fontSize: 26,
-    fontWeight: '700',
-    color: colors.textHeading,
-    lineHeight: 28,
+    fontSize: 30,
+    color: '#FFF4E0',
+    lineHeight: 34,
   },
   immersiveMeta: {
-    fontFamily: typography.mono,
-    fontSize: 12,
-    color: colors.textBodyAlt,
-    letterSpacing: 0.5,
-    marginTop: 4,
+    fontFamily: typography.body,
+    fontSize: 13.5,
+    color: 'rgba(255,244,224,.78)',
   },
   flatHeader: {
     paddingHorizontal: spacing.md + 2,

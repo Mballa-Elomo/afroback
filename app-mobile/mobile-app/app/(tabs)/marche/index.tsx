@@ -1,25 +1,27 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ProductCard } from '../../../src/components/ProductCard';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
+import { ErrorState } from '../../../src/components/LoadingState';
+import { Icon } from '../../../src/components/Icons';
 import { useMarketplaceProducts } from '../../../src/data/useMarketplaceData';
 import { getProductRatingSummaries } from '../../../src/data/marketplaceRepository';
 import { MARKETPLACE_CATEGORIE_LABEL } from '../../../src/data/marketplaceDisplay';
 import type { MarketplaceCategorie } from '../../../src/data/marketplaceTypes';
 import { useCart } from '../../../src/marketplace/CartProvider';
-import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { colors, typography } from '../../../src/theme/tokens';
 import { useRequireAccount } from '../../../src/auth/AccountWall';
 import { useAccess } from '../../../src/access/Access';
+import { Bone, FilterChips, PressableScale, ScreenHeader, SkeletonScreen } from '../../../src/ui/modern';
+
+type Filtre = MarketplaceCategorie | 'tous';
 
 /**
- * Catalogue Marché — fidèle à design-reference-marketplace.dc.excerpt.html
- * (section MARKET). Catalogue vide au lancement, conforme à la décision de
- * Yannick du 2026-07-31 (Option A) : aucun produit ni vendeur fictif
- * préchargé, état "Aucun produit pour l'instant" honnête plutôt qu'un faux
- * remplissage.
+ * Catalogue Marché (refonte moderne du 2026-09-30). Catalogue vide au
+ * lancement, conforme à la décision du 2026-07-31 : aucun produit ni vendeur
+ * fictif, état vide honnête avec invitation à ouvrir sa boutique.
  */
 export default function MarketScreen() {
   const router = useRouter();
@@ -29,6 +31,8 @@ export default function MarketScreen() {
   const products = productsState.status === 'ready' ? productsState.data : [];
   const cart = useCart();
   const [ratings, setRatings] = useState<Map<string, { moyenne: number; total: number }>>(new Map());
+  const [query, setQuery] = useState('');
+  const [filtre, setFiltre] = useState<Filtre>('tous');
 
   useFocusEffect(
     useCallback(() => {
@@ -41,297 +45,226 @@ export default function MarketScreen() {
     getProductRatingSummaries(products.map((p) => p.id)).then(setRatings);
   }, [products]);
 
-  const [query, setQuery] = useState('');
-  const categories = useMemo(() => {
+  const options = useMemo(() => {
     const present = new Set(products.map((p) => p.categorie));
-    return (Object.keys(MARKETPLACE_CATEGORIE_LABEL) as MarketplaceCategorie[]).filter((c) => present.has(c));
+    return [
+      { id: 'tous' as Filtre, label: 'Tous' },
+      ...(Object.keys(MARKETPLACE_CATEGORIE_LABEL) as MarketplaceCategorie[])
+        .filter((c) => present.has(c))
+        .map((c) => ({ id: c as Filtre, label: MARKETPLACE_CATEGORIE_LABEL[c] })),
+    ];
   }, [products]);
-  const [activeCategory, setActiveCategory] = useState<MarketplaceCategorie | 'tous'>('tous');
 
   const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
     let list = products;
-    if (activeCategory !== 'tous') list = list.filter((p) => p.categorie === activeCategory);
+    if (filtre !== 'tous') list = list.filter((p) => p.categorie === filtre);
     if (hasQuery) {
       const q = query.trim().toLowerCase();
       list = list.filter((p) => p.nom.toLowerCase().includes(q) || (p.vendor?.nom_boutique ?? '').toLowerCase().includes(q));
     }
     return list;
-  }, [products, activeCategory, hasQuery, query]);
+  }, [products, filtre, hasQuery, query]);
 
-  if (productsState.status === 'loading') {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="Le marché se prépare..." />
-      </SafeAreaView>
-    );
-  }
+  const openVendor = () => requireSubscription(() => router.push('/marche/vendeur'), 'vendor');
+
   if (productsState.status === 'error') {
     return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <ErrorState />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Marché</Text>
-          <Pressable
-            onPress={() => requireAccount(() => router.push('/marche/cart'), 'cart')}
-            style={styles.cartBtn}
-            hitSlop={8}
-          >
-            <Text style={styles.cartIcon}>⛾</Text>
-            {cart.count > 0 && (
-              <View style={styles.cartBadge}>
-                <Text style={styles.cartBadgeLabel}>{cart.count}</Text>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScreenHeader
+          title="Marché"
+          subtitle="Artisanat authentique, en direct des artisans"
+          right={
+            <Pressable
+              onPress={() => requireAccount(() => router.push('/marche/cart'), 'cart')}
+              style={styles.cartBtn}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={`Panier, ${cart.count} article${cart.count > 1 ? 's' : ''}`}
+            >
+              <Icon name="cart" size={20} color={colors.accentGoldPale} />
+              {cart.count > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{cart.count}</Text>
+                </View>
+              )}
+            </Pressable>
+          }
+        />
+
+        <View style={styles.pad}>
+          <PressableScale onPress={openVendor} accessibilityLabel="Espace vendeur">
+            <LinearGradient colors={['#3B2A12', '#1A130B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.vendor}>
+              <View style={styles.vendorIcon}>
+                <Icon name="store" size={22} color={colors.accentGoldBright} />
               </View>
-            )}
-          </Pressable>
-        </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.vendorTitle}>Espace vendeur</Text>
+                <Text style={styles.vendorSub}>Vends tes créations sur AFROBACK</Text>
+              </View>
+              <Icon name="chevronRight" size={18} color={colors.accentGold} />
+            </LinearGradient>
+          </PressableScale>
 
-        <Pressable style={styles.vendorBanner} onPress={() => requireSubscription(() => router.push('/marche/vendeur'), 'vendor')}>
-          <Text style={styles.vendorIcon}>🧑‍🎨</Text>
-          <View style={styles.vendorBody}>
-            <Text style={styles.vendorTitle}>Espace vendeur</Text>
-            <Text style={styles.vendorSubtitle}>Vends tes créations sur AFROBACK</Text>
-          </View>
-          <Text style={styles.vendorChevron}>›</Text>
-        </Pressable>
-
-        <View style={styles.searchBox}>
-          <Text style={styles.searchIcon}>⌕</Text>
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Rechercher un produit, un artisan…"
-            placeholderTextColor={colors.textMuted}
-            style={styles.searchInput}
-          />
-          {hasQuery && (
-            <Pressable onPress={() => setQuery('')} hitSlop={8}>
-              <Text style={styles.searchClear}>✕</Text>
-            </Pressable>
-          )}
-        </View>
-
-        {categories.length > 0 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
-            <Pressable onPress={() => setActiveCategory('tous')} style={[styles.chip, activeCategory === 'tous' && styles.chipActive]}>
-              <Text style={[styles.chipLabel, activeCategory === 'tous' && styles.chipLabelActive]}>Tous</Text>
-            </Pressable>
-            {categories.map((c) => {
-              const active = activeCategory === c;
-              return (
-                <Pressable key={c} onPress={() => setActiveCategory(c)} style={[styles.chip, active && styles.chipActive]}>
-                  <Text style={[styles.chipLabel, active && styles.chipLabelActive]}>{MARKETPLACE_CATEGORIE_LABEL[c]}</Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        )}
-
-        {filtered.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>🏺</Text>
-            <Text style={styles.emptyText}>
-              {products.length === 0
-                ? "Aucun produit pour l'instant. Sois le premier vendeur à ouvrir sa boutique sur AFROBACK."
-                : `Aucun produit ne correspond à ta recherche.`}
-            </Text>
-            {products.length === 0 && (
-              <Pressable style={styles.emptyCta} onPress={() => requireSubscription(() => router.push('/marche/vendeur'), 'vendor')}>
-                <Text style={styles.emptyCtaLabel}>Devenir vendeur</Text>
+          <View style={styles.search}>
+            <Icon name="search" size={18} color={colors.textMuted} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Un produit, un artisan…"
+              placeholderTextColor={colors.textMuted}
+              style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
+            />
+            {hasQuery && (
+              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Effacer">
+                <Text style={styles.clear}>✕</Text>
               </Pressable>
             )}
           </View>
-        ) : (
-          <View style={styles.grid}>
-            {filtered.map((product) => (
-              <View key={product.id} style={styles.gridItem}>
-                <ProductCard
-                  product={product}
-                  averageRating={ratings.get(product.id)?.moyenne ?? null}
-                  onPress={() => router.push(`/marche/${product.id}`)}
-                />
-              </View>
-            ))}
+        </View>
+
+        {options.length > 1 && (
+          <View style={{ marginTop: 14 }}>
+            <FilterChips options={options} value={filtre} onChange={setFiltre} />
           </View>
         )}
+
+        <View style={styles.pad}>
+          {productsState.status === 'loading' ? (
+            <SkeletonScreen>
+              <View style={styles.grid}>
+                {[0, 1, 2, 3].map((i) => (
+                  <Bone key={i} style={styles.boneCard} />
+                ))}
+              </View>
+            </SkeletonScreen>
+          ) : filtered.length === 0 ? (
+            <View style={styles.empty}>
+              <View style={styles.emptyIcon}>
+                <Icon name="store" size={30} color={colors.accentGoldBright} />
+              </View>
+              <Text style={styles.emptyTitle}>{products.length === 0 ? 'Le marché ouvre bientôt' : 'Aucun résultat'}</Text>
+              <Text style={styles.emptyText}>
+                {products.length === 0
+                  ? 'Aucun produit pour l’instant. Sois le premier artisan à ouvrir sa boutique sur AFROBACK.'
+                  : 'Aucun produit ne correspond à ta recherche.'}
+              </Text>
+              {products.length === 0 && (
+                <Pressable style={styles.emptyCta} onPress={openVendor} accessibilityRole="button">
+                  <Icon name="plus" size={16} color={colors.ctaTextOnGold} strokeWidth={2.6} />
+                  <Text style={styles.emptyCtaText}>Devenir vendeur</Text>
+                </Pressable>
+              )}
+            </View>
+          ) : (
+            <View style={[styles.grid, { marginTop: 16 }]}>
+              {filtered.map((product) => (
+                <View key={product.id} style={styles.gridItem}>
+                  <ProductCard
+                    product={product}
+                    averageRating={ratings.get(product.id)?.moyenne ?? null}
+                    onPress={() => router.push(`/marche/${product.id}`)}
+                  />
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    paddingHorizontal: spacing.md + 2,
-    paddingTop: 6,
-    paddingBottom: 40,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 14,
-  },
-  title: {
-    flex: 1,
-    fontFamily: typography.display,
-    fontSize: 19,
-    fontWeight: '600',
-    color: colors.textHeading,
-  },
+  safe: { flex: 1, backgroundColor: '#0B0906' },
+  scroll: { paddingBottom: 40 },
+  pad: { paddingHorizontal: 18 },
   cartBtn: {
-    position: 'relative',
-  },
-  cartIcon: {
-    fontSize: 19,
-    color: colors.accentGold,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(26,19,13,.95)',
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.28)',
   },
   cartBadge: {
     position: 'absolute',
-    top: -4,
-    right: -6,
-    backgroundColor: colors.terracotta,
-    borderRadius: 9,
-    minWidth: 16,
-    height: 16,
-    paddingHorizontal: 3,
+    top: -3,
+    right: -3,
+    minWidth: 19,
+    height: 19,
+    borderRadius: 10,
+    paddingHorizontal: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.accentGoldBright,
   },
-  cartBadgeLabel: {
-    fontFamily: typography.bodyBold,
-    fontSize: 9,
-    color: '#fff',
+  cartBadgeText: { fontFamily: typography.bodyBold, fontSize: 11, color: colors.ctaTextOnGold },
+  vendor: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.3)',
   },
-  vendorBanner: {
+  vendorIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.12)',
+  },
+  vendorTitle: { fontFamily: typography.display, fontSize: 16, color: colors.textHeading },
+  vendorSub: { fontFamily: typography.body, fontSize: 12.5, color: colors.textMuted, marginTop: 2 },
+  search: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    borderRadius: 16,
+    marginTop: 14,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surfaceCard,
-    padding: 14,
-    marginBottom: 16,
+    borderColor: 'rgba(237,227,212,.12)',
+    backgroundColor: 'rgba(26,19,13,.95)',
+    paddingHorizontal: 16,
   },
-  vendorIcon: {
-    fontSize: 20,
-  },
-  vendorBody: {
-    flex: 1,
-  },
-  vendorTitle: {
-    fontFamily: typography.displaySemiBold,
-    fontSize: 14,
-    color: colors.textHeading,
-  },
-  vendorSubtitle: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  vendorChevron: {
-    fontSize: 18,
-    color: colors.accentGold,
-  },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: colors.inputBg,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    marginBottom: 16,
-  },
-  searchIcon: {
-    color: colors.accentGold,
-    fontSize: 14,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: typography.body,
-    fontSize: 13.5,
-    color: colors.textPrimary,
-    padding: 0,
-  },
-  searchClear: {
-    color: colors.textMuted,
-    fontSize: 14,
-  },
-  chipsRow: {
-    gap: 8,
-    paddingBottom: 16,
-  },
-  chip: {
-    borderRadius: radii.badge,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 13,
-    paddingVertical: 7,
-  },
-  chipActive: {
-    backgroundColor: colors.accentGold,
-    borderColor: colors.accentGold,
-  },
-  chipLabel: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 11.5,
-    color: colors.textBody,
-  },
-  chipLabelActive: {
-    color: colors.ctaTextOnGold,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -7,
-  },
-  gridItem: {
-    width: '50%',
-    paddingHorizontal: 7,
-    marginBottom: 14,
-  },
-  empty: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-    gap: 10,
-  },
+  searchInput: { flex: 1, fontFamily: typography.body, fontSize: 14.5, color: colors.textPrimary, paddingVertical: 14 },
+  clear: { fontSize: 14, color: colors.textMuted },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
+  gridItem: { width: '47.5%' },
+  boneCard: { width: '47.5%', height: 240, borderRadius: 20, marginTop: 16 },
+  empty: { alignItems: 'center', paddingVertical: 40, paddingHorizontal: 16, gap: 10 },
   emptyIcon: {
-    fontSize: 32,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.10)',
   },
-  emptyText: {
-    fontFamily: typography.body,
-    fontSize: 13,
-    color: colors.textMuted,
-    textAlign: 'center',
-  },
+  emptyTitle: { fontFamily: typography.display, fontSize: 19, color: colors.textHeading },
+  emptyText: { fontFamily: typography.body, fontSize: 14, lineHeight: 20, color: colors.textMuted, textAlign: 'center' },
   emptyCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginTop: 8,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.button,
-    paddingHorizontal: 18,
-    paddingVertical: 11,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 999,
+    backgroundColor: colors.accentGoldBright,
   },
-  emptyCtaLabel: {
-    fontFamily: typography.bodyBold,
-    fontSize: 13,
-    color: colors.accentGold,
-  },
+  emptyCtaText: { fontFamily: typography.bodyBold, fontSize: 14, color: colors.ctaTextOnGold },
 });

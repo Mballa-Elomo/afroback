@@ -3,11 +3,11 @@ import type { FriseEvenement } from '../data/types';
 import { colors, spacing, typography } from '../theme/tokens';
 import { SectionTitle } from './SectionTitle';
 
-export function TimelineList({ evenements }: { evenements: FriseEvenement[] }) {
+export function TimelineList({ evenements, bare = false }: { evenements: FriseEvenement[]; /** Sans titre ni marge (dans une section repliable). */ bare?: boolean }) {
   if (evenements.length === 0) return null;
   return (
-    <View style={styles.container}>
-      <SectionTitle title="Frise chronologique" />
+    <View style={bare ? undefined : styles.container}>
+      {!bare && <SectionTitle title="Frise chronologique" />}
       {evenements.map((e, i) => (
         <View key={`${e.date}-${i}`} style={styles.row}>
           <View style={styles.markerColumn}>

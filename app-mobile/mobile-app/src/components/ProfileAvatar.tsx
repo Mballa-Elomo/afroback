@@ -1,4 +1,5 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import Svg, { Circle, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { colors, typography } from '../theme/tokens';
 
@@ -43,7 +44,7 @@ export function ProfileAvatar({
     );
   }
   if (value) {
-    return <Image source={{ uri: value }} style={[styles.frame, round]} accessibilityIgnoresInvertColors />;
+    return <Image source={{ uri: value }} style={[styles.frame, round]} cachePolicy="memory-disk" />;
   }
   return (
     <View style={[styles.frame, styles.initialBg, round]}>

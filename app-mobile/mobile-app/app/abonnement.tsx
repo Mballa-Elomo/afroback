@@ -10,6 +10,7 @@ import { startPayment, syncPendingPayments } from '../src/payments/paiement';
 import { MobileMoneyBadges, paymentErrorMessage } from '../src/payments/MobileMoneyBadges';
 import { BrandMark } from '../src/onboarding/ui';
 import { colors, typography } from '../src/theme/tokens';
+import { Icon } from '../src/components/Icons';
 
 /**
  * Écran "Abonnements" (cdc-acces-gratuit-abonnement.md, lot A), ouvert
@@ -90,7 +91,7 @@ export default function AbonnementScreen() {
         <ScrollView contentContainerStyle={styles.scroll}>
           <View style={styles.topRow}>
             <Pressable onPress={() => router.back()} hitSlop={14} style={styles.back} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-              <Text style={styles.backIcon}>‹</Text>
+              <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
             </Pressable>
             <BrandMark layout="inline" />
             <View style={styles.back} />

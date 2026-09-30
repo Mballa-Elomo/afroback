@@ -1,8 +1,11 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Heros } from '../data/types';
 import { colors, typography } from '../theme/tokens';
+import { BackButton } from '../ui/modern';
+import { Icon } from './Icons';
 
 function heroYears(heros: Heros) {
   const from = heros.annee_naissance_indicative;
@@ -16,100 +19,77 @@ function shortEra(epoque: string) {
   return epoque.split(/[,(]/)[0].trim();
 }
 
-/** En-tête immersif de la fiche héros — 340px, vraie photo si produite (sinon placeholder) + dégradé de fondu, fidèle à la maquette. */
+/**
+ * En-tête immersif de la fiche héros (refonte moderne du 2026-09-30) :
+ * grande photo qui se fond dans la page, bouton retour flottant, époque et
+ * thème en pastilles, nom en grand, années et région.
+ */
 export function HeroHeader({ heros, onBack }: { heros: Heros; onBack: () => void }) {
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.wrap}>
-      {heros.image_carte_catalogue ? (
-        <Image source={{ uri: heros.image_carte_catalogue }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-      ) : (
-        <LinearGradient
-          colors={[colors.placeholderStripeLight, colors.placeholderStripeDark]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-      )}
       <LinearGradient
-        colors={['rgba(15,11,8,0.2)', 'rgba(15,11,8,0.1)', colors.background]}
-        locations={[0, 0.4, 1]}
+        colors={[colors.placeholderStripeLight, colors.placeholderStripeDark]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
-      <Pressable onPress={onBack} style={[styles.backBtn, { top: insets.top + 8 }]} hitSlop={10}>
-        <Text style={styles.backIcon}>‹</Text>
-      </Pressable>
+      {heros.image_carte_catalogue ? (
+        <Image source={{ uri: heros.image_carte_catalogue }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="memory-disk" />
+      ) : (
+        <View style={styles.watermark}>
+          <Icon name="crown" size={90} color="rgba(240,195,107,.18)" strokeWidth={1.2} />
+        </View>
+      )}
+      <LinearGradient
+        colors={['rgba(11,9,6,0.45)', 'rgba(11,9,6,0)', 'rgba(11,9,6,0.55)', '#0B0906']}
+        locations={[0, 0.25, 0.65, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={[styles.back, { top: insets.top + 8 }]}>
+        <BackButton onPress={onBack} floating />
+      </View>
       <View style={styles.bottom}>
-        <View style={styles.eraPill}>
-          <Text style={styles.eraPillLabel}>{shortEra(heros.epoque).toUpperCase()}</Text>
+        <View style={styles.pills}>
+          <View style={styles.pill}>
+            <Text style={styles.pillText}>{shortEra(heros.epoque)}</Text>
+          </View>
+          {!!heros.theme[0] && (
+            <View style={[styles.pill, styles.pillGold]}>
+              <Text style={[styles.pillText, styles.pillGoldText]}>{heros.theme[0]}</Text>
+            </View>
+          )}
         </View>
         <Text style={styles.name}>{heros.nom_affiche}</Text>
-        <Text style={styles.meta}>
-          {heroYears(heros)} · {heros.region}
-        </Text>
+        <View style={styles.metaRow}>
+          <Icon name="mapPin" size={14} color={colors.accentGoldSoft} />
+          <Text style={styles.meta} numberOfLines={1}>
+            {heroYears(heros)} · {heros.region}
+          </Text>
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    height: 340,
-    overflow: 'hidden',
-    backgroundColor: colors.placeholderStripeDark,
-  },
-  backBtn: {
-    // `top` par défaut, écrasé à l'usage par `insets.top + 8` (retour de test
-    // Yannick du 2026-07-31 : trop proche de l'encoche/status bar sans ça).
-    position: 'absolute',
-    top: 12,
-    left: 14,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backIcon: {
-    fontSize: 20,
-    color: colors.accentGold,
-    marginTop: -2,
-  },
-  bottom: {
-    position: 'absolute',
-    bottom: 16,
-    left: 18,
-    right: 18,
-  },
-  eraPill: {
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderColor: 'rgba(233,161,92,0.4)',
+  wrap: { height: 440, overflow: 'hidden', backgroundColor: colors.placeholderStripeDark },
+  watermark: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  back: { position: 'absolute', left: 16 },
+  bottom: { position: 'absolute', bottom: 18, left: 18, right: 18 },
+  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 },
+  pill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginBottom: 8,
+    backgroundColor: 'rgba(8,6,4,.55)',
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.35)',
   },
-  eraPillLabel: {
-    fontFamily: typography.mono,
-    fontSize: 9.5,
-    letterSpacing: 1,
-    color: colors.terracottaTextAlt,
-  },
-  name: {
-    fontFamily: typography.display,
-    fontSize: 28,
-    color: colors.textHeading,
-    lineHeight: 30,
-  },
-  meta: {
-    fontFamily: typography.mono,
-    fontSize: 12,
-    color: colors.textBodyAlt,
-    letterSpacing: 0.5,
-    marginTop: 4,
-  },
+  pillText: { fontFamily: typography.bodySemiBold, fontSize: 11.5, color: colors.accentGoldPale },
+  pillGold: { backgroundColor: colors.accentGoldBright, borderColor: colors.accentGoldBright },
+  pillGoldText: { color: colors.ctaTextOnGold },
+  name: { fontFamily: typography.display, fontSize: 32, lineHeight: 36, color: '#FFF4E0' },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
+  meta: { flexShrink: 1, fontFamily: typography.body, fontSize: 13.5, color: 'rgba(255,244,224,.78)' },
 });

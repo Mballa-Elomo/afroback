@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CreateProfileForm } from '../../../../src/components/CreateProfileForm';
@@ -14,6 +15,7 @@ import { useAuth } from '../../../../src/auth/AuthProvider';
 import { LockedActionCard } from '../../../../src/auth/AccountWall';
 import { ProfileAvatar, presetKey } from '../../../../src/components/ProfileAvatar';
 import { PremiumActionCard, useAccess } from '../../../../src/access/Access';
+import { Icon } from '../../../../src/components/Icons';
 
 type State =
   | { status: 'loading' }
@@ -98,7 +100,7 @@ export default function PostDetailScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.headerTitle}>Post</Text>
           <View style={{ flex: 1 }} />
@@ -119,7 +121,7 @@ export default function PostDetailScreen() {
             {presetKey(post.author?.avatar_url) ? (
               <ProfileAvatar value={post.author?.avatar_url} size={44} />
             ) : post.author?.avatar_url ? (
-              <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} />
+              <Image source={{ uri: post.author.avatar_url }} style={styles.avatar} cachePolicy="memory-disk" />
             ) : (
               <HeroPlaceholder style={styles.avatar} radius={22} />
             )}
@@ -131,12 +133,18 @@ export default function PostDetailScreen() {
         </View>
 
         <Text style={styles.text}>{post.contenu_texte}</Text>
-        {post.image_url && <Image source={{ uri: post.image_url }} style={styles.photo} resizeMode="cover" />}
+        {post.image_url && <Image source={{ uri: post.image_url }} style={styles.photo} contentFit="cover" transition={200} cachePolicy="memory-disk" />}
 
         <View style={styles.statsRow}>
-          <Text style={styles.statLabel}>💬 {comments.length}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Icon name="chat" size={15} color={colors.textMuted} />
+            <Text style={styles.statLabel}>{comments.length}</Text>
+          </View>
           <Pressable onPress={share}>
-            <Text style={styles.statLabel}>↗ Partager</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Icon name="share" size={15} color={colors.textMuted} />
+              <Text style={styles.statLabel}>Partager</Text>
+            </View>
           </Pressable>
         </View>
 
@@ -147,7 +155,7 @@ export default function PostDetailScreen() {
               {presetKey(c.author?.avatar_url) ? (
                 <ProfileAvatar value={c.author?.avatar_url} size={32} />
               ) : c.author?.avatar_url ? (
-                <Image source={{ uri: c.author.avatar_url }} style={styles.commentAvatar} />
+                <Image source={{ uri: c.author.avatar_url }} style={styles.commentAvatar} cachePolicy="memory-disk" />
               ) : (
                 <HeroPlaceholder style={styles.commentAvatar} radius={16} />
               )}

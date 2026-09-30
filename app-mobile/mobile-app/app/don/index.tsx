@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GoldButton } from '../../src/components/Buttons';
 import { colors, spacing, typography } from '../../src/theme/tokens';
+import { Icon } from '../../src/components/Icons';
 
 /**
  * Écran mission du module Don — version volontairement simplifiée par
@@ -29,7 +30,7 @@ export default function DonMissionScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.cover}>
           <Pressable onPress={() => router.back()} hitSlop={10} style={styles.backButton}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <View style={styles.coverContent}>
             <View style={styles.tag}>

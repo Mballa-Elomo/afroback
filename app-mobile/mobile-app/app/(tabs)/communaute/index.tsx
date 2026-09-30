@@ -3,21 +3,24 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PostCard } from '../../../src/components/PostCard';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
+import { ErrorState } from '../../../src/components/LoadingState';
+import { Icon } from '../../../src/components/Icons';
 import { useFeedPosts } from '../../../src/data/useCommunityData';
-import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { colors, typography } from '../../../src/theme/tokens';
 import { useAccess } from '../../../src/access/Access';
+import { Bone, FilterChips, ScreenHeader, SkeletonScreen } from '../../../src/ui/modern';
 
 type Sort = 'recent' | 'popular';
+const SORTS: { id: Sort; label: string }[] = [
+  { id: 'recent', label: 'Récent' },
+  { id: 'popular', label: 'Populaire' },
+];
 
 /**
- * Fil communautaire — fidèle à design-reference-communaute.dc.excerpt.html
- * (section COMMUNITY). Simplifications assumées documentées dans
- * mobile-app/README.md : pas de catégories/tags de post (aucune colonne
- * dédiée dans le schéma) ; "Populaire" trie par nombre de commentaires
- * (proxy honnête d'engagement, faute de système de likes) ; l'"Espace
- * exclusif" (bouton ✦) affiche un "bientôt disponible" honnête, le pilier
- * Abonnement n'étant pas encore activé.
+ * Fil communautaire (refonte moderne du 2026-09-30). "Populaire" trie par
+ * nombre de commentaires (proxy honnête faute de système de likes) ;
+ * l'"Espace exclusif" reste "bientôt disponible". Publier : réservé aux
+ * abonnés (règle d'accès du 2026-09-29).
  */
 export default function CommunauteScreen() {
   const router = useRouter();
@@ -38,56 +41,58 @@ export default function CommunauteScreen() {
     return copy;
   }, [posts, sort]);
 
-  const openExclusive = () =>
-    Alert.alert('Bientôt disponible', "L'espace exclusif abonnés n'est pas encore activé sur AFROBACK.");
+  const openExclusive = () => Alert.alert('Bientôt disponible', "L'espace exclusif abonnés n'est pas encore activé sur AFROBACK.");
 
-  if (feedState.status === 'loading') {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="Le fil se prépare..." />
-      </SafeAreaView>
-    );
-  }
   if (feedState.status === 'error') {
     return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <ErrorState />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Communauté</Text>
-          <Pressable onPress={openExclusive} style={styles.exclusiveBtn}>
-            <Text style={styles.exclusiveLabel}>✦ Espace exclusif</Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.sortRow}>
-          <Pressable onPress={() => setSort('recent')}>
-            <Text style={[styles.sortLabel, sort === 'recent' && styles.sortLabelActive]}>Récent</Text>
-          </Pressable>
-          <Pressable onPress={() => setSort('popular')}>
-            <Text style={[styles.sortLabel, sort === 'popular' && styles.sortLabelActive]}>Populaire</Text>
-          </Pressable>
-        </View>
+        <ScreenHeader
+          title="Communauté"
+          subtitle="Partage, échange, transmets"
+          right={
+            <Pressable onPress={openExclusive} style={styles.exclusive} accessibilityRole="button">
+              <Icon name="crown" size={15} color={colors.accentGoldBright} />
+              <Text style={styles.exclusiveText}>Exclusif</Text>
+            </Pressable>
+          }
+        />
+        <FilterChips options={SORTS} value={sort} onChange={setSort} />
 
         <View style={styles.list}>
-          {sorted.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onPress={() => router.push(`/communaute/post/${post.id}`)}
-              onOpenAuthor={() => post.author && router.push(`/communaute/profil/${post.author.id}`)}
-            />
-          ))}
-          {sorted.length === 0 && (
-            <View style={styles.empty}>
-              <Text style={styles.emptyText}>Sois parmi les premiers à partager sur AFROBACK.</Text>
-            </View>
+          {feedState.status === 'loading' ? (
+            <SkeletonScreen>
+              {[0, 1, 2].map((i) => (
+                <Bone key={i} style={{ height: 170, borderRadius: 22, marginBottom: 14 }} />
+              ))}
+            </SkeletonScreen>
+          ) : (
+            <>
+              {sorted.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onPress={() => router.push(`/communaute/post/${post.id}`)}
+                  onOpenAuthor={() => post.author && router.push(`/communaute/profil/${post.author.id}`)}
+                />
+              ))}
+              {sorted.length === 0 && (
+                <View style={styles.empty}>
+                  <View style={styles.emptyIcon}>
+                    <Icon name="chat" size={30} color={colors.accentGoldBright} />
+                  </View>
+                  <Text style={styles.emptyTitle}>Le fil est encore calme</Text>
+                  <Text style={styles.emptyText}>Sois parmi les premiers à partager une histoire, une tradition ou une question.</Text>
+                </View>
+              )}
+            </>
           )}
         </View>
       </ScrollView>
@@ -98,95 +103,56 @@ export default function CommunauteScreen() {
         accessibilityRole="button"
         accessibilityLabel="Publier"
       >
-        <Text style={styles.fabIcon}>+</Text>
+        <Icon name="plus" size={20} color={colors.ctaTextOnGold} strokeWidth={2.6} />
+        <Text style={styles.fabText}>Publier</Text>
       </Pressable>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    paddingHorizontal: spacing.md + 2,
-    paddingTop: 6,
-    paddingBottom: 110,
-  },
-  header: {
+  safe: { flex: 1, backgroundColor: '#0B0906' },
+  scroll: { paddingBottom: 110 },
+  exclusive: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 14,
-  },
-  title: {
-    fontFamily: typography.display,
-    fontSize: 19,
-    fontWeight: '600',
-    color: colors.textHeading,
-  },
-  exclusiveBtn: {
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    backgroundColor: colors.cardBg,
-    borderRadius: radii.badge,
-    paddingHorizontal: 13,
+    gap: 6,
+    paddingHorizontal: 12,
     paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.4)',
+    backgroundColor: 'rgba(240,195,107,.08)',
   },
-  exclusiveLabel: {
-    fontFamily: typography.bodyBold,
-    fontSize: 11.5,
-    color: colors.accentGold,
-  },
-  sortRow: {
-    flexDirection: 'row',
-    gap: 14,
-    marginBottom: 16,
-  },
-  sortLabel: {
-    fontFamily: typography.body,
-    fontSize: 11.5,
-    color: colors.textMuted,
-  },
-  sortLabelActive: {
-    color: colors.accentGold,
-    fontFamily: typography.bodyBold,
-  },
-  list: {
-    gap: 14,
-  },
-  empty: {
-    paddingVertical: 50,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontFamily: typography.body,
-    fontSize: 13,
-    color: colors.textMuted,
-    textAlign: 'center',
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 24,
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: colors.accentGoldBright,
+  exclusiveText: { fontFamily: typography.bodyBold, fontSize: 12.5, color: colors.accentGoldPale },
+  list: { gap: 14, paddingHorizontal: 18, marginTop: 16 },
+  empty: { alignItems: 'center', paddingVertical: 40, paddingHorizontal: 20, gap: 10 },
+  emptyIcon: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.10)',
+  },
+  emptyTitle: { fontFamily: typography.display, fontSize: 19, color: colors.textHeading },
+  emptyText: { fontFamily: typography.body, fontSize: 14, lineHeight: 20, color: colors.textMuted, textAlign: 'center' },
+  fab: {
+    position: 'absolute',
+    right: 18,
+    bottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 20,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.accentGoldBright,
     shadowColor: '#000',
     shadowOpacity: 0.4,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 8,
   },
-  fabIcon: {
-    fontSize: 26,
-    fontWeight: '300',
-    color: colors.ctaTextOnGold,
-    marginTop: -2,
-  },
+  fabText: { fontFamily: typography.bodyBold, fontSize: 15, color: colors.ctaTextOnGold },
 });

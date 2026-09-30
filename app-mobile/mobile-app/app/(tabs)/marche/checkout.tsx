@@ -9,6 +9,7 @@ import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { useCart } from '../../../src/marketplace/CartProvider';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
+import { Icon } from '../../../src/components/Icons';
 
 const PAYMENT_METHODS: { id: MarketplacePaymentMethod; icon: string; name: string; sub: string }[] = [
   { id: 'mtn_momo', icon: '📱', name: 'MTN Mobile Money', sub: 'Confirmation par le vendeur' },
@@ -74,7 +75,7 @@ function CheckoutScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.title}>Commande</Text>
         </View>

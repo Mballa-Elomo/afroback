@@ -1,15 +1,18 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { SectionTitle } from './SectionTitle';
+import { Icon } from './Icons';
 
-export function SourcesList({ sources }: { sources: string[] }) {
+export function SourcesList({ sources, bare = false }: { sources: string[]; /** Sans titre ni marge (dans une section repliable). */ bare?: boolean }) {
   if (sources.length === 0) return null;
   return (
-    <View style={styles.container}>
-      <SectionTitle title="Sources" />
+    <View style={bare ? undefined : styles.container}>
+      {!bare && <SectionTitle title="Sources" />}
       {sources.map((s, i) => (
         <View key={i} style={styles.card}>
-          <Text style={styles.icon}>📚</Text>
+          <View style={{ marginTop: 2 }}>
+            <Icon name="book" size={13} color={colors.accentGoldSoft} />
+          </View>
           <Text style={styles.item}>{s}</Text>
         </View>
       ))}

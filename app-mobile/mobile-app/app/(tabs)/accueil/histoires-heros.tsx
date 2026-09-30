@@ -1,98 +1,103 @@
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { HeroCard } from '../../../src/components/HeroCard';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
+import { Icon } from '../../../src/components/Icons';
+import { ErrorState } from '../../../src/components/LoadingState';
 import { useHeroesList } from '../../../src/data/useHeroesData';
 import { ERA_FILTERS, eraCategory, type EraCategory } from '../../../src/data/eraCategory';
-import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { colors, typography } from '../../../src/theme/tokens';
+import { Bone, FilterChips, PressableScale, ScreenHeader, SkeletonScreen } from '../../../src/ui/modern';
+import { useLikeCounts } from '../../../src/stats/contentStats';
 
 /**
- * Catalogue "Histoires & Héros" — fidèle à la maquette (bannière Mythologie,
- * filtres par époque). Vit dans la pile de l'onglet Accueil (pas un écran
- * séparé hors des onglets) pour que la barre de navigation basse reste
- * visible ici, exactement comme le montre la maquette.
+ * Catalogue "Histoires & Héros" (refonte moderne du 2026-09-30) : en-tête,
+ * carte Mythologie en dégradé, filtres par époque en pastilles, grille de
+ * cartes photo. Vit dans la pile de l'onglet Accueil pour garder la barre
+ * de navigation basse visible.
  */
 export default function HistoiresHerosScreen() {
   const router = useRouter();
   const heroesState = useHeroesList();
   const heroes = heroesState.status === 'ready' ? heroesState.data : [];
-
   const [eraFilter, setEraFilter] = useState<EraCategory | 'tous'>('tous');
+  const likes = useLikeCounts('heros', heroes.map((h) => h.slug));
 
   const filtered = useMemo(
     () => (eraFilter === 'tous' ? heroes : heroes.filter((h) => eraCategory(h.epoque) === eraFilter)),
     [heroes, eraFilter]
   );
 
-  const openMythologie = () => router.push('/accueil/mythologie');
-
-  if (heroesState.status === 'loading') {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="Le catalogue des héros se prépare..." />
-      </SafeAreaView>
-    );
-  }
   if (heroesState.status === 'error') {
     return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <ErrorState />
       </SafeAreaView>
     );
   }
 
-  return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={10} style={styles.back}>
-          <Text style={styles.backIcon}>‹</Text>
-        </Pressable>
-        <Text style={styles.title}>Histoires & Héros</Text>
-      </View>
-
-      <Pressable style={styles.mythBanner} onPress={openMythologie}>
-        <Text style={styles.mythIcon}>📖</Text>
-        <View style={styles.mythBody}>
-          <Text style={styles.mythTitle}>Mythologie africaine</Text>
-          <Text style={styles.mythSubtitle}>Les mythes par peuple — lire, écouter, BD</Text>
-        </View>
-        <Text style={styles.mythChevron}>›</Text>
-      </Pressable>
-
-      <FlatList
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        data={ERA_FILTERS}
-        keyExtractor={(f) => f.id}
-        contentContainerStyle={styles.filterChips}
-        style={styles.filterRow}
-        renderItem={({ item }) => {
-          const active = eraFilter === item.id;
-          return (
-            <Pressable onPress={() => setEraFilter(item.id)} style={[styles.chip, active && styles.chipActive]}>
-              <Text style={[styles.chipLabel, active && styles.chipLabelActive]}>{item.label}</Text>
-            </Pressable>
-          );
-        }}
+  const header = (
+    <View>
+      <ScreenHeader
+        title="Histoires & Héros"
+        subtitle={heroesState.status === 'ready' ? `${heroes.length} figures qui ont marqué l'Afrique` : undefined}
+        onBack={() => router.back()}
       />
+      <View style={styles.pad}>
+        <PressableScale onPress={() => router.push('/accueil/mythologie')} accessibilityLabel="Mythologie africaine">
+          <LinearGradient colors={['#3B2A12', '#1A130B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.myth}>
+            <View style={styles.mythIcon}>
+              <Icon name="book" size={22} color={colors.accentGoldBright} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.mythTitle}>Mythologie africaine</Text>
+              <Text style={styles.mythSub}>Les mythes par peuple : lire, écouter, BD</Text>
+            </View>
+            <Icon name="chevronRight" size={18} color={colors.accentGold} />
+          </LinearGradient>
+        </PressableScale>
+      </View>
+      <View style={{ marginTop: 16, marginBottom: 14 }}>
+        <FilterChips options={ERA_FILTERS} value={eraFilter} onChange={setEraFilter} />
+      </View>
+    </View>
+  );
 
-      {filtered.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>🗺️</Text>
-          <Text style={styles.emptyBody}>Aucune histoire dans cette catégorie pour l'instant.</Text>
-        </View>
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      {heroesState.status === 'loading' ? (
+        <>
+          {header}
+          <SkeletonScreen>
+            <View style={[styles.row, styles.pad]}>
+              <Bone style={styles.bone} />
+              <Bone style={styles.bone} />
+            </View>
+            <View style={[styles.row, styles.pad, { marginTop: 14 }]}>
+              <Bone style={styles.bone} />
+              <Bone style={styles.bone} />
+            </View>
+          </SkeletonScreen>
+        </>
       ) : (
         <FlatList
           data={filtered}
           keyExtractor={(h) => h.slug}
           numColumns={2}
-          columnWrapperStyle={styles.row}
+          ListHeaderComponent={header}
+          columnWrapperStyle={[styles.row, styles.pad]}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <HeroCard heros={item} onPress={() => router.push(`/accueil/heros/${item.slug}`)} />
-          )}
+          showsVerticalScrollIndicator={false}
+          initialNumToRender={6}
+          renderItem={({ item }) => <HeroCard heros={item} likes={likes.get(item.slug)} onPress={() => router.push(`/accueil/heros/${item.slug}`)} />}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Icon name="compass" size={36} color={colors.accentGoldSoft} />
+              <Text style={styles.emptyBody}>Aucune histoire dans cette période pour l'instant.</Text>
+            </View>
+          }
         />
       )}
     </SafeAreaView>
@@ -100,115 +105,30 @@ export default function HistoiresHerosScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
+  safe: { flex: 1, backgroundColor: '#0B0906' },
+  pad: { paddingHorizontal: 18 },
+  myth: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: spacing.md + 2,
-    paddingTop: 6,
-    paddingBottom: 16,
-  },
-  back: {
-    width: 24,
-  },
-  backIcon: {
-    fontSize: 22,
-    color: colors.accentGold,
-  },
-  title: {
-    fontFamily: typography.display,
-    fontSize: 17,
-    letterSpacing: 0.5,
-    color: colors.textHeading,
-  },
-  mythBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginHorizontal: spacing.md + 2,
-    marginBottom: 18,
-    borderRadius: 16,
+    gap: 14,
+    padding: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.accentGold,
-    backgroundColor: colors.placeholderStripeDark,
-    padding: 15,
+    borderColor: 'rgba(240,195,107,.3)',
   },
   mythIcon: {
-    fontSize: 20,
-  },
-  mythBody: {
-    flex: 1,
-  },
-  mythTitle: {
-    fontFamily: typography.display,
-    fontSize: 14.5,
-    color: colors.textHeading,
-  },
-  mythSubtitle: {
-    fontFamily: typography.body,
-    fontSize: 11.5,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  mythChevron: {
-    fontSize: 20,
-    color: colors.accentGold,
-  },
-  filterRow: {
-    flexGrow: 0,
-    marginBottom: 8,
-  },
-  filterChips: {
-    gap: 8,
-    paddingHorizontal: spacing.md + 2,
-  },
-  chip: {
-    borderRadius: radii.badge,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: 'transparent',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-  },
-  chipActive: {
-    backgroundColor: colors.accentGold,
-    borderColor: colors.accentGold,
-  },
-  chipLabel: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 12,
-    color: colors.textBody,
-  },
-  chipLabelActive: {
-    color: colors.ctaTextOnGold,
-  },
-  row: {
-    gap: 14,
-    paddingHorizontal: spacing.md + 2,
-  },
-  list: {
-    paddingTop: 10,
-    paddingBottom: 40,
-    gap: 20,
-  },
-  empty: {
-    flex: 1,
+    width: 46,
+    height: 46,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.xl,
-    gap: 10,
+    backgroundColor: 'rgba(240,195,107,.12)',
   },
-  emptyIcon: {
-    fontSize: 30,
-  },
-  emptyBody: {
-    fontFamily: typography.body,
-    fontSize: 13,
-    color: colors.textMuted,
-    textAlign: 'center',
-  },
+  mythTitle: { fontFamily: typography.display, fontSize: 16, color: colors.textHeading },
+  mythSub: { fontFamily: typography.body, fontSize: 12.5, color: colors.textMuted, marginTop: 2 },
+  row: { gap: 14 },
+  list: { paddingBottom: 40, gap: 14 },
+  bone: { flex: 1, height: 230, borderRadius: 20 },
+  empty: { alignItems: 'center', gap: 12, padding: 40 },
+  emptyBody: { fontFamily: typography.body, fontSize: 14, color: colors.textMuted, textAlign: 'center' },
 });

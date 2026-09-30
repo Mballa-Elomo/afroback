@@ -9,6 +9,7 @@ import { BrandMark, MotifFrieze, ONBOARDING_BG, PillButton } from '../../src/onb
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
 import { SessionEndedNotice } from '../../src/security/SessionEndedNotice';
+import { Icon } from '../../src/components/Icons';
 
 /**
  * Connexion — restylée aux couleurs de la maquette du 2026-09-29.
@@ -72,7 +73,7 @@ export default function LoginScreen() {
         <KeyboardAvoidingView style={styles.safe} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
             <Pressable onPress={goBack} hitSlop={14} style={styles.back} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-              <Text style={styles.backIcon}>‹</Text>
+              <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
             </Pressable>
 
             <BrandMark layout="inline" />

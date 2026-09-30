@@ -7,6 +7,7 @@ import { startPayment } from '../../src/payments/paiement';
 import { MobileMoneyBadges, paymentErrorMessage } from '../../src/payments/MobileMoneyBadges';
 import { colors, spacing, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
+import { Icon } from '../../src/components/Icons';
 
 const PRESETS = [500, 1000, 2000, 5000];
 /** Minimum accepté pour un don. */
@@ -69,7 +70,7 @@ export default function DonMontantScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.title}>Ton don</Text>
         </View>

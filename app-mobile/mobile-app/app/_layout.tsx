@@ -194,11 +194,16 @@ function RootNavigator() {
         guard={(!!session && mfaOk && onboardingComplete && profileState.status === 'adult') || isGuest}
       >
         <Stack.Screen name="(tabs)" />
+        {/* Recherche globale (héros, mythes, Découverte), 2026-09-30. */}
+        <Stack.Screen name="recherche" options={{ animation: 'fade' }} />
       </Stack.Protected>
       <Stack.Protected guard={!!session && mfaOk && onboardingComplete}>
         <Stack.Screen name="profils/ajouter" />
         <Stack.Screen name="profils/parent" />
         <Stack.Screen name="abonnement" />
+        {/* Modifier le profil et changer le mot de passe (cdc-edition-profil.md, 2026-09-30). */}
+        <Stack.Screen name="profil/modifier" />
+        <Stack.Screen name="profil/mot-de-passe" />
         <Stack.Screen name="don/index" />
         <Stack.Screen name="don/montant" />
       </Stack.Protected>

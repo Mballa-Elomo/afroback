@@ -1,19 +1,28 @@
-import { useMemo, useRef, useState } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../../src/auth/AuthProvider';
-import { HeroPlaceholder, TagBadge } from '../../../src/components/HeroVisual';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
+import { HeroPlaceholder } from '../../../src/components/HeroVisual';
+import { Icon, type IconName } from '../../../src/components/Icons';
+import { ProfileAvatar } from '../../../src/components/ProfileAvatar';
+import { useOwnProfile } from '../../../src/profile/ownProfile';
+import { ErrorState } from '../../../src/components/LoadingState';
 import { useHeroesList } from '../../../src/data/useHeroesData';
+import { useMythesGroupedByZone } from '../../../src/data/useMythologieData';
+import { useDecouverteItems } from '../../../src/data/useDecouverteData';
+import { DECOUVERTE_TYPE_LABEL } from '../../../src/data/decouverteDisplay';
 import { getReadingProgress, type ReadingProgress } from '../../../src/data/readingProgress';
 import type { Heros } from '../../../src/data/types';
-import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { colors, typography } from '../../../src/theme/tokens';
 import { GuestBanner, useRequireAccount } from '../../../src/auth/AccountWall';
 import { AccessBadge, UpgradeBanner } from '../../../src/access/Access';
+import { Bone, PressableScale, RailSection, SkeletonScreen } from '../../../src/ui/modern';
 
-/** Salutation selon l'heure réelle de l'appareil — pas figée sur "Bonsoir" comme dans la capture de la maquette. */
+const GOLD = colors.accentGoldBright;
+
+/** Salutation selon l'heure réelle de l'appareil. */
 function greeting(): string {
   const h = new Date().getHours();
   if (h < 12) return 'Bonjour';
@@ -22,100 +31,89 @@ function greeting(): string {
 }
 
 /** Court extrait tiré du vrai contenu (première phrase du sous-titre du récit), jamais inventé pour l'occasion. */
-function firstSentence(text: string, maxLen = 90): string {
+function firstSentence(text: string, maxLen = 110): string {
   const period = text.indexOf('.');
-  const cut = period > 0 && period < maxLen ? text.slice(0, period + 1) : text.slice(0, maxLen).trim() + '…';
-  return cut;
+  return period > 0 && period < maxLen ? text.slice(0, period + 1) : text.slice(0, maxLen).trim() + '…';
 }
 
 /**
  * Héros du jour : priorité à ce qui a été mis "à la une" depuis le
- * back-office (`a_la_une`, ajouté le 2026-08-05 — voir
- * backoffice/supabase/schema-admin-heros.sql) ; s'il y en a plusieurs, la
- * même rotation quotidienne s'applique entre eux. Tant qu'aucun héros n'est
- * mis à la une (valeur par défaut, comportement inchangé), retombe sur la
- * rotation automatique parmi tous les héros — priorité à ceux qui ont une
- * vraie photo produite, retombe sur l'ensemble sinon.
+ * back-office (`a_la_une`) ; sinon rotation quotidienne, priorité aux héros
+ * qui ont une vraie photo.
  */
 function pickFeatured(heroes: Heros[]): Heros | undefined {
   if (heroes.length === 0) return undefined;
   const start = Date.UTC(new Date().getFullYear(), 0, 0);
   const dayOfYear = Math.floor((Date.now() - start) / 86400000);
-
   const featured = heroes.filter((h) => h.a_la_une);
   if (featured.length > 0) return featured[dayOfYear % featured.length];
-
   const withImage = heroes.filter((h) => h.image_carte_catalogue);
   const pool = withImage.length > 0 ? withImage : heroes;
   return pool[dayOfYear % pool.length];
 }
 
-/** Pas de défilement fixe : ~2 cartes (135px + 14px de gap) par appui sur ‹ ›, utile surtout au clavier/souris (export web Vercel). */
-const POUR_TOI_SCROLL_STEP = 149 * 2;
+const PILLARS: { icon: IconName; label: string; href: string }[] = [
+  { icon: 'crown', label: 'Héros', href: '/accueil/histoires-heros' },
+  { icon: 'book', label: 'Mythes', href: '/accueil/mythologie' },
+  { icon: 'compass', label: 'Découverte', href: '/decouverte' },
+  { icon: 'store', label: 'Marché', href: '/marche' },
+];
 
+/**
+ * Accueil (refonte moderne du 2026-09-30, demande de Yannick) : en-tête avec
+ * photo de profil, recherche, raccourcis vers les 4 piliers, grande carte
+ * "Histoire du jour", reprise de lecture, puis trois carrousels (héros,
+ * mythes, Découverte) et deux cartes Marché / Soutenir. Squelette de
+ * chargement au lieu d'une roue. Corrige aussi une boucle de rechargement :
+ * la progression de lecture était relue à chaque affichage (useFocusEffect
+ * sans useCallback), ce qui relançait l'affichage en continu.
+ */
 export default function AccueilScreen() {
   const router = useRouter();
   const { session } = useAuth();
   const requireAccount = useRequireAccount();
   const heroesState = useHeroesList();
+  const mythesState = useMythesGroupedByZone();
+  const decouverteState = useDecouverteItems();
   const heroes = heroesState.status === 'ready' ? heroesState.data : [];
   const [reading, setReading] = useState<ReadingProgress | null>(null);
-  const pourToiRef = useRef<ScrollView>(null);
-  const pourToiOffset = useRef(0);
+  const ownProfile = useOwnProfile();
+  const prenom = (session?.user?.user_metadata?.prenom as string | undefined) ?? '';
 
-  const scrollPourToiBy = (delta: number) => {
-    const next = Math.max(0, pourToiOffset.current + delta);
-    pourToiOffset.current = next;
-    pourToiRef.current?.scrollTo({ x: next, animated: true });
-  };
-  const onPourToiScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    pourToiOffset.current = e.nativeEvent.contentOffset.x;
-  };
-
-  const prenom = ((session?.user?.user_metadata?.prenom as string | undefined) ?? '').toUpperCase();
-
-  // Rechargé à chaque retour sur l'onglet (pas juste au montage) pour refléter une lecture qui vient de se terminer.
-  useFocusEffect(() => {
-    getReadingProgress().then(setReading);
-  });
+  // Relu au retour sur l'onglet (une lecture vient peut-être de se terminer), une seule fois par retour.
+  useFocusEffect(
+    useCallback(() => {
+      getReadingProgress().then(setReading);
+    }, [])
+  );
 
   const featured = useMemo(() => pickFeatured(heroes), [heroes]);
-  const reprendreHero = useMemo(
-    () => (reading ? heroes.find((h) => h.slug === reading.slug) : undefined),
-    [heroes, reading]
-  );
-  // Héros avec une vraie photo en premier (meilleur rendu visuel du carrousel), reste ensuite dans l'ordre du catalogue.
+  const reprendreHero = useMemo(() => (reading ? heroes.find((h) => h.slug === reading.slug) : undefined), [heroes, reading]);
   const pourToi = useMemo(() => {
     const rest = heroes.filter((h) => h.slug !== featured?.slug);
-    const withImage = rest.filter((h) => h.image_carte_catalogue);
-    const withoutImage = rest.filter((h) => !h.image_carte_catalogue);
-    return [...withImage, ...withoutImage].slice(0, 8);
+    return [...rest.filter((h) => h.image_carte_catalogue), ...rest.filter((h) => !h.image_carte_catalogue)].slice(0, 10);
   }, [heroes, featured]);
+  const mythes = useMemo(() => (mythesState.status === 'ready' ? mythesState.data.flatMap((g) => g.items) : []), [mythesState]);
+  const decouvertes = useMemo(() => (decouverteState.status === 'ready' ? decouverteState.data.slice(0, 10) : []), [decouverteState]);
 
-  if (heroesState.status === 'loading') {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="Ton accueil se prépare..." />
-      </SafeAreaView>
-    );
-  }
   if (heroesState.status === 'error') {
     return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <ErrorState />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <GuestBanner />
-        <UpgradeBanner />
+        {/* En-tête (salutation + photo), tout en haut, au-dessus des bandeaux (demande de Yannick). */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>{greeting()},</Text>
-            <Text style={styles.name}>{prenom || 'TOI'}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.greeting}>{greeting()}</Text>
+            <Text style={styles.name} numberOfLines={1}>
+              {prenom || 'Explorateur'} 👋🏾
+            </Text>
           </View>
           <Pressable
             onPress={() => requireAccount(() => router.push('/profil'), 'profile')}
@@ -123,422 +121,320 @@ export default function AccueilScreen() {
             accessibilityRole="button"
             accessibilityLabel="Mon profil"
           >
-            <HeroPlaceholder style={styles.avatar} radius={22} />
+            <View style={styles.avatarRing}>
+              {session ? (
+                <ProfileAvatar value={ownProfile?.avatar ?? null} size={42} name={ownProfile?.pseudo || prenom} />
+              ) : (
+                <View style={styles.guestAvatar}>
+                  <Icon name="userPlus" size={20} color={GOLD} />
+                </View>
+              )}
+            </View>
           </Pressable>
         </View>
 
-        <Pressable style={styles.search} onPress={() => router.push('/accueil/histoires-heros')}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <Text style={styles.searchPlaceholder}>Rechercher un héros, un lieu, un objet...</Text>
+        <GuestBanner />
+        <UpgradeBanner />
+
+        {/* Recherche */}
+        <Pressable style={styles.search} onPress={() => router.push('/recherche')} accessibilityRole="search">
+          <Icon name="search" size={18} color={colors.textMuted} />
+          <Text style={styles.searchPlaceholder}>Un héros, un mythe, un lieu…</Text>
         </Pressable>
 
-        {featured && (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>HISTOIRE DU JOUR</Text>
-            <Pressable onPress={() => router.push(`/accueil/heros/${featured.slug}`)}>
-              <HeroPlaceholder style={styles.featuredCard} radius={20} imageUrl={featured.image_carte_catalogue}>
-                <LinearGradient
-                  colors={['transparent', 'rgba(10,7,4,0.55)', 'rgba(8,6,4,0.92)']}
-                  locations={[0, 0.5, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-                <AccessBadge type="heros" slug={featured.slug} style={{ top: 12, right: 12 }} />
-                <View style={styles.featuredContent}>
-                  {featured.theme[0] && <TagBadge label={featured.theme[0].toUpperCase()} />}
-                  <Text style={styles.featuredTitle}>{featured.nom_affiche}</Text>
-                  <Text style={styles.featuredBlurb} numberOfLines={2}>
-                    {firstSentence(featured.sous_titre)}
+        {/* Piliers */}
+        <View style={styles.pillars}>
+          {PILLARS.map((p) => (
+            <PressableScale key={p.label} onPress={() => router.push(p.href as never)} style={styles.pillar} accessibilityLabel={p.label}>
+              <View style={styles.pillarIcon}>
+                <Icon name={p.icon} size={22} color={GOLD} />
+              </View>
+              <Text style={styles.pillarLabel}>{p.label}</Text>
+            </PressableScale>
+          ))}
+        </View>
+
+        {heroesState.status === 'loading' ? (
+          <HomeSkeleton />
+        ) : (
+          <>
+            {/* Histoire du jour */}
+            {featured && (
+              <View>
+                <View style={styles.dayHeader}>
+                  <Text style={styles.sectionTitle}>Histoire du jour</Text>
+                  <Text style={styles.dayDate}>
+                    {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </Text>
                 </View>
-              </HeroPlaceholder>
-            </Pressable>
-          </View>
-        )}
-
-        {reprendreHero && reading && (
-          <View style={styles.section}>
-            <View style={styles.sectionRow}>
-              <Text style={styles.sectionLabel}>REPRENDRE</Text>
-              <Text style={styles.sectionPercent}>{Math.round(reading.progress * 100)} %</Text>
-            </View>
-            <Pressable
-              style={styles.resumeCard}
-              onPress={() => router.push(`/accueil/heros/${reprendreHero.slug}/recit`)}
-            >
-              <HeroPlaceholder style={styles.resumeThumb} radius={12} imageUrl={reprendreHero.image_carte_catalogue} />
-              <View style={styles.resumeBody}>
-                <Text style={styles.resumeName} numberOfLines={1}>
-                  {reprendreHero.nom_affiche}
-                </Text>
-                <Text style={styles.resumeSub} numberOfLines={1}>
-                  {reprendreHero.sous_titre}
-                </Text>
-                <View style={styles.resumeTrack}>
-                  <View style={[styles.resumeFill, { width: `${reading.progress * 100}%` }]} />
-                </View>
-              </View>
-            </Pressable>
-          </View>
-        )}
-
-        {pourToi.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionRow}>
-              <Text style={styles.sectionLabel}>POUR TOI</Text>
-              <View style={styles.pourToiActions}>
-                <Pressable
-                  onPress={() => scrollPourToiBy(-POUR_TOI_SCROLL_STEP)}
-                  hitSlop={6}
-                  style={styles.scrollArrow}
-                >
-                  <Text style={styles.scrollArrowLabel}>‹</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => scrollPourToiBy(POUR_TOI_SCROLL_STEP)}
-                  hitSlop={6}
-                  style={styles.scrollArrow}
-                >
-                  <Text style={styles.scrollArrowLabel}>›</Text>
-                </Pressable>
-                <Pressable onPress={() => router.push('/accueil/histoires-heros')}>
-                  <Text style={styles.seeAll}>Tout voir →</Text>
-                </Pressable>
-              </View>
-            </View>
-            <ScrollView
-              ref={pourToiRef}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              onScroll={onPourToiScroll}
-              scrollEventThrottle={32}
-              contentContainerStyle={styles.pourToiRow}
-            >
-              {pourToi.map((h) => (
-                <Pressable key={h.slug} style={styles.pourToiItem} onPress={() => router.push(`/accueil/heros/${h.slug}`)}>
-                  <HeroPlaceholder style={styles.pourToiThumb} radius={14} imageUrl={h.image_carte_catalogue}>
-                    <AccessBadge type="heros" slug={h.slug} style={{ top: 6, right: 6 }} />
+                <PressableScale onPress={() => router.push(`/accueil/heros/${featured.slug}`)} accessibilityLabel={featured.nom_affiche}>
+                  <HeroPlaceholder style={styles.featured} radius={26} imageUrl={featured.image_carte_catalogue}>
+                    <LinearGradient
+                      colors={['rgba(8,6,4,0)', 'rgba(8,6,4,0.35)', 'rgba(8,6,4,0.95)']}
+                      locations={[0.25, 0.55, 1]}
+                      style={StyleSheet.absoluteFill}
+                    />
+                    <AccessBadge type="heros" slug={featured.slug} style={{ top: 14, right: 14 }} />
+                    <View style={styles.featuredContent}>
+                      {!!featured.theme[0] && (
+                        <View style={styles.chip}>
+                          <Text style={styles.chipText}>{featured.theme[0]}</Text>
+                        </View>
+                      )}
+                      <Text style={styles.featuredTitle}>{featured.nom_affiche}</Text>
+                      <Text style={styles.featuredBlurb} numberOfLines={2}>
+                        {firstSentence(featured.sous_titre)}
+                      </Text>
+                      <View style={styles.readBtn}>
+                        <Text style={styles.readBtnText}>Lire le récit</Text>
+                        <Icon name="arrowRight" size={16} color={colors.ctaTextOnGold} strokeWidth={2.4} />
+                      </View>
+                    </View>
                   </HeroPlaceholder>
-                  <Text style={styles.pourToiName} numberOfLines={2}>
-                    {h.nom_affiche}
+                </PressableScale>
+              </View>
+            )}
+
+            {/* Reprendre */}
+            {reprendreHero && reading && (
+              <PressableScale onPress={() => router.push(`/accueil/heros/${reprendreHero.slug}/recit`)} style={styles.resume}>
+                <HeroPlaceholder style={styles.resumeThumb} radius={14} imageUrl={reprendreHero.image_carte_catalogue} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.resumeLabel}>REPRENDRE · {Math.round(reading.progress * 100)} %</Text>
+                  <Text style={styles.resumeName} numberOfLines={1}>
+                    {reprendreHero.nom_affiche}
                   </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </View>
+                  <View style={styles.track}>
+                    <View style={[styles.fill, { width: `${reading.progress * 100}%` }]} />
+                  </View>
+                </View>
+                <View style={styles.playBtn}>
+                  <Icon name="play" size={16} color={colors.ctaTextOnGold} />
+                </View>
+              </PressableScale>
+            )}
+
+            {/* Héros */}
+            {pourToi.length > 0 && (
+              <RailSection title="Héros à découvrir" actionLabel="Tout voir" onAction={() => router.push('/accueil/histoires-heros')}>
+                {pourToi.map((h) => (
+                  <PressableScale key={h.slug} onPress={() => router.push(`/accueil/heros/${h.slug}`)} accessibilityLabel={h.nom_affiche}>
+                    <HeroPlaceholder style={styles.heroCard} radius={20} imageUrl={h.image_carte_catalogue} fallbackIcon="crown">
+                      <LinearGradient colors={['rgba(8,6,4,0)', 'rgba(8,6,4,0.9)']} locations={[0.45, 1]} style={StyleSheet.absoluteFill} />
+                      <AccessBadge type="heros" slug={h.slug} style={{ top: 8, right: 8 }} />
+                      <View style={styles.cardText}>
+                        <Text style={styles.cardTitle} numberOfLines={2}>
+                          {h.nom_affiche}
+                        </Text>
+                        {!!h.epoque && (
+                          <Text style={styles.cardMeta} numberOfLines={1}>
+                            {h.epoque}
+                          </Text>
+                        )}
+                      </View>
+                    </HeroPlaceholder>
+                  </PressableScale>
+                ))}
+              </RailSection>
+            )}
+
+            {/* Mythes */}
+            {mythes.length > 0 && (
+              <RailSection title="Mythes & légendes" actionLabel="Tout voir" onAction={() => router.push('/accueil/mythologie')}>
+                {mythes.map((m) => (
+                  <PressableScale key={m.slug} onPress={() => router.push(`/accueil/mythologie/${m.slug}`)} accessibilityLabel={m.titre}>
+                    <HeroPlaceholder style={styles.wideCard} radius={20} imageUrl={m.image_url} fallbackIcon="book">
+                      <LinearGradient colors={['rgba(8,6,4,0.1)', 'rgba(8,6,4,0.92)']} locations={[0.2, 1]} style={StyleSheet.absoluteFill} />
+                      <AccessBadge type="mythe" slug={m.slug} style={{ top: 8, right: 8 }} />
+                      <View style={styles.cardText}>
+                        <Text style={styles.cardKicker} numberOfLines={1}>
+                          {m.peuple.split(/[(,]/)[0].trim().toUpperCase()}
+                        </Text>
+                        <Text style={styles.cardTitle} numberOfLines={2}>
+                          {m.titre}
+                        </Text>
+                      </View>
+                    </HeroPlaceholder>
+                  </PressableScale>
+                ))}
+              </RailSection>
+            )}
+
+            {/* Découverte */}
+            {decouvertes.length > 0 && (
+              <RailSection title="À découvrir" actionLabel="Tout voir" onAction={() => router.push('/decouverte')}>
+                {decouvertes.map((it) => (
+                  <PressableScale key={it.slug} onPress={() => router.push(`/decouverte/${it.slug}`)} accessibilityLabel={it.titre}>
+                    <HeroPlaceholder style={styles.squareCard} radius={20} imageUrl={it.image_url} fallbackIcon="compass">
+                      <LinearGradient colors={['rgba(8,6,4,0)', 'rgba(8,6,4,0.9)']} locations={[0.35, 1]} style={StyleSheet.absoluteFill} />
+                      <AccessBadge type="decouverte" slug={it.slug} style={{ top: 8, right: 8 }} />
+                      <View style={styles.cardText}>
+                        <Text style={styles.cardKicker} numberOfLines={1}>
+                          {DECOUVERTE_TYPE_LABEL[it.type].toUpperCase()}
+                        </Text>
+                        <Text style={styles.cardTitle} numberOfLines={2}>
+                          {it.titre}
+                        </Text>
+                      </View>
+                    </HeroPlaceholder>
+                  </PressableScale>
+                ))}
+              </RailSection>
+            )}
+
+            {/* Marché & Soutenir */}
+            <View style={styles.duo}>
+              <PressableScale onPress={() => router.push('/marche')} wrapperStyle={{ flex: 1 }} accessibilityLabel="Marché">
+                <LinearGradient colors={['#3B2A12', '#1A130B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.duoCard}>
+                  <View style={styles.duoIcon}>
+                    <Icon name="store" size={22} color={GOLD} />
+                  </View>
+                  <Text style={styles.duoTitle}>Marché</Text>
+                  <Text style={styles.duoSub}>Artisanat authentique, en direct des artisans</Text>
+                </LinearGradient>
+              </PressableScale>
+              <PressableScale onPress={() => requireAccount(() => router.push('/don'), 'don')} wrapperStyle={{ flex: 1 }} accessibilityLabel="Soutenir AFROBACK">
+                <LinearGradient colors={['#4A2317', '#1A0F0B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.duoCard}>
+                  <View style={[styles.duoIcon, { backgroundColor: 'rgba(227,162,119,.15)' }]}>
+                    <Icon name="heart" size={22} color={colors.terracottaText} />
+                  </View>
+                  <Text style={styles.duoTitle}>Soutenir</Text>
+                  <Text style={styles.duoSub}>Finance les prochains récits et vidéos</Text>
+                </LinearGradient>
+              </PressableScale>
+            </View>
+          </>
         )}
-
-        {/*
-         * La maquette prévoit ici une bannière "ESPACE PARTENAIRE · SPONSORISÉ"
-         * (emplacement publicitaire générique). Volontairement non construite :
-         * aucun partenaire réel n'existe à ce jour, et afficher une bannière
-         * "Emplacement publicitaire" vide serait un faux contenu, contraire à
-         * la règle du projet (jamais un élément qui a l'air fonctionnel sans
-         * l'être). À construire seulement le jour où un vrai partenaire existe.
-         */}
-
-        <Pressable style={styles.marketBanner} onPress={() => router.push('/marche')}>
-          <Text style={styles.marketIcon}>🪘</Text>
-          <View style={styles.marketBody}>
-            <Text style={styles.marketTitle}>Explorer le Marketplace</Text>
-            <Text style={styles.marketSub}>Artisanat authentique, vendu directement par les artisans</Text>
-          </View>
-          <Text style={styles.marketChevron}>›</Text>
-        </Pressable>
-
-        <Pressable style={styles.mythBanner} onPress={() => router.push('/accueil/mythologie')}>
-          <Text style={styles.mythIcon}>📖</Text>
-          <View style={styles.mythBody}>
-            <Text style={styles.mythTitle}>Découvrir la mythologie africaine</Text>
-            <Text style={styles.mythSub}>5 mythes fondateurs, par peuple — lire, écouter, BD</Text>
-          </View>
-          <Text style={styles.mythChevron}>›</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.donBanner}
-          onPress={() => requireAccount(() => router.push('/don'), 'don')}
-        >
-          <Text style={styles.donIcon}>🙏</Text>
-          <View style={styles.donBody}>
-            <Text style={styles.donTitle}>Soutenir AFROBACK</Text>
-            <Text style={styles.donSub}>Aide à financer les prochains récits, audios et vidéos</Text>
-          </View>
-          <Text style={styles.donChevron}>›</Text>
-        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+function HomeSkeleton() {
+  return (
+    <SkeletonScreen>
+      <Bone style={{ height: 22, width: 160, marginTop: 28, marginBottom: 12, borderRadius: 8 }} />
+      <Bone style={{ height: 380, borderRadius: 26 }} />
+      <Bone style={{ height: 22, width: 190, marginTop: 28, marginBottom: 12, borderRadius: 8 }} />
+      <View style={{ flexDirection: 'row', gap: 14 }}>
+        <Bone style={{ width: 150, height: 210, borderRadius: 20 }} />
+        <Bone style={{ width: 150, height: 210, borderRadius: 20 }} />
+        <Bone style={{ width: 150, height: 210, borderRadius: 20 }} />
+      </View>
+    </SkeletonScreen>
+  );
+}
+
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    paddingHorizontal: spacing.md + 2,
-    paddingTop: 6,
-    paddingBottom: 30,
-  },
-  header: {
-    flexDirection: 'row',
+  safe: { flex: 1, backgroundColor: '#0B0906' },
+  scroll: { paddingHorizontal: 18, paddingTop: 8, paddingBottom: 36 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 6, marginBottom: 18 },
+  greeting: { fontFamily: typography.body, fontSize: 14, color: colors.textMuted },
+  name: { fontFamily: typography.display, fontSize: 26, color: colors.textHeading, marginTop: 2 },
+  avatarRing: { padding: 2.5, borderRadius: 999, borderWidth: 2, borderColor: GOLD },
+  guestAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 18,
-  },
-  greeting: {
-    fontFamily: typography.body,
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  name: {
-    fontFamily: typography.displayExtraBold,
-    fontSize: 19,
-    letterSpacing: 1,
-    color: colors.textPrimary,
-    marginTop: 2,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.12)',
   },
   search: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.placeholderStripeDark,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 26,
-  },
-  searchIcon: {
-    fontSize: 13,
-    opacity: 0.7,
-  },
-  searchPlaceholder: {
-    fontFamily: typography.body,
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  donBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: 12,
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: colors.terracottaBorder,
-    backgroundColor: colors.terracottaBg,
+    borderColor: 'rgba(237,227,212,.12)',
+    backgroundColor: 'rgba(26,19,13,.95)',
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 26,
+    paddingVertical: 15,
   },
-  donIcon: {
-    fontSize: 20,
-  },
-  donBody: {
-    flex: 1,
-  },
-  donTitle: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 13.5,
-    color: colors.textPrimary,
-  },
-  donSub: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  donChevron: {
-    fontSize: 18,
-    color: colors.terracottaTextAlt,
-  },
-  mythBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.accentGold,
-    backgroundColor: colors.placeholderStripeDark,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 26,
-  },
-  mythIcon: {
-    fontSize: 20,
-  },
-  mythBody: {
-    flex: 1,
-  },
-  mythTitle: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 13.5,
-    color: colors.textPrimary,
-  },
-  mythSub: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  mythChevron: {
-    fontSize: 18,
-    color: colors.accentGold,
-  },
-  marketBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.placeholderStripeDark,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 14,
-  },
-  marketIcon: {
-    fontSize: 20,
-  },
-  marketBody: {
-    flex: 1,
-  },
-  marketTitle: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 13.5,
-    color: colors.textPrimary,
-  },
-  marketSub: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  marketChevron: {
-    fontSize: 18,
-    color: colors.accentGold,
-  },
-  pourToiActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  scrollArrow: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
+  searchPlaceholder: { fontFamily: typography.body, fontSize: 14.5, color: colors.textMuted },
+  pillars: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 18 },
+  pillar: { alignItems: 'center', gap: 8, width: 76 },
+  pillarIcon: {
+    width: 58,
+    height: 58,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  scrollArrowLabel: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 13,
-    color: colors.accentGold,
-  },
-  section: {
-    marginBottom: 26,
-  },
-  sectionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  sectionLabel: {
-    fontFamily: typography.mono,
-    fontSize: 10.5,
-    letterSpacing: 1.8,
-    color: colors.accentGoldSoft,
-    marginBottom: 12,
-  },
-  sectionPercent: {
-    fontFamily: typography.mono,
-    fontSize: 11,
-    color: colors.textMuted,
-  },
-  seeAll: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 12,
-    color: colors.accentGold,
-  },
-  featuredCard: {
-    height: 230,
-    justifyContent: 'flex-end',
-  },
-  featuredContent: {
-    padding: 18,
-    gap: 8,
-  },
-  featuredTitle: {
-    fontFamily: typography.displayExtraBold,
-    fontSize: 24,
-    color: colors.textHeading,
-  },
-  featuredBlurb: {
-    fontFamily: typography.body,
-    fontSize: 12.5,
-    lineHeight: 18,
-    color: colors.textBodyAlt,
-  },
-  resumeCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderRadius: 16,
+    backgroundColor: 'rgba(240,195,107,.10)',
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.placeholderStripeDark,
-    padding: 12,
+    borderColor: 'rgba(240,195,107,.22)',
   },
-  resumeThumb: {
-    width: 48,
-    height: 48,
+  pillarLabel: { fontFamily: typography.bodySemiBold, fontSize: 12.5, color: colors.textPrimary },
+  dayHeader: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 28, marginBottom: 12 },
+  sectionTitle: { fontFamily: typography.display, fontSize: 19, color: colors.textHeading },
+  dayDate: { fontFamily: typography.body, fontSize: 12.5, color: colors.textMuted },
+  featured: { height: 400, borderWidth: 1, borderColor: 'rgba(240,195,107,.25)' },
+  featuredContent: { position: 'absolute', left: 20, right: 20, bottom: 20 },
+  chip: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: 'rgba(240,195,107,.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.4)',
+    marginBottom: 10,
   },
-  resumeBody: {
-    flex: 1,
-    gap: 4,
+  chipText: { fontFamily: typography.bodyBold, fontSize: 11, color: colors.accentGoldPale, letterSpacing: 0.5 },
+  featuredTitle: { fontFamily: typography.display, fontSize: 30, lineHeight: 34, color: '#FFF4E0' },
+  featuredBlurb: { fontFamily: typography.body, fontSize: 14.5, lineHeight: 21, color: 'rgba(255,244,224,.82)', marginTop: 6 },
+  readBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 8,
+    marginTop: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 11,
+    borderRadius: 999,
+    backgroundColor: GOLD,
   },
-  resumeName: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  resumeSub: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-  },
-  resumeTrack: {
-    height: 3,
-    borderRadius: 6,
-    backgroundColor: colors.placeholderStripeLight,
-    overflow: 'hidden',
-    marginTop: 4,
-  },
-  resumeFill: {
-    height: '100%',
-    backgroundColor: colors.accentGold,
-  },
-  pourToiRow: {
+  readBtnText: { fontFamily: typography.bodyBold, fontSize: 14, color: colors.ctaTextOnGold },
+  resume: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 14,
-    paddingRight: 8,
+    marginTop: 16,
+    padding: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(237,227,212,.10)',
+    backgroundColor: 'rgba(26,19,13,.95)',
   },
-  pourToiItem: {
-    width: 120,
+  resumeThumb: { width: 58, height: 58 },
+  resumeLabel: { fontFamily: typography.mono, fontSize: 10, letterSpacing: 1, color: colors.accentGoldSoft },
+  resumeName: { fontFamily: typography.bodyBold, fontSize: 15, color: colors.textPrimary, marginTop: 3 },
+  track: { height: 4, borderRadius: 2, backgroundColor: 'rgba(237,227,212,.1)', marginTop: 8, overflow: 'hidden' },
+  fill: { height: 4, borderRadius: 2, backgroundColor: GOLD },
+  playBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: GOLD, alignItems: 'center', justifyContent: 'center' },
+  heroCard: { width: 150, height: 210, borderWidth: 0 },
+  wideCard: { width: 250, height: 160, borderWidth: 0 },
+  squareCard: { width: 170, height: 170, borderWidth: 0 },
+  cardText: { position: 'absolute', left: 12, right: 12, bottom: 12 },
+  cardKicker: { fontFamily: typography.mono, fontSize: 9.5, letterSpacing: 1, color: colors.accentGoldPale, marginBottom: 3 },
+  cardTitle: { fontFamily: typography.bodyBold, fontSize: 15, lineHeight: 19, color: '#FFF4E0' },
+  cardMeta: { fontFamily: typography.body, fontSize: 11.5, color: 'rgba(255,244,224,.7)', marginTop: 3 },
+  duo: { flexDirection: 'row', gap: 12, marginTop: 30 },
+  duoCard: {
+    borderRadius: 22,
+    padding: 16,
+    minHeight: 150,
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.18)',
   },
-  pourToiThumb: {
-    height: 110,
+  duoIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.12)',
   },
-  pourToiName: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 12,
-    color: colors.textPrimary,
-    marginTop: 8,
-  },
+  duoTitle: { fontFamily: typography.display, fontSize: 18, color: colors.textHeading, marginTop: 14 },
+  duoSub: { fontFamily: typography.body, fontSize: 12.5, lineHeight: 18, color: colors.textMuted, marginTop: 4 },
 });

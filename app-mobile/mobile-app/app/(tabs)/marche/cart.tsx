@@ -7,6 +7,7 @@ import { useCart } from '../../../src/marketplace/CartProvider';
 import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
+import { Icon } from '../../../src/components/Icons';
 
 /** Panier — fidèle à design-reference-marketplace.dc.excerpt.html (section CART). Livraison à 0 FCFA tant qu'aucune grille de frais de port n'est définie (aucun frais inventé). */
 function CartScreen() {
@@ -18,7 +19,7 @@ function CartScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.title}>Panier</Text>
         </View>

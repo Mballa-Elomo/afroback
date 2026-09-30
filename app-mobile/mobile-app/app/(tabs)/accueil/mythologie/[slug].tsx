@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,6 +14,10 @@ import { colors, spacing, typography } from '../../../../src/theme/tokens';
 import { useRequireAccount } from '../../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../../src/access/Access';
 import { useI18n } from '../../../../src/i18n';
+import { Icon, type IconName } from '../../../../src/components/Icons';
+import { BackButton } from '../../../../src/ui/modern';
+import { CommentsSection } from '../../../../src/comments/CommentsSection';
+import { ContentActions } from '../../../../src/stats/ContentActions';
 
 type Onglet = 'lire' | 'ecouter' | 'regarder';
 type Langue = 'fr' | 'en';
@@ -43,6 +48,9 @@ export default function MytheDetailScreen() {
   const [chapitreIdx, setChapitreIdx] = useState(0);
   const [langue, setLangue] = useState<Langue>('fr');
   const recitLoggedRef = useRef<string | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const bodyY = useRef(0);
+  const commentsY = useRef(0);
 
   // Engagement réel (lecture du récit) : une fois par ouverture de ce mythe
   // — même principe que recordHeroEngagement('recit') côté héros (recit.tsx),
@@ -79,6 +87,7 @@ export default function MytheDetailScreen() {
         imageUrl={mythe.image_url}
         apercu={(lang === 'en' && mythe.acces.apercu_en ? mythe.acces.apercu_en : mythe.acces.apercu_fr)}
         reason="mythe"
+        footer={<CommentsSection type="mythe" slug={mythe.slug} />}
       />
     );
   }
@@ -94,10 +103,10 @@ export default function MytheDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.cover}>
           {mythe.image_url ? (
-            <Image source={{ uri: mythe.image_url }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+            <Image source={{ uri: mythe.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="memory-disk" />
           ) : (
             <LinearGradient
               colors={[colors.placeholderStripeLight, colors.placeholderStripeDark]}
@@ -107,13 +116,13 @@ export default function MytheDetailScreen() {
             />
           )}
           <LinearGradient
-            colors={['rgba(15,11,8,0.15)', 'rgba(15,11,8,0.1)', colors.background]}
-            locations={[0, 0.4, 1]}
+            colors={['rgba(11,9,6,0.45)', 'rgba(11,9,6,0)', 'rgba(11,9,6,0.55)', '#0B0906']}
+            locations={[0, 0.25, 0.65, 1]}
             style={StyleSheet.absoluteFill}
           />
-          <Pressable onPress={() => router.back()} hitSlop={10} style={styles.backButton}>
-            <Text style={styles.backIcon}>‹</Text>
-          </Pressable>
+          <View style={styles.backButton}>
+            <BackButton onPress={() => router.back()} floating />
+          </View>
           <View style={styles.coverContent}>
             <View style={styles.tag}>
               <Text style={styles.tagLabel}>{mythe.peuple.split(/[,(]/)[0].trim().toUpperCase()}</Text>
@@ -122,20 +131,17 @@ export default function MytheDetailScreen() {
           </View>
         </View>
 
-        <View style={styles.body}>
+        <View style={styles.body} onLayout={(e) => (bodyY.current = e.nativeEvent.layout.y)}>
+          <ContentActions
+            type="mythe"
+            slug={mythe.slug}
+            title={mythe.titre}
+            onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
+          />
           <View style={styles.tabs}>
-            <Pressable onPress={() => setOnglet('lire')} style={[styles.tab, onglet === 'lire' && styles.tabActive]}>
-              <Text style={[styles.tabLabel, onglet === 'lire' && styles.tabLabelActive]}>Lire</Text>
-            </Pressable>
-            <Pressable onPress={() => requireAccount(() => setOnglet('ecouter'), 'audio')} style={[styles.tab, onglet === 'ecouter' && styles.tabActive]}>
-              <Text style={[styles.tabLabel, onglet === 'ecouter' && styles.tabLabelActive]}>▶ Écouter</Text>
-            </Pressable>
-            <Pressable onPress={() => requireAccount(() => setOnglet('regarder'), 'video')} style={[styles.tab, onglet === 'regarder' && styles.tabActive]}>
-              <Text style={[styles.tabLabel, onglet === 'regarder' && styles.tabLabelActive]}>🎬 Regarder</Text>
-            </Pressable>
-            <Pressable onPress={openBd} style={styles.tabBd}>
-              <Text style={styles.tabLabel}>📖</Text>
-            </Pressable>
+            <Tab icon="book" label="Lire" active={onglet === 'lire'} onPress={() => setOnglet('lire')} />
+            <Tab icon="play" label="Écouter" active={onglet === 'ecouter'} onPress={() => requireAccount(() => setOnglet('ecouter'), 'audio')} />
+            <Tab icon="sparkle" label="Regarder" active={onglet === 'regarder'} onPress={() => requireAccount(() => setOnglet('regarder'), 'video')} />
           </View>
 
           {onglet === 'lire' && chapitreActuel && (
@@ -181,12 +187,12 @@ export default function MytheDetailScreen() {
               {estDernier && (
                 <>
                   <Pressable onPress={openBd} style={styles.reReadCard}>
-                    <Text style={styles.reReadIcon}>📖</Text>
+                    <Icon name="book" size={22} color={colors.accentGoldBright} />
                     <View style={styles.reReadBody}>
                       <Text style={styles.reReadTitle}>Revivre en BD</Text>
                       <Text style={styles.reReadSub}>Le mythe en images</Text>
                     </View>
-                    <Text style={styles.reReadChevron}>›</Text>
+                    <Icon name="chevronRight" size={16} color={colors.accentGold} strokeWidth={2.2} />
                   </Pressable>
 
                   {mythe.sources.length > 0 && (
@@ -212,6 +218,9 @@ export default function MytheDetailScreen() {
 
           {onglet === 'ecouter' && <EcouterTab mythe={mythe} />}
           {onglet === 'regarder' && <RegarderTab mythe={mythe} chapitres={chapitres} />}
+          <View onLayout={(e) => (commentsY.current = e.nativeEvent.layout.y)}>
+            <CommentsSection type="mythe" slug={mythe.slug} />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -361,7 +370,7 @@ function RegarderTab({ mythe, chapitres }: { mythe: Mythe; chapitres: { numero: 
       ) : (
         <View style={styles.audioCenter}>
           <View style={styles.audioPlaceholder}>
-            <Text style={styles.audioPlaceholderIcon}>🎬</Text>
+            <Icon name="sparkle" size={34} color={colors.accentGoldSoft} />
           </View>
           <Text style={styles.audioMissingText}>
             {chapitreActuel ? `Le chapitre ${chapitreActuel.numero} n'est pas encore tourné.` : "Aucune vidéo n'est encore tournée pour ce mythe."} En
@@ -373,10 +382,20 @@ function RegarderTab({ mythe, chapitres }: { mythe: Mythe; chapitres: { numero: 
   );
 }
 
+/** Onglet en pastille (Lire / Écouter / Regarder), icône + libellé, doré quand actif. */
+function Tab({ icon, label, active, onPress }: { icon: IconName; label: string; active: boolean; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} style={[styles.tab, active && styles.tabActive]} accessibilityRole="tab" accessibilityState={{ selected: active }}>
+      <Icon name={icon} size={15} color={active ? colors.ctaTextOnGold : colors.accentGoldPale} strokeWidth={2.2} />
+      <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{label}</Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#0B0906',
   },
   scroll: {
     paddingBottom: 40,
@@ -438,22 +457,14 @@ const styles = StyleSheet.create({
     color: colors.accentGold,
   },
   cover: {
-    height: 230,
+    height: 380,
     overflow: 'hidden',
     backgroundColor: colors.placeholderStripeDark,
   },
   backButton: {
     position: 'absolute',
     top: 12,
-    left: 14,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
+    left: 16,
     zIndex: 5,
   },
   backIcon: {
@@ -469,23 +480,24 @@ const styles = StyleSheet.create({
   tag: {
     alignSelf: 'flex-start',
     borderWidth: 1,
-    borderColor: colors.terracottaTextAlt,
+    borderColor: 'rgba(240,195,107,.4)',
+    backgroundColor: 'rgba(8,6,4,.55)',
     borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginBottom: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginBottom: 10,
   },
   tagLabel: {
-    fontFamily: typography.mono,
-    fontSize: 9.5,
-    letterSpacing: 1,
-    color: colors.terracottaTextAlt,
+    fontFamily: typography.bodySemiBold,
+    fontSize: 11,
+    letterSpacing: 0.6,
+    color: colors.accentGoldPale,
   },
   title: {
     fontFamily: typography.display,
-    fontSize: 23,
-    fontWeight: '700',
-    color: colors.textHeading,
+    fontSize: 30,
+    lineHeight: 34,
+    color: '#FFF4E0',
   },
   body: {
     paddingHorizontal: spacing.md + 2,
@@ -498,15 +510,19 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
     paddingVertical: 11,
-    borderRadius: 12,
+    borderRadius: 999,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(237,227,212,.14)',
+    backgroundColor: 'rgba(26,19,13,.95)',
   },
   tabActive: {
-    backgroundColor: colors.cardBg,
-    borderColor: colors.accentGold,
+    backgroundColor: colors.accentGoldBright,
+    borderColor: colors.accentGoldBright,
   },
   tabBd: {
     paddingVertical: 11,
@@ -522,7 +538,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   tabLabelActive: {
-    color: colors.accentGold,
+    color: colors.ctaTextOnGold,
   },
   readerHeader: {
     flexDirection: 'row',

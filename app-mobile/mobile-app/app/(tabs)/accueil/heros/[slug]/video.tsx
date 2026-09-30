@@ -14,6 +14,8 @@ import type { Heros } from '../../../../../src/data/types';
 import { withAccount } from '../../../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../../../src/access/Access';
 import { useI18n } from '../../../../../src/i18n';
+import { CommentsSection } from '../../../../../src/comments/CommentsSection';
+import { Icon } from '../../../../../src/components/Icons';
 
 /**
  * Lecteur vidéo plein écran. Dès qu'une URL de documentaire existe
@@ -82,6 +84,7 @@ function LecteurVideoScreen() {
         imageUrl={heros.image_carte_catalogue}
         apercu={(lang === 'en' && heros.acces.apercu_en ? heros.acces.apercu_en : heros.acces.apercu_fr)}
         reason="heros"
+        footer={<CommentsSection type="heros" slug={heros.slug} />}
       />
     );
   }
@@ -169,8 +172,8 @@ function LecteurVideoScreen() {
             <View style={styles.missingBanner}>
               <Text style={styles.missingText}>
                 {hasChapterVideos
-                  ? `🎬 Ce chapitre n'est pas encore tourné — voici son storyboard en avant-goût, planche par planche. ${videoChapitres.length}/${storyboardChapitres.length} chapitre${videoChapitres.length > 1 ? 's' : ''} déjà tourné${videoChapitres.length > 1 ? 's' : ''}.`
-                  : "🎬 Le documentaire n'est pas encore tourné — voici le storyboard complet en avant-goût, planche par planche."}
+                  ? `Ce chapitre n'est pas encore tourné — voici son storyboard en avant-goût, planche par planche. ${videoChapitres.length}/${storyboardChapitres.length} chapitre${videoChapitres.length > 1 ? 's' : ''} déjà tourné${videoChapitres.length > 1 ? 's' : ''}.`
+                  : "Le documentaire n'est pas encore tourné — voici le storyboard complet en avant-goût, planche par planche."}
               </Text>
             </View>
           )}
@@ -182,9 +185,12 @@ function LecteurVideoScreen() {
               <GhostButton label="Lire l'histoire" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
             </View>
             <View style={styles.actionsHalf}>
-              <OutlineButton label="▶ Écouter" onPress={() => router.push(`/accueil/heros/${heros.slug}/audio`)} />
+              <OutlineButton label="Écouter" onPress={() => router.push(`/accueil/heros/${heros.slug}/audio`)} />
             </View>
           </View>
+
+          {/* Même fil que la fiche du héros : une vidéo = un seul fil, comme YouTube. */}
+          <CommentsSection type="heros" slug={heros.slug} />
 
           {related.length > 0 && (
             <View style={styles.related}>

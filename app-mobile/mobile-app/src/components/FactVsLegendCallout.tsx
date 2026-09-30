@@ -35,11 +35,11 @@ export function CitationCard({ citation }: { citation: Citation }) {
   );
 }
 
-export function CitationsSection({ citations }: { citations: Citation[] }) {
+export function CitationsSection({ citations, bare = false }: { citations: Citation[]; /** Sans titre ni marge (dans une section repliable). */ bare?: boolean }) {
   if (citations.length === 0) return null;
   return (
-    <View style={styles.section}>
-      <SectionTitle title="Citations marquantes" />
+    <View style={bare ? undefined : styles.section}>
+      {!bare && <SectionTitle title="Citations marquantes" />}
       {citations.map((c, i) => (
         <CitationCard key={i} citation={c} />
       ))}
@@ -47,11 +47,11 @@ export function CitationsSection({ citations }: { citations: Citation[] }) {
   );
 }
 
-export function LegendesSection({ legendes }: { legendes: LegendeAssociee[] }) {
+export function LegendesSection({ legendes, bare = false }: { legendes: LegendeAssociee[]; /** Sans titre ni marge (dans une section repliable). */ bare?: boolean }) {
   if (legendes.length === 0) return null;
   return (
-    <View style={styles.section}>
-      <SectionTitle title="Légendes associées" />
+    <View style={bare ? undefined : styles.section}>
+      {!bare && <SectionTitle title="Légendes associées" />}
       {legendes.map((l, i) => (
         <LegendCard key={i} legende={l} />
       ))}

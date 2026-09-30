@@ -8,6 +8,7 @@ import { getAllLecons, getLeconResultats } from '../../../src/data/ecoleReposito
 import type { EcoleLecon, EnfantLeconResultat } from '../../../src/data/ecoleTypes';
 import { LoadingState } from '../../../src/components/LoadingState';
 import { colors, typography } from '../../../src/theme/tokens';
+import { Icon } from '../../../src/components/Icons';
 
 /**
  * Collection — fidèle dans l'esprit à
@@ -77,7 +78,7 @@ export default function EcoleCollectionScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.title}>Ma collection</Text>
         </View>

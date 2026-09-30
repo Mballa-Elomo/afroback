@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +8,10 @@ import { TimelineList } from '../../../../../src/components/TimelineList';
 import { CitationsSection, LegendesSection } from '../../../../../src/components/FactVsLegendCallout';
 import { RelatedHeroes } from '../../../../../src/components/RelatedHeroes';
 import { SourcesList } from '../../../../../src/components/SourcesList';
-import { GoldButton, OutlineButton } from '../../../../../src/components/Buttons';
+import { PremiumButton } from '../../../../../src/components/Buttons';
+import { ActionTile, Collapsible } from '../../../../../src/ui/modern';
+import { CommentsSection } from '../../../../../src/comments/CommentsSection';
+import { ContentActions } from '../../../../../src/stats/ContentActions';
 import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
 import { useHero, useRelatedHeroes } from '../../../../../src/data/useHeroesData';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
@@ -23,6 +27,9 @@ export default function FicheHerosScreen() {
   const herosState = useHero(slug);
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
   const related = useRelatedHeroes(heros);
+  const scrollRef = useRef<ScrollView>(null);
+  const commentsY = useRef(0);
+  const bodyY = useRef(0);
 
   if (herosState.status === 'loading') {
     return (
@@ -44,10 +51,16 @@ export default function FicheHerosScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <HeroHeader heros={heros} onBack={() => router.back()} />
 
-        <View style={styles.body}>
+        <View style={styles.body} onLayout={(e) => (bodyY.current = e.nativeEvent.layout.y)}>
+          <ContentActions
+            type="heros"
+            slug={heros.slug}
+            title={heros.nom_affiche}
+            onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
+          />
           {heros.avertissement_lecture && <WarningBanner text={heros.avertissement_lecture} />}
 
           {heros.acces?.verrouille ? (
@@ -57,28 +70,56 @@ export default function FicheHerosScreen() {
             </>
           ) : (
             <>
+              <PremiumButton label="Lire le récit" icon="book" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
               <View style={styles.actions}>
-                <View style={styles.goldFlex}>
-                  <GoldButton label="Lire le récit" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
-                </View>
-                <OutlineButton
-                  label={heros.statut_narration_audio === 'pret' ? '▶ Écouter' : '▶ Écouter'}
+                <ActionTile
+                  icon="play"
+                  label="Écouter"
+                  hint={heros.statut_narration_audio === 'pret' ? 'Narration audio' : 'Bientôt'}
                   onPress={() => requireAccount(() => router.push(`/accueil/heros/${heros.slug}/audio`), 'audio')}
                 />
-                <OutlineButton
-                  label={heros.statut_video === 'pret' ? '▷ Regarder' : '▷ Regarder'}
+                <ActionTile
+                  icon="sparkle"
+                  label="Regarder"
+                  hint={heros.statut_video === 'pret' ? 'Vidéo' : 'Storyboard'}
                   onPress={() => requireAccount(() => router.push(`/accueil/heros/${heros.slug}/video`), 'video')}
                 />
               </View>
 
               <Text style={styles.resume}>{heros.resume_catalogue}</Text>
 
-              <TimelineList evenements={heros.frise_chronologique} />
-              <SourcesList sources={heros.sources} />
-              <CitationsSection citations={heros.citations} />
-              <LegendesSection legendes={heros.legendes_associees} />
+              {/* Sections secondaires repliées par défaut (cdc-commentaires.md §2). */}
+              {heros.frise_chronologique.length > 0 && (
+                <Collapsible
+                  icon="compass"
+                  title="Frise chronologique"
+                  count={`${heros.frise_chronologique.length} dates`}
+                  preview={`${heros.frise_chronologique[0].date} · ${heros.frise_chronologique[0].evenement}`}
+                >
+                  <TimelineList evenements={heros.frise_chronologique} bare />
+                </Collapsible>
+              )}
+              {heros.citations.length > 0 && (
+                <Collapsible icon="chat" title="Citations marquantes" count={`${heros.citations.length}`} preview={`« ${heros.citations[0].texte} »`}>
+                  <CitationsSection citations={heros.citations} bare />
+                </Collapsible>
+              )}
+              {heros.legendes_associees.length > 0 && (
+                <Collapsible icon="sparkle" title="Légendes associées" count={`${heros.legendes_associees.length}`} preview={heros.legendes_associees[0].titre}>
+                  <LegendesSection legendes={heros.legendes_associees} bare />
+                </Collapsible>
+              )}
+              {heros.sources.length > 0 && (
+                <Collapsible icon="book" title="Sources" count={`${heros.sources.length}`} preview={heros.sources[0]}>
+                  <SourcesList sources={heros.sources} bare />
+                </Collapsible>
+              )}
             </>
           )}
+
+          <View onLayout={(e) => (commentsY.current = e.nativeEvent.layout.y)}>
+            <CommentsSection type="heros" slug={heros.slug} />
+          </View>
           <RelatedHeroes heroes={related} title="De la même époque" />
         </View>
       </ScrollView>
@@ -89,7 +130,7 @@ export default function FicheHerosScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#0B0906',
   },
   content: {
     paddingBottom: spacing.xl,
@@ -100,15 +141,13 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: spacing.md + 4,
-  },
-  goldFlex: {
-    flex: 1,
+    marginTop: 12,
+    marginBottom: spacing.lg,
   },
   resume: {
     fontFamily: typography.body,
-    fontSize: 14.5,
-    lineHeight: 24,
+    fontSize: 15.5,
+    lineHeight: 25,
     color: colors.textBody,
     marginBottom: spacing.lg,
   },

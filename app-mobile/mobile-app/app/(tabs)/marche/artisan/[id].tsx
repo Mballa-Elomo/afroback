@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeroPlaceholder } from '../../../../src/components/HeroVisual';
@@ -9,6 +10,7 @@ import { ErrorState, LoadingState } from '../../../../src/components/LoadingStat
 import { getProductRatingSummaries, getProductsByVendor, getVendorPublicById } from '../../../../src/data/marketplaceRepository';
 import type { MarketplaceProduct, MarketplaceVendorPublic } from '../../../../src/data/marketplaceTypes';
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
+import { Icon } from '../../../../src/components/Icons';
 
 type State =
   | { status: 'loading' }
@@ -74,18 +76,18 @@ export default function ArtisanProfileScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.banner}>
           <Pressable onPress={() => router.back()} style={[styles.backBtn, { top: insets.top + 8 }]} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
         </View>
         <View style={styles.body}>
           {vendor.avatar_url ? (
-            <Image source={{ uri: vendor.avatar_url }} style={styles.avatar} />
+            <Image source={{ uri: vendor.avatar_url }} style={styles.avatar} cachePolicy="memory-disk" />
           ) : (
             <View style={styles.avatarPlaceholder} />
           )}
           <Text style={styles.name}>{vendor.nom_boutique}</Text>
           <Text style={styles.meta}>
-            📍 {vendor.region} · {vendor.artisanat}
+            {vendor.region} · {vendor.artisanat}
           </Text>
 
           <View style={styles.statsRow}>

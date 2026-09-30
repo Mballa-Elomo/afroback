@@ -8,6 +8,7 @@ import { createChildProfile } from '../../src/data/parentEnfantRepository';
 import type { AvatarCouleur, LangueCamerounaise } from '../../src/data/parentEnfantTypes';
 import { GoldButton } from '../../src/components/Buttons';
 import { colors, radii, spacing, typography } from '../../src/theme/tokens';
+import { Icon } from '../../src/components/Icons';
 
 const LANGUES: { id: LangueCamerounaise; label: string }[] = [
   { id: 'ewondo', label: 'Ewondo' },
@@ -65,7 +66,7 @@ export default function AjouterProfilEnfantScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
-          <Text style={styles.back}>‹</Text>
+          <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
         </Pressable>
         <Text style={styles.title}>Ajoute ton enfant</Text>
         <Text style={styles.subtitle}>Un profil dédié, sans mot de passe séparé — l'enfant choisit juste son avatar dans le sélecteur.</Text>

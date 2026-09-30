@@ -1,6 +1,6 @@
 # Cahier des charges — Édition du profil (photo, informations)
 
-> Rédigé le 2026-09-26, avant tout développement. À valider par Yannick avant de passer aux devs.
+> Rédigé le 2026-09-26. **Développé le 2026-09-30** après validation de Yannick (voir §7), vérifié (typage, `expo-doctor` 18/18, export web) et publié sur le lien de test. Non testé en réel.
 
 ## 1. Constat actuel (vérifié dans le code)
 
@@ -54,3 +54,12 @@ Hors scope de cet écran (mais mentionné pour trancher) :
 1. **Confirmer le découpage** : un écran "Modifier le profil" (infos + photo) séparé d'un écran "Sécurité" (déjà là pour le MFA, à qui on ajoute le changement de mot de passe) ?
 2. **Changement de mot de passe** : à inclure dans ce chantier, ou à traiter plus tard avec `cdc-mot-de-passe-oublie.md` (les deux touchent au mot de passe, pourraient être développés ensemble) ?
 3. **Changement de numéro de téléphone** : confirmé hors scope, ou à ajouter à la liste des 4 chantiers ?
+
+## 7. Décisions de Yannick et réalisation (2026-09-30)
+
+Le cahier datait d'avant la refonte de l'inscription (pseudo + photo/avatar ajoutés le 2026-09-29 dans `community_profiles`) : l'écran réutilise donc ce profil communautaire au lieu d'un nouveau champ `avatar_url` dans les métadonnées.
+
+- **Contenu retenu : complet** — photo ou avatar et pseudo (profil communautaire, vérification de disponibilité en direct), prénom (obligatoire), pays (code ISO dans `user_metadata.pays`, Cameroun proposé par défaut car jamais demandé à l'inscription), usages ("Découvrir mes racines" toujours actif). Un seul bouton Enregistrer. Écran `app/profil/modifier.tsx`.
+- **Changer mon mot de passe : inclus** — `app/profil/mot-de-passe.tsx`, mot de passe actuel revérifié sur un client Supabase jetable (la session de l'app n'est pas touchée), même anti-force brute que la connexion, même règle de mot de passe qu'à l'inscription, puis déconnexion des autres appareils et retrait de leur confiance (règle D3 de `cdc-appareil-unique.md`).
+- **Email / téléphone : plus tard** (chantier à part, revérification du nouvel identifiant nécessaire).
+- Écran Profil refait : vraie photo/avatar, pseudo, bouton "Modifier le profil", ligne "Changer mon mot de passe", textes traduits FR/EN.

@@ -9,6 +9,7 @@ import type { Heros } from '../../../../src/data/types';
 import { GoldButton } from '../../../../src/components/Buttons';
 import { LoadingState } from '../../../../src/components/LoadingState';
 import { colors, typography } from '../../../../src/theme/tokens';
+import { Icon } from '../../../../src/components/Icons';
 
 const FORMATS: { id: EcoleFormat; icon: string; label: string }[] = [
   { id: 'lire', icon: '📖', label: 'Lire' },
@@ -83,7 +84,7 @@ export default function EcoleLeconScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.cover}>
           <Pressable onPress={() => router.back()} hitSlop={10} style={styles.backButton}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <View style={styles.coverContent}>
             <Text style={styles.heroName}>{heros?.nom_affiche ?? 'Héros'}</Text>

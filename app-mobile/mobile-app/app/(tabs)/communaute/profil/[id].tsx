@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeroPlaceholder } from '../../../../src/components/HeroVisual';
@@ -8,6 +9,7 @@ import { getPostsByAuthor, getPublicProfileById } from '../../../../src/data/com
 import type { CommunityPost, CommunityProfilePublic } from '../../../../src/data/communityTypes';
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
 import { ProfileAvatar, presetKey } from '../../../../src/components/ProfileAvatar';
+import { Icon } from '../../../../src/components/Icons';
 
 type State =
   | { status: 'loading' }
@@ -67,14 +69,14 @@ export default function MemberProfileScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Pressable onPress={() => router.back()} hitSlop={10} style={styles.back}>
-          <Text style={styles.backIcon}>‹</Text>
+          <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
         </Pressable>
 
         <View style={styles.header}>
           {presetKey(profile.avatar_url) ? (
             <ProfileAvatar value={profile.avatar_url} size={80} />
           ) : profile.avatar_url ? (
-            <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
+            <Image source={{ uri: profile.avatar_url }} style={styles.avatar} cachePolicy="memory-disk" />
           ) : (
             <HeroPlaceholder style={styles.avatar} radius={40} />
           )}

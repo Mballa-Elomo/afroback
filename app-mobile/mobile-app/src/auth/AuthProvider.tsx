@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { AppState } from 'react-native';
-import { supabase } from '../data/supabaseClient';
+import { createVerificationClient, supabase } from '../data/supabaseClient';
 import { getDeviceId, getDeviceName } from '../security/device';
-import i18n, { currentLanguage } from '../i18n';
+import i18n, { currentLanguage, setAppLanguage } from '../i18n';
 import { LEGAL_VERSION } from '../legal/documents';
 
 /**
@@ -105,6 +105,12 @@ interface AuthState {
   enterGuestMode: () => void;
   exitGuestMode: () => void;
   completeOnboarding: (choices: OnboardingChoices) => Promise<{ error: string | null }>;
+  /** "Modifier le profil" : prénom, pays (code ISO), usages, dans les métadonnées du compte. */
+  updateAccountInfo: (info: { prenom: string; pays: string | null; usages: string[] }) => Promise<{ error: string | null }>;
+  /** Langue de l'interface choisie depuis le Profil : mémorisée sur l'appareil et dans le compte. */
+  updateLanguage: (lang: 'fr' | 'en') => Promise<void>;
+  /** Changement de mot de passe connecté : revérifie l'actuel, puis déconnecte les autres appareils. */
+  changePassword: (params: { current: string; next: string }) => Promise<{ error: string | null; wrongCurrent?: boolean }>;
   signOut: () => Promise<void>;
   deviceStatus: DeviceStatus;
   /** 'autre_appareil' : cet appareil vient d'être déconnecté parce que le compte a été validé ailleurs. */
@@ -461,6 +467,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           },
         });
         return { error: error ? translateAuthError(error.message) : null };
+      },
+      async updateAccountInfo({ prenom, pays, usages }) {
+        const { error } = await supabase.auth.updateUser({ data: { prenom: prenom.trim(), pays, usages } });
+        return { error: error ? translateAuthError(error.message) : null };
+      },
+      async updateLanguage(lang) {
+        await setAppLanguage(lang);
+        // Le compte garde aussi la langue (emails dans la bonne langue) ; sans réseau, le choix local suffit.
+        await supabase.auth.updateUser({ data: { langue_interface: lang, langue: lang } }).catch(() => {});
+      },
+      async changePassword({ current, next }) {
+        const user = session?.user;
+        const identifier = user?.email ?? (user?.phone ? `+${user.phone}` : null);
+        if (!identifier) return { error: i18n.t('changePassword.error') };
+        // Même protection anti-force brute que la connexion (Lot 1 cybersécurité).
+        const { data: lockout } = await supabase.rpc('check_login_lockout', { p_phone: identifier });
+        if (lockout?.locked) return { error: i18n.t('changePassword.tooMany') };
+        // Revérification du mot de passe actuel sur un client jetable : la session de l'app n'est pas touchée.
+        const verifier = createVerificationClient();
+        const { error: checkError } = await verifier.auth.signInWithPassword(
+          user?.email ? { email: user.email, password: current } : { phone: identifier, password: current }
+        );
+        await supabase.rpc('record_login_attempt', { p_phone: identifier, p_success: !checkError });
+        if (checkError) return { error: i18n.t('changePassword.wrongCurrent'), wrongCurrent: true };
+        await verifier.auth.signOut({ scope: 'local' }).catch(() => {});
+        const { error } = await supabase.auth.updateUser({ password: next });
+        if (error) return { error: translateAuthError(error.message) };
+        // Nouveau mot de passe : les autres appareils sont déconnectés et perdent la confiance (règle D3, cdc-appareil-unique.md).
+        await supabase.auth.signOut({ scope: 'others' }).catch(() => {});
+        await supabase.rpc('revoquer_autres_appareils', { p_device_id: await getDeviceId() });
+        return { error: null };
       },
       async signOut() {
         // scope 'global' explicite (gestion de session, lot cybersécurité du

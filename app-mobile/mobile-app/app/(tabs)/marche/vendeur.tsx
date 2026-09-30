@@ -19,6 +19,7 @@ import type { MarketplaceOrder, MarketplaceOrderStatut, MarketplaceProduct } fro
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
 import { withSubscription } from '../../../src/access/Access';
+import { Icon } from '../../../src/components/Icons';
 
 type VendorTab = 'dash' | 'products' | 'orders' | 'reviews' | 'revenue' | 'plans';
 
@@ -116,7 +117,7 @@ function VendorSpaceScreen() {
         <ScrollView contentContainerStyle={styles.scroll}>
           <View style={styles.header}>
             <Pressable onPress={() => router.back()} hitSlop={10}>
-              <Text style={styles.backIcon}>‹</Text>
+              <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
             </Pressable>
             <Text style={styles.title}>Espace vendeur</Text>
           </View>
@@ -146,7 +147,7 @@ function VendorSpaceScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.title}>Espace vendeur</Text>
           <View style={{ flex: 1 }} />

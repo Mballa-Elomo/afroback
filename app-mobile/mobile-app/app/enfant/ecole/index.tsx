@@ -15,6 +15,7 @@ import type { EcoleLecon, EcoleNiveau, EnfantLeconResultat } from '../../../src/
 import type { Heros } from '../../../src/data/types';
 import { LoadingState } from '../../../src/components/LoadingState';
 import { colors, typography } from '../../../src/theme/tokens';
+import { Icon } from '../../../src/components/Icons';
 
 type LeconRow = {
   lecon: EcoleLecon;
@@ -106,7 +107,7 @@ export default function EcoleLevelMapScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <View style={styles.headerBody}>
             <Text style={styles.tag}>ÉCOLE DES HÉROS</Text>

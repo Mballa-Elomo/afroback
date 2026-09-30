@@ -8,6 +8,7 @@ import type { MarketplaceOrder, MarketplaceOrderStatut } from '../../../src/data
 import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
+import { Icon } from '../../../src/components/Icons';
 
 const STATUT_LABEL: Record<MarketplaceOrderStatut, string> = {
   en_attente_paiement: 'En attente de paiement',
@@ -46,7 +47,7 @@ function MyOrdersScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.title}>Mes commandes</Text>
         </View>

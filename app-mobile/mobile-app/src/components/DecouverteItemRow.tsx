@@ -1,15 +1,16 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DecouverteItem } from '../data/decouverteTypes';
 import { DECOUVERTE_TYPE_LABEL } from '../data/decouverteDisplay';
-import { colors, radii, typography } from '../theme/tokens';
+import { colors, typography } from '../theme/tokens';
 import { HeroPlaceholder } from './HeroVisual';
 import { AccessBadge } from '../access/Access';
+import { Icon } from './Icons';
 
 /** Ligne de liste (catalogue Découverte, hub pays) — fidèle à la maquette : photo 60x60, catégorie·région, nom, résumé tronqué. */
 export function DecouverteItemRow({ item, onPress }: { item: DecouverteItem; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
-      <HeroPlaceholder style={styles.visual} radius={12} imageUrl={item.image_url} />
+      <HeroPlaceholder style={styles.visual} radius={14} imageUrl={item.image_url} fallbackIcon="compass" />
       <View style={styles.body}>
         <Text style={styles.meta} numberOfLines={1}>
           {DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()} · {item.region_ethnie}
@@ -22,7 +23,7 @@ export function DecouverteItemRow({ item, onPress }: { item: DecouverteItem; onP
         </Text>
       </View>
       <AccessBadge type="decouverte" slug={item.slug} inline />
-      <Text style={styles.chevron}>›</Text>
+      <Icon name="chevronRight" size={16} color={colors.textMuted} />
     </Pressable>
   );
 }
@@ -32,18 +33,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 13,
-    backgroundColor: colors.surfaceCard,
+    backgroundColor: 'rgba(26,19,13,.95)',
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radii.card,
-    padding: 11,
+    borderColor: 'rgba(237,227,212,.10)',
+    borderRadius: 18,
+    padding: 12,
   },
   rowPressed: {
     opacity: 0.85,
   },
   visual: {
-    width: 60,
-    height: 60,
+    width: 68,
+    height: 68,
+    borderWidth: 0,
     flexShrink: 0,
   },
   body: {
@@ -52,21 +54,21 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontFamily: typography.mono,
-    fontSize: 8.5,
+    fontSize: 9.5,
     letterSpacing: 0.7,
-    color: colors.terracottaTextAlt,
+    color: colors.accentGoldSoft,
   },
   name: {
     fontFamily: typography.bodySemiBold,
-    fontSize: 14,
+    fontSize: 15,
     color: colors.textPrimary,
-    marginTop: 2,
+    marginTop: 3,
   },
   blurb: {
     fontFamily: typography.body,
-    fontSize: 11,
+    fontSize: 12.5,
     color: colors.textMuted,
-    marginTop: 1,
+    marginTop: 2,
   },
   chevron: {
     color: colors.accentGold,

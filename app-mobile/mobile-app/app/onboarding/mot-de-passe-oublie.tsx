@@ -8,6 +8,7 @@ import { FormField } from '../../src/onboarding/FormField';
 import { PasswordStrength, meetsPasswordRule } from '../../src/onboarding/PasswordStrength';
 import { BrandMark, ONBOARDING_BG, PillButton } from '../../src/onboarding/ui';
 import { colors, typography } from '../../src/theme/tokens';
+import { Icon } from '../../src/components/Icons';
 
 /**
  * Mot de passe oublié (Module 3, 2026-09-29) — deux étapes sur un seul écran :
@@ -138,7 +139,7 @@ export default function MotDePasseOublieScreen() {
         <KeyboardAvoidingView style={styles.safe} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
             <Pressable onPress={goBack} hitSlop={14} style={styles.back} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-              <Text style={styles.backIcon}>‹</Text>
+              <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
             </Pressable>
             <BrandMark layout="inline" />
 

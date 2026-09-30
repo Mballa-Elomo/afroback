@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image } from 'expo-image';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddToCartToast } from '../../../src/components/AddToCartToast';
@@ -22,6 +23,7 @@ import { useAuth } from '../../../src/auth/AuthProvider';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
 import { useRequireAccount } from '../../../src/auth/AccountWall';
 import { useAccess } from '../../../src/access/Access';
+import { Icon } from '../../../src/components/Icons';
 
 /**
  * Fiche produit — fidèle à design-reference-marketplace.dc.excerpt.html
@@ -130,12 +132,12 @@ export default function ProductDetailScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           {product.image_url ? (
-            <Image source={{ uri: product.image_url }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+            <Image source={{ uri: product.image_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="memory-disk" />
           ) : (
             <View style={styles.headerPlaceholder} />
           )}
           <Pressable onPress={() => router.back()} style={[styles.backBtn, { top: insets.top + 8 }]} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
         </View>
 
@@ -170,7 +172,7 @@ export default function ProductDetailScreen() {
                 <Text style={styles.artisanName}>{product.vendor.nom_boutique}</Text>
                 <Text style={styles.artisanRegion}>{product.vendor.region}</Text>
               </View>
-              <Text style={styles.artisanChevron}>›</Text>
+              <Icon name="chevronRight" size={16} color={colors.accentGold} strokeWidth={2.2} />
             </Pressable>
           )}
 

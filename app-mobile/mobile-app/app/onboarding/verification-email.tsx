@@ -6,6 +6,7 @@ import { useAuth } from '../../src/auth/AuthProvider';
 import { BrandMark, MotifFrieze, ONBOARDING_BG, PillButton } from '../../src/onboarding/ui';
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
+import { Icon } from '../../src/components/Icons';
 
 /**
  * Écran 7b — confirmation de l'email par code à 6 chiffres (absent de la
@@ -116,7 +117,7 @@ export default function VerificationEmailScreen() {
             accessibilityRole="button"
             accessibilityLabel={t('common.back')}
           >
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
 
           <BrandMark layout="inline" />

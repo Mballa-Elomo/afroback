@@ -1,101 +1,181 @@
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useOwnProfile } from '../../src/profile/ownProfile';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../src/auth/AuthProvider';
 import { useActiveProfile } from '../../src/profils/ActiveProfileProvider';
 import { PinGate } from '../../src/profils/PinGate';
-import { GhostButton } from '../../src/components/Buttons';
-import { HeroPlaceholder } from '../../src/components/HeroVisual';
-import { colors, spacing, typography } from '../../src/theme/tokens';
+import { COUNTRIES } from '../../src/components/CountryPicker';
+import { Icon, type IconName } from '../../src/components/Icons';
+import { ProfileAvatar } from '../../src/components/ProfileAvatar';
+import { colors, typography } from '../../src/theme/tokens';
 import { withAccount } from '../../src/auth/AccountWall';
 import { useAccess } from '../../src/access/Access';
+import { APP_LANGUAGES, currentLanguage, useI18n, type AppLanguage } from '../../src/i18n';
+import { Flag } from '../../src/i18n/LanguageDropdown';
 
-const FORFAIT_LABELS: Record<string, string> = {
-  decouverte: 'Découverte (gratuit)',
-  racines: 'Racines',
-  heritage: 'Héritage',
-};
+const PLAN_LABELS: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
+const BG = '#0B0906';
+const GOLD = colors.accentGoldBright;
 
-const USAGE_LABELS: Record<string, string> = {
-  decouverte: 'Découvrir mes racines',
-  enfants: 'Profils enfants',
-  vendeur: 'Vendeur Marketplace',
-};
-
-/** Profil — vraies données du compte (Supabase Auth), pas une maquette figée. */
+/**
+ * Profil (refonte du 2026-09-30, demande de Yannick : "moderne, avec des
+ * icônes") : carte d'identité en dégradé (photo/avatar à anneau doré, pseudo,
+ * forfait), 3 raccourcis, puis réglages groupés par thème avec pastilles
+ * d'icône. La langue de l'app se change ici (feuille FR/EN), mémorisée sur
+ * l'appareil et dans le compte. Données réelles : profil communautaire,
+ * métadonnées du compte, forfait serveur (mon_abonnement).
+ */
 function ProfilScreen() {
   const router = useRouter();
-  const { session, signOut } = useAuth();
+  const { t, lang } = useI18n();
+  const { session, signOut, updateLanguage } = useAuth();
   const { children, returnToSelector } = useActiveProfile();
-  // Forfait réel : abonnement actif côté serveur (mon_abonnement), pas le choix fait à l'inscription.
   const { subscription } = useAccess();
   const [pinVisible, setPinVisible] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  // Photo/avatar et pseudo partagés avec l'accueil, relus au retour sur l'onglet.
+  const community = useOwnProfile();
+
   const meta = session?.user?.user_metadata ?? {};
   const prenom = (meta.prenom as string | undefined) ?? '';
-  const pays = (meta.pays as string | undefined) ?? '—';
-  const forfait = subscription?.plan ?? 'decouverte';
-  const forfaitFin = subscription?.ends_at
-    ? ` · jusqu'au ${new Date(subscription.ends_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`
-    : '';
+  const country = COUNTRIES.find((c) => c.code === meta.pays || c.name === meta.pays);
+  const pays = country ? `${country.flag} ${t(`country.${country.code}`)}` : ((meta.pays as string | undefined) ?? '—');
+  const planName = subscription ? PLAN_LABELS[subscription.plan] ?? subscription.plan : t('profileTab.planFree');
+  const planEnd = subscription?.ends_at
+    ? t('profileTab.until', {
+        date: new Date(subscription.ends_at).toLocaleDateString(currentLanguage() === 'en' ? 'en-GB' : 'fr-FR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        }),
+      })
+    : null;
   const usages = (meta.usages as string[] | undefined) ?? [];
-  const langue = (meta.langue_interface as string | undefined) === 'en' ? 'English' : 'Français';
-  const phone = session?.user?.phone ? `+${session.user.phone}` : '—';
+  const identifier = session?.user?.email ?? (session?.user?.phone ? `+${session.user.phone}` : '—');
+  const langLabel = APP_LANGUAGES.find((l) => l.code === lang)?.label ?? 'Français';
+
+  const chooseLanguage = async (code: AppLanguage) => {
+    setLangOpen(false);
+    if (code !== lang) await updateLanguage(code);
+  };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.header}>
-          <HeroPlaceholder style={styles.avatar} radius={40} />
-          <Text style={styles.name}>{prenom || 'Ton profil'}</Text>
-          <Text style={styles.phone}>{phone}</Text>
-        </View>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Carte d'identité */}
+        <LinearGradient
+          colors={['#3A2410', '#1C130B', '#120D08']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
+          <View style={styles.heroGlow} pointerEvents="none" />
+          <Pressable
+            onPress={() => router.push('/profil/modifier')}
+            style={styles.heroEdit}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel={t('profileTab.edit')}
+          >
+            <Icon name="pencil" size={16} color={colors.accentGoldPale} />
+          </Pressable>
 
-        <View style={styles.card}>
-          <InfoRow label="PAYS" value={pays} />
-          <Separator />
-          <Pressable onPress={() => router.push('/abonnement')} accessibilityRole="button">
-            <InfoRow label="FORFAIT" value={`${FORFAIT_LABELS[forfait] ?? forfait}${forfaitFin}  ›`} />
+          <Pressable onPress={() => router.push('/profil/modifier')} accessibilityRole="button" accessibilityLabel={t('profileTab.edit')}>
+            <View style={styles.ring}>
+              <ProfileAvatar value={community?.avatar ?? null} size={92} name={community?.pseudo || prenom} />
+            </View>
           </Pressable>
-          <Separator />
-          <InfoRow label="LANGUE DE L'INTERFACE" value={langue} />
-          <Separator />
-          <InfoRow
-            label="USAGES"
-            value={usages.length > 0 ? usages.map((u) => USAGE_LABELS[u] ?? u).join(' · ') : '—'}
-          />
-        </View>
+          <Text style={styles.name}>{prenom || t('profileTab.fallbackName')}</Text>
+          {!!community?.pseudo && <Text style={styles.pseudo}>@{community.pseudo}</Text>}
 
-        <View style={styles.card}>
-          <Pressable style={styles.menuRow} onPress={() => router.push('/profil/mfa')}>
-            <Text style={styles.menuLabel}>Sécurité (vérification en 2 étapes)</Text>
-            <Text style={styles.menuChevron}>›</Text>
+          <Pressable onPress={() => router.push('/abonnement')} style={[styles.planChip, subscription && styles.planChipPaid]} accessibilityRole="button">
+            <Icon name="crown" size={15} color={subscription ? colors.ctaTextOnGold : GOLD} />
+            <Text style={[styles.planText, subscription && styles.planTextPaid]}>
+              {planName}
+              {planEnd ? ` · ${planEnd}` : ''}
+            </Text>
           </Pressable>
-          <Separator />
-          <Pressable style={styles.menuRow} onPress={() => router.push('/don')}>
-            <Text style={styles.menuLabel}>Faire un don</Text>
-            <Text style={styles.menuChevron}>›</Text>
-          </Pressable>
-          <Separator />
-          <Pressable style={styles.menuRow} onPress={() => setPinVisible(true)}>
-            <Text style={styles.menuLabel}>Espace Parent</Text>
-            <Text style={styles.menuChevron}>›</Text>
-          </Pressable>
-          {children.length > 0 && (
-            <>
-              <Separator />
-              <Pressable style={styles.menuRow} onPress={returnToSelector}>
-                <Text style={styles.menuLabel}>Changer de profil</Text>
-                <Text style={styles.menuChevron}>›</Text>
-              </Pressable>
-            </>
+          {!subscription && (
+            <Pressable onPress={() => router.push('/abonnement')} hitSlop={8} accessibilityRole="button">
+              <Text style={styles.upgrade}>{t('profileTab.upgrade')} ›</Text>
+            </Pressable>
           )}
+        </LinearGradient>
+
+        {/* Raccourcis */}
+        <View style={styles.quick}>
+          <QuickAction icon="pencil" label={t('profileTab.quickEdit')} onPress={() => router.push('/profil/modifier')} />
+          <QuickAction icon="crown" label={t('profileTab.quickPlan')} onPress={() => router.push('/abonnement')} />
+          <QuickAction icon="heart" label={t('profileTab.quickDonate')} onPress={() => router.push('/don')} />
         </View>
 
-        <View style={styles.cta}>
-          <GhostButton label="Déconnexion" onPress={() => signOut()} />
-        </View>
+        <Section title={t('profileTab.sectionAccount')}>
+          <SettingRow icon="mapPin" label={t('profileTab.country')} value={pays} onPress={() => router.push('/profil/modifier')} />
+          <SettingRow
+            icon="compass"
+            label={t('profileTab.usages')}
+            value={usages.length > 0 ? usages.map((u) => t(`usage.${u}.title`)).join(' · ') : '—'}
+            onPress={() => router.push('/profil/modifier')}
+          />
+          <SettingRow icon="phone" label={t('profileTab.identifier')} value={identifier} last />
+        </Section>
+
+        <Section title={t('profileTab.sectionPreferences')}>
+          <SettingRow
+            icon="globe"
+            label={t('profileTab.languageRow')}
+            value={langLabel}
+            leading={<Flag code={lang} size={14} />}
+            onPress={() => setLangOpen(true)}
+            last
+          />
+        </Section>
+
+        <Section title={t('profileTab.sectionSecurity')}>
+          <SettingRow icon="shield" label={t('profileTab.twoStep')} onPress={() => router.push('/profil/mfa')} />
+          <SettingRow icon="key" label={t('profileTab.password')} onPress={() => router.push('/profil/mot-de-passe')} last />
+        </Section>
+
+        <Section title={t('profileTab.sectionFamily')}>
+          <SettingRow icon="users" label={t('profileTab.parent')} onPress={() => setPinVisible(true)} last={children.length === 0} />
+          {children.length > 0 && <SettingRow icon="userPlus" label={t('profileTab.switchProfile')} onPress={returnToSelector} last />}
+        </Section>
+
+        <Pressable style={styles.logout} onPress={() => signOut()} accessibilityRole="button">
+          <Icon name="logout" size={18} color={colors.terracottaText} />
+          <Text style={styles.logoutText}>{t('profileTab.logout')}</Text>
+        </Pressable>
+        <Text style={styles.footer}>{t('profileTab.version')}</Text>
       </ScrollView>
+
+      {/* Choix de la langue */}
+      <Modal visible={langOpen} transparent animationType="fade" onRequestClose={() => setLangOpen(false)}>
+        <Pressable style={styles.backdrop} onPress={() => setLangOpen(false)} accessibilityLabel={t('common.cancel')}>
+          <Pressable style={styles.sheet} onPress={() => {}}>
+            <View style={styles.sheetHandle} />
+            <Text style={styles.sheetTitle}>{t('profileTab.languageSheet')}</Text>
+            {APP_LANGUAGES.map((l) => {
+              const selected = l.code === lang;
+              return (
+                <Pressable
+                  key={l.code}
+                  onPress={() => chooseLanguage(l.code)}
+                  style={[styles.langOption, selected && styles.langOptionOn]}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected }}
+                >
+                  <Flag code={l.code} size={20} />
+                  <Text style={styles.langLabel}>{l.label}</Text>
+                  {selected && <Icon name="check" size={18} color={GOLD} strokeWidth={2.6} />}
+                </Pressable>
+              );
+            })}
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       <PinGate
         visible={pinVisible}
@@ -109,93 +189,212 @@ function ProfilScreen() {
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function QuickAction({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
   return (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={styles.rowValue}>{value}</Text>
+    <Pressable style={({ pressed }) => [styles.quickTile, pressed && styles.pressed]} onPress={onPress} accessibilityRole="button">
+      <View style={styles.quickIcon}>
+        <Icon name={icon} size={20} color={GOLD} />
+      </View>
+      <Text style={styles.quickLabel}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.card}>{children}</View>
     </View>
   );
 }
 
-function Separator() {
-  return <View style={styles.separator} />;
+function SettingRow({
+  icon,
+  label,
+  value,
+  leading,
+  onPress,
+  last,
+}: {
+  icon: IconName;
+  label: string;
+  value?: string;
+  leading?: ReactNode;
+  onPress?: () => void;
+  last?: boolean;
+}) {
+  const content = (
+    <View style={[styles.row, !last && styles.rowBorder]}>
+      <View style={styles.rowIcon}>
+        <Icon name={icon} size={18} color={GOLD} />
+      </View>
+      <View style={styles.rowBody}>
+        <Text style={styles.rowLabel}>{label}</Text>
+        {!!value && (
+          <View style={styles.rowValueLine}>
+            {leading}
+            <Text style={styles.rowValue} numberOfLines={1}>
+              {value}
+            </Text>
+          </View>
+        )}
+      </View>
+      {onPress && <Icon name="chevronRight" size={16} color={colors.textMuted} />}
+    </View>
+  );
+  if (!onPress) return content;
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => pressed && styles.pressed} accessibilityRole="button">
+      {content}
+    </Pressable>
+  );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    paddingHorizontal: spacing.md + 2,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 26,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    marginBottom: 14,
-  },
-  name: {
-    fontFamily: typography.display,
-    fontSize: 21,
-    color: colors.textHeading,
-  },
-  phone: {
-    fontFamily: typography.mono,
-    fontSize: 12,
-    color: colors.textMuted,
-    marginTop: 4,
-  },
-  card: {
-    borderRadius: 16,
+  safe: { flex: 1, backgroundColor: BG },
+  scroll: { paddingHorizontal: 18, paddingTop: 14, paddingBottom: 36 },
+  hero: {
+    borderRadius: 26,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.placeholderStripeDark,
-    paddingHorizontal: 18,
-    paddingVertical: 4,
-    marginBottom: 30,
+    borderColor: 'rgba(240,195,107,.28)',
+    paddingTop: 26,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    overflow: 'hidden',
   },
-  row: {
-    paddingVertical: 14,
+  heroGlow: {
+    position: 'absolute',
+    top: -80,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: 'rgba(240,195,107,.06)',
   },
-  rowLabel: {
-    fontFamily: typography.mono,
-    fontSize: 10,
-    letterSpacing: 1,
-    color: colors.textMuted,
-    marginBottom: 5,
+  heroEdit: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(11,9,6,.45)',
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.35)',
   },
-  rowValue: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 14.5,
-    color: colors.textPrimary,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: colors.borderHairline,
-  },
-  menuRow: {
+  ring: { padding: 4, borderRadius: 999, borderWidth: 2, borderColor: GOLD },
+  name: { fontFamily: typography.display, fontSize: 24, color: colors.textHeading, marginTop: 14, textAlign: 'center' },
+  pseudo: { fontFamily: typography.bodySemiBold, fontSize: 14, color: colors.accentGoldPale, marginTop: 3 },
+  planChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 7,
+    marginTop: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.5)',
+    backgroundColor: 'rgba(240,195,107,.08)',
+  },
+  planChipPaid: { backgroundColor: GOLD, borderColor: GOLD },
+  planText: { fontFamily: typography.bodyBold, fontSize: 13, color: colors.accentGoldPale },
+  planTextPaid: { color: colors.ctaTextOnGold },
+  upgrade: { fontFamily: typography.bodySemiBold, fontSize: 13, color: GOLD, marginTop: 10 },
+  quick: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  quickTile: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(237,227,212,.10)',
+    backgroundColor: 'rgba(26,19,13,.95)',
+  },
+  quickIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.12)',
+  },
+  quickLabel: { fontFamily: typography.bodySemiBold, fontSize: 12.5, color: colors.textPrimary },
+  pressed: { opacity: 0.7 },
+  section: { marginTop: 24 },
+  sectionTitle: {
+    fontFamily: typography.mono,
+    fontSize: 10.5,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    color: colors.textMuted,
+    marginBottom: 8,
+    marginLeft: 6,
+  },
+  card: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(237,227,212,.10)',
+    backgroundColor: 'rgba(26,19,13,.95)',
+    paddingHorizontal: 14,
+  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13 },
+  rowBorder: { borderBottomWidth: 1, borderBottomColor: 'rgba(237,227,212,.07)' },
+  rowIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.12)',
+  },
+  rowBody: { flex: 1 },
+  rowLabel: { fontFamily: typography.bodySemiBold, fontSize: 14.5, color: colors.textPrimary },
+  rowValueLine: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  rowValue: { flexShrink: 1, fontFamily: typography.body, fontSize: 12.5, color: colors.textMuted },
+  logout: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 28,
     paddingVertical: 15,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(227,162,119,.35)',
+    backgroundColor: 'rgba(139,58,47,.12)',
   },
-  menuLabel: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 14,
-    color: colors.textPrimary,
+  logoutText: { fontFamily: typography.bodyBold, fontSize: 14.5, color: colors.terracottaText },
+  footer: { fontFamily: typography.mono, fontSize: 10.5, color: colors.textMuted, textAlign: 'center', marginTop: 18, letterSpacing: 0.6 },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,.6)', justifyContent: 'flex-end' },
+  sheet: {
+    backgroundColor: '#15100B',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.25)',
+    padding: 20,
+    paddingBottom: 34,
+    gap: 10,
   },
-  menuChevron: {
-    fontSize: 18,
-    color: colors.accentGold,
+  sheetHandle: { alignSelf: 'center', width: 42, height: 4, borderRadius: 2, backgroundColor: 'rgba(237,227,212,.25)', marginBottom: 6 },
+  sheetTitle: { fontFamily: typography.display, fontSize: 20, color: colors.textHeading, marginBottom: 6 },
+  langOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(237,227,212,.12)',
+    backgroundColor: 'rgba(26,19,13,.95)',
   },
-  cta: {},
+  langOptionOn: { borderColor: GOLD, backgroundColor: 'rgba(240,195,107,.08)' },
+  langLabel: { flex: 1, fontFamily: typography.bodySemiBold, fontSize: 15.5, color: colors.textPrimary },
 });
 
 // Réservé aux comptes : un invité voit une invitation à la place (mode invité, cdc-onboarding.md section 4).

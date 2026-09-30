@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../auth/AuthProvider';
@@ -247,6 +248,7 @@ export function LockedDetailScreen({
   apercu,
   reason,
   child = false,
+  footer,
 }: {
   title: string;
   subtitle?: string;
@@ -254,6 +256,8 @@ export function LockedDetailScreen({
   apercu?: string;
   reason: PaywallReason;
   child?: boolean;
+  /** Contenu affiché sous la présentation de l'abonnement (ex. commentaires en lecture). */
+  footer?: ReactNode;
 }) {
   const router = useRouter();
   const { t } = useI18n();
@@ -261,10 +265,10 @@ export function LockedDetailScreen({
     <SafeAreaView style={styles.detailSafe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.detailScroll} showsVerticalScrollIndicator={false}>
         <View style={styles.detailCover}>
-          {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
+          {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="memory-disk" /> : null}
           <View style={styles.detailCoverShade} />
           <Pressable onPress={() => router.back()} hitSlop={12} style={styles.detailBack} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-            <Text style={styles.detailBackIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <View style={styles.detailLock}>
             <Icon name="lock" size={15} color={colors.ctaTextOnGold} strokeWidth={2.4} />
@@ -276,6 +280,7 @@ export function LockedDetailScreen({
           </Text>
           {!!subtitle && <Text style={styles.detailSubtitle}>{subtitle}</Text>}
           <LockedContent apercu={apercu} reason={reason} child={child} style={{ marginTop: 16 }} />
+          {footer ? <View style={{ marginTop: 20 }}>{footer}</View> : null}
         </View>
       </ScrollView>
     </SafeAreaView>

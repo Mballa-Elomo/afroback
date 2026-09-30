@@ -36,3 +36,14 @@ export const supabase = createClient(url, anonKey, {
     detectSessionInUrl: false,
   },
 });
+
+/**
+ * Client jetable, sans session persistée : sert uniquement à revérifier un
+ * mot de passe (changement de mot de passe depuis le profil) sans toucher à
+ * la session de l'app ni déclencher la vérification d'appareil.
+ */
+export function createVerificationClient() {
+  return createClient(url!, anonKey!, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'afroback-verification' },
+  });
+}

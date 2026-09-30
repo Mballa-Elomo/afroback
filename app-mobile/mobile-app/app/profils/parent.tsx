@@ -13,6 +13,7 @@ import {
 import type { ChildProfile, ChildTodayStats } from '../../src/data/parentEnfantTypes';
 import { relativeTime } from '../../src/data/relativeTime';
 import { colors, radii, spacing, typography } from '../../src/theme/tokens';
+import { Icon } from '../../src/components/Icons';
 
 type ChildRowData = {
   stats: ChildTodayStats | null;
@@ -81,7 +82,7 @@ export default function ParentSpaceScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.headerRow}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.back}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.title}>Espace Parent</Text>
         </View>

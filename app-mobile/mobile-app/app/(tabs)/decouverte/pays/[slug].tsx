@@ -9,6 +9,7 @@ import { useDecouverteItems, useDecouvertePays } from '../../../../src/data/useD
 import { DECOUVERTE_TYPE_LABEL } from '../../../../src/data/decouverteDisplay';
 import type { DecouverteType } from '../../../../src/data/decouverteTypes';
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
+import { ScreenHeader } from '../../../../src/ui/modern';
 
 /**
  * Hub pays — fidèle à design-reference-decouverte.dc.excerpt.html (section
@@ -56,14 +57,8 @@ export default function CountryHubScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()} hitSlop={10} style={styles.back}>
-            <Text style={styles.backIcon}>‹</Text>
-          </Pressable>
-          <View style={styles.headerBody}>
-            <Text style={styles.eyebrow}>EXPLORER LE PAYS</Text>
-            <Text style={styles.title}>{pays?.nom}</Text>
-          </View>
+        <View style={{ marginHorizontal: -(spacing.md + 2) }}>
+          <ScreenHeader title={pays?.nom ?? ''} subtitle="Tout le patrimoine du pays" onBack={() => router.back()} />
         </View>
         {pays?.resume && <Text style={styles.intro}>{pays.resume}</Text>}
 
@@ -87,7 +82,7 @@ export default function CountryHubScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#0B0906',
   },
   scroll: {
     paddingHorizontal: spacing.md + 2,

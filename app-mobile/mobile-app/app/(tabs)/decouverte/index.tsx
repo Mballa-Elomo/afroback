@@ -1,22 +1,27 @@
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { DecouverteItemRow } from '../../../src/components/DecouverteItemRow';
-import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
+import { LinearGradient } from 'expo-linear-gradient';
+import { ErrorState } from '../../../src/components/LoadingState';
+import { HeroPlaceholder } from '../../../src/components/HeroVisual';
+import { Icon } from '../../../src/components/Icons';
 import { useDecouverteItems, useDecouvertePays } from '../../../src/data/useDecouverteData';
-import { DECOUVERTE_TYPE_ICON, DECOUVERTE_TYPE_LABEL } from '../../../src/data/decouverteDisplay';
-import type { DecouverteType } from '../../../src/data/decouverteTypes';
-import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
+import { DECOUVERTE_TYPE_LABEL } from '../../../src/data/decouverteDisplay';
+import type { DecouverteItem, DecouverteType } from '../../../src/data/decouverteTypes';
+import { colors, typography } from '../../../src/theme/tokens';
+import { AccessBadge } from '../../../src/access/Access';
+import { Bone, FilterChips, LikeBadge, PressableScale, ScreenHeader, SkeletonScreen } from '../../../src/ui/modern';
+import { useLikeCounts } from '../../../src/stats/contentStats';
+
+type Filtre = DecouverteType | 'tous';
+const ORDER: DecouverteType[] = ['village', 'coutume', 'objet', 'personnage', 'fait'];
 
 /**
- * Liste "Découverte" — fidèle à design-reference-decouverte.dc.excerpt.html
- * (section DISCOVERY), avec deux simplifications assumées (voir
- * mobile-app/README.md) : la carte Afrique interactive (iframe) est
- * remplacée par un vrai lien "Explorer le Cameroun" vers le hub pays (un
- * seul pays en base), et la visite virtuelle des musées 360° garde son état
- * "bientôt disponible" déjà prévu par la maquette elle-même (pas de contenu
- * produit).
+ * "Découverte" (refonte moderne du 2026-09-30) : en-tête, grande carte
+ * "Explorer le Cameroun" (hub pays), recherche, filtres par catégorie en
+ * pastilles, grille de cartes photo. La visite virtuelle des musées garde
+ * son état "bientôt disponible" (aucun contenu produit).
  */
 export default function DecouverteScreen() {
   const router = useRouter();
@@ -24,141 +29,118 @@ export default function DecouverteScreen() {
   const paysState = useDecouvertePays();
   const items = itemsState.status === 'ready' ? itemsState.data : [];
   const pays = paysState.status === 'ready' ? paysState.data : [];
-
   const [query, setQuery] = useState('');
-  const categories = useMemo(() => {
+  const [filtre, setFiltre] = useState<Filtre>('tous');
+  const likes = useLikeCounts('decouverte', items.map((it) => it.slug));
+
+  const options = useMemo(() => {
     const present = new Set(items.map((it) => it.type));
-    return (['village', 'coutume', 'objet', 'personnage', 'fait'] as DecouverteType[]).filter((t) => present.has(t));
+    return [
+      { id: 'tous' as Filtre, label: 'Tout' },
+      ...ORDER.filter((t) => present.has(t)).map((t) => ({ id: t as Filtre, label: DECOUVERTE_TYPE_LABEL[t] })),
+    ];
   }, [items]);
-  const [catIndex, setCatIndex] = useState(0);
-  const activeCategory = categories[catIndex] ?? categories[0];
 
   const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
-    if (hasQuery) {
-      const q = query.trim().toLowerCase();
-      return items.filter(
-        (it) =>
-          it.titre.toLowerCase().includes(q) ||
-          it.resume_liste.toLowerCase().includes(q) ||
-          it.region_ethnie.toLowerCase().includes(q)
-      );
-    }
-    if (!activeCategory) return items;
-    return items.filter((it) => it.type === activeCategory);
-  }, [items, hasQuery, query, activeCategory]);
+    const q = query.trim().toLowerCase();
+    return items.filter((it) => {
+      if (filtre !== 'tous' && it.type !== filtre) return false;
+      if (!q) return true;
+      return it.titre.toLowerCase().includes(q) || it.resume_liste.toLowerCase().includes(q) || it.region_ethnie.toLowerCase().includes(q);
+    });
+  }, [items, query, filtre]);
 
-  const openMuseum = () =>
-    Alert.alert('Bientôt disponible', "La visite virtuelle des musées en 360° n'est pas encore construite.");
+  const openMuseum = () => Alert.alert('Bientôt disponible', "La visite virtuelle des musées en 360° n'est pas encore construite.");
 
-  if (itemsState.status === 'loading') {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="La Découverte se prépare..." />
-      </SafeAreaView>
-    );
-  }
   if (itemsState.status === 'error') {
     return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <ErrorState />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Découverte</Text>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScreenHeader title="Découverte" subtitle="Villages, coutumes, objets et figures du patrimoine" />
 
-        {pays[0] && (
-          <Pressable style={styles.countryBanner} onPress={() => router.push(`/decouverte/pays/${pays[0].slug}`)}>
-            <Text style={styles.countryIcon}>🗺️</Text>
-            <View style={styles.countryBody}>
-              <Text style={styles.countryTitle}>Explorer {pays[0].nom}</Text>
-              <Text style={styles.countrySubtitle}>Tout le patrimoine du pays, réuni au même endroit</Text>
-            </View>
-            <Text style={styles.countryChevron}>›</Text>
-          </Pressable>
-        )}
-
-        <View style={styles.searchBox}>
-          <Text style={styles.searchIcon}>⌕</Text>
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Rechercher dans la Découverte…"
-            placeholderTextColor={colors.textMuted}
-            style={styles.searchInput}
-          />
-          {hasQuery && (
-            <Pressable onPress={() => setQuery('')} hitSlop={8}>
-              <Text style={styles.searchClear}>✕</Text>
-            </Pressable>
+        <View style={styles.pad}>
+          {pays[0] && (
+            <PressableScale onPress={() => router.push(`/decouverte/pays/${pays[0].slug}`)} accessibilityLabel={`Explorer ${pays[0].nom}`}>
+              <LinearGradient colors={['#2F5A3A', '#1B2A18', '#120D08']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.country}>
+                <View style={styles.countryIcon}>
+                  <Icon name="mapPin" size={24} color={colors.accentGoldBright} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.countryKicker}>EXPLORER LE PAYS</Text>
+                  <Text style={styles.countryTitle}>{pays[0].nom}</Text>
+                  <Text style={styles.countrySub}>Tout le patrimoine du pays, réuni au même endroit</Text>
+                </View>
+                <Icon name="chevronRight" size={18} color={colors.accentGold} />
+              </LinearGradient>
+            </PressableScale>
           )}
+
+          <View style={styles.search}>
+            <Icon name="search" size={18} color={colors.textMuted} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Rechercher dans la Découverte…"
+              placeholderTextColor={colors.textMuted}
+              style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
+            />
+            {hasQuery && (
+              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Effacer">
+                <Text style={styles.clear}>✕</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
 
-        {hasQuery ? (
-          <View style={styles.resultsRow}>
-            <Text style={styles.resultsLabel}>RÉSULTATS</Text>
-            <Text style={styles.resultsCount}>{filtered.length} trouvé(s)</Text>
+        {options.length > 1 && (
+          <View style={{ marginTop: 14 }}>
+            <FilterChips options={options} value={filtre} onChange={setFiltre} />
           </View>
-        ) : (
-          categories.length > 0 && (
-            <>
-              <View style={styles.catBrowser}>
-                <Pressable
-                  onPress={() => setCatIndex((i) => (i - 1 + categories.length) % categories.length)}
-                  style={styles.catArrow}
-                >
-                  <Text style={styles.catArrowLabel}>‹</Text>
-                </Pressable>
-                <View style={styles.catCard}>
-                  <Text style={styles.catIcon}>{DECOUVERTE_TYPE_ICON[activeCategory]}</Text>
-                  <Text style={styles.catName}>{DECOUVERTE_TYPE_LABEL[activeCategory]}</Text>
-                  <Text style={styles.catPos}>
-                    CATÉGORIE {catIndex + 1}/{categories.length} · {filtered.length} CONTENU(S)
-                  </Text>
-                </View>
-                <Pressable onPress={() => setCatIndex((i) => (i + 1) % categories.length)} style={styles.catArrow}>
-                  <Text style={styles.catArrowLabel}>›</Text>
-                </Pressable>
-              </View>
-
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
-                {categories.map((c, i) => {
-                  const active = i === catIndex;
-                  return (
-                    <Pressable key={c} onPress={() => setCatIndex(i)} style={[styles.chip, active && styles.chipActive]}>
-                      <Text style={[styles.chipLabel, active && styles.chipLabelActive]}>
-                        {DECOUVERTE_TYPE_ICON[c]} {DECOUVERTE_TYPE_LABEL[c]}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-
-              <Pressable style={styles.museumBanner} onPress={openMuseum}>
-                <View style={styles.museumBadge}>
-                  <Text style={styles.museumBadgeLabel}>BIENTÔT DISPONIBLE</Text>
-                </View>
-                <Text style={styles.museumTitle}>Visite virtuelle des musées · 360°</Text>
-                <Text style={styles.museumSubtitle}>
-                  Parcourez les collections avec points d'intérêt cliquables vers les objets sacrés. →
-                </Text>
-              </Pressable>
-            </>
-          )
         )}
 
-        <View style={styles.list}>
-          {filtered.map((item) => (
-            <DecouverteItemRow key={item.slug} item={item} onPress={() => router.push(`/decouverte/${item.slug}`)} />
-          ))}
-          {filtered.length === 0 && (
-            <Text style={styles.empty}>
-              {hasQuery ? `Aucun contenu ne correspond à « ${query} ».` : 'Aucun contenu dans cette catégorie pour l’instant.'}
-            </Text>
+        <View style={styles.pad}>
+          {itemsState.status === 'loading' ? (
+            <SkeletonScreen>
+              <View style={styles.grid}>
+                {[0, 1, 2, 3].map((i) => (
+                  <Bone key={i} style={styles.boneCard} />
+                ))}
+              </View>
+            </SkeletonScreen>
+          ) : (
+            <>
+              <Text style={styles.count}>
+                {filtered.length} contenu{filtered.length > 1 ? 's' : ''}
+              </Text>
+              <View style={styles.grid}>
+                {filtered.map((item) => (
+                  <ItemCard key={item.slug} item={item} likes={likes.get(item.slug)} onPress={() => router.push(`/decouverte/${item.slug}`)} />
+                ))}
+              </View>
+              {filtered.length === 0 && (
+                <Text style={styles.empty}>
+                  {hasQuery ? `Aucun contenu ne correspond à « ${query} ».` : 'Aucun contenu dans cette catégorie pour l’instant.'}
+                </Text>
+              )}
+
+              <Pressable style={styles.museum} onPress={openMuseum} accessibilityRole="button">
+                <View style={styles.museumIcon}>
+                  <Icon name="sparkle" size={20} color={colors.accentGoldBright} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.museumTitle}>Visite virtuelle des musées · 360°</Text>
+                  <Text style={styles.museumSub}>Bientôt disponible</Text>
+                </View>
+              </Pressable>
+            </>
           )}
         </View>
       </ScrollView>
@@ -166,210 +148,95 @@ export default function DecouverteScreen() {
   );
 }
 
+function ItemCard({ item, onPress, likes }: { item: DecouverteItem; onPress: () => void; likes?: number }) {
+  return (
+    <PressableScale onPress={onPress} wrapperStyle={styles.cardWrap} accessibilityLabel={item.titre}>
+      <HeroPlaceholder style={styles.card} radius={20} imageUrl={item.image_url} fallbackIcon="compass">
+        <LinearGradient colors={['rgba(8,6,4,0)', 'rgba(8,6,4,0.92)']} locations={[0.35, 1]} style={StyleSheet.absoluteFill} />
+        <AccessBadge type="decouverte" slug={item.slug} style={{ top: 8, right: 8 }} />
+        <LikeBadge count={likes} />
+        <View style={[styles.cardText, !!likes && { right: 56 }]}>
+          <Text style={styles.cardKicker} numberOfLines={1}>
+            {DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()}
+          </Text>
+          <Text style={styles.cardTitle} numberOfLines={2}>
+            {item.titre}
+          </Text>
+          <Text style={styles.cardMeta} numberOfLines={1}>
+            {item.region_ethnie}
+          </Text>
+        </View>
+      </HeroPlaceholder>
+    </PressableScale>
+  );
+}
+
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    paddingHorizontal: spacing.md + 2,
-    paddingTop: 6,
-    paddingBottom: 40,
-  },
-  title: {
-    fontFamily: typography.display,
-    fontSize: 19,
-    fontWeight: '600',
-    color: colors.textHeading,
-    marginBottom: 14,
-  },
-  countryBanner: {
+  safe: { flex: 1, backgroundColor: '#0B0906' },
+  scroll: { paddingBottom: 40 },
+  pad: { paddingHorizontal: 18 },
+  country: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    borderRadius: 16,
+    gap: 14,
+    padding: 18,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surfaceCard,
-    padding: 14,
-    marginBottom: 16,
+    borderColor: 'rgba(240,195,107,.3)',
   },
   countryIcon: {
-    fontSize: 22,
-  },
-  countryBody: {
-    flex: 1,
-  },
-  countryTitle: {
-    fontFamily: typography.displaySemiBold,
-    fontSize: 14,
-    color: colors.textHeading,
-  },
-  countrySubtitle: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  countryChevron: {
-    fontSize: 18,
-    color: colors.accentGold,
-  },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: colors.inputBg,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    marginBottom: 16,
-  },
-  searchIcon: {
-    color: colors.accentGold,
-    fontSize: 14,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: typography.body,
-    fontSize: 13.5,
-    color: colors.textPrimary,
-    padding: 0,
-  },
-  searchClear: {
-    color: colors.textMuted,
-    fontSize: 14,
-  },
-  resultsRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  resultsLabel: {
-    fontFamily: typography.display,
-    fontSize: 11,
-    letterSpacing: 1.8,
-    color: colors.accentGoldSoft,
-  },
-  resultsCount: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-  },
-  catBrowser: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 14,
-  },
-  catArrow: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    backgroundColor: colors.cardBg,
+    width: 50,
+    height: 50,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.14)',
   },
-  catArrowLabel: {
-    color: colors.accentGold,
-    fontSize: 18,
-  },
-  catCard: {
-    flex: 1,
+  countryKicker: { fontFamily: typography.mono, fontSize: 10, letterSpacing: 1.2, color: colors.accentGoldSoft },
+  countryTitle: { fontFamily: typography.display, fontSize: 19, color: colors.textHeading, marginTop: 2 },
+  countrySub: { fontFamily: typography.body, fontSize: 12.5, color: colors.textMuted, marginTop: 2 },
+  search: {
+    flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.placeholderStripeDark,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-  },
-  catIcon: {
-    fontSize: 22,
-    lineHeight: 22,
-  },
-  catName: {
-    fontFamily: typography.displaySemiBold,
-    fontSize: 14,
-    color: colors.textHeading,
-    marginTop: 4,
-  },
-  catPos: {
-    fontFamily: typography.mono,
-    fontSize: 9,
-    letterSpacing: 0.5,
-    color: colors.textMuted,
-    marginTop: 3,
-  },
-  chipsRow: {
-    gap: 8,
-    paddingBottom: 20,
-  },
-  chip: {
-    borderRadius: radii.badge,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 13,
-    paddingVertical: 7,
-  },
-  chipActive: {
-    backgroundColor: colors.accentGold,
-    borderColor: colors.accentGold,
-  },
-  chipLabel: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 11.5,
-    color: colors.textBody,
-  },
-  chipLabelActive: {
-    color: colors.ctaTextOnGold,
-  },
-  museumBanner: {
+    gap: 12,
+    marginTop: 14,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.placeholderStripeDark,
-    padding: 16,
-    marginBottom: 20,
+    borderColor: 'rgba(237,227,212,.12)',
+    backgroundColor: 'rgba(26,19,13,.95)',
+    paddingHorizontal: 16,
   },
-  museumBadge: {
-    alignSelf: 'flex-start',
-    borderRadius: radii.badge,
-    backgroundColor: colors.accentGoldBright,
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    marginBottom: 8,
-  },
-  museumBadgeLabel: {
-    fontFamily: typography.monoBold,
-    fontSize: 9,
-    letterSpacing: 0.5,
-    color: colors.ctaTextOnGold,
-  },
-  museumTitle: {
-    fontFamily: typography.displaySemiBold,
-    fontSize: 17,
-    color: colors.textHeading,
-  },
-  museumSubtitle: {
-    fontFamily: typography.body,
-    fontSize: 12.5,
-    color: colors.textBodyAlt,
-    marginTop: 4,
-  },
-  list: {
+  searchInput: { flex: 1, fontFamily: typography.body, fontSize: 14.5, color: colors.textPrimary, paddingVertical: 14 },
+  clear: { fontSize: 14, color: colors.textMuted },
+  count: { fontFamily: typography.mono, fontSize: 11, letterSpacing: 1, color: colors.textMuted, marginTop: 16, marginBottom: 10 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
+  cardWrap: { width: '47.5%' },
+  card: { height: 210, borderWidth: 0 },
+  boneCard: { width: '47.5%', height: 210, borderRadius: 20 },
+  cardText: { position: 'absolute', left: 12, right: 12, bottom: 12 },
+  cardKicker: { fontFamily: typography.mono, fontSize: 9.5, letterSpacing: 1, color: colors.accentGoldPale, marginBottom: 3 },
+  cardTitle: { fontFamily: typography.bodyBold, fontSize: 15, lineHeight: 19, color: '#FFF4E0' },
+  cardMeta: { fontFamily: typography.body, fontSize: 11.5, color: 'rgba(255,244,224,.7)', marginTop: 3 },
+  empty: { fontFamily: typography.body, fontSize: 14, color: colors.textMuted, textAlign: 'center', marginTop: 20 },
+  museum: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
+    marginTop: 24,
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(240,195,107,.3)',
   },
-  empty: {
-    fontFamily: typography.body,
-    fontSize: 13,
-    color: colors.textMuted,
-    textAlign: 'center',
-    paddingVertical: 30,
+  museumIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(240,195,107,.10)',
   },
+  museumTitle: { fontFamily: typography.bodyBold, fontSize: 14, color: colors.textPrimary },
+  museumSub: { fontFamily: typography.body, fontSize: 12, color: colors.textMuted, marginTop: 2 },
 });

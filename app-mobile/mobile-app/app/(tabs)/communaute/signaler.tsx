@@ -11,6 +11,7 @@ import type { CommunityReportMotif, CommunityReportTargetType } from '../../../s
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
 import { withSubscription } from '../../../src/access/Access';
+import { Icon } from '../../../src/components/Icons';
 
 const REASONS: { id: CommunityReportMotif; label: string }[] = [
   { id: 'contenu_inapproprie', label: 'Contenu inapproprié' },
@@ -66,7 +67,7 @@ function ReportScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} hitSlop={10}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <Text style={styles.title}>Signaler</Text>
         </View>

@@ -5,6 +5,7 @@ import { useI18n } from '../../src/i18n';
 import { LEGAL_DOCS, type LegalDocId } from '../../src/legal/documents';
 import { BrandMark, ONBOARDING_BG } from '../../src/onboarding/ui';
 import { colors, typography } from '../../src/theme/tokens';
+import { Icon } from '../../src/components/Icons';
 
 /**
  * Lecture des conditions d'utilisation (`/legal/cgu`) et de la politique de
@@ -25,7 +26,7 @@ export default function LegalScreen() {
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.topRow}>
           <Pressable onPress={() => router.back()} hitSlop={14} style={styles.back} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <BrandMark layout="inline" />
           <View style={styles.back} />

@@ -9,6 +9,7 @@ import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
 import { PasswordStrength, meetsPasswordRule } from '../../src/onboarding/PasswordStrength';
 import { COUNTRIES, CountryPicker, type Country } from '../../src/components/CountryPicker';
+import { Icon } from '../../src/components/Icons';
 
 /**
  * Écran 7 — "Crée ton compte", identique à la maquette de Yannick du
@@ -84,7 +85,7 @@ export default function SignupScreen() {
         <KeyboardAvoidingView style={styles.safe} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
             <Pressable onPress={goBack} hitSlop={14} style={styles.back} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-              <Text style={styles.backIcon}>‹</Text>
+              <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
             </Pressable>
 
             <BrandMark layout="inline" />

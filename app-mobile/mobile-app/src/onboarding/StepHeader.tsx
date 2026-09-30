@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography } from '../theme/tokens';
 import { BrandMark } from './ui';
 import { useI18n } from '../i18n';
+import { Icon } from '../components/Icons';
 
 /**
  * En-tête commun des écrans forfait/paiement : retour (optionnel) + "ÉTAPE X / N" + barre de progression.
@@ -17,7 +18,7 @@ export function StepHeader({ step, total = 2, onBack }: { step: number; total?: 
       </View>
       {onBack ? (
         <Pressable onPress={onBack} hitSlop={10} style={styles.back} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          <Text style={styles.backIcon}>‹</Text>
+          <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
         </Pressable>
       ) : (
         <View style={styles.backSpacer} />

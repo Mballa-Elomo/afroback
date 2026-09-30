@@ -8,6 +8,7 @@ import { supabase } from '../../src/data/supabaseClient';
 import { GoldButton, GhostButton } from '../../src/components/Buttons';
 import { colors, spacing, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
+import { Icon } from '../../src/components/Icons';
 
 /**
  * Activation/désactivation de la vérification en 2 étapes (MFA/TOTP).
@@ -120,7 +121,7 @@ export default function MfaSetupScreen() {
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.scroll}>
           <Pressable onPress={() => router.back()} hitSlop={10} style={styles.back}>
-            <Text style={styles.backIcon}>‹</Text>
+            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
 
           <Text style={styles.title}>{t('mfa.title')}</Text>

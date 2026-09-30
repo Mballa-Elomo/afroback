@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography } from '../theme/tokens';
-import { useReduceMotion } from '../onboarding/useReduceMotion';
+import { useMotionAllowed } from '../onboarding/useReduceMotion';
 import { Icon, type IconName } from './Icons';
 
 /**
@@ -54,7 +54,7 @@ export function PremiumButton({
   shimmer?: boolean;
   accessibilityHint?: string;
 }) {
-  const reduceMotion = useReduceMotion();
+  const reduceMotion = !useMotionAllowed();
   const press = useRef(new Animated.Value(0)).current;
   const sweep = useRef(new Animated.Value(0)).current;
   const [width, setWidth] = useState(0);

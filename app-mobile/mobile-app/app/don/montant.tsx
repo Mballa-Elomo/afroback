@@ -1,44 +1,37 @@
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { GoldButton } from '../../src/components/Buttons';
-import { createDon } from '../../src/data/donRepository';
-import type { DonPaymentMethod } from '../../src/data/donTypes';
-import { colors, radii, spacing, typography } from '../../src/theme/tokens';
+import { PremiumButton } from '../../src/components/Buttons';
+import { startPayment } from '../../src/payments/paiement';
+import { MobileMoneyBadges, paymentErrorMessage } from '../../src/payments/MobileMoneyBadges';
+import { colors, spacing, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
 
 const PRESETS = [500, 1000, 2000, 5000];
-
-const PAYMENT_METHODS: { id: DonPaymentMethod; icon: string; name: string; sub: string }[] = [
-  { id: 'mtn_momo', icon: '📱', name: 'MTN Mobile Money', sub: 'Confirmation manuelle par Yannick' },
-  { id: 'orange_money', icon: '📱', name: 'Orange Money', sub: 'Confirmation manuelle par Yannick' },
-];
+/** Minimum accepté pour un don. */
+const MIN_DON = 200;
 
 function formatFcfa(n: number): string {
   return `${n.toLocaleString('fr-FR')} FCFA`;
 }
 
 /**
- * Montant + paiement + confirmation, fidèle dans l'esprit à
- * design-reference-don.dc.excerpt.html (section DON AMOUNT+PAYMENT), avec la
- * simplification décidée par Yannick le 2026-08-05 : une seule cause
- * ("Soutenir AFROBACK") au lieu d'une carte de cause sélectionnée, pas de
- * bouton "partager" (aucune intégration de partage réelle, jamais un bouton
- * mort). Même règle que le checkout Marketplace : le don est réellement
- * enregistré en base (`statut = 'en_attente_paiement'`), jamais un faux
- * succès de paiement — Mobile Money n'est pas intégré à AFROBACK à ce jour.
+ * Montant + paiement, fidèle dans l'esprit à design-reference-don.dc.excerpt.html
+ * (une seule cause "Soutenir AFROBACK", décision du 2026-08-05). Paiement
+ * Mobile Money réel via Campay depuis le 2026-09-29
+ * (cdc-paiement-geniuspay.md) : l'écran paiement/retour confirme le don.
+ * Le "don mensuel" est retiré tant qu'aucun prélèvement automatique n'existe
+ * (jamais un bouton qui promet ce qu'il ne fait pas).
  */
 export default function DonMontantScreen() {
   const router = useRouter();
+  const { t } = useI18n();
   const [preset, setPreset] = useState<number | null>(1000);
   const [custom, setCustom] = useState('');
-  const [recurrent, setRecurrent] = useState(false);
   const [anonyme, setAnonyme] = useState(false);
-  const [methode, setMethode] = useState<DonPaymentMethod>('mtn_momo');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
-  const [doneAmount, setDoneAmount] = useState(0);
 
   const montant = useMemo(() => {
     const customValue = parseInt(custom, 10);
@@ -52,40 +45,24 @@ export default function DonMontantScreen() {
   };
 
   const submit = async () => {
-    if (submitting || montant <= 0) return;
-    setSubmitting(true);
-    setError(null);
-    const { don, error: apiError } = await createDon({
-      montantFcfa: montant,
-      recurrent,
-      anonyme,
-      methodePaiement: methode,
-    });
-    setSubmitting(false);
-    if (apiError || !don) {
-      setError(apiError ?? "Impossible d'enregistrer ton don pour le moment.");
+    if (submitting) return;
+    if (montant < MIN_DON) {
+      setError(t('paiement.errors.amount'));
       return;
     }
-    setDoneAmount(montant);
-    setDone(true);
+    setSubmitting(true);
+    setError(null);
+    const { paiementId, error: err } = await startPayment({ type: 'don', montant, anonyme });
+    if (err || !paiementId) {
+      setSubmitting(false);
+      setError(paymentErrorMessage(t, err));
+      return;
+    }
+    if (Platform.OS !== 'web') {
+      setSubmitting(false);
+      router.push({ pathname: '/paiement/retour', params: { id: paiementId } });
+    }
   };
-
-  if (done) {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <View style={styles.thanks}>
-          <Text style={styles.thanksIcon}>🙏</Text>
-          <Text style={styles.thanksTitle}>Merci pour ton soutien</Text>
-          <Text style={styles.thanksText}>
-            Ton don de {formatFcfa(doneAmount)}
-            {recurrent ? ' par mois' : ''} pour AFROBACK a bien été enregistré. Le paiement Mobile Money n'est pas
-            encore intégré : Yannick te contactera pour confirmer le règlement.
-          </Text>
-          <GoldButton label="Retour à l'accueil" onPress={() => router.replace('/accueil')} />
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -123,21 +100,11 @@ export default function DonMontantScreen() {
             setCustom(v.replace(/[^0-9]/g, ''));
             setPreset(null);
           }}
-          placeholder="Autre montant (FCFA)"
+          placeholder="Autre montant (200 FCFA minimum)"
           placeholderTextColor={colors.textMuted}
           keyboardType="number-pad"
           style={styles.input}
         />
-
-        <Pressable style={styles.toggleRow} onPress={() => setRecurrent((v) => !v)}>
-          <View style={styles.toggleBody}>
-            <Text style={styles.toggleLabel}>Don mensuel</Text>
-            <Text style={styles.toggleSub}>Plutôt qu'un don ponctuel</Text>
-          </View>
-          <View style={[styles.switchTrack, recurrent && styles.switchTrackActive]}>
-            <View style={[styles.switchKnob, recurrent && styles.switchKnobActive]} />
-          </View>
-        </Pressable>
 
         <Pressable style={styles.toggleRow} onPress={() => setAnonyme((v) => !v)}>
           <View style={[styles.checkbox, anonyme && styles.checkboxActive]}>
@@ -147,29 +114,8 @@ export default function DonMontantScreen() {
         </Pressable>
 
         <Text style={styles.sectionTitle}>MODE DE PAIEMENT</Text>
-        <View style={styles.methods}>
-          {PAYMENT_METHODS.map((m) => {
-            const active = methode === m.id;
-            return (
-              <Pressable key={m.id} onPress={() => setMethode(m.id)} style={[styles.method, active && styles.methodActive]}>
-                <Text style={styles.methodIcon}>{m.icon}</Text>
-                <View style={styles.methodBody}>
-                  <Text style={styles.methodName}>{m.name}</Text>
-                  <Text style={styles.methodSub}>{m.sub}</Text>
-                </View>
-                <View style={[styles.radio, active && styles.radioActive]} />
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <View style={styles.notice}>
-          <Text style={styles.noticeIcon}>ℹ</Text>
-          <Text style={styles.noticeText}>
-            Le paiement en ligne n'est pas encore actif sur AFROBACK. Ton don sera enregistré, et Yannick te
-            contactera pour confirmer le règlement.
-          </Text>
-        </View>
+        <MobileMoneyBadges />
+        <View style={{ height: 18 }} />
 
         <View style={styles.recapCard}>
           <View style={styles.recapRow}>
@@ -180,17 +126,18 @@ export default function DonMontantScreen() {
             <Text style={styles.recapTotalLabel}>Total</Text>
             <Text style={styles.recapTotalValue}>
               {formatFcfa(montant)}
-              {recurrent ? ' /mois' : ''}
             </Text>
           </View>
         </View>
 
         {error && <Text style={styles.error}>{error}</Text>}
 
-        <GoldButton
-          label={submitting ? 'Enregistrement...' : 'Confirmer mon don'}
+        <PremiumButton
+          label={t('paiement.donate', { amount: formatFcfa(montant) })}
+          icon="heart"
           onPress={submit}
-          disabled={submitting || montant <= 0}
+          loading={submitting}
+          disabled={montant <= 0}
         />
       </ScrollView>
     </SafeAreaView>
@@ -303,37 +250,10 @@ const styles = StyleSheet.create({
     padding: 13,
     marginBottom: 10,
   },
-  toggleBody: {
-    flex: 1,
-  },
   toggleLabel: {
     fontFamily: typography.bodySemiBold,
     fontSize: 13,
     color: colors.textPrimary,
-  },
-  toggleSub: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-  },
-  switchTrack: {
-    width: 40,
-    height: 22,
-    borderRadius: 999,
-    backgroundColor: colors.placeholderStripeLight,
-    padding: 2,
-  },
-  switchTrackActive: {
-    backgroundColor: colors.accentGold,
-  },
-  switchKnob: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#fff',
-  },
-  switchKnobActive: {
-    marginLeft: 18,
   },
   checkbox: {
     width: 18,
@@ -352,73 +272,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.ctaTextOnGold,
     fontWeight: '700',
-  },
-  methods: {
-    gap: 10,
-    marginBottom: 18,
-  },
-  method: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 14,
-    borderRadius: radii.button,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surfaceCard,
-  },
-  methodActive: {
-    borderColor: colors.accentGold,
-    backgroundColor: colors.cardBg,
-  },
-  methodIcon: {
-    fontSize: 18,
-  },
-  methodBody: {
-    flex: 1,
-  },
-  methodName: {
-    fontFamily: typography.bodySemiBold,
-    fontSize: 13.5,
-    color: colors.textPrimary,
-  },
-  methodSub: {
-    fontFamily: typography.body,
-    fontSize: 11,
-    color: colors.textMuted,
-  },
-  radio: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1.5,
-    borderColor: colors.borderStrong,
-  },
-  radioActive: {
-    borderColor: colors.accentGold,
-    backgroundColor: colors.accentGold,
-  },
-  notice: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    backgroundColor: colors.surfaceCardDeep,
-    borderWidth: 1,
-    borderColor: colors.borderHairline,
-    borderRadius: 12,
-    padding: 13,
-    marginBottom: 18,
-  },
-  noticeIcon: {
-    color: colors.accentGoldSoft,
-    fontSize: 13,
-  },
-  noticeText: {
-    flex: 1,
-    fontFamily: typography.body,
-    fontSize: 11.5,
-    lineHeight: 17,
-    color: colors.textMuted,
   },
   recapCard: {
     backgroundColor: colors.surfaceCardDeep,
@@ -464,30 +317,5 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     color: colors.terracottaText,
     marginBottom: 14,
-  },
-  thanks: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-    gap: 8,
-  },
-  thanksIcon: {
-    fontSize: 56,
-  },
-  thanksTitle: {
-    fontFamily: typography.display,
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.textHeading,
-    marginTop: 8,
-  },
-  thanksText: {
-    fontFamily: typography.body,
-    fontSize: 13.5,
-    lineHeight: 20,
-    color: colors.textMutedAlt,
-    textAlign: 'center',
-    marginBottom: 24,
   },
 });

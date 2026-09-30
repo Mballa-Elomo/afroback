@@ -18,7 +18,7 @@ import { colors, typography } from '../theme/tokens';
 import { AnimatedLetters } from './AnimatedText';
 import { PremiumButton } from '../components/Buttons';
 import type { IconName } from '../components/Icons';
-import { useReduceMotion } from './useReduceMotion';
+import { useMotionAllowed, useReduceMotion } from './useReduceMotion';
 import { useI18n } from '../i18n';
 
 /**
@@ -76,7 +76,7 @@ export function IllustratedBackground({
   /** Mouvement lent et continu façon caméra (zoom + léger déplacement). */
   drift?: boolean;
 }) {
-  const reduceMotion = useReduceMotion();
+  const reduceMotion = !useMotionAllowed();
   const t = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
@@ -149,7 +149,7 @@ export function BrandMark({
   animated?: boolean;
   layout?: 'stacked' | 'inline';
 }) {
-  const reduceMotion = useReduceMotion();
+  const reduceMotion = !useMotionAllowed();
   const { t } = useI18n();
   const pulse = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -168,7 +168,7 @@ export function BrandMark({
     return (
       <View style={styles.brandInline} accessible accessibilityLabel="AFROBACK">
         <View style={[styles.logoRing, { width: 38, height: 38, borderRadius: 19 }]}>
-          <Image source={require('../../assets/icon.png')} style={{ width: 32, height: 32, borderRadius: 16 }} />
+          <Image source={require('../../assets/logo-medaillon.jpg')} style={{ width: 32, height: 32, borderRadius: 16 }} />
         </View>
         <Text style={[styles.wordmark, styles.wordmarkInline]}>AFROBACK</Text>
       </View>
@@ -204,7 +204,7 @@ export function BrandMark({
           {/* Logo actuel en médaillon : la version dorée sur fond transparent de la
               maquette n'a pas encore été fournie (cdc-onboarding.md, section 7). */}
           <Image
-            source={require('../../assets/icon.png')}
+            source={require('../../assets/logo-medaillon.jpg')}
             style={{ width: logo, height: logo, borderRadius: logo / 2 }}
           />
         </View>
@@ -304,8 +304,13 @@ interface Particle {
  * maquette (retirée : lourde, jamais testée sur un vrai téléphone). Rien
  * n'est rendu si "Réduire les animations" est activé.
  */
-export function GoldParticles({ count = 18, style }: { count?: number; style?: StyleProp<ViewStyle> }) {
-  const reduceMotion = useReduceMotion();
+// Sur navigateur, chaque particule est animée image par image en JavaScript (pas de pilote natif) :
+// au-delà de quelques-unes, un téléphone sature. Limite appliquée au web uniquement.
+const WEB_MAX_PARTICLES = 6;
+
+export function GoldParticles({ count: requested = 18, style }: { count?: number; style?: StyleProp<ViewStyle> }) {
+  const reduceMotion = !useMotionAllowed();
+  const count = Platform.OS === 'web' ? Math.min(requested, WEB_MAX_PARTICLES) : requested;
   const particles = useMemo<Particle[]>(
     () =>
       Array.from({ length: count }, (_, i) => ({
@@ -334,8 +339,8 @@ function FloatingParticle({ p }: { p: Particle }) {
     const loop = Animated.loop(
       Animated.sequence([
         Animated.delay(p.delay),
-        Animated.timing(t, { toValue: 1, duration: p.duration, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-        Animated.timing(t, { toValue: 0, duration: 0, useNativeDriver: true }),
+        Animated.timing(t, { toValue: 1, duration: p.duration, easing: Easing.out(Easing.quad), useNativeDriver: USE_NATIVE }),
+        Animated.timing(t, { toValue: 0, duration: 0, useNativeDriver: USE_NATIVE }),
       ])
     );
     loop.start();

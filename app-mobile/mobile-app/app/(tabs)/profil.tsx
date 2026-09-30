@@ -9,6 +9,7 @@ import { GhostButton } from '../../src/components/Buttons';
 import { HeroPlaceholder } from '../../src/components/HeroVisual';
 import { colors, spacing, typography } from '../../src/theme/tokens';
 import { withAccount } from '../../src/auth/AccountWall';
+import { useAccess } from '../../src/access/Access';
 
 const FORFAIT_LABELS: Record<string, string> = {
   decouverte: 'Découverte (gratuit)',
@@ -27,11 +28,16 @@ function ProfilScreen() {
   const router = useRouter();
   const { session, signOut } = useAuth();
   const { children, returnToSelector } = useActiveProfile();
+  // Forfait réel : abonnement actif côté serveur (mon_abonnement), pas le choix fait à l'inscription.
+  const { subscription } = useAccess();
   const [pinVisible, setPinVisible] = useState(false);
   const meta = session?.user?.user_metadata ?? {};
   const prenom = (meta.prenom as string | undefined) ?? '';
   const pays = (meta.pays as string | undefined) ?? '—';
-  const forfait = (meta.forfait as string | undefined) ?? 'decouverte';
+  const forfait = subscription?.plan ?? 'decouverte';
+  const forfaitFin = subscription?.ends_at
+    ? ` · jusqu'au ${new Date(subscription.ends_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`
+    : '';
   const usages = (meta.usages as string[] | undefined) ?? [];
   const langue = (meta.langue_interface as string | undefined) === 'en' ? 'English' : 'Français';
   const phone = session?.user?.phone ? `+${session.user.phone}` : '—';
@@ -48,7 +54,9 @@ function ProfilScreen() {
         <View style={styles.card}>
           <InfoRow label="PAYS" value={pays} />
           <Separator />
-          <InfoRow label="FORFAIT" value={FORFAIT_LABELS[forfait] ?? forfait} />
+          <Pressable onPress={() => router.push('/abonnement')} accessibilityRole="button">
+            <InfoRow label="FORFAIT" value={`${FORFAIT_LABELS[forfait] ?? forfait}${forfaitFin}  ›`} />
+          </Pressable>
           <Separator />
           <InfoRow label="LANGUE DE L'INTERFACE" value={langue} />
           <Separator />

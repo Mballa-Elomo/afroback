@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AFROBACK · Paiement</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0B0906; font-family: Arial, Helvetica, sans-serif; color: #EDE3D4; padding: 0 20px; box-sizing: border-box; }
+  .card { max-width: 420px; width: 100%; text-align: center; background: #15100B; border: 1px solid #4A3818; border-radius: 18px; padding: 32px 24px; }
+  img { width: 72px; height: 72px; }
+  .brand { font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: bold; letter-spacing: 5px; color: #F0C36B; margin: 10px 0 20px; }
+  h1 { font-family: Georgia, serif; font-size: 22px; color: #F7D98B; margin: 0 0 10px; }
+  p { font-size: 15px; line-height: 23px; color: #D6C6B2; margin: 0 0 8px; }
+  a { display: inline-block; margin-top: 18px; padding: 14px 22px; border-radius: 999px; background: #F0C36B; color: #1a1109; font-weight: bold; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <img src="/email/afroback-logo.png" alt="AFROBACK">
+  <div class="brand">AFROBACK</div>
+  <h1 id="t">Paiement terminé</h1>
+  <p id="p">Ferme cette page pour revenir dans l'app AFROBACK : ton paiement y est confirmé automatiquement.</p>
+  <a id="a" href="afroback://paiement/retour">Revenir dans AFROBACK</a>
+</div>
+<script>
+  // Page affichée dans le navigateur intégré du téléphone, à la fin du paiement GeniusPay.
+  var q = new URLSearchParams(location.search);
+  var en = (navigator.language || '').toLowerCase().indexOf('en') === 0;
+  if (q.get('echec')) {
+    document.getElementById('t').textContent = en ? 'Payment not completed' : 'Paiement non abouti';
+    document.getElementById('p').textContent = en ? 'No amount was charged. Close this page to go back to AFROBACK.' : "Aucun montant n'a été débité. Ferme cette page pour revenir dans AFROBACK.";
+  } else if (en) {
+    document.getElementById('t').textContent = 'Payment complete';
+    document.getElementById('p').textContent = 'Close this page to go back to the AFROBACK app: your payment is confirmed there automatically.';
+  }
+  if (en) document.getElementById('a').textContent = 'Back to AFROBACK';
+  var id = q.get('id');
+  if (id) document.getElementById('a').href = 'afroback://paiement/retour?id=' + encodeURIComponent(id);
+</script>
+</body>
+</html>

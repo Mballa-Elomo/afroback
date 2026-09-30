@@ -1,11 +1,13 @@
-import { useCallback } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAccess } from '../src/access/Access';
-import { Icon } from '../src/components/Icons';
 import { currentLanguage, useI18n } from '../src/i18n';
-import { formatPlanPrice } from '../src/onboarding/pricing';
+import { formatPlanPrice, type Billing, type PaidPlan } from '../src/onboarding/pricing';
+import { PremiumButton } from '../src/components/Buttons';
+import { startPayment, syncPendingPayments } from '../src/payments/paiement';
+import { MobileMoneyBadges, paymentErrorMessage } from '../src/payments/MobileMoneyBadges';
 import { BrandMark } from '../src/onboarding/ui';
 import { colors, typography } from '../src/theme/tokens';
 
@@ -15,19 +17,45 @@ import { colors, typography } from '../src/theme/tokens';
  * profil. Montre le forfait actuel (source serveur `mon_abonnement()`) et
  * les trois forfaits.
  *
- * Honnête sur l'état réel : le paiement Mobile Money n'existe pas encore
- * (Module 4). Aucun bouton "Payer" factice : un encart l'explique et
- * indique comment obtenir un accès offert (décision D5 du 2026-09-29).
+ * Paiement Mobile Money réel via Campay (cdc-paiement-geniuspay.md) :
+ * mensuel ou annuel, "Renouveler" sur le forfait en cours (les jours
+ * restants sont conservés côté serveur).
  */
 export default function AbonnementScreen() {
   const router = useRouter();
   const { t } = useI18n();
   const { subscription, refresh } = useAccess();
+  const [billing, setBilling] = useState<Billing>('monthly');
+  const [paying, setPaying] = useState<PaidPlan | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  // Diagnostic d'un paiement resté en attente (mise en service Campay).
+  const [pendingDiag, setPendingDiag] = useState<string | null>(null);
 
-  // Un abonnement offert entre-temps depuis le back-office apparaît au retour sur l'écran.
+  const pay = async (plan: PaidPlan) => {
+    if (paying) return;
+    setPaying(plan);
+    setError(null);
+    const { paiementId, error: err } = await startPayment({ type: 'abonnement', plan, periode: billing });
+    if (err || !paiementId) {
+      setPaying(null);
+      setError(paymentErrorMessage(t, err));
+      return;
+    }
+    if (Platform.OS !== 'web') {
+      setPaying(null);
+      router.push({ pathname: '/paiement/retour', params: { id: paiementId } });
+    }
+  };
+
+  // Un abonnement offert entre-temps depuis le back-office apparaît au retour sur l'écran ;
+  // un paiement resté en attente (retour de Campay interrompu) est revérifié et crédité.
   useFocusEffect(
     useCallback(() => {
       refresh();
+      syncPendingPayments().then(({ credite, diag }) => {
+        if (credite > 0) refresh();
+        setPendingDiag(credite > 0 ? null : diag);
+      });
     }, [refresh])
   );
 
@@ -46,11 +74,11 @@ export default function AbonnementScreen() {
 
   const plans = [
     { id: 'decouverte' as const, name: 'Découverte', price: t('abonnement.freePrice'), desc: t('abonnement.decouverteDesc') },
-    { id: 'racines' as const, name: 'Racines', price: formatPlanPrice('racines', 'monthly'), desc: t('abonnement.racinesDesc') },
+    { id: 'racines' as const, name: 'Racines', price: formatPlanPrice('racines', billing), desc: t('abonnement.racinesDesc') },
     {
       id: 'heritage' as const,
       name: 'Héritage',
-      price: formatPlanPrice('heritage', 'monthly'),
+      price: formatPlanPrice('heritage', billing),
       desc: t('abonnement.heritageDesc'),
       recommended: true,
     },
@@ -86,6 +114,22 @@ export default function AbonnementScreen() {
             )}
           </View>
 
+          <View style={styles.toggle}>
+            {(['monthly', 'yearly'] as const).map((b) => (
+              <Pressable
+                key={b}
+                onPress={() => setBilling(b)}
+                style={[styles.togglePill, billing === b && styles.togglePillActive]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: billing === b }}
+              >
+                <Text style={[styles.toggleLabel, billing === b && styles.toggleLabelActive]}>
+                  {t(b === 'monthly' ? 'plan.monthly' : 'plan.yearly')}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
           <View style={styles.plans}>
             {plans.map((p) => {
               const isCurrent = p.id === current;
@@ -101,18 +145,29 @@ export default function AbonnementScreen() {
                     <Text style={styles.planPrice}>{p.price}</Text>
                   </View>
                   <Text style={styles.planDesc}>{p.desc}</Text>
+                  {p.id !== 'decouverte' && (
+                    <View style={styles.planCta}>
+                      <PremiumButton
+                        label={isCurrent ? t('abonnement.renew') : t('plan.choose', { plan: p.name })}
+                        variant={p.recommended || isCurrent ? 'gold' : 'glass'}
+                        icon="lock"
+                        loading={paying === p.id}
+                        disabled={!!paying && paying !== p.id}
+                        onPress={() => pay(p.id as PaidPlan)}
+                      />
+                    </View>
+                  )}
                 </View>
               );
             })}
           </View>
 
-          <View style={styles.soon}>
-            <Icon name="sparkle" size={20} color={colors.accentGoldBright} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.soonTitle}>{t('abonnement.soonTitle')}</Text>
-              <Text style={styles.soonText}>{t('abonnement.soonText')}</Text>
-            </View>
-          </View>
+          {!!error && <Text style={styles.error}>{error}</Text>}
+          {!!pendingDiag && <Text style={styles.diag}>{t('abonnement.pendingCheck', { diag: pendingDiag })}</Text>}
+
+          <Text style={styles.sectionLabel}>{t('payment.methods')}</Text>
+          <MobileMoneyBadges />
+          <Text style={styles.disclaimer}>{t('abonnement.payNote')}</Text>
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -170,16 +225,29 @@ const styles = StyleSheet.create({
   planName: { fontFamily: typography.display, fontSize: 20, color: colors.textHeading },
   planPrice: { fontFamily: typography.bodyBold, fontSize: 14.5, color: colors.accentGoldPale },
   planDesc: { fontFamily: typography.body, fontSize: 13.5, lineHeight: 20, color: colors.textBody, marginTop: 8 },
-  soon: {
+  planCta: { marginTop: 14 },
+  diag: { fontFamily: typography.mono, fontSize: 11, color: colors.textMuted, textAlign: 'center', marginTop: 14 },
+  toggle: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 22,
-    padding: 16,
-    borderRadius: 16,
+    marginTop: 20,
+    padding: 4,
+    borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(240,195,107,.3)',
-    backgroundColor: 'rgba(240,195,107,.06)',
+    borderColor: 'rgba(237,227,212,.14)',
+    backgroundColor: 'rgba(26,19,13,.9)',
   },
-  soonTitle: { fontFamily: typography.bodyBold, fontSize: 14.5, color: colors.textPrimary },
-  soonText: { fontFamily: typography.body, fontSize: 13.5, lineHeight: 20, color: colors.textBody, marginTop: 4 },
+  togglePill: { flex: 1, paddingVertical: 10, borderRadius: 999, alignItems: 'center' },
+  togglePillActive: { backgroundColor: colors.accentGoldBright },
+  toggleLabel: { fontFamily: typography.bodySemiBold, fontSize: 13.5, color: colors.textBodyAlt },
+  toggleLabelActive: { color: colors.ctaTextOnGold },
+  error: { fontFamily: typography.body, fontSize: 13.5, color: colors.terracottaText, textAlign: 'center', marginTop: 16 },
+  sectionLabel: {
+    fontFamily: typography.mono,
+    fontSize: 10,
+    letterSpacing: 1,
+    color: colors.textMuted,
+    marginTop: 24,
+    marginBottom: 10,
+  },
+  disclaimer: { fontFamily: typography.body, fontSize: 12, lineHeight: 18, color: colors.textMuted, textAlign: 'center', marginTop: 12 },
 });

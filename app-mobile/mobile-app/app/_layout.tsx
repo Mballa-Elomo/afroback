@@ -170,6 +170,8 @@ function RootNavigator() {
           naviguer avant que `onboardingComplete` ne soit vrai. */}
       <Stack.Protected guard={!!session && mfaOk}>
         <Stack.Screen name="profil/mfa" />
+        {/* Confirmation de paiement (Campay) : pendant l'inscription (forfait) comme après. */}
+        <Stack.Screen name="paiement/retour" options={{ animation: 'fade', gestureEnabled: false }} />
       </Stack.Protected>
       <Stack.Protected guard={!!session && mfaOk && onboardingComplete && profileState.status === 'selecting'}>
         <Stack.Screen name="profils/selection" />

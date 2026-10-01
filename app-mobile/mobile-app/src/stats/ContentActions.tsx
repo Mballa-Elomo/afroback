@@ -11,7 +11,24 @@ import { getContentStats, likeContent, plural, compactNumber, type ContentStats 
 
 const GOLD = colors.accentGoldBright;
 const SITE = 'https://afroback-test.vercel.app';
-const PATH: Record<ContentType, string> = { heros: '/accueil/heros/', mythe: '/accueil/mythologie/', decouverte: '/decouverte/' };
+/** Code du lien court de partage (/s/<code>), lu par la fonction web-vercel/api/share.js. */
+const CODE: Record<ContentType, string> = { heros: 'h', mythe: 'm', decouverte: 'd' };
+
+function accroche(type: ContentType, title: string): string {
+  if (type === 'heros') return `Découvre l'histoire de ${title} sur AFROBACK`;
+  if (type === 'mythe') return `Découvre le mythe « ${title} » sur AFROBACK`;
+  return `À découvrir sur AFROBACK : ${title}`;
+}
+
+/** Première phrase, ou coupe propre à ~160 caractères. */
+function shortDescription(text?: string, max = 160): string {
+  const t = (text ?? '').replace(/\s+/g, ' ').trim();
+  if (!t) return '';
+  const dot = t.indexOf('. ');
+  if (dot > 30 && dot < max) return t.slice(0, dot + 1);
+  if (t.length <= max) return t;
+  return `${t.slice(0, t.lastIndexOf(' ', max))}…`;
+}
 
 /**
  * Sous le titre d'une fiche (cdc-jaime-compteurs.md) : ligne de statistiques
@@ -23,11 +40,14 @@ export function ContentActions({
   type,
   slug,
   title,
+  description,
   onOpenComments,
 }: {
   type: ContentType;
   slug: string;
   title: string;
+  /** Courte description reprise dans le message de partage. */
+  description?: string;
   /** Fait défiler jusqu'aux commentaires. */
   onOpenComments?: () => void;
 }) {
@@ -37,6 +57,7 @@ export function ContentActions({
   const [stats, setStats] = useState<ContentStats | null>(null);
   const [comments, setComments] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
   const pop = useRef(new Animated.Value(1)).current;
 
   const load = useCallback(async () => {
@@ -68,9 +89,25 @@ export function ContentActions({
     else setStats((s) => (s ? { ...s, aime: !like, likes: Math.max(0, s.likes + (like ? -1 : 1)) } : s));
   };
 
-  const share = () => {
-    const url = `${SITE}${PATH[type]}${slug}`;
-    Share.share({ message: `${title} sur AFROBACK : ${url}`, url, title }).catch(() => {});
+  // Partage (2026-09-30) : accroche + courte description + lien court. La carte
+  // d'aperçu (photo, logo AFROBACK, titre) est fournie par /s/<code> côté serveur.
+  const share = async () => {
+    const url = `${SITE}/s/${CODE[type]}-${slug}`;
+    const desc = shortDescription(description);
+    const message = [`✨ ${accroche(type, title)}`, desc, `👉 Clique ici pour en savoir plus : ${url}`].filter(Boolean).join('\n\n');
+    const nav = Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator : null;
+    if (nav && !nav.share) {
+      // Ordinateur sans partage natif : le message est copié, prêt à coller.
+      try {
+        await nav.clipboard.writeText(message);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
+      } catch {
+        /* presse-papiers refusé */
+      }
+      return;
+    }
+    Share.share(Platform.OS === 'ios' ? { message, url } : { message, title }).catch(() => {});
   };
 
   const parts: string[] = [];
@@ -104,7 +141,7 @@ export function ContentActions({
         )}
         <Pressable onPress={share} style={styles.pill} accessibilityRole="button">
           <Icon name="share" size={17} color={colors.textPrimary} strokeWidth={1.9} />
-          <Text style={styles.pillText}>Partager</Text>
+          <Text style={styles.pillText}>{copied ? 'Message copié !' : 'Partager'}</Text>
         </Pressable>
       </View>
     </View>

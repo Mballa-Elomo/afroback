@@ -1,0 +1,21 @@
+{
+  "voice_dir": "C:/Users/Yannico/Music/Afroback Stories Audio/Voix Ngan Medza",
+  "lines": [
+    {"start": 0.4, "text": "Écoute."},
+    {"start": 3.2, "text": "Il y a très longtemps, le peuple beti marchait vers le sud."},
+    {"start": 6.5, "text": "Devant lui : la Sanaga. Un fleuve infranchissable."},
+    {"start": 10.15, "text": "Alors surgit Ngan Medza,"},
+    {"start": 11.9, "text": "un serpent immense, qui offrit son dos comme un pont."},
+    {"start": 15.0, "text": "De nuit, famille après famille, le peuple traversa…"},
+    {"start": 19.4, "text": "Mais une lance, ou une flamme, blessa le serpent."},
+    {"start": 23.1, "text": "Et depuis ce jour, le peuple vit sur les deux rives."},
+    {"start": 26.8, "text": "Écoute la légende entière, sur AFROBACK."}
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Baobab Oath (1).mp3",
+  "music_offset": 8.0,
+  "music_volume": 0.30,
+  "sfx": [],
+  "duration": 30,
+  "out": "public/audio/mix-mythe-ngan-medza-beti.wav",
+  "timing_out": "recits/mythe-ngan-medza-beti/timing.json"
+}

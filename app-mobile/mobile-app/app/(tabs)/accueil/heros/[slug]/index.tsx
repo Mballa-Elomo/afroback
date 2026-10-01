@@ -59,6 +59,7 @@ export default function FicheHerosScreen() {
             type="heros"
             slug={heros.slug}
             title={heros.nom_affiche}
+            description={heros.sous_titre}
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
           {heros.avertissement_lecture && <WarningBanner text={heros.avertissement_lecture} />}

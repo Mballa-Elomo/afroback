@@ -136,6 +136,7 @@ export default function MytheDetailScreen() {
             type="mythe"
             slug={mythe.slug}
             title={mythe.titre}
+            description={mythe.sous_titre}
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
           <View style={styles.tabs}>

@@ -167,6 +167,7 @@ export default function DecouverteDetailScreen() {
             type="decouverte"
             slug={item.slug}
             title={item.titre}
+            description={item.resume_liste}
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
           <Text style={styles.subtitle}>{item.sous_titre}</Text>

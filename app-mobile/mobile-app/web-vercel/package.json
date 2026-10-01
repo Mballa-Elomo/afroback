@@ -1,0 +1,9 @@
+{
+  "name": "afroback-web",
+  "private": true,
+  "type": "module",
+  "description": "Publication web d'AFROBACK sur Vercel : app exportée (expo export) + fonctions de partage (api/).",
+  "dependencies": {
+    "@vercel/og": "0.6.8"
+  }
+}

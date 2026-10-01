@@ -1,0 +1,350 @@
+[
+ {
+  "n": 1,
+  "start": 0.4,
+  "dur": 0.449,
+  "text": "Écoute.",
+  "words": [
+   [
+    "Écoute.",
+    0.4
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 3.2,
+  "dur": 3.154,
+  "text": "Il y a très longtemps, le peuple beti marchait vers le sud.",
+  "words": [
+   [
+    "Il",
+    3.2
+   ],
+   [
+    "y",
+    3.36
+   ],
+   [
+    "a",
+    3.48
+   ],
+   [
+    "très",
+    3.59
+   ],
+   [
+    "longtemps,",
+    3.83
+   ],
+   [
+    "le",
+    4.46
+   ],
+   [
+    "peuple",
+    4.62
+   ],
+   [
+    "beti",
+    4.93
+   ],
+   [
+    "marchait",
+    5.17
+   ],
+   [
+    "vers",
+    5.57
+   ],
+   [
+    "le",
+    5.8
+   ],
+   [
+    "sud.",
+    5.96
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 6.5,
+  "dur": 3.188,
+  "text": "Devant lui : la Sanaga. Un fleuve infranchissable.",
+  "words": [
+   [
+    "Devant",
+    6.5
+   ],
+   [
+    "lui",
+    6.86
+   ],
+   [
+    ":",
+    7.08
+   ],
+   [
+    "la",
+    7.4
+   ],
+   [
+    "Sanaga.",
+    7.58
+   ],
+   [
+    "Un",
+    8.16
+   ],
+   [
+    "fleuve",
+    8.34
+   ],
+   [
+    "infranchissable.",
+    8.7
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 10.15,
+  "dur": 1.353,
+  "text": "Alors surgit Ngan Medza,",
+  "words": [
+   [
+    "Alors",
+    10.15
+   ],
+   [
+    "surgit",
+    10.44
+   ],
+   [
+    "Ngan",
+    10.77
+   ],
+   [
+    "Medza,",
+    11.01
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 11.9,
+  "dur": 2.841,
+  "text": "un serpent immense, qui offrit son dos comme un pont.",
+  "words": [
+   [
+    "un",
+    11.9
+   ],
+   [
+    "serpent",
+    12.06
+   ],
+   [
+    "immense,",
+    12.41
+   ],
+   [
+    "qui",
+    12.97
+   ],
+   [
+    "offrit",
+    13.16
+   ],
+   [
+    "son",
+    13.48
+   ],
+   [
+    "dos",
+    13.68
+   ],
+   [
+    "comme",
+    13.87
+   ],
+   [
+    "un",
+    14.15
+   ],
+   [
+    "pont.",
+    14.31
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 15.0,
+  "dur": 3.333,
+  "text": "De nuit, famille après famille, le peuple traversa…",
+  "words": [
+   [
+    "De",
+    15.0
+   ],
+   [
+    "nuit,",
+    15.19
+   ],
+   [
+    "famille",
+    15.69
+   ],
+   [
+    "après",
+    16.11
+   ],
+   [
+    "famille,",
+    16.44
+   ],
+   [
+    "le",
+    17.08
+   ],
+   [
+    "peuple",
+    17.27
+   ],
+   [
+    "traversa…",
+    17.64
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 19.4,
+  "dur": 2.822,
+  "text": "Mais une lance, ou une flamme, blessa le serpent.",
+  "words": [
+   [
+    "Mais",
+    19.4
+   ],
+   [
+    "une",
+    19.64
+   ],
+   [
+    "lance,",
+    19.84
+   ],
+   [
+    "ou",
+    20.31
+   ],
+   [
+    "une",
+    20.47
+   ],
+   [
+    "flamme,",
+    20.67
+   ],
+   [
+    "blessa",
+    21.19
+   ],
+   [
+    "le",
+    21.51
+   ],
+   [
+    "serpent.",
+    21.67
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 23.1,
+  "dur": 2.81,
+  "text": "Et depuis ce jour, le peuple vit sur les deux rives.",
+  "words": [
+   [
+    "Et",
+    23.1
+   ],
+   [
+    "depuis",
+    23.26
+   ],
+   [
+    "ce",
+    23.57
+   ],
+   [
+    "jour,",
+    23.72
+   ],
+   [
+    "le",
+    24.15
+   ],
+   [
+    "peuple",
+    24.31
+   ],
+   [
+    "vit",
+    24.62
+   ],
+   [
+    "sur",
+    24.82
+   ],
+   [
+    "les",
+    25.01
+   ],
+   [
+    "deux",
+    25.21
+   ],
+   [
+    "rives.",
+    25.44
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 26.8,
+  "dur": 2.358,
+  "text": "Écoute la légende entière, sur AFROBACK.",
+  "words": [
+   [
+    "Écoute",
+    26.8
+   ],
+   [
+    "la",
+    27.14
+   ],
+   [
+    "légende",
+    27.31
+   ],
+   [
+    "entière,",
+    27.7
+   ],
+   [
+    "sur",
+    28.3
+   ],
+   [
+    "AFROBACK.",
+    28.51
+   ]
+  ]
+ }
+]

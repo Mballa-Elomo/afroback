@@ -1,0 +1,22 @@
+{
+  "voice_dir": "C:/Users/Yannico/Music/Afroback Stories Audio/Voix Charles Atangana",
+  "lines": [
+    {"start": 0.2, "text": "Il a servi deux puissances coloniales."},
+    {"start": 2.4, "text": "Charles Atangana. Sa mémoire divise."},
+    {"start": 4.9, "text": "Né Ntsama, il devient Charles."},
+    {"start": 7.4, "text": "L'impôt allemand passe par ses mains."},
+    {"start": 9.9, "text": "Il dénonce un complot : six des siens exécutés."},
+    {"start": 13.2, "text": "Les Allemands le font chef supérieur."},
+    {"start": 15.7, "text": "Il recueille les contes beti."},
+    {"start": 18.0, "text": "Puis il fuit avec les Allemands."},
+    {"start": 20.5, "text": "Sous la France : des routes… et une plainte."},
+    {"start": 23.3, "text": "Ni s'incliner, ni juger d'un bloc : comprendre. Son histoire entière, sur AFROBACK."}
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Baobab Oath (1).mp3",
+  "music_offset": 124.0,
+  "music_volume": 0.3,
+  "sfx": [],
+  "duration": 30,
+  "out": "public/audio/mix-charles-atangana.wav",
+  "timing_out": "recits/charles-atangana/timing.json"
+}

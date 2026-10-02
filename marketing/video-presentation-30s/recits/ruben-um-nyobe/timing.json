@@ -1,0 +1,370 @@
+[
+ {
+  "n": 1,
+  "start": 0.15,
+  "dur": 1.658,
+  "text": "Ce nom fut longtemps interdit.",
+  "words": [
+   [
+    "Ce",
+    0.15
+   ],
+   [
+    "nom",
+    0.32
+   ],
+   [
+    "fut",
+    0.52
+   ],
+   [
+    "longtemps",
+    0.73
+   ],
+   [
+    "interdit.",
+    1.19
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 1.95,
+  "dur": 2.928,
+  "text": "Ruben Um Nyobè. Son peuple l'appelait Mpodol.",
+  "words": [
+   [
+    "Ruben",
+    1.95
+   ],
+   [
+    "Um",
+    2.29
+   ],
+   [
+    "Nyobè.",
+    2.48
+   ],
+   [
+    "Son",
+    3.05
+   ],
+   [
+    "peuple",
+    3.29
+   ],
+   [
+    "l'appelait",
+    3.68
+   ],
+   [
+    "Mpodol.",
+    4.25
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 5.0,
+  "dur": 3.219,
+  "text": "Greffier, syndicaliste, puis chef de l'UPC.",
+  "words": [
+   [
+    "Greffier,",
+    5.0
+   ],
+   [
+    "syndicaliste,",
+    5.78
+   ],
+   [
+    "puis",
+    6.77
+   ],
+   [
+    "chef",
+    7.08
+   ],
+   [
+    "de",
+    7.39
+   ],
+   [
+    "l'UPC.",
+    7.6
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 8.35,
+  "dur": 3.028,
+  "text": "À l'ONU, il réclame une date pour l'indépendance.",
+  "words": [
+   [
+    "À",
+    8.35
+   ],
+   [
+    "l'ONU,",
+    8.49
+   ],
+   [
+    "il",
+    9.04
+   ],
+   [
+    "réclame",
+    9.22
+   ],
+   [
+    "une",
+    9.63
+   ],
+   [
+    "date",
+    9.86
+   ],
+   [
+    "pour",
+    10.14
+   ],
+   [
+    "l'indépendance.",
+    10.41
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 11.55,
+  "dur": 2.961,
+  "text": "Son parti est dissous. Lui entre dans la forêt.",
+  "words": [
+   [
+    "Son",
+    11.55
+   ],
+   [
+    "parti",
+    11.78
+   ],
+   [
+    "est",
+    12.1
+   ],
+   [
+    "dissous.",
+    12.32
+   ],
+   [
+    "Lui",
+    12.96
+   ],
+   [
+    "entre",
+    13.19
+   ],
+   [
+    "dans",
+    13.51
+   ],
+   [
+    "la",
+    13.78
+   ],
+   [
+    "forêt.",
+    13.96
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 14.7,
+  "dur": 1.367,
+  "text": "Trois ans, il y tient bon.",
+  "words": [
+   [
+    "Trois",
+    14.7
+   ],
+   [
+    "ans,",
+    14.93
+   ],
+   [
+    "il",
+    15.27
+   ],
+   [
+    "y",
+    15.4
+   ],
+   [
+    "tient",
+    15.5
+   ],
+   [
+    "bon.",
+    15.73
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 16.9,
+  "dur": 1.328,
+  "text": "Puis l'armée française le tue.",
+  "words": [
+   [
+    "Puis",
+    16.9
+   ],
+   [
+    "l'armée",
+    17.1
+   ],
+   [
+    "française",
+    17.4
+   ],
+   [
+    "le",
+    17.76
+   ],
+   [
+    "tue.",
+    17.9
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 19.4,
+  "dur": 1.968,
+  "text": "On l'enterre sans nom, dans le béton.",
+  "words": [
+   [
+    "On",
+    19.4
+   ],
+   [
+    "l'enterre",
+    19.55
+   ],
+   [
+    "sans",
+    19.96
+   ],
+   [
+    "nom,",
+    20.18
+   ],
+   [
+    "dans",
+    20.55
+   ],
+   [
+    "le",
+    20.77
+   ],
+   [
+    "béton.",
+    20.92
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 22.45,
+  "dur": 3.299,
+  "text": "Mais son nom revient. Et la France reconnaît sa responsabilité.",
+  "words": [
+   [
+    "Mais",
+    22.45
+   ],
+   [
+    "son",
+    22.69
+   ],
+   [
+    "nom",
+    22.89
+   ],
+   [
+    "revient.",
+    23.09
+   ],
+   [
+    "Et",
+    23.66
+   ],
+   [
+    "la",
+    23.82
+   ],
+   [
+    "France",
+    23.98
+   ],
+   [
+    "reconnaît",
+    24.3
+   ],
+   [
+    "sa",
+    24.74
+   ],
+   [
+    "responsabilité.",
+    24.9
+   ]
+  ]
+ },
+ {
+  "n": 10,
+  "start": 26.2,
+  "dur": 3.118,
+  "text": "Souviens-toi de ce nom. Écoute son histoire sur AFROBACK.",
+  "words": [
+   [
+    "Souviens-toi",
+    26.2
+   ],
+   [
+    "de",
+    26.78
+   ],
+   [
+    "ce",
+    26.95
+   ],
+   [
+    "nom.",
+    27.11
+   ],
+   [
+    "Écoute",
+    27.53
+   ],
+   [
+    "son",
+    27.86
+   ],
+   [
+    "histoire",
+    28.07
+   ],
+   [
+    "sur",
+    28.49
+   ],
+   [
+    "AFROBACK.",
+    28.69
+   ]
+  ]
+ }
+]

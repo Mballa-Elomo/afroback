@@ -1,0 +1,362 @@
+[
+ {
+  "n": 1,
+  "start": 0.2,
+  "dur": 1.973,
+  "text": "Il a servi deux puissances coloniales.",
+  "words": [
+   [
+    "Il",
+    0.2
+   ],
+   [
+    "a",
+    0.36
+   ],
+   [
+    "servi",
+    0.48
+   ],
+   [
+    "deux",
+    0.76
+   ],
+   [
+    "puissances",
+    1.01
+   ],
+   [
+    "coloniales.",
+    1.49
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 2.4,
+  "dur": 2.299,
+  "text": "Charles Atangana. Sa mémoire divise.",
+  "words": [
+   [
+    "Charles",
+    2.4
+   ],
+   [
+    "Atangana.",
+    2.81
+   ],
+   [
+    "Sa",
+    3.5
+   ],
+   [
+    "mémoire",
+    3.69
+   ],
+   [
+    "divise.",
+    4.1
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 4.9,
+  "dur": 2.033,
+  "text": "Né Ntsama, il devient Charles.",
+  "words": [
+   [
+    "Né",
+    4.9
+   ],
+   [
+    "Ntsama,",
+    5.08
+   ],
+   [
+    "il",
+    5.69
+   ],
+   [
+    "devient",
+    5.87
+   ],
+   [
+    "Charles.",
+    6.29
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 7.4,
+  "dur": 1.618,
+  "text": "L'impôt allemand passe par ses mains.",
+  "words": [
+   [
+    "L'impôt",
+    7.4
+   ],
+   [
+    "allemand",
+    7.7
+   ],
+   [
+    "passe",
+    8.04
+   ],
+   [
+    "par",
+    8.28
+   ],
+   [
+    "ses",
+    8.44
+   ],
+   [
+    "mains.",
+    8.61
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 9.9,
+  "dur": 2.933,
+  "text": "Il dénonce un complot : six des siens exécutés.",
+  "words": [
+   [
+    "Il",
+    9.9
+   ],
+   [
+    "dénonce",
+    10.08
+   ],
+   [
+    "un",
+    10.49
+   ],
+   [
+    "complot",
+    10.67
+   ],
+   [
+    ":",
+    11.07
+   ],
+   [
+    "six",
+    11.39
+   ],
+   [
+    "des",
+    11.61
+   ],
+   [
+    "siens",
+    11.84
+   ],
+   [
+    "exécutés.",
+    12.16
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 13.2,
+  "dur": 1.898,
+  "text": "Les Allemands le font chef supérieur.",
+  "words": [
+   [
+    "Les",
+    13.2
+   ],
+   [
+    "Allemands",
+    13.4
+   ],
+   [
+    "le",
+    13.83
+   ],
+   [
+    "font",
+    13.99
+   ],
+   [
+    "chef",
+    14.23
+   ],
+   [
+    "supérieur.",
+    14.47
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 15.7,
+  "dur": 1.406,
+  "text": "Il recueille les contes beti.",
+  "words": [
+   [
+    "Il",
+    15.7
+   ],
+   [
+    "recueille",
+    15.84
+   ],
+   [
+    "les",
+    16.24
+   ],
+   [
+    "contes",
+    16.42
+   ],
+   [
+    "beti.",
+    16.71
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 18.0,
+  "dur": 1.522,
+  "text": "Puis il fuit avec les Allemands.",
+  "words": [
+   [
+    "Puis",
+    18.0
+   ],
+   [
+    "il",
+    18.21
+   ],
+   [
+    "fuit",
+    18.35
+   ],
+   [
+    "avec",
+    18.57
+   ],
+   [
+    "les",
+    18.78
+   ],
+   [
+    "Allemands.",
+    18.96
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 20.5,
+  "dur": 2.393,
+  "text": "Sous la France : des routes… et une plainte.",
+  "words": [
+   [
+    "Sous",
+    20.5
+   ],
+   [
+    "la",
+    20.72
+   ],
+   [
+    "France",
+    20.86
+   ],
+   [
+    ":",
+    21.15
+   ],
+   [
+    "des",
+    21.41
+   ],
+   [
+    "routes…",
+    21.59
+   ],
+   [
+    "et",
+    22.06
+   ],
+   [
+    "une",
+    22.2
+   ],
+   [
+    "plainte.",
+    22.39
+   ]
+  ]
+ },
+ {
+  "n": 10,
+  "start": 23.3,
+  "dur": 5.646,
+  "text": "Ni s'incliner, ni juger d'un bloc : comprendre. Son histoire entière, sur AFROBACK.",
+  "words": [
+   [
+    "Ni",
+    23.3
+   ],
+   [
+    "s'incliner,",
+    23.49
+   ],
+   [
+    "ni",
+    24.31
+   ],
+   [
+    "juger",
+    24.51
+   ],
+   [
+    "d'un",
+    24.84
+   ],
+   [
+    "bloc",
+    25.13
+   ],
+   [
+    ":",
+    25.42
+   ],
+   [
+    "comprendre.",
+    25.76
+   ],
+   [
+    "Son",
+    26.58
+   ],
+   [
+    "histoire",
+    26.82
+   ],
+   [
+    "entière,",
+    27.31
+   ],
+   [
+    "sur",
+    27.98
+   ],
+   [
+    "AFROBACK.",
+    28.22
+   ]
+  ]
+ }
+]

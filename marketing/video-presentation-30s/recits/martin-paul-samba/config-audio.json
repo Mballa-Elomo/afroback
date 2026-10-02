@@ -1,0 +1,22 @@
+{
+  "voice_dir": "C:/Users/Yannico/Music/Afroback Stories Audio/Voix Martin Paul Samba",
+  "lines": [
+    {"start": 0.15, "text": "Il a porté l'uniforme allemand."},
+    {"start": 1.95, "text": "Puis il s'est retourné contre eux."},
+    {"start": 4.45, "text": "Né Mebenga m'Ebono, en pays bulu."},
+    {"start": 6.65, "text": "Envoyé en Allemagne, il revient officier : Martin-Paul Samba."},
+    {"start": 11.15, "text": "Huit ans, il accompagne les expéditions allemandes."},
+    {"start": 14.3, "text": "À Ebolowa, il voit souffrir les siens."},
+    {"start": 16.6, "text": "Devenu chef, il prépare un soulèvement."},
+    {"start": 19.05, "text": "Une lettre est interceptée. Une semaine après, on l'exécute."},
+    {"start": 22.65, "text": "La légende dit qu'il refusa le bandeau."},
+    {"start": 26.05, "text": "Il a choisi les siens. Son histoire, sur AFROBACK."}
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Legends by the Fire (1).mp3",
+  "music_offset": 109.25,
+  "music_volume": 0.3,
+  "sfx": [],
+  "duration": 30,
+  "out": "public/audio/mix-martin-paul-samba.wav",
+  "timing_out": "recits/martin-paul-samba/timing.json"
+}

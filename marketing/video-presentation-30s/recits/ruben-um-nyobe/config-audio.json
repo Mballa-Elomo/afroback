@@ -1,0 +1,52 @@
+{
+  "voice_dir": "C:/Users/Yannico/Music/Afroback Stories Audio/Voix Ruben Um Nyobe",
+  "lines": [
+    {
+      "start": 0.15,
+      "text": "Ce nom fut longtemps interdit."
+    },
+    {
+      "start": 1.95,
+      "text": "Ruben Um Nyobè. Son peuple l'appelait Mpodol."
+    },
+    {
+      "start": 5.0,
+      "text": "Greffier, syndicaliste, puis chef de l'UPC."
+    },
+    {
+      "start": 8.35,
+      "text": "À l'ONU, il réclame une date pour l'indépendance."
+    },
+    {
+      "start": 11.55,
+      "text": "Son parti est dissous. Lui entre dans la forêt."
+    },
+    {
+      "start": 14.7,
+      "text": "Trois ans, il y tient bon."
+    },
+    {
+      "start": 16.9,
+      "text": "Puis l'armée française le tue."
+    },
+    {
+      "start": 19.4,
+      "text": "On l'enterre sans nom, dans le béton."
+    },
+    {
+      "start": 22.45,
+      "text": "Mais son nom revient. Et la France reconnaît sa responsabilité."
+    },
+    {
+      "start": 26.2,
+      "text": "Souviens-toi de ce nom. Écoute son histoire sur AFROBACK."
+    }
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Legends by the Fire.mp3",
+  "music_offset": 57.5,
+  "music_volume": 0.3,
+  "sfx": [],
+  "duration": 30,
+  "out": "public/audio/mix-ruben-um-nyobe.wav",
+  "timing_out": "recits/ruben-um-nyobe/timing.json"
+}

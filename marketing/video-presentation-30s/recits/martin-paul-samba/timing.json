@@ -1,0 +1,366 @@
+[
+ {
+  "n": 1,
+  "start": 0.15,
+  "dur": 1.49,
+  "text": "Il a porté l'uniforme allemand.",
+  "words": [
+   [
+    "Il",
+    0.15
+   ],
+   [
+    "a",
+    0.3
+   ],
+   [
+    "porté",
+    0.4
+   ],
+   [
+    "l'uniforme",
+    0.66
+   ],
+   [
+    "allemand.",
+    1.09
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 1.95,
+  "dur": 1.53,
+  "text": "Puis il s'est retourné contre eux.",
+  "words": [
+   [
+    "Puis",
+    1.95
+   ],
+   [
+    "il",
+    2.15
+   ],
+   [
+    "s'est",
+    2.29
+   ],
+   [
+    "retourné",
+    2.53
+   ],
+   [
+    "contre",
+    2.87
+   ],
+   [
+    "eux.",
+    3.14
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 4.45,
+  "dur": 2.084,
+  "text": "Né Mebenga m'Ebono, en pays bulu.",
+  "words": [
+   [
+    "Né",
+    4.45
+   ],
+   [
+    "Mebenga",
+    4.62
+   ],
+   [
+    "m'Ebono,",
+    5.01
+   ],
+   [
+    "en",
+    5.62
+   ],
+   [
+    "pays",
+    5.8
+   ],
+   [
+    "bulu.",
+    6.06
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 6.65,
+  "dur": 4.367,
+  "text": "Envoyé en Allemagne, il revient officier : Martin-Paul Samba.",
+  "words": [
+   [
+    "Envoyé",
+    6.65
+   ],
+   [
+    "en",
+    7.07
+   ],
+   [
+    "Allemagne,",
+    7.28
+   ],
+   [
+    "il",
+    8.12
+   ],
+   [
+    "revient",
+    8.33
+   ],
+   [
+    "officier",
+    8.81
+   ],
+   [
+    ":",
+    9.33
+   ],
+   [
+    "Martin-Paul",
+    9.7
+   ],
+   [
+    "Samba.",
+    10.39
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 11.15,
+  "dur": 2.995,
+  "text": "Huit ans, il accompagne les expéditions allemandes.",
+  "words": [
+   [
+    "Huit",
+    11.15
+   ],
+   [
+    "ans,",
+    11.42
+   ],
+   [
+    "il",
+    11.87
+   ],
+   [
+    "accompagne",
+    12.04
+   ],
+   [
+    "les",
+    12.58
+   ],
+   [
+    "expéditions",
+    12.8
+   ],
+   [
+    "allemandes.",
+    13.39
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 14.3,
+  "dur": 2.159,
+  "text": "À Ebolowa, il voit souffrir les siens.",
+  "words": [
+   [
+    "À",
+    14.3
+   ],
+   [
+    "Ebolowa,",
+    14.42
+   ],
+   [
+    "il",
+    14.98
+   ],
+   [
+    "voit",
+    15.14
+   ],
+   [
+    "souffrir",
+    15.38
+   ],
+   [
+    "les",
+    15.78
+   ],
+   [
+    "siens.",
+    15.98
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 16.6,
+  "dur": 2.308,
+  "text": "Devenu chef, il prépare un soulèvement.",
+  "words": [
+   [
+    "Devenu",
+    16.6
+   ],
+   [
+    "chef,",
+    16.94
+   ],
+   [
+    "il",
+    17.41
+   ],
+   [
+    "prépare",
+    17.58
+   ],
+   [
+    "un",
+    17.97
+   ],
+   [
+    "soulèvement.",
+    18.14
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 19.05,
+  "dur": 3.437,
+  "text": "Une lettre est interceptée. Une semaine après, on l'exécute.",
+  "words": [
+   [
+    "Une",
+    19.05
+   ],
+   [
+    "lettre",
+    19.26
+   ],
+   [
+    "est",
+    19.59
+   ],
+   [
+    "interceptée.",
+    19.8
+   ],
+   [
+    "Une",
+    20.56
+   ],
+   [
+    "semaine",
+    20.77
+   ],
+   [
+    "après,",
+    21.15
+   ],
+   [
+    "on",
+    21.65
+   ],
+   [
+    "l'exécute.",
+    21.82
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 22.65,
+  "dur": 1.889,
+  "text": "La légende dit qu'il refusa le bandeau.",
+  "words": [
+   [
+    "La",
+    22.65
+   ],
+   [
+    "légende",
+    22.8
+   ],
+   [
+    "dit",
+    23.13
+   ],
+   [
+    "qu'il",
+    23.32
+   ],
+   [
+    "refusa",
+    23.58
+   ],
+   [
+    "le",
+    23.87
+   ],
+   [
+    "bandeau.",
+    24.02
+   ]
+  ]
+ },
+ {
+  "n": 10,
+  "start": 26.05,
+  "dur": 3.462,
+  "text": "Il a choisi les siens. Son histoire, sur AFROBACK.",
+  "words": [
+   [
+    "Il",
+    26.05
+   ],
+   [
+    "a",
+    26.24
+   ],
+   [
+    "choisi",
+    26.39
+   ],
+   [
+    "les",
+    26.77
+   ],
+   [
+    "siens.",
+    27.01
+   ],
+   [
+    "Son",
+    27.59
+   ],
+   [
+    "histoire,",
+    27.83
+   ],
+   [
+    "sur",
+    28.55
+   ],
+   [
+    "AFROBACK.",
+    28.79
+   ]
+  ]
+ }
+]

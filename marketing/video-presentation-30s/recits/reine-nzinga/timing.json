@@ -1,0 +1,390 @@
+[
+ {
+  "n": 1,
+  "start": 0.15,
+  "dur": 2.087,
+  "text": "Njinga. Son nom évoque : tordre.",
+  "words": [
+   [
+    "Njinga.",
+    0.15
+   ],
+   [
+    "Son",
+    0.68
+   ],
+   [
+    "nom",
+    0.89
+   ],
+   [
+    "évoque",
+    1.09
+   ],
+   [
+    ":",
+    1.42
+   ],
+   [
+    "tordre.",
+    1.71
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 2.45,
+  "dur": 1.545,
+  "text": "Elle, jamais on ne la pliera.",
+  "words": [
+   [
+    "Elle,",
+    2.45
+   ],
+   [
+    "jamais",
+    2.84
+   ],
+   [
+    "on",
+    3.12
+   ],
+   [
+    "ne",
+    3.26
+   ],
+   [
+    "la",
+    3.4
+   ],
+   [
+    "pliera.",
+    3.54
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 4.25,
+  "dur": 2.965,
+  "text": "Elle vient négocier la paix chez les Portugais, à Luanda.",
+  "words": [
+   [
+    "Elle",
+    4.25
+   ],
+   [
+    "vient",
+    4.48
+   ],
+   [
+    "négocier",
+    4.76
+   ],
+   [
+    "la",
+    5.15
+   ],
+   [
+    "paix",
+    5.3
+   ],
+   [
+    "chez",
+    5.54
+   ],
+   [
+    "les",
+    5.77
+   ],
+   [
+    "Portugais,",
+    5.97
+   ],
+   [
+    "à",
+    6.59
+   ],
+   [
+    "Luanda.",
+    6.71
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 7.5,
+  "dur": 3.752,
+  "text": "On raconte : pour eux, des sièges. Pour elle, un simple tapis.",
+  "words": [
+   [
+    "On",
+    7.5
+   ],
+   [
+    "raconte",
+    7.66
+   ],
+   [
+    ":",
+    8.01
+   ],
+   [
+    "pour",
+    8.29
+   ],
+   [
+    "eux,",
+    8.53
+   ],
+   [
+    "des",
+    8.92
+   ],
+   [
+    "sièges.",
+    9.12
+   ],
+   [
+    "Pour",
+    9.63
+   ],
+   [
+    "elle,",
+    9.87
+   ],
+   [
+    "un",
+    10.3
+   ],
+   [
+    "simple",
+    10.46
+   ],
+   [
+    "tapis.",
+    10.78
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 11.5,
+  "dur": 4.105,
+  "text": "Elle s'assit, dit-on, sur le dos d'une servante. D'égale à égal.",
+  "words": [
+   [
+    "Elle",
+    11.5
+   ],
+   [
+    "s'assit,",
+    11.77
+   ],
+   [
+    "dit-on,",
+    12.39
+   ],
+   [
+    "sur",
+    12.97
+   ],
+   [
+    "le",
+    13.2
+   ],
+   [
+    "dos",
+    13.37
+   ],
+   [
+    "d'une",
+    13.6
+   ],
+   [
+    "servante.",
+    13.91
+   ],
+   [
+    "D'égale",
+    14.58
+   ],
+   [
+    "à",
+    14.98
+   ],
+   [
+    "égal.",
+    15.11
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 15.85,
+  "dur": 2.878,
+  "text": "Elle obtient la paix. Puis elle devient reine.",
+  "words": [
+   [
+    "Elle",
+    15.85
+   ],
+   [
+    "obtient",
+    16.12
+   ],
+   [
+    "la",
+    16.54
+   ],
+   [
+    "paix.",
+    16.72
+   ],
+   [
+    "Puis",
+    17.22
+   ],
+   [
+    "elle",
+    17.49
+   ],
+   [
+    "devient",
+    17.77
+   ],
+   [
+    "reine.",
+    18.18
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 19.0,
+  "dur": 3.18,
+  "text": "Plus de quarante ans, par les armes et par la ruse.",
+  "words": [
+   [
+    "Plus",
+    19.0
+   ],
+   [
+    "de",
+    19.27
+   ],
+   [
+    "quarante",
+    19.45
+   ],
+   [
+    "ans,",
+    19.9
+   ],
+   [
+    "par",
+    20.34
+   ],
+   [
+    "les",
+    20.57
+   ],
+   [
+    "armes",
+    20.79
+   ],
+   [
+    "et",
+    21.11
+   ],
+   [
+    "par",
+    21.28
+   ],
+   [
+    "la",
+    21.51
+   ],
+   [
+    "ruse.",
+    21.69
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 22.5,
+  "dur": 3.021,
+  "text": "Pas une statue lisse. Une reine, avec ses ombres.",
+  "words": [
+   [
+    "Pas",
+    22.5
+   ],
+   [
+    "une",
+    22.71
+   ],
+   [
+    "statue",
+    22.93
+   ],
+   [
+    "lisse.",
+    23.27
+   ],
+   [
+    "Une",
+    23.78
+   ],
+   [
+    "reine,",
+    23.99
+   ],
+   [
+    "avec",
+    24.5
+   ],
+   [
+    "ses",
+    24.76
+   ],
+   [
+    "ombres.",
+    24.97
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 26.4,
+  "dur": 1.922,
+  "text": "Écoute toute son histoire sur AFROBACK.",
+  "words": [
+   [
+    "Écoute",
+    26.4
+   ],
+   [
+    "toute",
+    26.71
+   ],
+   [
+    "son",
+    26.98
+   ],
+   [
+    "histoire",
+    27.17
+   ],
+   [
+    "sur",
+    27.55
+   ],
+   [
+    "AFROBACK.",
+    27.75
+   ]
+  ]
+ }
+]

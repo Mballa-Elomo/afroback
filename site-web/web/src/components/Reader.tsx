@@ -8,6 +8,7 @@ import { recordRead } from '@/lib/engagement';
 import { TYPE_PATH } from '@/lib/catalogue';
 import { useLiveDetail } from '@/lib/useLiveDetail';
 import { useLang } from '@/lib/lang-client';
+import { QuizEndCard } from './quiz';
 
 /**
  * Lecteur du récit : colonne de lecture confortable, chapitres dans une
@@ -122,6 +123,7 @@ export function Reader({ type, tile, detail: initial, initialChapter }: { type: 
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold leading-tight text-heading md:text-4xl">{chap.titre}</h1>
           <div className="mt-8 whitespace-pre-line text-[19px] leading-[1.85] text-text">{chap.texte}</div>
+          {index === chapters.length - 1 && <QuizEndCard type={type} slug={tile.slug} className="mt-12" />}
 
           <div className="mt-14 flex items-center justify-between gap-4 border-t border-gold/10 pt-8">
             <button

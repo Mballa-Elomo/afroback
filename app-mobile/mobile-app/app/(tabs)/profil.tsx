@@ -15,6 +15,7 @@ import { withAccount } from '../../src/auth/AccountWall';
 import { useAccess } from '../../src/access/Access';
 import { APP_LANGUAGES, currentLanguage, useI18n, type AppLanguage } from '../../src/i18n';
 import { Flag } from '../../src/i18n/LanguageDropdown';
+import { ProgressCard } from '../../src/quiz/QuizUI';
 
 const PLAN_LABELS: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const BG = '#0B0906';
@@ -104,6 +105,9 @@ function ProfilScreen() {
             </Pressable>
           )}
         </LinearGradient>
+
+        {/* Progression des quiz (cdc-quiz-progression.md §4.4), cachée tant que le serveur n'est pas prêt. */}
+        <ProgressCard style={{ marginTop: 16 }} />
 
         {/* Raccourcis */}
         <View style={styles.quick}>

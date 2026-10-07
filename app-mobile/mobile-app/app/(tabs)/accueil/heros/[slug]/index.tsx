@@ -18,6 +18,7 @@ import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import { useRequireAccount } from '../../../../../src/auth/AccountWall';
 import { LockedContent } from '../../../../../src/access/Access';
 import { useI18n } from '../../../../../src/i18n';
+import { QuizTile } from '../../../../../src/quiz/QuizUI';
 
 export default function FicheHerosScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -86,6 +87,7 @@ export default function FicheHerosScreen() {
                   onPress={() => requireAccount(() => router.push(`/accueil/heros/${heros.slug}/video`), 'video')}
                 />
               </View>
+              <QuizTile type="heros" slug={heros.slug} style={{ marginTop: -spacing.lg + 10, marginBottom: spacing.lg }} />
 
               <Text style={styles.resume}>{heros.resume_catalogue}</Text>
 

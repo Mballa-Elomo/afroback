@@ -14,6 +14,7 @@ import type { Heros } from '../../../../../src/data/types';
 import { withAccount } from '../../../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../../../src/access/Access';
 import { currentLanguage, useI18n } from '../../../../../src/i18n';
+import { QuizEndCard } from '../../../../../src/quiz/QuizUI';
 
 /**
  * Lecteur audio plein écran. Quand aucune narration n'est disponible pour
@@ -191,6 +192,11 @@ function AudioPlayerBlock({ heros }: { heros: Heros }) {
   }, [actualLang, heros.id]);
 
   const progress = status.duration > 0 ? status.currentTime / status.duration : 0;
+  // Fin de l'écoute atteinte une fois : la carte du quiz reste affichée ensuite.
+  const [reachedEnd, setReachedEnd] = useState(false);
+  useEffect(() => {
+    if (!reachedEnd && (status.didJustFinish || progress >= 0.95)) setReachedEnd(true);
+  }, [progress, status.didJustFinish, reachedEnd]);
 
   return (
     <View style={styles.playerBlock}>
@@ -225,6 +231,7 @@ function AudioPlayerBlock({ heros }: { heros: Heros }) {
         <Text style={styles.timeLabel}>{formatTime(status.currentTime)}</Text>
         <Text style={styles.timeLabel}>{formatTime(status.duration)}</Text>
       </View>
+      {reachedEnd && <QuizEndCard type="heros" slug={heros.slug} style={{ alignSelf: 'stretch', marginTop: 16 }} />}
     </View>
   );
 }

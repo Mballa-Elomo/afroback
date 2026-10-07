@@ -3,27 +3,55 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ContentType, Detail, Tile } from '@/lib/types';
-import { contentId, videosOf, type Lang } from '@/lib/content';
+import { chaptersOf, contentId, videosOf, type Lang } from '@/lib/content';
 import { recordWatchChapter, recordWatchOpen } from '@/lib/engagement';
-import { TYPE_PATH } from '@/lib/catalogue';
+import { TYPE_PATH, tileHref } from '@/lib/catalogue';
 import { useLiveDetail } from '@/lib/useLiveDetail';
+import { loc } from '@/lib/lang';
 import { Locked } from './Reader';
 import { useLang } from '@/lib/lang-client';
+import { QuizEndCard, QuizTile } from './quiz';
+import { ContentActions } from './ContentActions';
+import { Comments } from './Comments';
+
+const str = (v: unknown): string => (typeof v === 'string' ? v : '');
 
 /**
- * Lecteur vidéo façon Netflix : vidéo plein cadre sur fond noir, liste des
- * chapitres à côté, passage automatique au chapitre suivant avec un compte à
- * rebours de 5 secondes (« épisode suivant »). Chaque chapitre lu est compté
- * comme dans l'application.
+ * Page vidéo façon YouTube (demande de Yannick du 2026-10-07).
+ * - Ordinateur : à gauche le lecteur, le titre, les actions (J'aime,
+ *   commentaires, partager), la description dépliable et les commentaires ;
+ *   à droite la playlist de l'histoire (tous les chapitres, celui en cours en
+ *   surbrillance, les chapitres pas encore tournés grisés) puis « À suivre ».
+ * - Téléphone (comme l'appli YouTube) : lecteur en haut, titre, actions,
+ *   description, playlist, commentaires, puis « À suivre ».
+ * Conservé de l'ancien lecteur : comptage des vues comme dans l'app, chapitre
+ * suivant après 5 s, bouton lecture tant que la vidéo n'a pas démarré (les
+ * téléphones bloquent la lecture automatique avec le son).
  */
-export function WatchPlayer({ type, tile, detail: initial, initialChapter }: { type: ContentType; tile: Tile; detail: Detail | null; initialChapter: number }) {
+export function WatchPlayer({
+  type,
+  tile,
+  detail: initial,
+  initialChapter,
+  related = [],
+}: {
+  type: ContentType;
+  tile: Tile;
+  detail: Detail | null;
+  initialChapter: number;
+  related?: Tile[];
+}) {
   const detail = useLiveDetail(type, tile.slug, initial);
   const { lang: siteLang, tr } = useLang();
   const [lang, setLang] = useState<Lang>(siteLang);
   const chapters = useMemo(() => videosOf(detail, type, lang, tile.title), [detail, type, lang, tile.title]);
   const hasEn = useMemo(() => videosOf(detail, type, 'en', tile.title).some((c) => c.lang === 'en'), [detail, type, tile.title]);
+  const recit = chaptersOf(detail, lang);
   const [index, setIndex] = useState(Math.max(0, chapters.findIndex((c) => c.numero === initialChapter)));
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [ended, setEnded] = useState(false);
+  // Vidéo (chapitre et langue) réellement démarrée : changer de chapitre réaffiche le bouton lecture si besoin.
+  const [startedSrc, setStartedSrc] = useState<string | null>(null);
   const video = useRef<HTMLVideoElement>(null);
   const opened = useRef(false);
   const counted = useRef(new Set<string>());
@@ -39,12 +67,12 @@ export function WatchPlayer({ type, tile, detail: initial, initialChapter }: { t
 
   useEffect(() => {
     if (countdown === null) return;
-    if (countdown === 0) {
-      setCountdown(null);
-      setIndex((i) => i + 1);
-      return;
-    }
-    const t = setTimeout(() => setCountdown(countdown - 1), 1000);
+    const t = setTimeout(() => {
+      if (countdown <= 1) {
+        setCountdown(null);
+        setIndex((i) => i + 1);
+      } else setCountdown(countdown - 1);
+    }, 1000);
     return () => clearTimeout(t);
   }, [countdown]);
 
@@ -53,8 +81,29 @@ export function WatchPlayer({ type, tile, detail: initial, initialChapter }: { t
 
   const chap = chapters[Math.min(index, chapters.length - 1)];
   const next = chapters[index + 1];
+  const d = (detail && !detail.verrouille ? detail : {}) as Record<string, unknown>;
+  const description = str(loc(d, 'resume_catalogue', lang)) || tile.summary;
+  const meta = [str(loc(d, 'epoque', lang)) || tile.meta, str(loc(d, 'region', lang)) || str(loc(d, 'peuple', lang))].filter(Boolean);
+  const withQuiz = type === 'heros' || type === 'mythe';
+
+  // Playlist : tous les chapitres du récit (pas seulement ceux déjà tournés), comme une playlist YouTube.
+  const source = recit.length > 0 ? recit.map((c) => ({ numero: c.numero, titre: c.titre })) : chapters.map((c) => ({ numero: c.numero, titre: c.titre }));
+  const playlist = source.map((c) => ({
+    numero: c.numero,
+    titre: chapters.find((v) => v.numero === c.numero)?.titre || c.titre || `${tr('Chapitre', 'Chapter')} ${c.numero}`,
+    videoIndex: chapters.findIndex((v) => v.numero === c.numero),
+  }));
+
+  const goTo = (i: number) => {
+    setCountdown(null);
+    setEnded(false);
+    setIndex(i);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const onPlay = () => {
+    setStartedSrc(chap.src);
+    setEnded(false);
     const key = `${chap.numero}:${chap.lang}`;
     if (id && !counted.current.has(key)) {
       counted.current.add(key);
@@ -62,11 +111,100 @@ export function WatchPlayer({ type, tile, detail: initial, initialChapter }: { t
     }
   };
 
+  const playlistPanel = (
+    <section className="overflow-hidden rounded-xl bg-surface ring-1 ring-ivory/10" aria-label={tr('Playlist du récit', 'Story playlist')}>
+      <div className="flex items-start justify-between gap-3 border-b border-ivory/10 bg-gold/[0.06] px-4 py-3">
+        <div className="min-w-0">
+          <p className="truncate font-display text-lg font-bold text-ivory">{tile.title}</p>
+          <p className="text-xs text-body">
+            AFROBACK · {chap.numero}/{playlist.length}
+          </p>
+        </div>
+        {hasEn && (
+          <div className="inline-flex shrink-0 rounded-full border border-gold/25 p-0.5" role="group" aria-label={tr('Langue de la vidéo', 'Video language')}>
+            {(['fr', 'en'] as Lang[]).map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => setLang(l)}
+                aria-pressed={lang === l}
+                className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${lang === l ? 'bg-gold/20 text-gold' : 'text-muted hover:text-ivory'}`}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <ol className="max-h-[420px] overflow-y-auto py-1">
+        {playlist.map((c) => {
+          const active = c.videoIndex === index;
+          const available = c.videoIndex >= 0;
+          return (
+            <li key={c.numero}>
+              <button
+                type="button"
+                disabled={!available}
+                onClick={() => goTo(c.videoIndex)}
+                aria-current={active ? 'true' : undefined}
+                className={`flex w-full items-center gap-3 px-3 py-2 text-left transition ${active ? 'bg-gold/15' : available ? 'hover:bg-ivory/5' : 'cursor-not-allowed opacity-50'}`}
+              >
+                <span className={`w-4 shrink-0 text-center text-xs font-bold ${active ? 'text-gold' : 'text-muted'}`}>{active ? '▶' : c.numero}</span>
+                <span className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-lg bg-ink">
+                  {tile.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={tile.image} alt="" className="h-full w-full object-cover" style={{ objectPosition: `${15 + c.numero * 18}% ${15 + c.numero * 6}%` }} />
+                  )}
+                  {!available && <span className="absolute inset-x-0 bottom-0 bg-ink/85 py-0.5 text-center text-[10px] font-bold text-gold">{tr('BIENTÔT', 'SOON')}</span>}
+                  {active && <span className="absolute inset-0 rounded-lg ring-2 ring-inset ring-gold" />}
+                </span>
+                <span className="min-w-0">
+                  <span className={`line-clamp-2 text-sm leading-snug ${active ? 'font-bold text-ivory' : 'font-semibold text-text'}`}>{c.titre}</span>
+                  <span className="mt-0.5 block text-xs text-muted">
+                    {tr('Chapitre', 'Chapter')} {c.numero}
+                    {!available ? ` · ${tr('pas encore tourné', 'not filmed yet')}` : ''}
+                  </span>
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+
+  const upNext =
+    related.length > 0 ? (
+      <section aria-label={tr('À suivre', 'Up next')}>
+        <p className="mb-3 text-sm font-bold text-ivory">{tr('À suivre', 'Up next')}</p>
+        <ul className="space-y-3">
+          {related.map((r) => (
+            <li key={r.slug}>
+              <Link href={tileHref(r)} className="group flex gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-gold">
+                <span className="relative aspect-video w-40 shrink-0 overflow-hidden rounded-lg bg-ink">
+                  {r.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={r.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  )}
+                </span>
+                <span className="min-w-0 pt-0.5">
+                  <span className="line-clamp-2 text-sm font-semibold leading-snug text-text group-hover:text-ivory">{r.title}</span>
+                  <span className="mt-1 block text-xs text-muted">AFROBACK</span>
+                  <span className="block truncate text-xs text-muted">{r.kicker}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null;
+
   return (
-    <div className="min-h-screen bg-black pt-16 md:pt-[72px]">
-      <div className="mx-auto grid max-w-[1500px] gap-6 px-0 pb-12 md:px-8 md:pt-6 lg:grid-cols-[1fr_320px]">
-        <div>
-          <div className="relative aspect-video w-full bg-black">
+    <div className="min-h-screen bg-ink pt-24 md:pt-[88px]">
+      <div className="mx-auto grid max-w-[1700px] gap-6 pb-14 md:px-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-8">
+        {/* Colonne principale : lecteur, titre, actions, description, commentaires */}
+        <div className="min-w-0">
+          <div className="relative aspect-video w-full overflow-hidden bg-black md:rounded-xl">
             <video
               ref={video}
               key={chap.src}
@@ -74,75 +212,96 @@ export function WatchPlayer({ type, tile, detail: initial, initialChapter }: { t
               controls
               autoPlay
               playsInline
+              preload="metadata"
+              poster={tile.image ?? undefined}
               onPlay={onPlay}
-              onEnded={() => next && setCountdown(5)}
+              onEnded={() => (next ? setCountdown(5) : setEnded(true))}
               className="h-full w-full"
             />
+            {startedSrc !== chap.src && (
+              <button
+                type="button"
+                onClick={() => video.current?.play().catch(() => {})}
+                className="group absolute inset-0 grid place-items-center bg-ink/40 focus-visible:outline-2 focus-visible:outline-gold"
+                aria-label={tr(`Lire la vidéo : ${chap.titre}`, `Play the video: ${chap.titre}`)}
+              >
+                <span className="grid h-20 w-20 place-items-center rounded-full bg-gold text-ink shadow-[0_10px_40px_rgba(240,195,107,0.45)] transition group-hover:scale-105 group-active:scale-95">
+                  <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+                  </svg>
+                </span>
+              </button>
+            )}
             {countdown !== null && next && (
-              <div className="absolute bottom-6 right-6 max-w-xs rounded-lg bg-ink/90 p-4 ring-1 ring-gold/30">
+              <div className="absolute bottom-4 right-4 max-w-xs rounded-lg bg-ink/90 p-4 ring-1 ring-gold/30">
                 <p className="text-xs font-bold tracking-[0.14em] text-gold">{tr(`CHAPITRE SUIVANT DANS ${countdown} S`, `NEXT CHAPTER IN ${countdown} S`)}</p>
                 <p className="mt-1 font-bold text-ivory">{next.titre}</p>
                 <div className="mt-3 flex gap-2">
-                  <button
-                    onClick={() => {
-                      setCountdown(null);
-                      setIndex(index + 1);
-                    }}
-                    className="rounded bg-gold px-3 py-1.5 text-sm font-bold text-ink"
-                  >
+                  <button type="button" onClick={() => goTo(index + 1)} className="rounded bg-gold px-3 py-1.5 text-sm font-bold text-ink">
                     {tr('Regarder maintenant', 'Watch now')}
                   </button>
-                  <button onClick={() => setCountdown(null)} className="rounded px-3 py-1.5 text-sm text-body hover:text-ivory">
+                  <button type="button" onClick={() => setCountdown(null)} className="rounded px-3 py-1.5 text-sm text-body hover:text-ivory">
                     {tr('Annuler', 'Cancel')}
                   </button>
                 </div>
               </div>
             )}
           </div>
-          <div className="px-4 pt-5 md:px-0">
-            <Link href={base} className="text-sm font-semibold text-gold hover:underline">
-              ‹ {tile.title}
-            </Link>
-            <h1 className="mt-2 font-display text-2xl font-bold text-ivory md:text-3xl">
-              {chapters.length > 1 ? `${tr('Chapitre', 'Chapter')} ${chap.numero} · ` : ''}
-              {chap.titre}
+
+          <div className="space-y-4 px-4 pt-4 md:px-0">
+            <h1 className="font-display text-xl font-bold leading-snug text-ivory md:text-2xl">
+              {tile.title}
+              {playlist.length > 1 ? ` · ${tr('Chapitre', 'Chapter')} ${chap.numero} : ${chap.titre}` : ''}
             </h1>
+
+            {/* Ligne « chaîne », comme sous une vidéo YouTube */}
+            <Link href={base} className="flex w-fit items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-medaillon.jpg" alt="" className="h-10 w-10 rounded-full ring-1 ring-gold" />
+              <span>
+                <span className="block font-bold text-ivory">AFROBACK</span>
+                <span className="block text-xs text-muted">{tr("Voir la fiche de l'histoire", 'See the story page')}</span>
+              </span>
+            </Link>
+            <ContentActions type={type} tile={tile} />
+
+            {/* Description dépliable */}
+            <details className="group rounded-xl bg-surface p-4 ring-1 ring-ivory/10 open:ring-gold/25">
+              <summary className="cursor-pointer list-none">
+                {meta.length > 0 && <p className="text-sm font-bold text-ivory">{meta.join('  ·  ')}</p>}
+                <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-text group-open:line-clamp-none">{description}</p>
+                <span className="mt-1 inline-block text-sm font-bold text-gold group-open:hidden">{tr('…plus', '…more')}</span>
+                <span className="mt-1 hidden text-sm font-bold text-gold group-open:inline-block">{tr('Moins', 'Less')}</span>
+              </summary>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <Link href={`${base}/lire?chapitre=${chap.numero}`} className="rounded-full bg-gold px-4 py-2 text-sm font-bold text-ink hover:bg-gold-pale">
+                  {tr('Lire ce chapitre', 'Read this chapter')}
+                </Link>
+                {type !== 'decouverte' && (
+                  <Link href={`${base}/ecouter`} className="rounded-full border border-gold/40 px-4 py-2 text-sm font-bold text-gold hover:bg-gold/10">
+                    {tr('Écouter le récit', 'Listen to the story')}
+                  </Link>
+                )}
+              </div>
+            </details>
+
+            {withQuiz && (ended && !next ? <QuizEndCard type={type} slug={tile.slug} /> : <QuizTile type={type} slug={tile.slug} />)}
+
+            {/* Téléphone : la playlist vient avant les commentaires, comme dans l'appli YouTube */}
+            <div className="lg:hidden">{playlistPanel}</div>
+
+            <div id="commentaires" className="pt-2">
+              <Comments type={type} slug={tile.slug} />
+            </div>
+
+            {upNext && <div className="lg:hidden">{upNext}</div>}
           </div>
         </div>
 
-        <aside className="px-4 md:px-0">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-bold tracking-[0.16em] text-muted">{tr('CHAPITRES', 'CHAPTERS')}</p>
-            {hasEn && (
-              <div className="inline-flex rounded-full border border-gold/25 p-1">
-                {(['fr', 'en'] as Lang[]).map((l) => (
-                  <button
-                    key={l}
-                    onClick={() => setLang(l)}
-                    className={`rounded-full px-3 py-1 text-xs font-bold ${lang === l ? 'bg-gold/20 text-gold' : 'text-muted'}`}
-                  >
-                    {l.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <ol className="mt-3 space-y-2">
-            {chapters.map((c, i) => (
-              <li key={`${c.numero}-${c.lang}`}>
-                <button
-                  onClick={() => {
-                    setCountdown(null);
-                    setIndex(i);
-                  }}
-                  className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition ${i === index ? 'bg-gold/15 ring-1 ring-gold/40' : 'hover:bg-text/5'}`}
-                >
-                  <span className={`font-display text-xl font-bold ${i === index ? 'text-gold' : 'text-muted'}`}>{c.numero}</span>
-                  <span className={`text-sm ${i === index ? 'font-bold text-ivory' : 'text-body'}`}>{c.titre}</span>
-                </button>
-              </li>
-            ))}
-          </ol>
+        {/* Colonne de droite (ordinateur) : playlist puis « À suivre » */}
+        <aside className="hidden space-y-6 lg:block">
+          {playlistPanel}
+          {upNext}
         </aside>
       </div>
     </div>

@@ -206,6 +206,9 @@ function RootNavigator() {
         <Stack.Screen name="profil/mot-de-passe" />
         <Stack.Screen name="don/index" />
         <Stack.Screen name="don/montant" />
+        {/* Quiz de fin de contenu et progression (cdc-quiz-progression.md, 2026-10-07) : réservés aux comptes. */}
+        <Stack.Screen name="quiz/[type]/[slug]" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="profil/progression" />
       </Stack.Protected>
     </Stack>
   );

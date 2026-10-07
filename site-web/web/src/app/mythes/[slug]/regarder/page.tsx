@@ -14,6 +14,6 @@ export async function generateMetadata({ params }: Props) {
 export default async function Page({ params, searchParams }: Props) {
   const { slug } = await params;
   const chap = Number((await searchParams).chapitre ?? 1) || 1;
-  const { tile, detail } = await loadContent('mythe', slug);
-  return <WatchPlayer type="mythe" tile={tile} detail={detail} initialChapter={chap} />;
+  const { tile, detail, related } = await loadContent('mythe', slug);
+  return <WatchPlayer type="mythe" tile={tile} detail={detail} initialChapter={chap} related={related} />;
 }

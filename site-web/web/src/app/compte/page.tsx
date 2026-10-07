@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { useMember } from '@/lib/auth';
 import { Avatar } from '@/components/Avatar';
 import { useLang } from '@/lib/lang-client';
+import { ProgressSummary } from '@/components/quiz';
 
 const PLAN_NAME: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const PLAN_NAME_EN = PLAN_NAME; // noms de marque, identiques en anglais
@@ -56,6 +57,8 @@ export default function Compte() {
           </div>
         </div>
       </motion.div>
+
+      <ProgressSummary />
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tiles.map((t, i) => (

@@ -14,6 +14,7 @@ import { colors, spacing, typography } from '../../../../src/theme/tokens';
 import { useRequireAccount } from '../../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../../src/access/Access';
 import { currentLanguage, useI18n } from '../../../../src/i18n';
+import { QuizEndCard, QuizTile } from '../../../../src/quiz/QuizUI';
 import { Icon, type IconName } from '../../../../src/components/Icons';
 import { BackButton } from '../../../../src/ui/modern';
 import { CommentsSection } from '../../../../src/comments/CommentsSection';
@@ -139,6 +140,7 @@ export default function MytheDetailScreen() {
             description={mythe.sous_titre}
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
+          <QuizTile type="mythe" slug={mythe.slug} style={{ marginBottom: 14 }} />
           <View style={styles.tabs}>
             <Tab icon="book" label={t('content.read')} active={onglet === 'lire'} onPress={() => setOnglet('lire')} />
             <Tab icon="play" label={t('content.listen')} active={onglet === 'ecouter'} onPress={() => requireAccount(() => setOnglet('ecouter'), 'audio')} />
@@ -187,6 +189,7 @@ export default function MytheDetailScreen() {
 
               {estDernier && (
                 <>
+                  <QuizEndCard type="mythe" slug={mythe.slug} style={{ marginBottom: 16 }} />
                   <Pressable onPress={openBd} style={styles.reReadCard}>
                     <Icon name="book" size={22} color={colors.accentGoldBright} />
                     <View style={styles.reReadBody}>
@@ -264,6 +267,11 @@ function RealAudioPlayer({ mythe }: { mythe: Mythe }) {
   const status = useAudioPlayerStatus(player);
   const progress = status.duration > 0 ? status.currentTime / status.duration : 0;
   const loggedLangsRef = useRef(new Set<'fr' | 'en'>());
+  // Fin de l'écoute atteinte une fois : la carte du quiz reste affichée ensuite.
+  const [reachedEnd, setReachedEnd] = useState(false);
+  useEffect(() => {
+    if (!reachedEnd && (status.didJustFinish || progress >= 0.95)) setReachedEnd(true);
+  }, [progress, status.didJustFinish, reachedEnd]);
 
   useEffect(() => {
     player.replace(uri);
@@ -302,6 +310,7 @@ function RealAudioPlayer({ mythe }: { mythe: Mythe }) {
       <Pressable onPress={() => (status.playing ? player.pause() : player.play())} style={styles.playButton}>
         <Text style={styles.playButtonIcon}>{status.playing ? '⏸' : '▶'}</Text>
       </Pressable>
+      {reachedEnd && <QuizEndCard type="mythe" slug={mythe.slug} style={{ alignSelf: 'stretch', marginTop: 18 }} />}
     </View>
   );
 }

@@ -41,7 +41,8 @@ export type IconName =
   | 'send'
   | 'close'
   | 'flag'
-  | 'trash';
+  | 'trash'
+  | 'trophy';
 
 export function Icon({ name, size = 18, color = '#F7D98B', strokeWidth = 2 }: {
   name: IconName;
@@ -205,6 +206,12 @@ export function Icon({ name, size = 18, color = '#F7D98B', strokeWidth = 2 }: {
       {name === 'trash' && (
         <>
           <Path d="M4.5 7h15M9.5 7V5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2M6.5 7l.8 12a1.5 1.5 0 0 0 1.5 1.4h6.4a1.5 1.5 0 0 0 1.5-1.4l.8-12" {...common} />
+        </>
+      )}
+      {name === 'trophy' && (
+        <>
+          <Path d="M8 4h8v5a4 4 0 0 1-8 0V4z" {...common} />
+          <Path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4" {...common} />
         </>
       )}
       {name === 'plus' && <Path d="M12 5v14M5 12h14" {...common} />}

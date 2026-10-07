@@ -8,6 +8,7 @@ import { audioOf, contentId, videosOf } from '@/lib/content';
 import { recordRead } from '@/lib/engagement';
 import { TYPE_PATH } from '@/lib/catalogue';
 import { ContentActions } from './ContentActions';
+import { QuizTile } from './quiz';
 import { Comments } from './Comments';
 import { useLiveDetail } from '@/lib/useLiveDetail';
 import { chaptersOf } from '@/lib/content';
@@ -118,6 +119,7 @@ export function ContentView({ tile, detail: initial, loading, compact }: { tile:
               )}
             </>
           )}
+          <QuizTile type={tile.type} slug={tile.slug} />
         </div>
         <div className="mt-6">
           <ContentActions type={tile.type} tile={tile} onComments={() => setTab('commentaires')} />

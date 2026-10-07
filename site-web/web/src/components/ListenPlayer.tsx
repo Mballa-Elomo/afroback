@@ -9,6 +9,7 @@ import { TYPE_PATH } from '@/lib/catalogue';
 import { useLiveDetail } from '@/lib/useLiveDetail';
 import { Locked } from './Reader';
 import { useLang } from '@/lib/lang-client';
+import { QuizEndCard } from './quiz';
 
 /**
  * Lecteur audio immersif : pochette, grand bouton lecture, barre de
@@ -31,6 +32,7 @@ export function ListenPlayer({ type, tile, detail: initial }: { type: ContentTyp
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
+  const [ended, setEnded] = useState(false);
   const counted = useRef(false);
   const base = `/${TYPE_PATH[type]}/${tile.slug}`;
   const src = audioOf(detail, type, lang);
@@ -63,6 +65,7 @@ export function ListenPlayer({ type, tile, detail: initial }: { type: ContentTyp
 
   const onPlay = () => {
     setPlaying(true);
+    setEnded(false);
     const id = contentId(detail);
     if (!counted.current && id) {
       counted.current = true;
@@ -99,7 +102,10 @@ export function ListenPlayer({ type, tile, detail: initial }: { type: ContentTyp
           onPause={() => setPlaying(false)}
           onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-          onEnded={() => setPlaying(false)}
+          onEnded={() => {
+            setPlaying(false);
+            setEnded(true);
+          }}
         />
 
         <input
@@ -171,6 +177,7 @@ export function ListenPlayer({ type, tile, detail: initial }: { type: ContentTyp
             </div>
           )}
         </div>
+        {ended && <QuizEndCard type={type} slug={tile.slug} className="mt-10 w-full" />}
       </div>
     </div>
   );

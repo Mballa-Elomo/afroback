@@ -19,6 +19,7 @@ import type { RecitChapitre } from '../../../../../src/data/types';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import { LockedDetailScreen } from '../../../../../src/access/Access';
 import { currentLanguage, useI18n } from '../../../../../src/i18n';
+import { QuizEndCard } from '../../../../../src/quiz/QuizUI';
 
 type Langue = 'fr' | 'en';
 type TailleTexte = 'S' | 'M' | 'L';
@@ -220,6 +221,7 @@ export default function LecteurDeRecitScreen() {
         {estDernierChapitre ? (
           <>
             <Text style={styles.endLabel}>{t('reader.end')}</Text>
+            <QuizEndCard type="heros" slug={heros.slug} style={{ marginBottom: 14 }} />
             <GhostButton label={t('reader.backToSheet')} onPress={() => router.back()} />
           </>
         ) : (

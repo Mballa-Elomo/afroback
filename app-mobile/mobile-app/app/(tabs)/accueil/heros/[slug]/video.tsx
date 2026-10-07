@@ -14,6 +14,7 @@ import type { Heros } from '../../../../../src/data/types';
 import { withAccount } from '../../../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../../../src/access/Access';
 import { useI18n } from '../../../../../src/i18n';
+import { QuizTile } from '../../../../../src/quiz/QuizUI';
 import { CommentsSection } from '../../../../../src/comments/CommentsSection';
 import { Icon } from '../../../../../src/components/Icons';
 
@@ -201,6 +202,9 @@ function LecteurVideoScreen() {
               <OutlineButton label={t('content.listen')} onPress={() => router.push(`/accueil/heros/${heros.slug}/audio`)} />
             </View>
           </View>
+
+          {/* Quiz discret sous les actions : la vidéo reste au premier plan. */}
+          <QuizTile type="heros" slug={heros.slug} style={{ marginBottom: 18 }} />
 
           {/* Même fil que la fiche du héros : une vidéo = un seul fil, comme YouTube. */}
           <CommentsSection type="heros" slug={heros.slug} />

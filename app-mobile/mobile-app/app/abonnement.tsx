@@ -1,13 +1,14 @@
-import { useCallback, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAccess } from '../src/access/Access';
 import { currentLanguage, useI18n } from '../src/i18n';
-import { formatPlanPrice, type Billing, type PaidPlan } from '../src/onboarding/pricing';
+import { formatPlanPrice, planPriceFcfa, type Billing, type PaidPlan } from '../src/onboarding/pricing';
 import { PremiumButton } from '../src/components/Buttons';
-import { startPayment, syncPendingPayments } from '../src/payments/paiement';
-import { MobileMoneyBadges, paymentErrorMessage } from '../src/payments/MobileMoneyBadges';
+import { setSubscriptionCancelled, syncPendingPayments } from '../src/payments/paiement';
+import { MobileMoneyBadges } from '../src/payments/MobileMoneyBadges';
+import { PaymentSheet } from '../src/payments/PaymentSheet';
 import { BrandMark } from '../src/onboarding/ui';
 import { colors, typography } from '../src/theme/tokens';
 import { Icon } from '../src/components/Icons';
@@ -18,34 +19,46 @@ import { Icon } from '../src/components/Icons';
  * profil. Montre le forfait actuel (source serveur `mon_abonnement()`) et
  * les trois forfaits.
  *
- * Paiement Mobile Money réel via Campay (cdc-paiement-geniuspay.md) :
- * mensuel ou annuel, "Renouveler" sur le forfait en cours (les jours
- * restants sont conservés côté serveur).
+ * Paiement Mobile Money réel via Campay, SANS QUITTER L'APP
+ * (cdc-paiement-sans-sortie.md, 2026-10-07) : la feuille de paiement envoie
+ * la demande au numéro MTN / Orange et attend la validation sur place.
+ * Mensuel ou annuel, "Renouveler" sur le forfait en cours (les jours restants
+ * sont conservés côté serveur). Résilier / reprendre : accès conservé jusqu'à
+ * la date de fin, sans remboursement (décision de Yannick).
+ * `?renouveler=1` (bandeau de renouvellement) ouvre directement le paiement
+ * du forfait en cours.
  */
 export default function AbonnementScreen() {
   const router = useRouter();
   const { t } = useI18n();
   const { subscription, refresh } = useAccess();
   const [billing, setBilling] = useState<Billing>('monthly');
-  const [paying, setPaying] = useState<PaidPlan | null>(null);
+  const params = useLocalSearchParams<{ renouveler?: string }>();
+  const [sheetPlan, setSheetPlan] = useState<PaidPlan | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Diagnostic d'un paiement resté en attente (mise en service Campay).
   const [pendingDiag, setPendingDiag] = useState<string | null>(null);
 
-  const pay = async (plan: PaidPlan) => {
-    if (paying) return;
-    setPaying(plan);
+  const pay = (plan: PaidPlan) => {
     setError(null);
-    const { paiementId, error: err } = await startPayment({ type: 'abonnement', plan, periode: billing });
-    if (err || !paiementId) {
-      setPaying(null);
-      setError(paymentErrorMessage(t, err));
-      return;
-    }
-    if (Platform.OS !== 'web') {
-      setPaying(null);
-      router.push({ pathname: '/paiement/retour', params: { id: paiementId } });
-    }
+    setSheetPlan(plan);
+  };
+
+  // Bandeau « Renouveler » : ouvre directement le paiement du forfait en cours.
+  useEffect(() => {
+    if (params.renouveler === '1' && subscription?.plan) setSheetPlan(subscription.plan);
+  }, [params.renouveler, subscription?.plan]);
+
+  const toggleCancelled = async (cancel: boolean) => {
+    setBusy(true);
+    setError(null);
+    const ok = await setSubscriptionCancelled(cancel);
+    if (ok) await refresh();
+    else setError(t('abonnement.actionError'));
+    setBusy(false);
+    setConfirmCancel(false);
   };
 
   // Un abonnement offert entre-temps depuis le back-office apparaît au retour sur l'écran ;
@@ -61,6 +74,11 @@ export default function AbonnementScreen() {
   );
 
   const current = subscription?.plan ?? 'decouverte';
+  const cancelled = !!subscription?.resilie_le;
+  const endDate = subscription?.ends_at
+    ? new Date(subscription.ends_at).toLocaleDateString(currentLanguage() === 'en' ? 'en-GB' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+  const currentName = subscription?.plan === 'heritage' ? 'Héritage' : 'Racines';
   const endLabel = subscription
     ? subscription.ends_at
       ? t('abonnement.until', {
@@ -109,9 +127,19 @@ export default function AbonnementScreen() {
             </Text>
             {!!endLabel && (
               <Text style={styles.currentMeta}>
-                {endLabel}
+                {cancelled ? t('abonnement.cancelled', { date: endDate }) : endLabel}
                 {subscription?.source === 'offert' ? ` · ${t('abonnement.offered')}` : ''}
               </Text>
+            )}
+            {subscription?.resiliable && !cancelled && (
+              <Pressable onPress={() => setConfirmCancel(true)} hitSlop={8} style={styles.manageBtn} accessibilityRole="button">
+                <Text style={styles.manageText}>{t('abonnement.cancel')}</Text>
+              </Pressable>
+            )}
+            {subscription?.resiliable && cancelled && (
+              <Pressable onPress={() => toggleCancelled(false)} disabled={busy} style={[styles.manageBtn, styles.resumeBtn]} accessibilityRole="button">
+                <Text style={[styles.manageText, styles.resumeText]}>{t('abonnement.resume')}</Text>
+              </Pressable>
             )}
           </View>
 
@@ -152,8 +180,6 @@ export default function AbonnementScreen() {
                         label={isCurrent ? t('abonnement.renew') : t('plan.choose', { plan: p.name })}
                         variant={p.recommended || isCurrent ? 'gold' : 'glass'}
                         icon="lock"
-                        loading={paying === p.id}
-                        disabled={!!paying && paying !== p.id}
                         onPress={() => pay(p.id as PaidPlan)}
                       />
                     </View>
@@ -171,6 +197,32 @@ export default function AbonnementScreen() {
           <Text style={styles.disclaimer}>{t('abonnement.payNote')}</Text>
         </ScrollView>
       </SafeAreaView>
+
+      <PaymentSheet
+        visible={!!sheetPlan}
+        request={sheetPlan ? { type: 'abonnement', plan: sheetPlan, periode: billing } : null}
+        summary={sheetPlan ? `${sheetPlan === 'heritage' ? 'Héritage' : 'Racines'} · ${t(billing === 'yearly' ? 'abonnement.periodYear' : 'abonnement.periodMonth')}` : ''}
+        amount={sheetPlan ? planPriceFcfa(sheetPlan, billing) : 0}
+        onClose={() => setSheetPlan(null)}
+        onSuccess={() => {
+          setSheetPlan(null);
+          refresh();
+        }}
+      />
+
+      {/* Confirmation de résiliation : accès conservé jusqu'à la fin, sans remboursement. */}
+      <Modal visible={confirmCancel} transparent animationType="fade" onRequestClose={() => setConfirmCancel(false)}>
+        <View style={styles.confirmBackdrop}>
+          <View style={styles.confirmCard}>
+            <Text style={styles.confirmTitle}>{t('abonnement.cancelTitle')}</Text>
+            <Text style={styles.confirmText}>{t('abonnement.cancelText', { plan: currentName, date: endDate })}</Text>
+            <Pressable onPress={() => toggleCancelled(true)} disabled={busy} style={styles.confirmDanger} accessibilityRole="button">
+              <Text style={styles.confirmDangerText}>{t('abonnement.cancelConfirm')}</Text>
+            </Pressable>
+            <PremiumButton label={t('abonnement.cancelKeep')} variant="gold" onPress={() => setConfirmCancel(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -201,6 +253,25 @@ const styles = StyleSheet.create({
   },
   currentValue: { fontFamily: typography.display, fontSize: 20, color: colors.accentGoldPale, marginTop: 4 },
   currentMeta: { fontFamily: typography.body, fontSize: 13, color: colors.textBodyAlt, marginTop: 2 },
+  manageBtn: { alignSelf: 'flex-start', marginTop: 12, paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: 'rgba(227,162,119,.4)' },
+  manageText: { fontFamily: typography.bodyBold, fontSize: 13, color: colors.terracottaText },
+  resumeBtn: { borderColor: colors.accentGoldBright, backgroundColor: 'rgba(240,195,107,.12)' },
+  resumeText: { color: colors.accentGoldBright },
+  confirmBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,.7)', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  confirmCard: {
+    width: '100%',
+    maxWidth: 420,
+    gap: 14,
+    padding: 22,
+    borderRadius: 22,
+    backgroundColor: '#15100B',
+    borderWidth: 1,
+    borderColor: 'rgba(240,195,107,.25)',
+  },
+  confirmTitle: { fontFamily: typography.display, fontSize: 20, color: colors.textHeading },
+  confirmText: { fontFamily: typography.body, fontSize: 14.5, lineHeight: 22, color: colors.textBody },
+  confirmDanger: { alignItems: 'center', paddingVertical: 14, borderRadius: 999, borderWidth: 1, borderColor: 'rgba(227,162,119,.45)' },
+  confirmDangerText: { fontFamily: typography.bodyBold, fontSize: 14.5, color: colors.terracottaText },
   plans: { gap: 14, marginTop: 22 },
   plan: {
     padding: 18,

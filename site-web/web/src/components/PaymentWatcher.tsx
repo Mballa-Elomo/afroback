@@ -8,6 +8,8 @@ import { useAuth } from '@/lib/auth';
 import { useLang } from '@/lib/lang-client';
 
 /**
+ * Ancien parcours (page Campay) : ne sert plus qu'à /paiement/retour, pour un
+ * paiement commencé avant la feuille de paiement sans sortie (PaymentSheet).
  * Suivi du paiement en direct : vérifie toutes les 4 s pendant 6 minutes
  * (la personne valide sur son téléphone, MTN ou Orange). Succès : forfait
  * rechargé depuis le serveur.
@@ -44,7 +46,7 @@ export function PaymentWatcher({ paiementId, kind, onClose }: { paiementId: stri
           <>
             <div className="mx-auto h-20 w-20 animate-spin rounded-full border-4 border-gold/20 border-t-gold" />
             <p className="mt-6 font-display text-2xl font-bold text-ivory">{tr('Confirme sur ton téléphone', 'Confirm on your phone')}</p>
-            <p className="mt-2 text-body">{tr("Valide le paiement dans l'onglet Campay, puis sur ton téléphone (MTN MoMo ou Orange Money). Cette page se met à jour toute seule.", 'Approve the payment in the Campay tab, then on your phone (MTN MoMo or Orange Money). This page updates by itself.')}</p>
+            <p className="mt-2 text-body">{tr('Valide le paiement sur ton téléphone (MTN MoMo ou Orange Money). Cette page se met à jour toute seule.', 'Approve the payment on your phone (MTN MoMo or Orange Money). This page updates by itself.')}</p>
           </>
         )}
         {statut === 'reussi' && (

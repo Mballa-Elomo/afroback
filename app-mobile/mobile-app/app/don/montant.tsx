@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PremiumButton } from '../../src/components/Buttons';
-import { startPayment } from '../../src/payments/paiement';
-import { MobileMoneyBadges, paymentErrorMessage } from '../../src/payments/MobileMoneyBadges';
+import { PaymentSheet } from '../../src/payments/PaymentSheet';
+import { MobileMoneyBadges } from '../../src/payments/MobileMoneyBadges';
 import { colors, spacing, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
 import { Icon } from '../../src/components/Icons';
@@ -21,7 +21,8 @@ function formatFcfa(n: number): string {
  * Montant + paiement, fidèle dans l'esprit à design-reference-don.dc.excerpt.html
  * (une seule cause "Soutenir AFROBACK", décision du 2026-08-05). Paiement
  * Mobile Money réel via Campay depuis le 2026-09-29
- * (cdc-paiement-geniuspay.md) : l'écran paiement/retour confirme le don.
+ * sans quitter l'app (cdc-paiement-sans-sortie.md) : la feuille de paiement
+ * envoie la demande au numéro MTN / Orange et confirme le don sur place.
  * Le "don mensuel" est retiré tant qu'aucun prélèvement automatique n'existe
  * (jamais un bouton qui promet ce qu'il ne fait pas).
  */
@@ -31,7 +32,7 @@ export default function DonMontantScreen() {
   const [preset, setPreset] = useState<number | null>(1000);
   const [custom, setCustom] = useState('');
   const [anonyme, setAnonyme] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [sheet, setSheet] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const montant = useMemo(() => {
@@ -46,23 +47,12 @@ export default function DonMontantScreen() {
   };
 
   const submit = async () => {
-    if (submitting) return;
     if (montant < MIN_DON) {
       setError(t('paiement.errors.amount'));
       return;
     }
-    setSubmitting(true);
     setError(null);
-    const { paiementId, error: err } = await startPayment({ type: 'don', montant, anonyme });
-    if (err || !paiementId) {
-      setSubmitting(false);
-      setError(paymentErrorMessage(t, err));
-      return;
-    }
-    if (Platform.OS !== 'web') {
-      setSubmitting(false);
-      router.push({ pathname: '/paiement/retour', params: { id: paiementId } });
-    }
+    setSheet(true);
   };
 
   return (
@@ -137,10 +127,20 @@ export default function DonMontantScreen() {
           label={t('paiement.donate', { amount: formatFcfa(montant) })}
           icon="heart"
           onPress={submit}
-          loading={submitting}
           disabled={montant <= 0}
         />
       </ScrollView>
+      <PaymentSheet
+        visible={sheet}
+        request={{ type: 'don', montant, anonyme }}
+        summary={t('abonnement.donSummary')}
+        amount={montant}
+        onClose={() => setSheet(false)}
+        onSuccess={() => {
+          setSheet(false);
+          router.replace('/accueil');
+        }}
+      />
     </SafeAreaView>
   );
 }

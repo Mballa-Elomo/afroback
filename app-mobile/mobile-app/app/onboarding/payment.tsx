@@ -1,51 +1,34 @@
 import { useState } from 'react';
-import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StepHeader } from '../../src/onboarding/StepHeader';
 import { useWizardState } from '../../src/onboarding/WizardState';
-import { formatPlanPrice, PLAN_NAMES, type PaidPlan } from '../../src/onboarding/pricing';
+import { formatPlanPrice, planPriceFcfa, PLAN_NAMES, type PaidPlan } from '../../src/onboarding/pricing';
 import { PremiumButton, TextLinkButton } from '../../src/components/Buttons';
-import { startPayment } from '../../src/payments/paiement';
-import { MobileMoneyBadges, paymentErrorMessage } from '../../src/payments/MobileMoneyBadges';
+import { MobileMoneyBadges } from '../../src/payments/MobileMoneyBadges';
+import { PaymentSheet } from '../../src/payments/PaymentSheet';
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
 
 /**
  * Étape 4/5 (suite de plan.tsx) : récapitulatif puis paiement Mobile Money
- * réel via Campay (cdc-paiement-geniuspay.md). Le choix MTN / Orange se
- * fait sur la page sécurisée de Campay (décision D3). Le forfait n'est
- * débloqué que par le serveur, une fois le paiement confirmé par Campay
- * (écran paiement/retour). "Continuer avec Découverte" reste possible.
+ * réel via Campay, sans quitter l'app (cdc-paiement-sans-sortie.md) : la
+ * feuille de paiement envoie la demande au numéro MTN / Orange et attend la
+ * validation sur place. Le forfait n'est débloqué que par le serveur.
+ * "Continuer avec Découverte" reste possible.
  */
 export default function PaymentStepScreen() {
   const router = useRouter();
   const { forfait, billing } = useWizardState();
   const { t } = useI18n();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [sheet, setSheet] = useState(false);
 
   // Cet écran n'est atteint que depuis plan.tsx pour Racines/Héritage.
   const plan = (forfait === 'decouverte' ? 'racines' : forfait) as PaidPlan;
   const planLabel = PLAN_NAMES[plan];
   const total = formatPlanPrice(plan, billing);
 
-  const pay = async () => {
-    if (loading) return;
-    setLoading(true);
-    setError(null);
-    const { paiementId, error: err } = await startPayment({ type: 'abonnement', plan, periode: billing });
-    if (err || !paiementId) {
-      setLoading(false);
-      setError(paymentErrorMessage(t, err));
-      return;
-    }
-    // Sur web, la page part vers Campay : rien d'autre à faire ici.
-    if (Platform.OS !== 'web') {
-      setLoading(false);
-      router.push({ pathname: '/paiement/retour', params: { id: paiementId } });
-    }
-  };
 
   return (
     <View style={styles.wrap}>
@@ -70,10 +53,8 @@ export default function PaymentStepScreen() {
           <Text style={styles.sectionLabel}>{t('payment.methods')}</Text>
           <MobileMoneyBadges />
 
-          {!!error && <Text style={styles.error}>{error}</Text>}
-
           <View style={styles.cta}>
-            <PremiumButton label={t('payment.pay', { amount: total })} icon="lock" onPress={pay} loading={loading} />
+            <PremiumButton label={t('payment.pay', { amount: total })} icon="lock" onPress={() => setSheet(true)} />
           </View>
           <Text style={styles.disclaimer}>{t('payment.disclaimer')}</Text>
 
@@ -82,6 +63,17 @@ export default function PaymentStepScreen() {
           </View>
         </ScrollView>
       </SafeAreaView>
+      <PaymentSheet
+        visible={sheet}
+        request={{ type: 'abonnement', plan, periode: billing }}
+        summary={`${planLabel} · ${t(billing === 'yearly' ? 'abonnement.periodYear' : 'abonnement.periodMonth')}`}
+        amount={planPriceFcfa(plan, billing)}
+        onClose={() => setSheet(false)}
+        onSuccess={() => {
+          setSheet(false);
+          router.replace('/onboarding/welcome');
+        }}
+      />
     </View>
   );
 }

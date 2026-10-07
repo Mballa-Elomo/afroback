@@ -1,18 +1,20 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useMember } from '@/lib/auth';
-import { fcfa, openPaymentTab, price, startPayment, type Periode, type Plan } from '@/lib/payment';
+import { fcfa, price, type Periode, type Plan } from '@/lib/payment';
 import { Notice } from '@/components/auth-ui';
-import { PaymentWatcher } from '@/components/PaymentWatcher';
+import { PaymentSheet } from '@/components/PaymentSheet';
+import { SubscriptionControls } from '@/components/SubscriptionControls';
 import { useLang } from '@/lib/lang-client';
 
 /**
  * Abonnements (lot 4) : mêmes forfaits et mêmes prix que l'app, paiement
- * Mobile Money Campay (MTN, Orange). Le forfait actif vient toujours du
- * serveur (mon_abonnement), jamais d'un choix fait ici.
+ * Mobile Money Campay (MTN, Orange) sans quitter le site (feuille de paiement,
+ * cdc-paiement-sans-sortie.md), résiliation / reprise. Le forfait actif vient
+ * toujours du serveur (mon_abonnement), jamais d'un choix fait ici.
  */
 const PLANS: { id: 'decouverte' | Plan; name: string; nameEn: string; perks: string[]; perksEn: string[]; highlight?: boolean }[] = [
   {
@@ -47,21 +49,21 @@ function Abonnement() {
   const router = useRouter();
   const wanted = useSearchParams().get('forfait');
   const [periode, setPeriode] = useState<Periode>('monthly');
-  const [busy, setBusy] = useState<Plan | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [watch, setWatch] = useState<string | null>(null);
+  const [sheet, setSheet] = useState<Plan | null>(null);
 
-  const choose = async (plan: Plan) => {
-    if (!session) return router.push('/connexion?suite=/abonnement');
+  const choose = (plan: Plan) => {
+    if (!session) return router.push(`/connexion?suite=${encodeURIComponent(`/abonnement?forfait=${plan}`)}`);
     if (!member) return;
-    setError(null);
-    const win = openPaymentTab();
-    setBusy(plan);
-    const r = await startPayment({ type: 'abonnement', plan, periode }, win);
-    setBusy(null);
-    if (r.error) return setError(r.error);
-    if (r.paiementId) setWatch(r.paiementId);
+    setSheet(plan);
   };
+
+  // Arrivée depuis l'inscription (/bienvenue) ou la connexion avec un forfait choisi : la feuille s'ouvre d'elle-même, une fois.
+  const autoOpened = useRef(false);
+  useEffect(() => {
+    if (autoOpened.current || !member || (wanted !== 'racines' && wanted !== 'heritage')) return;
+    autoOpened.current = true;
+    setTimeout(() => setSheet(wanted), 0);
+  }, [member, wanted]);
 
   return (
     <div className="relative overflow-hidden px-5 pb-20 pt-32 md:px-14">
@@ -75,8 +77,9 @@ function Abonnement() {
             <Notice tone="success">
               {tr(`Forfait ${NAME[subscription.plan]} actif`, `${NAME_EN[subscription.plan]} plan active`)}
               {subscription.ends_at ? ` ${tr("jusqu'au", 'until')} ${new Date(subscription.ends_at).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}.{' '}
-              {tr('Payer à nouveau prolonge ton abonnement.', 'Paying again extends your subscription.')}
+              {subscription.resilie_le ? '' : tr('Payer à nouveau prolonge ton abonnement.', 'Paying again extends your subscription.')}
             </Notice>
+            <SubscriptionControls className="mt-4" />
           </div>
         )}
 
@@ -90,12 +93,6 @@ function Abonnement() {
             </button>
           ))}
         </div>
-
-        {error && (
-          <div className="mx-auto mt-6 max-w-md">
-            <Notice>{error}</Notice>
-          </div>
-        )}
 
         <div className="mt-12 grid gap-6 text-left md:grid-cols-3">
           {PLANS.map((p, i) => {
@@ -127,10 +124,9 @@ function Abonnement() {
                 {paid ? (
                   <button
                     onClick={() => choose(p.id as Plan)}
-                    disabled={!!busy}
                     className={`mt-8 rounded-full py-4 font-extrabold transition hover:-translate-y-0.5 ${p.highlight || isWanted ? 'bg-gold text-ink shadow-[0_10px_30px_rgba(240,195,107,0.35)]' : 'bg-ivory/10 text-ivory ring-1 ring-ivory/20 hover:ring-gold'}`}
                   >
-                    {busy === p.id ? tr('Ouverture du paiement…', 'Opening payment…') : isCurrent ? tr(`Renouveler ${p.name}`, `Renew ${p.nameEn}`) : tr(`Choisir ${p.name}`, `Choose ${p.nameEn}`)}
+                    {isCurrent ? tr(`Renouveler ${p.name}`, `Renew ${p.nameEn}`) : tr(`Choisir ${p.name}`, `Choose ${p.nameEn}`)}
                   </button>
                 ) : (
                   <p className="mt-8 rounded-full py-4 text-center text-sm font-bold text-muted ring-1 ring-ivory/10">{isCurrent ? tr('Ton forfait actuel', 'Your current plan') : tr('Inclus avec ton compte', 'Included with your account')}</p>
@@ -146,7 +142,7 @@ function Abonnement() {
           <span>{tr('Paiement sécurisé par Campay · sans engagement', 'Secure payment by Campay · no commitment')}</span>
         </div>
       </div>
-      {watch && <PaymentWatcher paiementId={watch} kind="abonnement" onClose={() => setWatch(null)} />}
+      {sheet && <PaymentSheet request={{ type: 'abonnement', plan: sheet, periode }} onClose={() => setSheet(null)} />}
     </div>
   );
 }

@@ -16,6 +16,7 @@ import { useAccess } from '../../src/access/Access';
 import { APP_LANGUAGES, currentLanguage, useI18n, type AppLanguage } from '../../src/i18n';
 import { Flag } from '../../src/i18n/LanguageDropdown';
 import { ProgressCard } from '../../src/quiz/QuizUI';
+import { RenewBanner } from '../../src/payments/RenewBanner';
 
 const PLAN_LABELS: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const BG = '#0B0906';
@@ -96,6 +97,7 @@ function ProfilScreen() {
             <Icon name="crown" size={15} color={subscription ? colors.ctaTextOnGold : GOLD} />
             <Text style={[styles.planText, subscription && styles.planTextPaid]}>
               {planName}
+              {subscription?.resilie_le ? ` · ${t('profileTab.cancelled')}` : ''}
               {planEnd ? ` · ${planEnd}` : ''}
             </Text>
           </Pressable>
@@ -105,6 +107,8 @@ function ProfilScreen() {
             </Pressable>
           )}
         </LinearGradient>
+
+        <RenewBanner style={{ marginTop: 16 }} />
 
         {/* Progression des quiz (cdc-quiz-progression.md §4.4), cachée tant que le serveur n'est pas prêt. */}
         <ProgressCard style={{ marginTop: 16 }} />

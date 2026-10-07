@@ -22,7 +22,11 @@ import { clientLang, localeOf, tc } from './lang';
 
 export type DeviceStatus = 'unknown' | 'ok' | 'a_verifier' | 'remplace' | 'indisponible';
 export type MfaStatus = 'unknown' | 'none' | 'required' | 'ok';
-export type Subscription = { plan: 'racines' | 'heritage'; ends_at: string | null; source: string } | null;
+/**
+ * `resilie_le` et `resiliable` n'existent qu'une fois schema-paiement-sans-sortie.sql
+ * exécuté : absents, le site garde le comportement d'avant (pas de bouton Résilier).
+ */
+export type Subscription = { plan: 'racines' | 'heritage'; ends_at: string | null; source: string; resilie_le?: string | null; resiliable?: boolean } | null;
 export type OwnProfile = { id: string; pseudo: string; avatar_url: string | null } | null;
 
 const DEVICE_KEY = 'afroback-web:device-id';

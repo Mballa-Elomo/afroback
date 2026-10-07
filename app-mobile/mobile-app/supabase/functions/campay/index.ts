@@ -6,10 +6,15 @@
 // pratique, 2026-09-29). Page de paiement Campay (/get_payment_link/) :
 // la personne y saisit son numéro MTN ou Orange et valide sur son téléphone.
 //
-// Trois usages dans une seule fonction :
-//   - action "creer"    (app, personne connectée) : calcule le montant côté
-//     serveur, enregistre la ligne `paiements`, crée le lien de paiement
-//     Campay et renvoie son adresse ;
+// Usages dans une seule fonction :
+//   - action "demander" (app et site, personne connectée, 2026-10-07,
+//     cdc-paiement-sans-sortie.md) : DEMANDE DE PAIEMENT DIRECTE (/collect/)
+//     envoyée au numéro MTN / Orange de la personne, qui valide sur son
+//     téléphone sans quitter AFROBACK. Montant calculé côté serveur ;
+//   - action "annuler" : abandonne une demande en attente (si elle est
+//     validée quand même sur le téléphone, elle est créditée normalement) ;
+//   - action "creer" (ancien parcours, gardé pour les versions de l'app déjà
+//     installées) : lien vers la page de paiement Campay ;
 //   - actions "verifier" / "verifier_en_attente" (app) : redemande le statut
 //     À CAMPAY (/transaction/{reference}/) et crédite si le paiement est réussi ;
 //   - notification Campay (callback, GET ou POST, sans jeton Supabase) :
@@ -52,6 +57,50 @@ const DON_MAX = 1_000_000;
 function prix(plan: string, periode: string): number {
   const m = PRIX_MENSUEL[plan];
   return periode === 'yearly' ? Math.round(m * 12 * REDUCTION_ANNUELLE) : m;
+}
+
+// Ce qui est acheté : montant et libellé TOUJOURS calculés ici, jamais repris de l'app.
+function preparer(body: Record<string, any>):
+  | { type: 'abonnement' | 'don'; montant: number; description: string; plan: string | null; periode: string | null }
+  | { erreur: string } {
+  if (body.type === 'don') {
+    const montant = Math.round(Number(body.montant));
+    if (!Number.isFinite(montant) || montant < DON_MIN || montant > DON_MAX) return { erreur: 'montant_invalide' };
+    return { type: 'don', montant, description: 'Don - Soutenir AFROBACK', plan: null, periode: null };
+  }
+  const plan = String(body.plan);
+  const periode = body.periode === 'yearly' ? 'yearly' : 'monthly';
+  if (!PRIX_MENSUEL[plan]) return { erreur: 'forfait_invalide' };
+  return {
+    type: 'abonnement',
+    montant: prix(plan, periode),
+    description: `AFROBACK ${NOMS[plan]} - ${periode === 'yearly' ? '12 mois' : '1 mois'}`,
+    plan,
+    periode,
+  };
+}
+
+// Numéro Mobile Money camerounais (MTN ou Orange) au format attendu par Campay : 2376XXXXXXXX.
+function numeroCamerounais(v: unknown): string | null {
+  let d = String(v ?? '').replace(/\D/g, '');
+  if (d.startsWith('00237')) d = d.slice(5);
+  else if (d.startsWith('237') && d.length === 12) d = d.slice(3);
+  if (!/^6\d{8}$/.test(d)) return null;
+  if (!operateurDe(`237${d}`)) return null;
+  return `237${d}`;
+}
+
+// MTN : 67, 68, 650 à 654 · Orange : 69, 655 à 659, 640.
+function operateurDe(tel: string): 'MTN' | 'ORANGE' | null {
+  const n = tel.slice(3);
+  if (/^6(7|8|5[0-4])/.test(n)) return 'MTN';
+  if (/^6(9|5[5-9]|40)/.test(n)) return 'ORANGE';
+  return null;
+}
+
+function masquer(tel: string): string {
+  const n = tel.slice(3);
+  return `${n.slice(0, 1)}•• •• •• ${n.slice(-2)}`;
 }
 
 function json(body: unknown, status = 200) {
@@ -191,7 +240,7 @@ Deno.serve(async (req) => {
         .from('paiements')
         .select('id, reference, statut, created_at')
         .eq('user_id', user.id)
-        .eq('statut', 'en_attente')
+        .in('statut', ['en_attente', 'annule'])
         .gte('created_at', depuis)
         .order('created_at', { ascending: false })
         .limit(5);
@@ -212,24 +261,80 @@ Deno.serve(async (req) => {
       return json({ ok: true, verifies: rows?.length ?? 0, credite, diag: diags[0] ?? null });
     }
 
-    if (body.action !== 'creer') return json({ ok: false, error: 'action_inconnue' }, 400);
+    // Abandon d'une demande en attente (bouton « Annuler » de l'écran d'attente).
+    if (body.action === 'annuler') {
+      await db
+        .from('paiements')
+        .update({ statut: 'annule' })
+        .eq('id', String(body.paiement_id ?? ''))
+        .eq('user_id', user.id)
+        .eq('statut', 'en_attente');
+      return json({ ok: true });
+    }
+
+    if (body.action !== 'creer' && body.action !== 'demander') return json({ ok: false, error: 'action_inconnue' }, 400);
     if (!TOKEN) return json({ ok: false, error: 'non_configure' }, 503);
 
-    const type = body.type === 'don' ? 'don' : 'abonnement';
-    let montant: number;
-    let description: string;
-    let plan: string | null = null;
-    let periode: string | null = null;
-    if (type === 'abonnement') {
-      plan = String(body.plan);
-      periode = body.periode === 'yearly' ? 'yearly' : 'monthly';
-      if (!PRIX_MENSUEL[plan]) return json({ ok: false, error: 'forfait_invalide' }, 400);
-      montant = prix(plan, periode);
-      description = `AFROBACK ${NOMS[plan]} - ${periode === 'yearly' ? '12 mois' : '1 mois'}`;
-    } else {
-      montant = Math.round(Number(body.montant));
-      if (!Number.isFinite(montant) || montant < DON_MIN || montant > DON_MAX) return json({ ok: false, error: 'montant_invalide' }, 400);
-      description = 'Don - Soutenir AFROBACK';
+    const commande = preparer(body);
+    if ('erreur' in commande) return json({ ok: false, error: commande.erreur }, 400);
+    const { type, montant, description, plan, periode } = commande;
+    // En demo, Campay plafonne les montants : CAMPAY_MONTANT_TEST remplace le vrai prix (le crédit reste celui du forfait).
+    const montantEnvoye = Number.isFinite(MONTANT_TEST) && MONTANT_TEST > 0 ? Math.round(MONTANT_TEST) : montant;
+
+    if (body.action === 'demander') {
+      const tel = numeroCamerounais(body.telephone);
+      if (!tel) return json({ ok: false, error: 'numero_invalide' }, 400);
+      // Garde-fou : 5 demandes par heure et par compte au maximum.
+      const uneHeure = new Date(Date.now() - 3600 * 1000).toISOString();
+      const { count } = await db.from('paiements').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', uneHeure);
+      if ((count ?? 0) >= 5) return json({ ok: false, error: 'trop_de_demandes' }, 429);
+      // Une seule demande en attente à la fois : les précédentes sont abandonnées (créditées quand même si validées).
+      await db.from('paiements').update({ statut: 'annule' }).eq('user_id', user.id).eq('statut', 'en_attente').not('telephone_masque', 'is', null);
+
+      const { data: p, error: insErr } = await db
+        .from('paiements')
+        .insert({
+          user_id: user.id,
+          type,
+          plan,
+          periode,
+          montant_fcfa: montant,
+          anonyme: !!body.anonyme,
+          environnement: ENV,
+          telephone_masque: masquer(tel),
+          operateur: operateurDe(tel),
+        })
+        .select('id')
+        .single();
+      if (insErr || !p) {
+        console.error('Enregistrement paiement', JSON.stringify(insErr));
+        return json({ ok: false, error: 'enregistrement', detail: insErr?.message ?? null }, 500);
+      }
+      const { status, data: cp } = await campay('POST', '/collect/', {
+        amount: String(montantEnvoye),
+        currency: 'XAF',
+        from: tel,
+        description,
+        external_reference: p.id,
+      });
+      if (status >= 400 || !cp?.reference) {
+        await db.from('paiements').update({ statut: 'echoue' }).eq('id', p.id);
+        console.error('Campay collect', status, JSON.stringify(cp));
+        const detail = [cp?.error_code, cp?.message ?? cp?.detail ?? (cp ? JSON.stringify(cp).slice(0, 160) : `HTTP ${status}`)]
+          .filter(Boolean)
+          .join(' · ');
+        return json({ ok: false, error: 'passerelle', detail }, 502);
+      }
+      const operateur = cp.operator ? String(cp.operator).toUpperCase().slice(0, 20) : operateurDe(tel);
+      await db.from('paiements').update({ reference: String(cp.reference), operateur }).eq('id', p.id);
+      return json({
+        ok: true,
+        paiement_id: p.id,
+        montant,
+        operateur,
+        ussd_code: cp.ussd_code ? String(cp.ussd_code) : operateur === 'ORANGE' ? '#150*50#' : '*126#',
+        telephone_masque: masquer(tel),
+      });
     }
 
     const { data: p, error: insErr } = await db
@@ -245,8 +350,6 @@ Deno.serve(async (req) => {
     const retour = retourAutorise(body.retour_url) ?? `${SITE}/paiement-termine.html`;
     const sep = retour.includes('?') ? '&' : '?';
     const meta = user.user_metadata ?? {};
-    // En demo, Campay plafonne les montants : CAMPAY_MONTANT_TEST remplace le vrai prix (le crédit reste celui du forfait).
-    const montantEnvoye = Number.isFinite(MONTANT_TEST) && MONTANT_TEST > 0 ? Math.round(MONTANT_TEST) : montant;
     const { status, data: cp } = await campay('POST', '/get_payment_link/', {
       amount: String(montantEnvoye),
       currency: 'XAF',

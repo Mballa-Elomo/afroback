@@ -8,6 +8,7 @@ import { useMember } from '@/lib/auth';
 import { Avatar } from '@/components/Avatar';
 import { useLang } from '@/lib/lang-client';
 import { ProgressSummary } from '@/components/quiz';
+import { RenewBanner, SubscriptionControls } from '@/components/SubscriptionControls';
 
 const PLAN_NAME: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const PLAN_NAME_EN = PLAN_NAME; // noms de marque, identiques en anglais
@@ -26,7 +27,7 @@ export default function Compte() {
   const planName = (p: string) => tr(PLAN_NAME[p], PLAN_NAME_EN[p]);
   const tiles = [
     { href: '/compte/profil', title: tr('Mon profil', 'My profile'), text: tr('Pseudo, prénom, photo', 'Username, first name, photo') },
-    { href: '/abonnement', title: tr('Mon abonnement', 'My subscription'), text: subscription ? `${planName(subscription.plan)} · ${tr('actif', 'active')}` : tr('Forfait Découverte (gratuit)', 'Découverte plan (free)') },
+    { href: '/abonnement', title: tr('Mon abonnement', 'My subscription'), text: subscription ? `${planName(subscription.plan)} · ${subscription.resilie_le ? tr('résilié', 'cancelled') : tr('actif', 'active')}` : tr('Forfait Découverte (gratuit)', 'Découverte plan (free)') },
     { href: '/compte/mot-de-passe', title: tr('Mot de passe', 'Password'), text: tr('Changer de mot de passe', 'Change password') },
     { href: '/compte/securite', title: tr('Sécurité', 'Security'), text: tr('Vérification en 2 étapes', '2-step verification') },
     { href: '/profils', title: tr('Qui regarde ?', "Who's watching?"), text: tr('Ton profil et ceux de tes enfants', "Your profile and your children's") },
@@ -53,10 +54,18 @@ export default function Compte() {
           <div className="rounded-2xl bg-ink/60 px-6 py-4 text-center ring-1 ring-gold/30">
             <p className="text-xs font-bold tracking-[0.2em] text-muted">{tr('FORFAIT', 'PLAN')}</p>
             <p className="font-display text-2xl font-black text-gold">{subscription ? planName(subscription.plan) : 'Découverte'}</p>
-            {ends && <p className="text-xs text-body">{tr("jusqu'au", 'until')} {ends}</p>}
+            {ends && (
+              <p className="text-xs text-body">
+                {subscription?.resilie_le ? `${tr('Résilié', 'Cancelled')} · ${tr('actif', 'active')} ` : ''}
+                {tr("jusqu'au", 'until')} {ends}
+              </p>
+            )}
+            <SubscriptionControls className="mt-2" showLabel={false} />
           </div>
         </div>
       </motion.div>
+
+      <RenewBanner className="mt-6" />
 
       <ProgressSummary />
 

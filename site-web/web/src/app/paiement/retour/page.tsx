@@ -5,7 +5,11 @@ import { useSearchParams } from 'next/navigation';
 import { PaymentWatcher } from '@/components/PaymentWatcher';
 import { useLang } from '@/lib/lang-client';
 
-/** Retour depuis Campay (quand l'adresse du site est autorisée par la fonction de paiement). */
+/**
+ * Retour depuis la page Campay de l'ANCIEN parcours (lien de paiement). Le site
+ * paie désormais sans sortir (PaymentSheet) ; cette page reste pour un paiement
+ * commencé avant, ou un lien de retour encore ouvert.
+ */
 function Retour() {
   const params = useSearchParams();
   const { tr } = useLang();

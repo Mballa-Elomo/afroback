@@ -4,12 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useMember } from '@/lib/auth';
-import { fcfa, openPaymentTab, startPayment } from '@/lib/payment';
+import { fcfa, type PaymentRequest } from '@/lib/payment';
 import { Notice } from '@/components/auth-ui';
-import { PaymentWatcher } from '@/components/PaymentWatcher';
+import { PaymentSheet } from '@/components/PaymentSheet';
 import { useLang } from '@/lib/lang-client';
 
-/** Soutenir AFROBACK : don ponctuel par Mobile Money (entre 200 et 1 000 000 FCFA, vérifié côté serveur). */
+/**
+ * Soutenir AFROBACK : don ponctuel par Mobile Money (entre 200 et 1 000 000 FCFA,
+ * vérifié côté serveur), avec la même feuille de paiement que l'abonnement :
+ * la personne ne quitte jamais le site.
+ */
 const AMOUNTS = [500, 1000, 2500, 5000, 10000];
 
 export default function Don() {
@@ -19,22 +23,16 @@ export default function Don() {
   const [amount, setAmount] = useState(1000);
   const [custom, setCustom] = useState('');
   const [anonyme, setAnonyme] = useState(false);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [watch, setWatch] = useState<string | null>(null);
+  const [sheet, setSheet] = useState<PaymentRequest | null>(null);
   const value = custom ? Number(custom.replace(/\D/g, '')) : amount;
 
-  const give = async () => {
+  const give = () => {
     if (!session) return router.push('/connexion?suite=/don');
     if (!member) return;
     if (!(value >= 200 && value <= 1_000_000)) return setError(tr('Montant entre 200 et 1 000 000 FCFA.', 'Amount between 200 and 1,000,000 FCFA.'));
     setError(null);
-    const win = openPaymentTab();
-    setBusy(true);
-    const r = await startPayment({ type: 'don', montant: value, anonyme }, win);
-    setBusy(false);
-    if (r.error) return setError(r.error);
-    if (r.paiementId) setWatch(r.paiementId);
+    setSheet({ type: 'don', montant: value, anonyme });
   };
 
   return (
@@ -76,12 +74,12 @@ export default function Don() {
             <Notice>{error}</Notice>
           </div>
         )}
-        <button onClick={give} disabled={busy} className="mt-8 w-full rounded-full bg-gradient-to-r from-gold-pale via-gold to-gold-deep py-5 text-lg font-extrabold text-ink shadow-[0_10px_30px_rgba(240,195,107,0.35)] transition hover:-translate-y-0.5 disabled:opacity-60">
-          {busy ? tr('Ouverture du paiement…', 'Opening payment…') : tr(`Donner ${fcfa(value || 0)}`, `Give ${fcfa(value || 0)}`)}
+        <button onClick={give} className="mt-8 w-full rounded-full bg-gradient-to-r from-gold-pale via-gold to-gold-deep py-5 text-lg font-extrabold text-ink shadow-[0_10px_30px_rgba(240,195,107,0.35)] transition hover:-translate-y-0.5 disabled:opacity-60">
+          {tr(`Donner ${fcfa(value || 0)}`, `Give ${fcfa(value || 0)}`)}
         </button>
         <p className="mt-4 text-xs text-muted">{tr('MTN MoMo · Orange Money · paiement sécurisé par Campay', 'MTN MoMo · Orange Money · secure payment by Campay')}</p>
       </div>
-      {watch && <PaymentWatcher paiementId={watch} kind="don" onClose={() => setWatch(null)} />}
+      {sheet && <PaymentSheet request={sheet} onClose={() => setSheet(null)} />}
     </div>
   );
 }

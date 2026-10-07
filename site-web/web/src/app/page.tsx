@@ -6,6 +6,7 @@ import { videosOf } from '@/lib/content';
 import type { Tile } from '@/lib/types';
 import { getLang } from '@/lib/lang-server';
 import { pick } from '@/lib/lang';
+import { RenewBanner } from '@/components/SubscriptionControls';
 
 export const revalidate = 120;
 
@@ -47,6 +48,7 @@ export default async function Home() {
     <>
       <HeroCarousel slides={slides} />
       <div className="relative z-10 -mt-16 md:-mt-24">
+        <RenewBanner className="relative mx-5 mb-6 md:mx-14" />
         <Row title={t('Gratuit sur AFROBACK', 'Free on AFROBACK')} subtitle={t('Commence ici : à lire, écouter et regarder sans abonnement', 'Start here: read, listen and watch without a subscription')} tiles={all.filter((x) => x.free)} variant="wide" />
         <Row title={t('Les résistants', 'The resisters')} subtitle={t('Ceux et celles qui ont dit non', 'The men and women who said no')} tiles={byTheme('Résistance')} href="/heros" />
         <TopRanked tiles={top} />

@@ -18,6 +18,7 @@ import type { Heros } from '../../../src/data/types';
 import { colors, typography } from '../../../src/theme/tokens';
 import { GuestBanner, useRequireAccount } from '../../../src/auth/AccountWall';
 import { AccessBadge, UpgradeBanner } from '../../../src/access/Access';
+import { RenewBanner } from '../../../src/payments/RenewBanner';
 import { Bone, PressableScale, RailSection, SkeletonScreen } from '../../../src/ui/modern';
 import i18n, { useI18n } from '../../../src/i18n';
 
@@ -137,6 +138,7 @@ export default function AccueilScreen() {
 
         <GuestBanner />
         <UpgradeBanner />
+        <RenewBanner style={{ marginHorizontal: 16, marginTop: 8 }} />
 
         {/* Recherche */}
         <Pressable style={styles.search} onPress={() => router.push('/recherche')} accessibilityRole="search">

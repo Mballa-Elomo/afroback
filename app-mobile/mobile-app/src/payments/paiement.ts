@@ -115,3 +115,62 @@ export function closePaymentBrowser() {
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// Paiement SANS QUITTER L'APP (cdc-paiement-sans-sortie.md, 2026-10-07) :
+// demande de paiement directe Campay envoyée au numéro MTN / Orange ; la
+// personne valide sur son téléphone, l'app attend la confirmation sur place.
+// ---------------------------------------------------------------------------
+
+export type Operator = 'MTN' | 'ORANGE';
+
+export interface DirectPayment {
+  paiement_id: string;
+  montant: number;
+  operateur: Operator;
+  ussd_code: string;
+  telephone_masque: string;
+}
+
+/** Les 9 chiffres du numéro camerounais (6XXXXXXXX), sans indicatif ni espaces. */
+export function localDigits(raw: string): string {
+  let d = raw.replace(/\D/g, '');
+  if (d.startsWith('00237')) d = d.slice(5);
+  else if (d.startsWith('237') && d.length >= 12) d = d.slice(3);
+  return d.slice(0, 9);
+}
+
+/** MTN : 67, 68, 650 à 654 · Orange : 69, 655 à 659, 640 (mêmes règles que le serveur). */
+export function detectOperator(raw: string): Operator | null {
+  const d = localDigits(raw);
+  if (d.length < 2) return null;
+  if (/^6(7|8|5[0-4])/.test(d)) return 'MTN';
+  if (/^6(9|5[5-9]|40)/.test(d)) return 'ORANGE';
+  return null;
+}
+
+export const isValidMobileMoney = (raw: string) => /^6\d{8}$/.test(localDigits(raw)) && detectOperator(raw) !== null;
+
+/** "6XX XX XX XX" pendant la saisie. */
+export function formatLocal(raw: string): string {
+  const d = localDigits(raw);
+  return [d.slice(0, 3), d.slice(3, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(' ');
+}
+
+/** Envoie la demande de paiement au numéro : le téléphone de la personne affiche la validation. */
+export async function requestPayment(req: PaymentRequest, telephone: string) {
+  const { data, error, detail } = await call<DirectPayment>({ action: 'demander', telephone: localDigits(telephone), ...req });
+  if (error || !data) return { error: detail ? `${error ?? 'inconnu'}|${detail}` : error ?? 'inconnu' };
+  return { data };
+}
+
+/** Abandonne une demande en attente (si elle est validée quand même, elle sera créditée). */
+export async function cancelPayment(paiementId: string) {
+  await call({ action: 'annuler', paiement_id: paiementId });
+}
+
+/** Résilier / reprendre son abonnement (schema-paiement-sans-sortie.sql). */
+export async function setSubscriptionCancelled(cancel: boolean): Promise<boolean> {
+  const { data, error } = await supabase.rpc(cancel ? 'resilier_abonnement' : 'reprendre_abonnement');
+  return !error && !!(data as { ok?: boolean } | null)?.ok;
+}

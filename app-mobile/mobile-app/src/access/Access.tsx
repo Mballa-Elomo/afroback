@@ -33,6 +33,10 @@ export interface Subscription {
   plan: 'racines' | 'heritage';
   ends_at: string | null;
   source: 'offert' | 'paiement' | 'test';
+  /** Date de résiliation (accès conservé jusqu'à ends_at) ; absent tant que schema-paiement-sans-sortie.sql n'est pas exécuté. */
+  resilie_le?: string | null;
+  /** Abonnement payé, donc résiliable (un abonnement offert ne se résilie pas). */
+  resiliable?: boolean;
 }
 
 export type PaywallReason = keyof Translation['paywall']['reasons'];

@@ -5,6 +5,7 @@ import { relativeTime } from '../data/relativeTime';
 import { colors, typography } from '../theme/tokens';
 import { ProfileAvatar } from './ProfileAvatar';
 import { Icon } from './Icons';
+import { useI18n } from '../i18n';
 
 /**
  * Carte de post du fil (refonte moderne du 2026-09-30). Pas de compteur de
@@ -21,6 +22,7 @@ export function PostCard({
   onPress: () => void;
   onOpenAuthor: () => void;
 }) {
+  const { t } = useI18n();
   const share = () => {
     Share.share({ message: post.contenu_texte }).catch(() => {});
   };
@@ -34,7 +36,7 @@ export function PostCard({
         <View style={styles.headerBody}>
           <Pressable onPress={onOpenAuthor} hitSlop={4}>
             <Text style={styles.author} numberOfLines={1}>
-              {post.author?.pseudo ?? 'Membre supprimé'}
+              {post.author?.pseudo ?? t('postCard.deletedMember')}
             </Text>
           </Pressable>
           <Text style={styles.time}>{relativeTime(post.created_at)}</Text>
@@ -51,13 +53,13 @@ export function PostCard({
       </Pressable>
 
       <View style={styles.footerRow}>
-        <Pressable onPress={onPress} style={styles.footerBtn} accessibilityRole="button" accessibilityLabel="Commentaires">
+        <Pressable onPress={onPress} style={styles.footerBtn} accessibilityRole="button" accessibilityLabel={t('postCard.comments')}>
           <Icon name="chat" size={16} color={colors.accentGoldPale} />
           <Text style={styles.footerLabel}>{post.commentCount}</Text>
         </Pressable>
-        <Pressable onPress={share} style={styles.footerBtn} accessibilityRole="button" accessibilityLabel="Partager">
+        <Pressable onPress={share} style={styles.footerBtn} accessibilityRole="button" accessibilityLabel={t('postCard.share')}>
           <Icon name="share" size={16} color={colors.accentGoldPale} />
-          <Text style={styles.footerLabel}>Partager</Text>
+          <Text style={styles.footerLabel}>{t('postCard.share')}</Text>
         </Pressable>
       </View>
     </View>

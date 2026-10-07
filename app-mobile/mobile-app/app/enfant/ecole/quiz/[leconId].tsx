@@ -13,6 +13,7 @@ import {
 import type { EcoleQuizNiveauQuestion, EcoleQuizQuestion } from '../../../../src/data/ecoleTypes';
 import { LoadingState } from '../../../../src/components/LoadingState';
 import { colors, typography } from '../../../../src/theme/tokens';
+import { useI18n } from '../../../../src/i18n';
 
 /**
  * Seuil de réussite : 60 % de bonnes réponses. Choix par défaut du chef de
@@ -32,6 +33,7 @@ type Question = { question: string; choix: string[]; reponseCorrecteIndex: numbe
  * encore disponible" plutôt qu'un quiz vide qui semble cassé.
  */
 export default function EcoleQuizScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { leconId, niveau: niveauParam } = useLocalSearchParams<{ leconId: string; niveau?: string }>();
   const { state } = useActiveProfile();
@@ -71,7 +73,7 @@ export default function EcoleQuizScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="Le quiz se prépare..." />
+        <LoadingState message={t('quiz.loading')} />
       </SafeAreaView>
     );
   }
@@ -81,10 +83,10 @@ export default function EcoleQuizScreen() {
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.soonWrap}>
           <Text style={styles.soonIcon}>📝</Text>
-          <Text style={styles.soonTitle}>Quiz pas encore prêt</Text>
-          <Text style={styles.soonText}>Reviens un peu plus tard, ce quiz n'est pas encore disponible !</Text>
+          <Text style={styles.soonTitle}>{t('quiz.notReady')}</Text>
+          <Text style={styles.soonText}>{t('quiz.notReadyText')}</Text>
           <Pressable onPress={() => router.back()} style={styles.soonBtn}>
-            <Text style={styles.soonBtnLabel}>Retour</Text>
+            <Text style={styles.soonBtnLabel}>{t('kids.backPlain')}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -174,15 +176,15 @@ export default function EcoleQuizScreen() {
           <View style={styles.feedback}>
             <Text style={styles.feedbackIcon}>{selected === current.reponseCorrecteIndex ? '🎉' : '💡'}</Text>
             <Text style={styles.feedbackTitle}>
-              {selected === current.reponseCorrecteIndex ? 'Bravo !' : 'Presque !'}
+              {selected === current.reponseCorrecteIndex ? t('quiz.bravo') : t('quiz.almost')}
             </Text>
             <Text style={styles.feedbackText}>
               {selected === current.reponseCorrecteIndex
-                ? 'Bonne réponse !'
-                : `La bonne réponse était : ${current.choix[current.reponseCorrecteIndex]}`}
+                ? t('quiz.right')
+                : t('quiz.answerWas', { a: current.choix[current.reponseCorrecteIndex] })}
             </Text>
             <Pressable onPress={next} disabled={saving} style={styles.continueBtn}>
-              <Text style={styles.continueLabel}>{saving ? 'Un instant...' : isLast ? 'Voir mon score' : 'Continuer'}</Text>
+              <Text style={styles.continueLabel}>{saving ? t('quiz.moment') : isLast ? t('quiz.score') : t('kids.continue')}</Text>
             </Pressable>
           </View>
         )}

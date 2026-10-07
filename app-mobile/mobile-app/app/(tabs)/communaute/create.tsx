@@ -10,6 +10,7 @@ import { useOwnProfile } from '../../../src/data/useCommunityData';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
 import { withSubscription } from '../../../src/access/Access';
+import { useI18n } from '../../../src/i18n';
 
 const MAX_LEN = 500;
 
@@ -22,6 +23,7 @@ const MAX_LEN = 500;
  * post↔contenu dans le schéma actuel).
  */
 function CreatePostScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const [ownProfileState, refreshOwnProfile] = useOwnProfile();
   const [text, setText] = useState('');
@@ -39,13 +41,13 @@ function CreatePostScreen() {
     });
     setPublishing(false);
     if (error || !post) {
-      Alert.alert('Un souci est survenu', error ?? 'Impossible de publier ce post pour le moment.');
+      Alert.alert(t('createPost.oops'), error ?? t('createPost.failed'));
       return;
     }
     if (post.statut === 'masque_filtre_auto') {
       Alert.alert(
-        'Post masqué automatiquement',
-        "Ce post ne respecte peut-être pas la charte communautaire et n'est pas visible publiquement. Tu peux le modifier depuis ton profil."
+        t('createPost.hidden'),
+        t('createPost.hiddenText')
       );
       router.replace('/communaute');
       return;
@@ -68,11 +70,11 @@ function CreatePostScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Text style={styles.closeIcon}>✕</Text>
           </Pressable>
-          <Text style={styles.title}>Créer un post</Text>
+          <Text style={styles.title}>{t('createPost.title')}</Text>
           <View style={{ flex: 1 }} />
           {ownProfileState.status === 'ready' && ownProfileState.data && (
             <Pressable onPress={publish} style={styles.publishBtn} disabled={publishing}>
-              <Text style={styles.publishLabel}>{publishing ? '...' : 'Publier'}</Text>
+              <Text style={styles.publishLabel}>{publishing ? '...' : t('createPost.publish')}</Text>
             </Pressable>
           )}
         </View>
@@ -84,7 +86,7 @@ function CreatePostScreen() {
             <TextInput
               value={text}
               onChangeText={(t) => setText(t.slice(0, MAX_LEN))}
-              placeholder="Partage une histoire, une question, un souvenir..."
+              placeholder={t('createPost.placeholder')}
               placeholderTextColor={colors.textMuted}
               style={styles.textarea}
               multiline
@@ -101,9 +103,9 @@ function CreatePostScreen() {
             <View style={styles.charterNote}>
               <Text style={styles.charterIcon}>ℹ</Text>
               <Text style={styles.charterText}>
-                En publiant, tu acceptes de respecter la{' '}
+                {t('createPost.accept')}{' '}
                 <Text style={styles.charterLink} onPress={() => router.push('/communaute/charte')}>
-                  charte communautaire
+                  {t('createPost.charter')}
                 </Text>
                 .
               </Text>

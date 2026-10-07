@@ -33,7 +33,7 @@ function LecteurVideoScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const herosState = useHero(slug);
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
   const related = useRelatedHeroes(heros);
   const [chapterIdx, setChapterIdx] = useState(0);
@@ -118,8 +118,8 @@ function LecteurVideoScreen() {
             {heros.nom_affiche}
           </Text>
           <Text style={styles.topSub}>
-            {showingRealVideo ? 'DOCUMENTAIRE' : 'APERÇU STORYBOARD'}
-            {hasChapterVideos ? ` · CHAP. ${selectedStoryboard?.numero ?? 1}/${storyboardChapitres.length}` : ''}
+            {showingRealVideo ? t('heroVideo.documentary') : t('heroVideo.storyboardPreview')}
+            {hasChapterVideos ? t('heroVideo.chap', { n: selectedStoryboard?.numero ?? 1, total: storyboardChapitres.length }) : ''}
             {' · '}
             {heros.region.toUpperCase()}
           </Text>
@@ -133,13 +133,26 @@ function LecteurVideoScreen() {
         ) : selectedVideoChapitre ? (
           <VideoChapitrePlayerArea heroId={heros.id} chapitre={selectedVideoChapitre} />
         ) : selectedStoryboard && selectedStoryboard.planches.length > 0 ? (
-          <StoryboardSlideshow chapitres={[selectedStoryboard]} />
+          <>
+            {/* Storyboard pas encore traduit : titre de chapitre repris du récit anglais, planches en français signalées comme telles. */}
+            <StoryboardSlideshow
+              chapitres={[
+                lang === 'en'
+                  ? {
+                      ...selectedStoryboard,
+                      titre_chapitre: heros.recit_chapitres_en?.find((c) => c.numero === selectedStoryboard.numero)?.titre ?? selectedStoryboard.titre_chapitre,
+                    }
+                  : selectedStoryboard,
+              ]}
+            />
+            {lang === 'en' && <Text style={styles.missingText}>{t('heroVideo.storyboardFrOnly')}</Text>}
+          </>
         ) : (
           <View style={styles.videoArea}>
             <View style={styles.playCircle}>
               <Text style={styles.playIcon}>▶</Text>
             </View>
-            <Text style={styles.videoLabel}>DOCUMENTAIRE BIENTÔT DISPONIBLE</Text>
+            <Text style={styles.videoLabel}>{t('heroVideo.docSoon')}</Text>
           </View>
         )}
 
@@ -163,17 +176,17 @@ function LecteurVideoScreen() {
         )}
 
         <View style={styles.body}>
-          <Text style={styles.title}>{heros.nom_affiche} — l'histoire en vidéo</Text>
+          <Text style={styles.title}>{t('heroVideo.title', { nom: heros.nom_affiche })}</Text>
           <Text style={styles.meta}>
-            DOCUMENTAIRE · {heros.region} · {heros.annee_naissance_indicative ?? heros.epoque}
+            {t('heroVideo.documentary')} · {heros.region} · {heros.annee_naissance_indicative ?? heros.epoque}
           </Text>
 
           {!showingRealVideo && (
             <View style={styles.missingBanner}>
               <Text style={styles.missingText}>
                 {hasChapterVideos
-                  ? `Ce chapitre n'est pas encore tourné — voici son storyboard en avant-goût, planche par planche. ${videoChapitres.length}/${storyboardChapitres.length} chapitre${videoChapitres.length > 1 ? 's' : ''} déjà tourné${videoChapitres.length > 1 ? 's' : ''}.`
-                  : "Le documentaire n'est pas encore tourné — voici le storyboard complet en avant-goût, planche par planche."}
+                  ? t('heroVideo.chapterNotShot', { done: videoChapitres.length, total: storyboardChapitres.length })
+                  : t('heroVideo.docNotShot')}
               </Text>
             </View>
           )}
@@ -182,10 +195,10 @@ function LecteurVideoScreen() {
 
           <View style={styles.actions}>
             <View style={styles.actionsHalf}>
-              <GhostButton label="Lire l'histoire" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
+              <GhostButton label={t('heroVideo.readHistory')} onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
             </View>
             <View style={styles.actionsHalf}>
-              <OutlineButton label="Écouter" onPress={() => router.push(`/accueil/heros/${heros.slug}/audio`)} />
+              <OutlineButton label={t('content.listen')} onPress={() => router.push(`/accueil/heros/${heros.slug}/audio`)} />
             </View>
           </View>
 
@@ -194,7 +207,7 @@ function LecteurVideoScreen() {
 
           {related.length > 0 && (
             <View style={styles.related}>
-              <Text style={styles.relatedLabel}>AUTRES VIDÉOS</Text>
+              <Text style={styles.relatedLabel}>{t('heroVideo.others')}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.relatedRow}>
                 {related.map((h) => (
                   <Pressable key={h.slug} style={styles.relatedItem} onPress={() => router.replace(`/accueil/heros/${h.slug}/video`)}>

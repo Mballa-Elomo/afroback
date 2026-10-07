@@ -9,6 +9,7 @@ import { AVATAR_GRADIENTS } from '../../src/profils/enfantPalette';
 import { pickHeroDuJour } from '../../src/profils/heroDuJour';
 import { useHeroesList } from '../../src/data/useHeroesData';
 import { colors, radii, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
 
 /**
  * Accueil enfant — fidèle à design-reference-parent-enfant.dc.excerpt.html
@@ -24,6 +25,7 @@ import { colors, radii, typography } from '../../src/theme/tokens';
  *   parent a laissé le réglage "Découverte activée" sur ce profil.
  */
 export default function AccueilEnfantScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { state, returnToSelector } = useActiveProfile();
   const [pinVisible, setPinVisible] = useState(false);
@@ -35,7 +37,7 @@ export default function AccueilEnfantScreen() {
   const heroDuJour = heroesState.status === 'ready' ? pickHeroDuJour(heroesState.data) : undefined;
 
   const bientotDisponible = (titre: string) =>
-    Alert.alert(titre, "Ce contenu n'est pas encore disponible — reviens bientôt !");
+    Alert.alert(titre, t('kidHome.soonText'));
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -45,7 +47,7 @@ export default function AccueilEnfantScreen() {
             <Text style={styles.avatarLetter}>{profil.prenom.charAt(0).toUpperCase()}</Text>
           </View>
           <View style={styles.headerBody}>
-            <Text style={styles.hello}>Salut,</Text>
+            <Text style={styles.hello}>{t('kidHome.hello')}</Text>
             <Text style={styles.name}>{profil.prenom} !</Text>
           </View>
           <Pressable onPress={() => setPinVisible(true)} hitSlop={10}>
@@ -55,17 +57,17 @@ export default function AccueilEnfantScreen() {
 
         <Pressable style={styles.gameCard} onPress={() => router.push('/enfant/ecole')}>
           <Text style={styles.gameEmoji}>🏅</Text>
-          <Text style={styles.gameKicker}>ÉCOLE DES HÉROS</Text>
-          <Text style={styles.gameTitle}>Découvre tes{'\n'}héros africains</Text>
+          <Text style={styles.gameKicker}>{t('kids.school')}</Text>
+          <Text style={styles.gameTitle}>{t('kidHome.discover', { br: '\n' })}</Text>
           <View style={styles.gamePill}>
-            <Text style={styles.gamePillLabel}>Jouer ▶</Text>
+            <Text style={styles.gamePillLabel}>{t('kidHome.play')}</Text>
           </View>
         </Pressable>
 
         <View style={styles.grid}>
-          <Pressable style={[styles.tile, styles.tileBlue]} onPress={() => bientotDisponible('Apprendre une langue')}>
+          <Pressable style={[styles.tile, styles.tileBlue]} onPress={() => bientotDisponible(t('kidHome.language'))}>
             <Text style={styles.tileEmoji}>🗣️</Text>
-            <Text style={styles.tileTitle}>Apprendre{'\n'}une langue</Text>
+            <Text style={styles.tileTitle}>{t('kidHome.languageTile', { br: '\n' })}</Text>
           </Pressable>
           <Pressable
             style={[styles.tile, styles.tileGold]}
@@ -73,7 +75,7 @@ export default function AccueilEnfantScreen() {
             disabled={!heroDuJour}
           >
             <Text style={styles.tileEmoji}>📖</Text>
-            <Text style={styles.tileTitle}>Histoire :{'\n'}{heroDuJour?.nom_affiche ?? '…'}</Text>
+            <Text style={styles.tileTitle}>{t('kidHome.story', { br: '\n', nom: heroDuJour?.nom_affiche ?? '…' })}</Text>
           </Pressable>
         </View>
 
@@ -81,8 +83,8 @@ export default function AccueilEnfantScreen() {
           <Pressable style={styles.carnetCard} onPress={() => router.push('/enfant/carnet')}>
             <Text style={styles.carnetEmoji}>🧭</Text>
             <View style={styles.carnetBody}>
-              <Text style={styles.carnetTitle}>Carnet d'explorateur</Text>
-              <Text style={styles.carnetSubtitle}>Découvre un village africain !</Text>
+              <Text style={styles.carnetTitle}>{t('kidHome.notebook')}</Text>
+              <Text style={styles.carnetSubtitle}>{t('kidHome.notebookSub')}</Text>
             </View>
           </Pressable>
         )}

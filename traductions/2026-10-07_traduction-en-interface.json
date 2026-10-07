@@ -1,0 +1,298 @@
+[
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/accueil/mythologie/[slug].tsx",
+    "ligne": 211,
+    "fr": "Récit établi d'après ces sources ; traditions orales à faire valider par des spécialistes.",
+    "en": "Story based on these sources; oral traditions still to be validated by specialists.",
+    "cle_proposee": "myth.sourcesNote"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/marche/[id].tsx",
+    "ligne": 165,
+    "fr": "{{n}} en stock",
+    "en": "{{n}} in stock",
+    "cle_proposee": "product.inStock"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/marche/[id].tsx",
+    "ligne": 165,
+    "fr": "Épuisé",
+    "en": "Sold out",
+    "cle_proposee": "product.soldOut (clé existante, à utiliser)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/marche/vendeur.tsx",
+    "ligne": 262,
+    "fr": "EN LIGNE",
+    "en": "ONLINE",
+    "cle_proposee": "vendor.online (clé existante 'En ligne' / 'Online', à passer en majuscules)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/marche/vendeur.tsx",
+    "ligne": 262,
+    "fr": "RUPTURE",
+    "en": "OUT OF STOCK",
+    "cle_proposee": "vendor.outOfStock (clé existante 'Rupture', à passer en majuscules)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/enfant/ecole/lecon/[id].tsx",
+    "ligne": 92,
+    "fr": "Héros",
+    "en": "Hero",
+    "cle_proposee": "lesson.heroFallback"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/eraCategory.ts",
+    "ligne": 4,
+    "fr": "Tous",
+    "en": "All",
+    "cle_proposee": "heroesList.eraAll"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/eraCategory.ts",
+    "ligne": 5,
+    "fr": "Précolonial",
+    "en": "Precolonial",
+    "cle_proposee": "heroesList.eraPrecolonial"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/eraCategory.ts",
+    "ligne": 6,
+    "fr": "Colonial",
+    "en": "Colonial",
+    "cle_proposee": "heroesList.eraColonial"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/eraCategory.ts",
+    "ligne": 7,
+    "fr": "Indépendances",
+    "en": "Independence era",
+    "cle_proposee": "heroesList.eraIndependances"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/enfant/carnet/[slug].tsx",
+    "ligne": 60,
+    "fr": "Village / Coutume / Objet / Personnage / Fait (DECOUVERTE_TYPE_LABEL)",
+    "en": "Village / Custom / Object / Figure / Fact",
+    "cle_proposee": "decouverteType.{type} (clés existantes, à utiliser à la place de DECOUVERTE_TYPE_LABEL)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/components/DecouverteItemRow.tsx",
+    "ligne": 16,
+    "fr": "Village / Coutume / Objet / Personnage / Fait (DECOUVERTE_TYPE_LABEL)",
+    "en": "Village / Custom / Object / Figure / Fact",
+    "cle_proposee": "decouverteType.{type} (clés existantes)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/recherche.tsx",
+    "ligne": 93,
+    "fr": "Village / Coutume / Objet / Personnage / Fait (DECOUVERTE_TYPE_LABEL)",
+    "en": "Village / Custom / Object / Figure / Fact",
+    "cle_proposee": "decouverteType.{type} (clés existantes ; ligne 96 : garder les deux langues dans le texte de recherche)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/accueil/index.tsx",
+    "ligne": 183,
+    "fr": "Résistance",
+    "en": "Resistance",
+    "cle_proposee": "heroTheme.resistance"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/accueil/index.tsx",
+    "ligne": 183,
+    "fr": "Politique",
+    "en": "Politics",
+    "cle_proposee": "heroTheme.politique"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/accueil/index.tsx",
+    "ligne": 183,
+    "fr": "Science",
+    "en": "Science",
+    "cle_proposee": "heroTheme.science"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/app/(tabs)/accueil/index.tsx",
+    "ligne": 183,
+    "fr": "Art",
+    "en": "Art",
+    "cle_proposee": "heroTheme.art"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/components/HeroHeader.tsx",
+    "ligne": 59,
+    "fr": "Résistance / Politique / Science / Art (heros.theme[0])",
+    "en": "Resistance / Politics / Science / Art",
+    "cle_proposee": "heroTheme.* (mêmes clés que ci-dessus, même correspondance que THEME_EN du site)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/communityRepository.ts",
+    "ligne": 79,
+    "fr": "Aucune session active.",
+    "en": "No active session.",
+    "cle_proposee": "repoErrors.noSession"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/communityRepository.ts",
+    "ligne": 111,
+    "fr": "Aucune session active.",
+    "en": "No active session.",
+    "cle_proposee": "repoErrors.noSession"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/marketplaceRepository.ts",
+    "ligne": 47,
+    "fr": "Aucune session active.",
+    "en": "No active session.",
+    "cle_proposee": "repoErrors.noSession"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/marketplaceRepository.ts",
+    "ligne": 198,
+    "fr": "Aucune session active.",
+    "en": "No active session.",
+    "cle_proposee": "repoErrors.noSession"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/marketplaceRepository.ts",
+    "ligne": 268,
+    "fr": "Aucune session active.",
+    "en": "No active session.",
+    "cle_proposee": "repoErrors.noSession"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/uploadImage.ts",
+    "ligne": 83,
+    "fr": "Aucune session active.",
+    "en": "No active session.",
+    "cle_proposee": "repoErrors.noSession"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/uploadImage.ts",
+    "ligne": 59,
+    "fr": "Accès à tes photos refusé. Autorise AFROBACK dans les réglages de ton téléphone pour ajouter une image.",
+    "en": "Access to your photos was denied. Allow AFROBACK in your phone's settings to add an image.",
+    "cle_proposee": "photo.permissionDenied"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/uploadImage.ts",
+    "ligne": 77,
+    "fr": "Impossible de lire cette image, réessaie avec une autre.",
+    "en": "Couldn't read this image, try another one.",
+    "cle_proposee": "photo.unreadable"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/uploadImage.ts",
+    "ligne": 96,
+    "fr": "Échec de l'envoi de l'image : {{message}}",
+    "en": "Image upload failed: {{message}}",
+    "cle_proposee": "photo.uploadFailed"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/parentEnfantRepository.ts",
+    "ligne": 23,
+    "fr": "Impossible de déterminer l'utilisateur connecté.",
+    "en": "Couldn't identify the signed-in user.",
+    "cle_proposee": "repoErrors.noUser"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/parentEnfantRepository.ts",
+    "ligne": 60,
+    "fr": "Impossible de créer le profil enfant : {{message}}",
+    "en": "Couldn't create the child profile: {{message}}",
+    "cle_proposee": "repoErrors.childCreateFailed (affiché par app/profils/ajouter.tsx:61 ; alternative : afficher addChild.failed)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/data/parentEnfantRepository.ts",
+    "ligne": 108,
+    "fr": "Impossible d'enregistrer le code PIN : {{message}}",
+    "en": "Couldn't save the PIN code: {{message}}",
+    "cle_proposee": "repoErrors.pinSaveFailed (affiché par src/profils/PinGate.tsx:87 ; alternative : afficher pin.saveFailed)"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/security/device.ts",
+    "ligne": 40,
+    "fr": "iPhone ou iPad",
+    "en": "iPhone or iPad",
+    "cle_proposee": "device.nameIos"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/security/device.ts",
+    "ligne": 41,
+    "fr": "Téléphone Android",
+    "en": "Android phone",
+    "cle_proposee": "device.nameAndroid"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/security/device.ts",
+    "ligne": 53,
+    "fr": "Navigateur",
+    "en": "Browser",
+    "cle_proposee": "device.nameBrowser"
+  },
+  {
+    "cible": "app",
+    "fichier": "livrables/sites-web/afroback/app-mobile/mobile-app/src/security/device.ts",
+    "ligne": 65,
+    "fr": "{{browser}} sur {{os}}",
+    "en": "{{browser}} on {{os}}",
+    "cle_proposee": "device.nameWeb"
+  },
+  {
+    "cible": "site",
+    "fichier": "livrables/sites-web/afroback/site-web/web/src/lib/market.ts",
+    "ligne": 115,
+    "fr": "Connecte-toi pour commander.",
+    "en": "Sign in to order.",
+    "cle_proposee": null
+  },
+  {
+    "cible": "site",
+    "fichier": "livrables/sites-web/afroback/site-web/web/src/lib/auth.tsx",
+    "ligne": 48,
+    "fr": "Navigateur",
+    "en": "Browser",
+    "cle_proposee": null
+  },
+  {
+    "cible": "site",
+    "fichier": "livrables/sites-web/afroback/site-web/web/src/lib/auth.tsx",
+    "ligne": 50,
+    "fr": "Site web · {browser} · {os}",
+    "en": "Website · {browser} · {os}",
+    "cle_proposee": null
+  }
+]

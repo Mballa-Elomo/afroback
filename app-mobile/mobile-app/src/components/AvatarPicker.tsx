@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } fr
 import { pickAndUploadImage, type UploadFolder } from '../data/uploadImage';
 import { colors, typography } from '../theme/tokens';
 import { HeroPlaceholder } from './HeroVisual';
+import { useI18n } from '../i18n';
 
 /** Sélecteur d'avatar circulaire (profil communautaire, boutique vendeur) — cadrage carré forcé, upload réel vers `user-uploads`. */
 export function AvatarPicker({
@@ -16,6 +17,7 @@ export function AvatarPicker({
   onChange: (url: string | null) => void;
   size?: number;
 }) {
+  const { t } = useI18n();
   const [uploading, setUploading] = useState(false);
 
   const pick = async () => {
@@ -24,7 +26,7 @@ export function AvatarPicker({
     setUploading(false);
     if (cancelled) return;
     if (error) {
-      Alert.alert("Impossible d'ajouter cette photo", error);
+      Alert.alert(t('photo.cantAdd'), error);
       return;
     }
     if (url) onChange(url);
@@ -45,7 +47,7 @@ export function AvatarPicker({
         )}
       </Pressable>
       <Pressable onPress={pick} disabled={uploading} hitSlop={6}>
-        <Text style={styles.label}>{value ? 'Changer la photo' : 'Ajouter une photo'}</Text>
+        <Text style={styles.label}>{value ? t('photo.changePhoto') : t('photo.add')}</Text>
       </Pressable>
     </View>
   );

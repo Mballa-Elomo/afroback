@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { getParentSettings, setParentPin } from '../data/parentEnfantRepository';
 import { colors, radii, spacing, typography } from '../theme/tokens';
+import { useI18n } from '../i18n';
 
 /**
  * Verrou PIN à 4 chiffres — décision PAR DÉFAUT du chef de projet (Yannick
@@ -24,6 +25,7 @@ export function PinGate({
   onSuccess: () => void;
 }) {
   const [mode, setMode] = useState<'loading' | 'enter' | 'create'>('loading');
+  const { t } = useI18n();
   const [existingPin, setExistingPin] = useState<string | null>(null);
   const [value, setValue] = useState('');
   const [confirmValue, setConfirmValue] = useState('');
@@ -64,7 +66,7 @@ export function PinGate({
       onSuccess();
       return;
     }
-    setError('Code incorrect.');
+    setError(t('pin.wrong'));
     setValue('');
   };
 
@@ -72,7 +74,7 @@ export function PinGate({
     if (value.length !== 4) return;
     if (confirmValue.length !== 4) return;
     if (value !== confirmValue) {
-      setError('Les deux codes ne correspondent pas.');
+      setError(t('pin.mismatch'));
       setConfirmValue('');
       return;
     }
@@ -82,7 +84,8 @@ export function PinGate({
       await setParentPin(value);
       onSuccess();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Impossible d'enregistrer le code.");
+      console.warn(e);
+      setError(t('pin.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -120,12 +123,12 @@ export function PinGate({
         {/* Tape en dehors de la carte pour masquer le clavier sans fermer la modale. */}
         <Pressable style={StyleSheet.absoluteFill} onPress={() => Keyboard.dismiss()} />
         <View style={styles.card}>
-          {mode === 'loading' && <Text style={styles.title}>Vérification…</Text>}
+          {mode === 'loading' && <Text style={styles.title}>{t('pin.checking')}</Text>}
 
           {mode === 'enter' && (
             <>
-              <Text style={styles.title}>Code parent</Text>
-              <Text style={styles.subtitle}>Entre le code à 4 chiffres pour continuer.</Text>
+              <Text style={styles.title}>{t('pin.title')}</Text>
+              <Text style={styles.subtitle}>{t('pin.enter')}</Text>
               <TextInput
                 value={value}
                 onChangeText={(t) => {
@@ -143,10 +146,10 @@ export function PinGate({
               {error && <Text style={styles.error}>{error}</Text>}
               <View style={styles.row}>
                 <Pressable onPress={onCancel} style={styles.secondaryBtn}>
-                  <Text style={styles.secondaryLabel}>Annuler</Text>
+                  <Text style={styles.secondaryLabel}>{t('pin.cancel')}</Text>
                 </Pressable>
                 <Pressable onPress={handleEnterSubmit} disabled={value.length !== 4} style={[styles.primaryBtn, value.length !== 4 && styles.btnDisabled]}>
-                  <Text style={styles.primaryLabel}>Valider</Text>
+                  <Text style={styles.primaryLabel}>{t('pin.validate')}</Text>
                 </Pressable>
               </View>
             </>
@@ -154,9 +157,9 @@ export function PinGate({
 
           {mode === 'create' && (
             <>
-              <Text style={styles.title}>Créer un code parent</Text>
+              <Text style={styles.title}>{t('pin.createTitle')}</Text>
               <Text style={styles.subtitle}>
-                Choisis un code à 4 chiffres. Il sera demandé pour revenir à l'espace adulte depuis un profil enfant, et pour accéder à l'Espace Parent.
+                {t('pin.createText')}
               </Text>
               <TextInput
                 value={value}
@@ -168,7 +171,7 @@ export function PinGate({
                 maxLength={4}
                 secureTextEntry
                 style={styles.input}
-                placeholder="Nouveau code"
+                placeholder={t('pin.newCode')}
                 placeholderTextColor={colors.textMuted}
                 autoFocus
               />
@@ -183,20 +186,20 @@ export function PinGate({
                 maxLength={4}
                 secureTextEntry
                 style={styles.input}
-                placeholder="Confirme le code"
+                placeholder={t('pin.confirmCode')}
                 placeholderTextColor={colors.textMuted}
               />
               {error && <Text style={styles.error}>{error}</Text>}
               <View style={styles.row}>
                 <Pressable onPress={onCancel} style={styles.secondaryBtn}>
-                  <Text style={styles.secondaryLabel}>Annuler</Text>
+                  <Text style={styles.secondaryLabel}>{t('pin.cancel')}</Text>
                 </Pressable>
                 <Pressable
                   onPress={handleCreateSubmit}
                   disabled={value.length !== 4 || confirmValue.length !== 4 || saving}
                   style={[styles.primaryBtn, (value.length !== 4 || confirmValue.length !== 4 || saving) && styles.btnDisabled]}
                 >
-                  <Text style={styles.primaryLabel}>{saving ? 'Enregistrement…' : 'Créer'}</Text>
+                  <Text style={styles.primaryLabel}>{saving ? t('pin.saving') : t('pin.create')}</Text>
                 </Pressable>
               </View>
             </>

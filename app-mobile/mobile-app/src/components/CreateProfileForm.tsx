@@ -5,6 +5,7 @@ import type { CommunityProfileOwn } from '../data/communityTypes';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { GoldButton } from './Buttons';
 import { AvatarPicker } from './AvatarPicker';
+import { useI18n } from '../i18n';
 
 /**
  * Formulaire de création du profil communautaire (pseudo + bio optionnelle),
@@ -15,6 +16,7 @@ import { AvatarPicker } from './AvatarPicker';
  * conforme au pseudonymat structuré.
  */
 export function CreateProfileForm({ onCreated }: { onCreated: (profile: CommunityProfileOwn) => void }) {
+  const { t } = useI18n();
   const [pseudo, setPseudo] = useState('');
   const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export function CreateProfileForm({ onCreated }: { onCreated: (profile: Communit
 
   const submit = async () => {
     if (pseudo.trim().length < 2) {
-      setError('Choisis un pseudo d’au moins 2 caractères.');
+      setError(t('createProfile.short'));
       return;
     }
     setError(null);
@@ -35,7 +37,7 @@ export function CreateProfileForm({ onCreated }: { onCreated: (profile: Communit
     });
     setLoading(false);
     if (apiError || !profile) {
-      setError(apiError ?? 'Impossible de créer ton profil pour le moment.');
+      setError(apiError ?? t('createProfile.failed'));
       return;
     }
     onCreated(profile);
@@ -43,33 +45,33 @@ export function CreateProfileForm({ onCreated }: { onCreated: (profile: Communit
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.title}>Crée ton profil communautaire</Text>
+      <Text style={styles.title}>{t('createProfile.title')}</Text>
       <Text style={styles.subtitle}>
-        Un pseudo suffit — ton numéro de téléphone ne sera jamais visible des autres membres.
+        {t('createProfile.subtitle')}
       </Text>
       <AvatarPicker folder="avatars-communaute" value={avatarUrl} onChange={setAvatarUrl} />
-      <Text style={styles.label}>PSEUDO</Text>
+      <Text style={styles.label}>{t('createProfile.pseudo')}</Text>
       <TextInput
         value={pseudo}
         onChangeText={setPseudo}
-        placeholder="Ex. Ama_Diaspora"
+        placeholder={t('createProfile.pseudoPh')}
         placeholderTextColor={colors.textMuted}
         style={styles.input}
         maxLength={30}
         autoCapitalize="none"
       />
-      <Text style={styles.label}>BIO (optionnel)</Text>
+      <Text style={styles.label}>{t('createProfile.bio')}</Text>
       <TextInput
         value={bio}
         onChangeText={setBio}
-        placeholder="Quelques mots sur toi..."
+        placeholder={t('createProfile.bioPh')}
         placeholderTextColor={colors.textMuted}
         style={styles.input}
         maxLength={200}
       />
       {error && <Text style={styles.error}>{error}</Text>}
       <View style={styles.cta}>
-        <GoldButton label={loading ? 'Création...' : 'Créer mon profil'} onPress={submit} />
+        <GoldButton label={loading ? t('createProfile.creating') : t('createProfile.create')} onPress={submit} />
       </View>
     </View>
   );

@@ -13,7 +13,7 @@ import type { Mythe, VideoChapitre } from '../../../../src/data/mythologieTypes'
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
 import { useRequireAccount } from '../../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../../src/access/Access';
-import { useI18n } from '../../../../src/i18n';
+import { currentLanguage, useI18n } from '../../../../src/i18n';
 import { Icon, type IconName } from '../../../../src/components/Icons';
 import { BackButton } from '../../../../src/ui/modern';
 import { CommentsSection } from '../../../../src/comments/CommentsSection';
@@ -42,11 +42,11 @@ export default function MytheDetailScreen() {
   const router = useRouter();
   const requireAccount = useRequireAccount();
   const mytheState = useMythe(slug);
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const mythe = mytheState.status === 'ready' ? mytheState.data : undefined;
   const [onglet, setOnglet] = useState<Onglet>('lire');
   const [chapitreIdx, setChapitreIdx] = useState(0);
-  const [langue, setLangue] = useState<Langue>('fr');
+  const [langue, setLangue] = useState<Langue>(currentLanguage());
   const recitLoggedRef = useRef<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const bodyY = useRef(0);
@@ -66,7 +66,7 @@ export default function MytheDetailScreen() {
   if (mytheState.status === 'loading') {
     return (
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="Le mythe se prépare..." />
+        <LoadingState message={t('myth.loading')} />
       </SafeAreaView>
     );
   }
@@ -99,7 +99,7 @@ export default function MytheDetailScreen() {
   const estPremier = chapitreIdx === 0;
 
   const openBd = () =>
-    Alert.alert('Bientôt disponible', "La bande dessinée de ce mythe n'est pas encore prête.");
+    Alert.alert(t('content.soon'), t('myth.comicSoon'));
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -140,15 +140,15 @@ export default function MytheDetailScreen() {
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
           <View style={styles.tabs}>
-            <Tab icon="book" label="Lire" active={onglet === 'lire'} onPress={() => setOnglet('lire')} />
-            <Tab icon="play" label="Écouter" active={onglet === 'ecouter'} onPress={() => requireAccount(() => setOnglet('ecouter'), 'audio')} />
-            <Tab icon="sparkle" label="Regarder" active={onglet === 'regarder'} onPress={() => requireAccount(() => setOnglet('regarder'), 'video')} />
+            <Tab icon="book" label={t('content.read')} active={onglet === 'lire'} onPress={() => setOnglet('lire')} />
+            <Tab icon="play" label={t('content.listen')} active={onglet === 'ecouter'} onPress={() => requireAccount(() => setOnglet('ecouter'), 'audio')} />
+            <Tab icon="sparkle" label={t('content.watch')} active={onglet === 'regarder'} onPress={() => requireAccount(() => setOnglet('regarder'), 'video')} />
           </View>
 
           {onglet === 'lire' && chapitreActuel && (
             <>
               <View style={styles.readerHeader}>
-                <Text style={styles.readerPageNum}>CHAPITRE {chapitreActuel.numero}/{chapitres.length}</Text>
+                <Text style={styles.readerPageNum}>{t('myth.chapter', { n: chapitreActuel.numero, total: chapitres.length })}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   {hasEnglishRecit && (
                     <View style={styles.langToggle}>
@@ -175,12 +175,12 @@ export default function MytheDetailScreen() {
               <View style={styles.pager}>
                 {!estPremier && (
                   <Pressable onPress={() => setChapitreIdx((i) => i - 1)} style={styles.pagerBtnGhost}>
-                    <Text style={styles.pagerBtnGhostLabel}>‹ Chapitre précédent</Text>
+                    <Text style={styles.pagerBtnGhostLabel}>{t('content.prevChapter')}</Text>
                   </Pressable>
                 )}
                 {!estDernier && (
                   <Pressable onPress={() => setChapitreIdx((i) => i + 1)} style={styles.pagerBtnGold}>
-                    <Text style={styles.pagerBtnGoldLabel}>Chapitre suivant ›</Text>
+                    <Text style={styles.pagerBtnGoldLabel}>{t('content.nextChapter')}</Text>
                   </Pressable>
                 )}
               </View>
@@ -190,15 +190,15 @@ export default function MytheDetailScreen() {
                   <Pressable onPress={openBd} style={styles.reReadCard}>
                     <Icon name="book" size={22} color={colors.accentGoldBright} />
                     <View style={styles.reReadBody}>
-                      <Text style={styles.reReadTitle}>Revivre en BD</Text>
-                      <Text style={styles.reReadSub}>Le mythe en images</Text>
+                      <Text style={styles.reReadTitle}>{t('myth.comic')}</Text>
+                      <Text style={styles.reReadSub}>{t('myth.comicSub')}</Text>
                     </View>
                     <Icon name="chevronRight" size={16} color={colors.accentGold} strokeWidth={2.2} />
                   </Pressable>
 
                   {mythe.sources.length > 0 && (
                     <>
-                      <Text style={styles.sourcesLabel}>SOURCES</Text>
+                      <Text style={styles.sourcesLabel}>{t('content.sources')}</Text>
                       <View style={styles.sources}>
                         {mythe.sources.map((src, i) => (
                           <View key={i} style={styles.sourceRow}>
@@ -208,7 +208,7 @@ export default function MytheDetailScreen() {
                         ))}
                       </View>
                       <Text style={styles.sourcesNote}>
-                        Récit établi d'après ces sources ; traditions orales à faire valider par des spécialistes.
+                        {t('myth.sourcesNote')}
                       </Text>
                     </>
                   )}
@@ -236,6 +236,7 @@ function formatTime(seconds: number) {
 }
 
 function EcouterTab({ mythe }: { mythe: Mythe }) {
+  const { t } = useI18n();
   if (!mythe.narration_audio_url && !mythe.narration_audio_url_en) {
     return (
       <View style={styles.audioCenter}>
@@ -243,7 +244,7 @@ function EcouterTab({ mythe }: { mythe: Mythe }) {
           <Text style={styles.audioPlaceholderIcon}>🎧</Text>
         </View>
         <Text style={styles.audioMissingText}>
-          La narration audio de ce mythe est en cours de production. En attendant, tu peux lire le récit du griot.
+          {t('myth.audioMissing')}
         </Text>
       </View>
     );
@@ -253,8 +254,9 @@ function EcouterTab({ mythe }: { mythe: Mythe }) {
 
 /** Vrai lecteur (expo-audio), bascule FR/EN quand les deux narrations existent — même principe que AudioPlayerBlock côté héros (audio.tsx). */
 function RealAudioPlayer({ mythe }: { mythe: Mythe }) {
+  const { t } = useI18n();
   const hasBoth = Boolean(mythe.narration_audio_url && mythe.narration_audio_url_en);
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const [lang, setLang] = useState<'fr' | 'en'>(currentLanguage());
   const actualLang: 'fr' | 'en' = lang === 'fr' ? (mythe.narration_audio_url ? 'fr' : 'en') : mythe.narration_audio_url_en ? 'en' : 'fr';
   const uri = (lang === 'fr' ? mythe.narration_audio_url : mythe.narration_audio_url_en) ?? mythe.narration_audio_url ?? mythe.narration_audio_url_en ?? '';
 
@@ -278,7 +280,7 @@ function RealAudioPlayer({ mythe }: { mythe: Mythe }) {
       <View style={styles.audioPlaceholder}>
         <Text style={styles.audioPlaceholderIcon}>🎧</Text>
       </View>
-      <Text style={styles.audioTitle}>Narration AFROBACK</Text>
+      <Text style={styles.audioTitle}>{t('myth.narration')}</Text>
       <Text style={styles.audioSub}>Voix pré-enregistrée · {mythe.peuple.split(/[,(]/)[0].trim()}</Text>
       {hasBoth && (
         <View style={[styles.langToggle, { marginBottom: 14 }]}>
@@ -311,6 +313,7 @@ function RealAudioPlayer({ mythe }: { mythe: Mythe }) {
  * honnêtement "à produire" plutôt qu'un contenu de remplacement inventé.
  */
 function RegarderTab({ mythe, chapitres }: { mythe: Mythe; chapitres: { numero: number; titre: string }[] }) {
+  const { t } = useI18n();
   const [chapIdx, setChapIdx] = useState(0);
   const chapitreActuel = chapitres[chapIdx];
   const videoChapitre = chapitreActuel ? mythe.video_chapitres.find((c) => c.numero === chapitreActuel.numero) : undefined;
@@ -374,8 +377,7 @@ function RegarderTab({ mythe, chapitres }: { mythe: Mythe; chapitres: { numero: 
             <Icon name="sparkle" size={34} color={colors.accentGoldSoft} />
           </View>
           <Text style={styles.audioMissingText}>
-            {chapitreActuel ? `Le chapitre ${chapitreActuel.numero} n'est pas encore tourné.` : "Aucune vidéo n'est encore tournée pour ce mythe."} En
-            attendant, tu peux lire le récit du griot.
+            {chapitreActuel ? t('myth.chapterNotShot', { n: chapitreActuel.numero }) : t('myth.noVideo')} {t('myth.meanwhile')}
           </Text>
         </View>
       )}

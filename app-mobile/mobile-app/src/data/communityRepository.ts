@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import i18n from '../i18n';
 import type {
   CommunityComment,
   CommunityCommentWithAuthor,
@@ -75,7 +76,7 @@ export async function createOwnProfile(params: {
 }): Promise<{ profile: CommunityProfileOwn | null; error: string | null }> {
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
-  if (!userId) return { profile: null, error: 'Aucune session active.' };
+  if (!userId) return { profile: null, error: i18n.t('repoErrors.noSession') };
 
   const { data, error } = await supabase
     .from('community_profiles')
@@ -107,7 +108,7 @@ export async function updateOwnProfile(params: {
 
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
-  if (!userId) return { error: 'Aucune session active.' };
+  if (!userId) return { error: i18n.t('repoErrors.noSession') };
 
   const { error } = await supabase.from('community_profiles').update(patch).eq('user_id', userId);
   return { error: error ? translateCommunityError(error.message) : null };
@@ -304,10 +305,10 @@ export async function createReport(params: {
 /** Messages Postgres/Supabase traduits pour l'UI, sans changer le comportement. */
 function translateCommunityError(message: string): string {
   if (message.includes('community_profiles_pseudo_key') || message.toLowerCase().includes('duplicate')) {
-    return 'Ce pseudo est déjà pris, choisis-en un autre.';
+    return i18n.t('repoErrors.pseudoTaken');
   }
   if (message.toLowerCase().includes('row-level security') || message.toLowerCase().includes('policy')) {
-    return "Action non autorisée — vérifie que ton profil communautaire est bien créé.";
+    return i18n.t('repoErrors.communityDenied');
   }
   return message;
 }

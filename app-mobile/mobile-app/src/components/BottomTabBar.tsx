@@ -4,6 +4,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, typography } from '../theme/tokens';
 import { Icon, type IconName } from './Icons';
+import { useI18n } from '../i18n';
 
 /**
  * Barre de navigation basse. Refonte moderne du 2026-09-30 (demande de
@@ -11,11 +12,11 @@ import { Icon, type IconName } from './Icons';
  * onglet actif signalé par une pastille dorée derrière l'icône.
  */
 const TAB_META: Record<string, { icon: IconName; label: string }> = {
-  accueil: { icon: 'home', label: 'Accueil' },
-  decouverte: { icon: 'compass', label: 'Découverte' },
-  marche: { icon: 'store', label: 'Marché' },
-  communaute: { icon: 'users', label: 'Communauté' },
-  profil: { icon: 'user', label: 'Profil' },
+  accueil: { icon: 'home', label: 'tabs.accueil' },
+  decouverte: { icon: 'compass', label: 'tabs.decouverte' },
+  marche: { icon: 'store', label: 'tabs.marche' },
+  communaute: { icon: 'users', label: 'tabs.communaute' },
+  profil: { icon: 'user', label: 'tabs.profil' },
 };
 
 /**
@@ -26,6 +27,7 @@ const TAB_META: Record<string, { icon: IconName; label: string }> = {
 const ROUTES_SANS_BARRE = new Set(['heros/[slug]/audio', 'heros/[slug]/video']);
 
 export function BottomTabBar(props: BottomTabBarProps) {
+  const { t } = useI18n();
   const { state, navigation } = props;
   const focusedTabRoute = state.routes[state.index];
   const focusedRouteName = getFocusedRouteNameFromRoute(focusedTabRoute);
@@ -53,13 +55,13 @@ export function BottomTabBar(props: BottomTabBarProps) {
               style={styles.item}
               accessibilityRole="tab"
               accessibilityState={{ selected: focused }}
-              accessibilityLabel={meta.label}
+              accessibilityLabel={t(meta.label)}
             >
               <View style={[styles.pill, focused && styles.pillActive]}>
                 <Icon name={meta.icon} size={22} color={focused ? colors.accentGoldBright : colors.textMuted} strokeWidth={focused ? 2.2 : 1.8} />
               </View>
               <Text style={[styles.label, focused && styles.labelActive]} numberOfLines={1}>
-                {meta.label}
+                {t(meta.label)}
               </Text>
             </Pressable>
           );

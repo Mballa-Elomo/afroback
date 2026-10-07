@@ -11,6 +11,7 @@ import { getProductRatingSummaries, getProductsByVendor, getVendorPublicById } f
 import type { MarketplaceProduct, MarketplaceVendorPublic } from '../../../../src/data/marketplaceTypes';
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
 import { Icon } from '../../../../src/components/Icons';
+import { useI18n } from '../../../../src/i18n';
 
 type State =
   | { status: 'loading' }
@@ -26,6 +27,7 @@ type State =
  * le modèle de données) — voir mobile-app/README.md.
  */
 export default function ArtisanProfileScreen() {
+  const { t } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -93,23 +95,23 @@ export default function ArtisanProfileScreen() {
           <View style={styles.statsRow}>
             <View style={styles.statTile}>
               <Text style={styles.statValue}>{avgRating !== null ? avgRating.toFixed(1) : '—'}</Text>
-              <Text style={styles.statLabel}>Note moyenne</Text>
+              <Text style={styles.statLabel}>{t('artisan.avg')}</Text>
             </View>
             <View style={styles.statTile}>
               <Text style={styles.statValue}>{reviewCount}</Text>
-              <Text style={styles.statLabel}>Avis</Text>
+              <Text style={styles.statLabel}>{t('artisan.reviews')}</Text>
             </View>
             <View style={styles.statTile}>
               <Text style={styles.statValue}>{products.length}</Text>
-              <Text style={styles.statLabel}>Produits</Text>
+              <Text style={styles.statLabel}>{t('artisan.products')}</Text>
             </View>
           </View>
 
           {vendor.bio && <Text style={styles.bio}>{vendor.bio}</Text>}
 
-          <SectionTitle title="Produits" />
+          <SectionTitle title={t('artisan.products')} />
           {products.length === 0 ? (
-            <Text style={styles.empty}>Aucun produit en ligne pour l'instant.</Text>
+            <Text style={styles.empty}>{t('artisan.none')}</Text>
           ) : (
             <View style={styles.grid}>
               {products.map((p) => (

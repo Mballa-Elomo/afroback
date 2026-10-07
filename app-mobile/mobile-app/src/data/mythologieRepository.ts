@@ -1,6 +1,8 @@
 import { supabase } from './supabaseClient';
 import type { Mythe, VideoChapitre } from './mythologieTypes';
 import { getContentDetail } from './contentAccess';
+import i18n from '../i18n';
+import { MYTHES_EN_COLUMNS, MYTHES_EN_FIELDS, localize } from '../i18n/content';
 
 /**
  * Source de données réelle : table `mythes` sur Supabase (voir
@@ -31,13 +33,19 @@ const MYTHES_CATALOGUE =
 
 let cache: Mythe[] | null = null;
 let inflight: Promise<Mythe[]> | null = null;
+i18n.on('languageChanged', () => {
+  cache = null;
+});
 
 async function fetchMythes(): Promise<Mythe[]> {
-  const { data, error } = await supabase.from('mythes').select(MYTHES_CATALOGUE).order('ordre_affichage', { ascending: true });
+  let { data, error }: { data: unknown; error: { message: string } | null } = await supabase.from('mythes').select(MYTHES_CATALOGUE + MYTHES_EN_COLUMNS).order('ordre_affichage', { ascending: true });
+  if (error) {
+    ({ data, error } = await supabase.from('mythes').select(MYTHES_CATALOGUE).order('ordre_affichage', { ascending: true }));
+  }
   if (error) {
     throw new Error(`Impossible de charger la mythologie depuis Supabase : ${error.message}`);
   }
-  const mythes = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+  const mythes = ((data ?? []) as unknown as Record<string, unknown>[]).map((raw) => localize(raw, MYTHES_EN_FIELDS)).map((row) => ({
     recit_chapitres_fr: [],
     recit_chapitres_en: [],
     sources: [],
@@ -88,7 +96,7 @@ export async function getMytheBySlug(slug: string): Promise<Mythe | undefined> {
   if (detail.verrouille) {
     return { ...base, acces: { verrouille: true, apercu_fr: detail.apercu_fr, apercu_en: detail.apercu_en } };
   }
-  const row = detail.row;
+  const row = localize(detail.row, MYTHES_EN_FIELDS);
   return {
     ...base,
     ...(row as unknown as Mythe),

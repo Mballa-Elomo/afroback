@@ -16,6 +16,7 @@ import { LockedActionCard } from '../../../../src/auth/AccountWall';
 import { ProfileAvatar, presetKey } from '../../../../src/components/ProfileAvatar';
 import { PremiumActionCard, useAccess } from '../../../../src/access/Access';
 import { Icon } from '../../../../src/components/Icons';
+import { useI18n } from '../../../../src/i18n';
 
 type State =
   | { status: 'loading' }
@@ -25,6 +26,7 @@ type State =
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useI18n();
   const router = useRouter();
   const { isGuest } = useAuth();
   const { systemActive, isSubscribed } = useAccess();
@@ -54,7 +56,7 @@ export default function PostDetailScreen() {
     // les stores, et la diffusion du site one-page reste une décision ouverte
     // (voir context/AFROBACK.md). La signature évite un partage anonyme en
     // attendant qu'un vrai lien existe.
-    const message = `${state.post.contenu_texte}\n\n— partagé depuis AFROBACK`;
+    const message = `${state.post.contenu_texte}\n\n${t('post.sharedFrom')}`;
     Share.share({ message }).catch(() => {});
   };
 
@@ -102,7 +104,7 @@ export default function PostDetailScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.headerTitle}>Post</Text>
+          <Text style={styles.headerTitle}>{t('post.title')}</Text>
           <View style={{ flex: 1 }} />
           <Pressable
             onPress={() =>
@@ -112,7 +114,7 @@ export default function PostDetailScreen() {
               })
             }
           >
-            <Text style={styles.reportLabel}>⚑ Signaler</Text>
+            <Text style={styles.reportLabel}>{t('post.report')}</Text>
           </Pressable>
         </View>
 
@@ -127,7 +129,7 @@ export default function PostDetailScreen() {
             )}
           </Pressable>
           <View>
-            <Text style={styles.authorName}>{post.author?.pseudo ?? 'Membre supprimé'}</Text>
+            <Text style={styles.authorName}>{post.author?.pseudo ?? t('post.deletedMember')}</Text>
             <Text style={styles.time}>{relativeTime(post.created_at)}</Text>
           </View>
         </View>
@@ -143,12 +145,12 @@ export default function PostDetailScreen() {
           <Pressable onPress={share}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Icon name="share" size={15} color={colors.textMuted} />
-              <Text style={styles.statLabel}>Partager</Text>
+              <Text style={styles.statLabel}>{t('post.share')}</Text>
             </View>
           </Pressable>
         </View>
 
-        <Text style={styles.commentsLabel}>COMMENTAIRES</Text>
+        <Text style={styles.commentsLabel}>{t('post.comments')}</Text>
         <View style={styles.commentsList}>
           {comments.map((c) => (
             <View key={c.id} style={styles.commentRow}>
@@ -160,12 +162,12 @@ export default function PostDetailScreen() {
                 <HeroPlaceholder style={styles.commentAvatar} radius={16} />
               )}
               <View style={styles.commentBubble}>
-                <Text style={styles.commentAuthor}>{c.author?.pseudo ?? 'Membre supprimé'}</Text>
+                <Text style={styles.commentAuthor}>{c.author?.pseudo ?? t('post.deletedMember')}</Text>
                 <Text style={styles.commentText}>{c.contenu_texte}</Text>
               </View>
             </View>
           ))}
-          {comments.length === 0 && <Text style={styles.noComments}>Aucun commentaire pour l'instant.</Text>}
+          {comments.length === 0 && <Text style={styles.noComments}>{t('post.noComments')}</Text>}
         </View>
 
         {isGuest ? (
@@ -182,13 +184,13 @@ export default function PostDetailScreen() {
             <TextInput
               value={draft}
               onChangeText={setDraft}
-              placeholder="Ajouter un commentaire..."
+              placeholder={t('post.addPh')}
               placeholderTextColor={colors.textMuted}
               style={styles.commentInput}
               maxLength={500}
             />
             <Pressable onPress={sendComment} style={styles.sendBtn} disabled={sending}>
-              <Text style={styles.sendLabel}>{sending ? '...' : 'Envoyer'}</Text>
+              <Text style={styles.sendLabel}>{sending ? '...' : t('post.send')}</Text>
             </Pressable>
           </View>
         )}

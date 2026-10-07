@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { pickAndUploadImage, type UploadFolder } from '../data/uploadImage';
 import { colors, radii, typography } from '../theme/tokens';
+import { useI18n } from '../i18n';
 
 /**
  * Sélecteur de photo rectangulaire (post Communauté, produit Marketplace) —
@@ -13,13 +14,15 @@ export function PhotoPicker({
   folder,
   value,
   onChange,
-  label = 'Ajouter une photo',
+  label,
 }: {
   folder: UploadFolder;
   value: string | null;
   onChange: (url: string | null) => void;
   label?: string;
 }) {
+  const { t } = useI18n();
+  label = label ?? t('photo.add');
   const [uploading, setUploading] = useState(false);
 
   const pick = async () => {
@@ -28,7 +31,7 @@ export function PhotoPicker({
     setUploading(false);
     if (cancelled) return;
     if (error) {
-      Alert.alert("Impossible d'ajouter cette photo", error);
+      Alert.alert(t('photo.cantAdd'), error);
       return;
     }
     if (url) onChange(url);
@@ -42,7 +45,7 @@ export function PhotoPicker({
           <Text style={styles.removeIcon}>✕</Text>
         </Pressable>
         <Pressable style={styles.changeBtn} onPress={pick} disabled={uploading}>
-          <Text style={styles.changeLabel}>{uploading ? 'Envoi...' : 'Changer'}</Text>
+          <Text style={styles.changeLabel}>{uploading ? t('photo.uploading') : t('photo.change')}</Text>
         </Pressable>
       </View>
     );

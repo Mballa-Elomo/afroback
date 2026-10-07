@@ -22,7 +22,7 @@ import { useI18n } from '../../../../../src/i18n';
 export default function FicheHerosScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const requireAccount = useRequireAccount();
   const herosState = useHero(slug);
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
@@ -71,18 +71,18 @@ export default function FicheHerosScreen() {
             </>
           ) : (
             <>
-              <PremiumButton label="Lire le récit" icon="book" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
+              <PremiumButton label={t('content.readStory')} icon="book" onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} />
               <View style={styles.actions}>
                 <ActionTile
                   icon="play"
-                  label="Écouter"
-                  hint={heros.statut_narration_audio === 'pret' ? 'Narration audio' : 'Bientôt'}
+                  label={t('content.listen')}
+                  hint={heros.statut_narration_audio === 'pret' ? t('hero.narration') : t('hero.soon')}
                   onPress={() => requireAccount(() => router.push(`/accueil/heros/${heros.slug}/audio`), 'audio')}
                 />
                 <ActionTile
                   icon="sparkle"
-                  label="Regarder"
-                  hint={heros.statut_video === 'pret' ? 'Vidéo' : 'Storyboard'}
+                  label={t('content.watch')}
+                  hint={heros.statut_video === 'pret' ? t('hero.video') : t('hero.storyboard')}
                   onPress={() => requireAccount(() => router.push(`/accueil/heros/${heros.slug}/video`), 'video')}
                 />
               </View>
@@ -93,25 +93,25 @@ export default function FicheHerosScreen() {
               {heros.frise_chronologique.length > 0 && (
                 <Collapsible
                   icon="compass"
-                  title="Frise chronologique"
-                  count={`${heros.frise_chronologique.length} dates`}
+                  title={t('hero.timeline')}
+                  count={t('hero.dates', { n: heros.frise_chronologique.length })}
                   preview={`${heros.frise_chronologique[0].date} · ${heros.frise_chronologique[0].evenement}`}
                 >
                   <TimelineList evenements={heros.frise_chronologique} bare />
                 </Collapsible>
               )}
               {heros.citations.length > 0 && (
-                <Collapsible icon="chat" title="Citations marquantes" count={`${heros.citations.length}`} preview={`« ${heros.citations[0].texte} »`}>
+                <Collapsible icon="chat" title={t('hero.quotes')} count={`${heros.citations.length}`} preview={`« ${heros.citations[0].texte} »`}>
                   <CitationsSection citations={heros.citations} bare />
                 </Collapsible>
               )}
               {heros.legendes_associees.length > 0 && (
-                <Collapsible icon="sparkle" title="Légendes associées" count={`${heros.legendes_associees.length}`} preview={heros.legendes_associees[0].titre}>
+                <Collapsible icon="sparkle" title={t('hero.legends')} count={`${heros.legendes_associees.length}`} preview={heros.legendes_associees[0].titre}>
                   <LegendesSection legendes={heros.legendes_associees} bare />
                 </Collapsible>
               )}
               {heros.sources.length > 0 && (
-                <Collapsible icon="book" title="Sources" count={`${heros.sources.length}`} preview={heros.sources[0]}>
+                <Collapsible icon="book" title={t('content.sources')} count={`${heros.sources.length}`} preview={heros.sources[0]}>
                   <SourcesList sources={heros.sources} bare />
                 </Collapsible>
               )}
@@ -121,7 +121,7 @@ export default function FicheHerosScreen() {
           <View onLayout={(e) => (commentsY.current = e.nativeEvent.layout.y)}>
             <CommentsSection type="heros" slug={heros.slug} />
           </View>
-          <RelatedHeroes heroes={related} title="De la même époque" />
+          <RelatedHeroes heroes={related} title={t('hero.sameEra')} />
         </View>
       </ScrollView>
     </SafeAreaView>

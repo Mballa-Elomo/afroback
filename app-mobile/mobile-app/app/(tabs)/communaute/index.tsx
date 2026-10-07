@@ -9,11 +9,12 @@ import { useFeedPosts } from '../../../src/data/useCommunityData';
 import { colors, typography } from '../../../src/theme/tokens';
 import { useAccess } from '../../../src/access/Access';
 import { Bone, FilterChips, ScreenHeader, SkeletonScreen } from '../../../src/ui/modern';
+import { useI18n } from '../../../src/i18n';
 
 type Sort = 'recent' | 'popular';
 const SORTS: { id: Sort; label: string }[] = [
-  { id: 'recent', label: 'Récent' },
-  { id: 'popular', label: 'Populaire' },
+  { id: 'recent', label: 'community.recent' },
+  { id: 'popular', label: 'community.popular' },
 ];
 
 /**
@@ -23,6 +24,7 @@ const SORTS: { id: Sort; label: string }[] = [
  * abonnés (règle d'accès du 2026-09-29).
  */
 export default function CommunauteScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { requireSubscription } = useAccess();
   const [feedState, refresh] = useFeedPosts();
@@ -41,7 +43,7 @@ export default function CommunauteScreen() {
     return copy;
   }, [posts, sort]);
 
-  const openExclusive = () => Alert.alert('Bientôt disponible', "L'espace exclusif abonnés n'est pas encore activé sur AFROBACK.");
+  const openExclusive = () => Alert.alert(t('community.soon'), t('community.exclusiveSoon'));
 
   if (feedState.status === 'error') {
     return (
@@ -55,16 +57,16 @@ export default function CommunauteScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <ScreenHeader
-          title="Communauté"
-          subtitle="Partage, échange, transmets"
+          title={t('community.title')}
+          subtitle={t('community.subtitle')}
           right={
             <Pressable onPress={openExclusive} style={styles.exclusive} accessibilityRole="button">
               <Icon name="crown" size={15} color={colors.accentGoldBright} />
-              <Text style={styles.exclusiveText}>Exclusif</Text>
+              <Text style={styles.exclusiveText}>{t('community.exclusive')}</Text>
             </Pressable>
           }
         />
-        <FilterChips options={SORTS} value={sort} onChange={setSort} />
+        <FilterChips options={SORTS.map((s) => ({ ...s, label: t(s.label) }))} value={sort} onChange={setSort} />
 
         <View style={styles.list}>
           {feedState.status === 'loading' ? (
@@ -88,8 +90,8 @@ export default function CommunauteScreen() {
                   <View style={styles.emptyIcon}>
                     <Icon name="chat" size={30} color={colors.accentGoldBright} />
                   </View>
-                  <Text style={styles.emptyTitle}>Le fil est encore calme</Text>
-                  <Text style={styles.emptyText}>Sois parmi les premiers à partager une histoire, une tradition ou une question.</Text>
+                  <Text style={styles.emptyTitle}>{t('community.calm')}</Text>
+                  <Text style={styles.emptyText}>{t('community.calmText')}</Text>
                 </View>
               )}
             </>
@@ -101,10 +103,10 @@ export default function CommunauteScreen() {
         style={styles.fab}
         onPress={() => requireSubscription(() => router.push('/communaute/create'), 'publish')}
         accessibilityRole="button"
-        accessibilityLabel="Publier"
+        accessibilityLabel={t('community.post')}
       >
         <Icon name="plus" size={20} color={colors.ctaTextOnGold} strokeWidth={2.6} />
-        <Text style={styles.fabText}>Publier</Text>
+        <Text style={styles.fabText}>{t('community.post')}</Text>
       </Pressable>
     </SafeAreaView>
   );

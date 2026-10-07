@@ -14,6 +14,7 @@ import {
 import { colors, typography } from '../theme/tokens';
 import { Icon, type IconName } from '../components/Icons';
 import { useMotionAllowed } from '../onboarding/useReduceMotion';
+import { useI18n } from '../i18n';
 
 /**
  * Briques du design "moderne" (refonte du 2026-09-30, demande de Yannick :
@@ -56,13 +57,14 @@ export function PressableScale({
 
 /** Bouton retour rond (en-têtes d'écran et en surimpression sur une photo). */
 export function BackButton({ onPress, floating = false }: { onPress: () => void; floating?: boolean }) {
+  const { t } = useI18n();
   return (
     <Pressable
       onPress={onPress}
       hitSlop={10}
       style={[styles.back, floating && styles.backFloating]}
       accessibilityRole="button"
-      accessibilityLabel="Retour"
+      accessibilityLabel={t('ui.back')}
     >
       <View style={{ transform: [{ rotate: '180deg' }] }}>
         <Icon name="chevronRight" size={18} color={colors.accentGoldPale} strokeWidth={2.4} />
@@ -237,6 +239,7 @@ export function RailSection({
   step?: number;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
   const ref = useRef<ScrollView>(null);
   const offset = useRef(0);
   const by = (d: number) => {
@@ -252,10 +255,10 @@ export function RailSection({
         <View style={styles.headerRight}>
           {Platform.OS === 'web' && (
             <>
-              <Pressable onPress={() => by(-step)} style={styles.railArrow} accessibilityLabel="Précédent">
+              <Pressable onPress={() => by(-step)} style={styles.railArrow} accessibilityLabel={t('ui.prev')}>
                 <Icon name="chevronLeft" size={16} color={colors.accentGold} strokeWidth={2.2} />
               </Pressable>
-              <Pressable onPress={() => by(step)} style={styles.railArrow} accessibilityLabel="Suivant">
+              <Pressable onPress={() => by(step)} style={styles.railArrow} accessibilityLabel={t('ui.next')}>
                 <Icon name="chevronRight" size={16} color={colors.accentGold} strokeWidth={2.2} />
               </Pressable>
             </>
@@ -289,6 +292,7 @@ export function RailSection({
  * contenu arrive (une seule animation pour tout l'écran, pas une par forme).
  */
 export function SkeletonScreen({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
   const motion = useMotionAllowed();
   const pulse = useRef(new Animated.Value(0.55)).current;
   useEffect(() => {
@@ -303,7 +307,7 @@ export function SkeletonScreen({ children }: { children: ReactNode }) {
     return () => loop.stop();
   }, [motion, pulse]);
   return (
-    <Animated.View style={{ opacity: pulse }} accessibilityLabel="Chargement" accessibilityRole="progressbar">
+    <Animated.View style={{ opacity: pulse }} accessibilityLabel={t('ui.loading')} accessibilityRole="progressbar">
       {children}
     </Animated.View>
   );

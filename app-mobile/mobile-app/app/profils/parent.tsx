@@ -14,6 +14,7 @@ import type { ChildProfile, ChildTodayStats } from '../../src/data/parentEnfantT
 import { relativeTime } from '../../src/data/relativeTime';
 import { colors, radii, spacing, typography } from '../../src/theme/tokens';
 import { Icon } from '../../src/components/Icons';
+import { useI18n } from '../../src/i18n';
 
 type ChildRowData = {
   stats: ChildTodayStats | null;
@@ -33,6 +34,7 @@ type ChildRowData = {
  *   affiché et modifiable, mais n'entraîne aucun verrouillage de l'app.
  */
 export default function ParentSpaceScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { children, refreshChildren } = useActiveProfile();
   const [rowData, setRowData] = useState<Record<string, ChildRowData>>({});
@@ -84,13 +86,13 @@ export default function ParentSpaceScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Espace Parent</Text>
+          <Text style={styles.title}>{t('parentSpace.title')}</Text>
         </View>
-        <Text style={styles.subtitle}>Contrôle parental &amp; suivi des profils enfants.</Text>
+        <Text style={styles.subtitle}>{t('parentSpace.subtitle')}</Text>
 
         {children.length === 0 && (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>Aucun profil enfant pour l'instant.</Text>
+            <Text style={styles.emptyText}>{t('parentSpace.empty')}</Text>
           </View>
         )}
 
@@ -99,9 +101,9 @@ export default function ParentSpaceScreen() {
           const tempsLabel = row?.stats
             ? row.stats.aDejaUneSession
               ? formatMinutes(row.stats.minutesAujourdhui)
-              : 'Aucune session'
+              : t('parentSpace.noSession')
             : '…';
-          const derniereActiviteLabel = row?.loading ? '…' : row?.lastActivity ? relativeTime(row.lastActivity) : 'Jamais encore';
+          const derniereActiviteLabel = row?.loading ? '…' : row?.lastActivity ? relativeTime(row.lastActivity) : t('parentSpace.never');
 
           return (
             <View key={c.id} style={styles.card}>
@@ -119,30 +121,30 @@ export default function ParentSpaceScreen() {
 
               <View style={styles.statTile}>
                 <Text style={styles.statValue}>{tempsLabel}</Text>
-                <Text style={styles.statLabel}>aujourd'hui</Text>
+                <Text style={styles.statLabel}>{t('parentSpace.today')}</Text>
               </View>
               <Text style={styles.statNote}>
-                Leçons de langue et badges pas encore disponibles (pilier langues bloqué) — voir mobile-app/README.md.
+                {t('parentSpace.note')}
               </Text>
 
               <View style={styles.settingRow}>
-                <Text style={styles.settingLabel}>Limite d'écran quotidienne</Text>
+                <Text style={styles.settingLabel}>{t('parentSpace.limit')}</Text>
                 <View style={styles.stepper}>
                   <Pressable onPress={() => adjustLimite(c, -15)} style={styles.stepperBtn}>
                     <Text style={styles.stepperBtnLabel}>−</Text>
                   </Pressable>
                   <Text style={styles.stepperValue}>
-                    {c.limite_ecran_minutes ? formatMinutes(c.limite_ecran_minutes) : 'Aucune'}
+                    {c.limite_ecran_minutes ? formatMinutes(c.limite_ecran_minutes) : t('parentSpace.none')}
                   </Text>
                   <Pressable onPress={() => adjustLimite(c, 15)} style={styles.stepperBtn}>
                     <Text style={styles.stepperBtnLabel}>+</Text>
                   </Pressable>
                 </View>
               </View>
-              <Text style={styles.settingHint}>Informatif pour l'instant : l'app ne se verrouille pas automatiquement à la limite.</Text>
+              <Text style={styles.settingHint}>{t('parentSpace.limitHint')}</Text>
 
               <View style={styles.settingRow}>
-                <Text style={styles.settingLabel}>Découverte activée</Text>
+                <Text style={styles.settingLabel}>{t('parentSpace.discovery')}</Text>
                 <Pressable onPress={() => toggleDecouverte(c)} style={[styles.toggle, c.decouverte_activee && styles.toggleOn]}>
                   <View style={[styles.toggleKnob, c.decouverte_activee && styles.toggleKnobOn]} />
                 </Pressable>
@@ -152,7 +154,7 @@ export default function ParentSpaceScreen() {
         })}
 
         <Pressable style={styles.addBtn} onPress={() => router.push('/profils/ajouter')}>
-          <Text style={styles.addBtnLabel}>+ Ajouter un profil enfant</Text>
+          <Text style={styles.addBtnLabel}>{t('parentSpace.add')}</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

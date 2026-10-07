@@ -1,6 +1,6 @@
 # Cahier des charges — Traduction effective de l'application mobile
 
-> **Lot 1 livré le 2026-09-29** (demande de Yannick : choix de la langue dès l'écran 1). Infrastructure `i18next` posée pour toute l'app, FR/EN seulement (décision du 2026-09-29), parcours d'entrée traduit à 100 %. Reste : extraire les autres écrans par lots dans `src/i18n/fr.ts` / `en.ts`. Détail dans `mobile-app/README.md`.
+> **Lot 1 livré le 2026-09-29** (parcours d'entrée). **Lot 2 livré le 2026-10-07** (demande de Yannick du 2026-10-06 : « traduis totalement AFROBACK en français et en anglais, dans le site et dans l'application ») : tous les écrans de l'app passent par `src/i18n/fr.ts` / `en.ts` (Marché, Communauté, commentaires, espace enfant, École des Héros, profils, fiches, lecteurs, Découverte, recherche, dons, barre d'onglets). Contenu : colonnes `_en` ajoutées en base (`supabase/schema-i18n-contenu-en.sql`), lues par les repositories et appliquées quand l'app est en anglais (`src/i18n/content.ts`, repli sur le français si vide). Traductions du catalogue : `supabase/traduction-en-lot1-catalogue.sql` (brouillon à relire). Reste : traduire frises, citations, légendes, faits, récits des mythes et textes Découverte à partir de l'export `supabase/export-contenu-a-traduire.sql`. Les noms de forfaits (Découverte, Racines, Héritage) restent des noms de marque.
 
 > Rédigé le 2026-09-26, avant tout développement. À valider par Yannick avant de passer aux devs.
 

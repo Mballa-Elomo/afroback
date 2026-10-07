@@ -8,9 +8,11 @@ import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
 import { Icon } from '../../../src/components/Icons';
+import { useI18n } from '../../../src/i18n';
 
 /** Panier — fidèle à design-reference-marketplace.dc.excerpt.html (section CART). Livraison à 0 FCFA tant qu'aucune grille de frais de port n'est définie (aucun frais inventé). */
 function CartScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const cart = useCart();
 
@@ -21,14 +23,14 @@ function CartScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Panier</Text>
+          <Text style={styles.title}>{t('cart.title')}</Text>
         </View>
 
         {cart.items.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>🛒</Text>
-            <Text style={styles.emptyText}>Ton panier est vide.</Text>
-            <GhostButton label="Parcourir le marché" onPress={() => router.replace('/marche')} />
+            <Text style={styles.emptyText}>{t('cart.empty')}</Text>
+            <GhostButton label={t('cart.browse')} onPress={() => router.replace('/marche')} />
           </View>
         ) : (
           <>
@@ -57,20 +59,20 @@ function CartScreen() {
 
             <View style={styles.summary}>
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Sous-total</Text>
+                <Text style={styles.summaryLabel}>{t('cart.subtotal')}</Text>
                 <Text style={styles.summaryValue}>{formatFcfa(cart.subtotal)}</Text>
               </View>
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Livraison</Text>
-                <Text style={styles.summaryValue}>À définir avec le vendeur</Text>
+                <Text style={styles.summaryLabel}>{t('cart.delivery')}</Text>
+                <Text style={styles.summaryValue}>{t('cart.deliveryTbd')}</Text>
               </View>
               <View style={[styles.summaryRow, styles.totalRow]}>
-                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalLabel}>{t('cart.total')}</Text>
                 <Text style={styles.totalValue}>{formatFcfa(cart.subtotal)}</Text>
               </View>
             </View>
 
-            <GoldButton label="Passer commande" onPress={() => router.push('/marche/checkout')} />
+            <GoldButton label={t('cart.checkout')} onPress={() => router.push('/marche/checkout')} />
           </>
         )}
       </ScrollView>

@@ -1,8 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, radii, typography } from '../theme/tokens';
+import { useI18n } from '../i18n';
 
 /** Toast "ajouté au panier" — fidèle à design-reference-marketplace.dc.excerpt.html. */
 export function AddToCartToast({ message, onViewCart }: { message: string; onViewCart: () => void }) {
+  const { t } = useI18n();
   return (
     <View style={styles.toast}>
       <View style={styles.check}>
@@ -10,7 +12,7 @@ export function AddToCartToast({ message, onViewCart }: { message: string; onVie
       </View>
       <Text style={styles.message}>{message}</Text>
       <Pressable onPress={onViewCart}>
-        <Text style={styles.link}>Voir le panier</Text>
+        <Text style={styles.link}>{t('toast.viewCart')}</Text>
       </Pressable>
     </View>
   );

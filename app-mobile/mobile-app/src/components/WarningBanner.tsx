@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radii, spacing, typography } from '../theme/tokens';
+import { useI18n } from '../i18n';
 
 /**
  * Bandeau d'avertissement générique (style terracotta). Titre par défaut
@@ -10,7 +11,9 @@ import { colors, radii, spacing, typography } from '../theme/tokens';
  * démonstration du paiement sur payment.tsx) — évite d'afficher "Avertissement
  * de lecture" hors de son contexte éditorial.
  */
-export function WarningBanner({ text, title = 'Avertissement de lecture' }: { text: string; title?: string }) {
+export function WarningBanner({ text, title }: { text: string; title?: string }) {
+  const { t } = useI18n();
+  title = title ?? t('states.warning');
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>⚠</Text>

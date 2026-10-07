@@ -9,6 +9,7 @@ import type { AvatarCouleur, LangueCamerounaise } from '../../src/data/parentEnf
 import { GoldButton } from '../../src/components/Buttons';
 import { colors, radii, spacing, typography } from '../../src/theme/tokens';
 import { Icon } from '../../src/components/Icons';
+import { useI18n } from '../../src/i18n';
 
 const LANGUES: { id: LangueCamerounaise; label: string }[] = [
   { id: 'ewondo', label: 'Ewondo' },
@@ -31,6 +32,7 @@ const LANGUES: { id: LangueCamerounaise; label: string }[] = [
  * context/AFROBACK.md) — voir schema-parent-enfant.sql.
  */
 export default function AjouterProfilEnfantScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { refreshChildren } = useActiveProfile();
   const [prenom, setPrenom] = useState('');
@@ -56,7 +58,8 @@ export default function AjouterProfilEnfantScreen() {
       await refreshChildren();
       router.back();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Impossible d'ajouter ce profil pour l'instant.");
+      console.warn(e);
+      setError(t('addChild.failed'));
     } finally {
       setSaving(false);
     }
@@ -68,11 +71,11 @@ export default function AjouterProfilEnfantScreen() {
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
         </Pressable>
-        <Text style={styles.title}>Ajoute ton enfant</Text>
-        <Text style={styles.subtitle}>Un profil dédié, sans mot de passe séparé — l'enfant choisit juste son avatar dans le sélecteur.</Text>
+        <Text style={styles.title}>{t('addChild.title')}</Text>
+        <Text style={styles.subtitle}>{t('addChild.subtitle')}</Text>
 
         <View style={styles.field}>
-          <Text style={styles.label}>PRÉNOM DE L'ENFANT</Text>
+          <Text style={styles.label}>{t('addChild.firstName')}</Text>
           <TextInput
             value={prenom}
             onChangeText={setPrenom}
@@ -84,7 +87,7 @@ export default function AjouterProfilEnfantScreen() {
 
         <View style={styles.row}>
           <View style={[styles.field, styles.flex1]}>
-            <Text style={styles.label}>ÂGE</Text>
+            <Text style={styles.label}>{t('addChild.age')}</Text>
             <TextInput
               value={age}
               onChangeText={(t) => setAge(t.replace(/[^0-9]/g, '').slice(0, 2))}
@@ -95,13 +98,13 @@ export default function AjouterProfilEnfantScreen() {
             />
           </View>
           <View style={[styles.field, styles.flex2]}>
-            <Text style={styles.label}>AVATAR</Text>
+            <Text style={styles.label}>{t('addChild.avatar')}</Text>
             <View style={styles.avatarRow}>
               {AVATAR_COULEURS.map((c) => (
                 <Pressable
                   key={c}
                   onPress={() => setAvatarCouleur(c)}
-                  accessibilityLabel={AVATAR_LABEL[c]}
+                  accessibilityLabel={t(`addChild.c_${c}`)}
                   style={[
                     styles.avatarSwatch,
                     { backgroundColor: AVATAR_GRADIENTS[c][0] },
@@ -114,7 +117,7 @@ export default function AjouterProfilEnfantScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>LANGUES À ACTIVER</Text>
+          <Text style={styles.label}>{t('addChild.languages')}</Text>
           <View style={styles.chipsRow}>
             {LANGUES.map((l) => {
               const active = langues.includes(l.id);
@@ -125,13 +128,13 @@ export default function AjouterProfilEnfantScreen() {
               );
             })}
           </View>
-          <Text style={styles.hint}>Aucune leçon n'existe encore dans ces langues — c'est une préférence enregistrée pour plus tard.</Text>
+          <Text style={styles.hint}>{t('addChild.languagesHint')}</Text>
         </View>
 
         {error && <Text style={styles.error}>{error}</Text>}
 
         <View style={styles.cta}>
-          <GoldButton label={saving ? 'Ajout en cours…' : 'Ajouter ce profil'} onPress={handleSubmit} disabled={!isValid || saving} />
+          <GoldButton label={saving ? t('addChild.adding') : t('addChild.add')} onPress={handleSubmit} disabled={!isValid || saving} />
         </View>
       </ScrollView>
     </SafeAreaView>

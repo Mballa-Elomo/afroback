@@ -19,15 +19,16 @@ import { colors, typography } from '../../../src/theme/tokens';
 import { GuestBanner, useRequireAccount } from '../../../src/auth/AccountWall';
 import { AccessBadge, UpgradeBanner } from '../../../src/access/Access';
 import { Bone, PressableScale, RailSection, SkeletonScreen } from '../../../src/ui/modern';
+import i18n, { useI18n } from '../../../src/i18n';
 
 const GOLD = colors.accentGoldBright;
 
 /** Salutation selon l'heure réelle de l'appareil. */
 function greeting(): string {
   const h = new Date().getHours();
-  if (h < 12) return 'Bonjour';
-  if (h < 18) return 'Bon après-midi';
-  return 'Bonsoir';
+  if (h < 12) return i18n.t('home.morning');
+  if (h < 18) return i18n.t('home.afternoon');
+  return i18n.t('home.evening');
 }
 
 /** Court extrait tiré du vrai contenu (première phrase du sous-titre du récit), jamais inventé pour l'occasion. */
@@ -53,10 +54,10 @@ function pickFeatured(heroes: Heros[]): Heros | undefined {
 }
 
 const PILLARS: { icon: IconName; label: string; href: string }[] = [
-  { icon: 'crown', label: 'Héros', href: '/accueil/histoires-heros' },
-  { icon: 'book', label: 'Mythes', href: '/accueil/mythologie' },
-  { icon: 'compass', label: 'Découverte', href: '/decouverte' },
-  { icon: 'store', label: 'Marché', href: '/marche' },
+  { icon: 'crown', label: 'home.heroes', href: '/accueil/histoires-heros' },
+  { icon: 'book', label: 'home.myths', href: '/accueil/mythologie' },
+  { icon: 'compass', label: 'home.discovery', href: '/decouverte' },
+  { icon: 'store', label: 'home.market', href: '/marche' },
 ];
 
 /**
@@ -69,6 +70,7 @@ const PILLARS: { icon: IconName; label: string; href: string }[] = [
  * sans useCallback), ce qui relançait l'affichage en continu.
  */
 export default function AccueilScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { session } = useAuth();
   const requireAccount = useRequireAccount();
@@ -112,14 +114,14 @@ export default function AccueilScreen() {
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting}>{greeting()}</Text>
             <Text style={styles.name} numberOfLines={1}>
-              {prenom || 'Explorateur'} 👋🏾
+              {prenom || t('home.guest')} 👋🏾
             </Text>
           </View>
           <Pressable
             onPress={() => requireAccount(() => router.push('/profil'), 'profile')}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Mon profil"
+            accessibilityLabel={t('home.profile')}
           >
             <View style={styles.avatarRing}>
               {session ? (
@@ -139,17 +141,17 @@ export default function AccueilScreen() {
         {/* Recherche */}
         <Pressable style={styles.search} onPress={() => router.push('/recherche')} accessibilityRole="search">
           <Icon name="search" size={18} color={colors.textMuted} />
-          <Text style={styles.searchPlaceholder}>Un héros, un mythe, un lieu…</Text>
+          <Text style={styles.searchPlaceholder}>{t('home.search')}</Text>
         </Pressable>
 
         {/* Piliers */}
         <View style={styles.pillars}>
           {PILLARS.map((p) => (
-            <PressableScale key={p.label} onPress={() => router.push(p.href as never)} style={styles.pillar} accessibilityLabel={p.label}>
+            <PressableScale key={p.label} onPress={() => router.push(p.href as never)} style={styles.pillar} accessibilityLabel={t(p.label)}>
               <View style={styles.pillarIcon}>
                 <Icon name={p.icon} size={22} color={GOLD} />
               </View>
-              <Text style={styles.pillarLabel}>{p.label}</Text>
+              <Text style={styles.pillarLabel}>{t(p.label)}</Text>
             </PressableScale>
           ))}
         </View>
@@ -162,9 +164,9 @@ export default function AccueilScreen() {
             {featured && (
               <View>
                 <View style={styles.dayHeader}>
-                  <Text style={styles.sectionTitle}>Histoire du jour</Text>
+                  <Text style={styles.sectionTitle}>{t('home.storyOfDay')}</Text>
                   <Text style={styles.dayDate}>
-                    {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    {new Date().toLocaleDateString(i18n.language === 'en' ? 'en-GB' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </Text>
                 </View>
                 <PressableScale onPress={() => router.push(`/accueil/heros/${featured.slug}`)} accessibilityLabel={featured.nom_affiche}>
@@ -178,7 +180,7 @@ export default function AccueilScreen() {
                     <View style={styles.featuredContent}>
                       {!!featured.theme[0] && (
                         <View style={styles.chip}>
-                          <Text style={styles.chipText}>{featured.theme[0]}</Text>
+                          <Text style={styles.chipText}>{t(`heroTheme.${featured.theme[0]}`, { defaultValue: featured.theme[0] })}</Text>
                         </View>
                       )}
                       <Text style={styles.featuredTitle}>{featured.nom_affiche}</Text>
@@ -186,7 +188,7 @@ export default function AccueilScreen() {
                         {firstSentence(featured.sous_titre)}
                       </Text>
                       <View style={styles.readBtn}>
-                        <Text style={styles.readBtnText}>Lire le récit</Text>
+                        <Text style={styles.readBtnText}>{t('content.readStory')}</Text>
                         <Icon name="arrowRight" size={16} color={colors.ctaTextOnGold} strokeWidth={2.4} />
                       </View>
                     </View>
@@ -216,7 +218,7 @@ export default function AccueilScreen() {
 
             {/* Héros */}
             {pourToi.length > 0 && (
-              <RailSection title="Héros à découvrir" actionLabel="Tout voir" onAction={() => router.push('/accueil/histoires-heros')}>
+              <RailSection title={t('home.heroesRail')} actionLabel={t('content.seeAll')} onAction={() => router.push('/accueil/histoires-heros')}>
                 {pourToi.map((h) => (
                   <PressableScale key={h.slug} onPress={() => router.push(`/accueil/heros/${h.slug}`)} accessibilityLabel={h.nom_affiche}>
                     <HeroPlaceholder style={styles.heroCard} radius={20} imageUrl={h.image_carte_catalogue} fallbackIcon="crown">
@@ -240,7 +242,7 @@ export default function AccueilScreen() {
 
             {/* Mythes */}
             {mythes.length > 0 && (
-              <RailSection title="Mythes & légendes" actionLabel="Tout voir" onAction={() => router.push('/accueil/mythologie')}>
+              <RailSection title={t('home.mythsRail')} actionLabel={t('content.seeAll')} onAction={() => router.push('/accueil/mythologie')}>
                 {mythes.map((m) => (
                   <PressableScale key={m.slug} onPress={() => router.push(`/accueil/mythologie/${m.slug}`)} accessibilityLabel={m.titre}>
                     <HeroPlaceholder style={styles.wideCard} radius={20} imageUrl={m.image_url} fallbackIcon="book">
@@ -262,7 +264,7 @@ export default function AccueilScreen() {
 
             {/* Découverte */}
             {decouvertes.length > 0 && (
-              <RailSection title="À découvrir" actionLabel="Tout voir" onAction={() => router.push('/decouverte')}>
+              <RailSection title={t('home.discoverRail')} actionLabel={t('content.seeAll')} onAction={() => router.push('/decouverte')}>
                 {decouvertes.map((it) => (
                   <PressableScale key={it.slug} onPress={() => router.push(`/decouverte/${it.slug}`)} accessibilityLabel={it.titre}>
                     <HeroPlaceholder style={styles.squareCard} radius={20} imageUrl={it.image_url} fallbackIcon="compass">
@@ -270,7 +272,7 @@ export default function AccueilScreen() {
                       <AccessBadge type="decouverte" slug={it.slug} style={{ top: 8, right: 8 }} />
                       <View style={styles.cardText}>
                         <Text style={styles.cardKicker} numberOfLines={1}>
-                          {DECOUVERTE_TYPE_LABEL[it.type].toUpperCase()}
+                          {t(`decouverteType.${it.type}`).toUpperCase()}
                         </Text>
                         <Text style={styles.cardTitle} numberOfLines={2}>
                           {it.titre}
@@ -284,22 +286,22 @@ export default function AccueilScreen() {
 
             {/* Marché & Soutenir */}
             <View style={styles.duo}>
-              <PressableScale onPress={() => router.push('/marche')} wrapperStyle={{ flex: 1 }} accessibilityLabel="Marché">
+              <PressableScale onPress={() => router.push('/marche')} wrapperStyle={{ flex: 1 }} accessibilityLabel={t('home.market')}>
                 <LinearGradient colors={['#3B2A12', '#1A130B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.duoCard}>
                   <View style={styles.duoIcon}>
                     <Icon name="store" size={22} color={GOLD} />
                   </View>
-                  <Text style={styles.duoTitle}>Marché</Text>
-                  <Text style={styles.duoSub}>Artisanat authentique, en direct des artisans</Text>
+                  <Text style={styles.duoTitle}>{t('home.market')}</Text>
+                  <Text style={styles.duoSub}>{t('home.marketSub')}</Text>
                 </LinearGradient>
               </PressableScale>
-              <PressableScale onPress={() => requireAccount(() => router.push('/don'), 'don')} wrapperStyle={{ flex: 1 }} accessibilityLabel="Soutenir AFROBACK">
+              <PressableScale onPress={() => requireAccount(() => router.push('/don'), 'don')} wrapperStyle={{ flex: 1 }} accessibilityLabel={t('home.supportA11y')}>
                 <LinearGradient colors={['#4A2317', '#1A0F0B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.duoCard}>
                   <View style={[styles.duoIcon, { backgroundColor: 'rgba(227,162,119,.15)' }]}>
                     <Icon name="heart" size={22} color={colors.terracottaText} />
                   </View>
-                  <Text style={styles.duoTitle}>Soutenir</Text>
-                  <Text style={styles.duoSub}>Finance les prochains récits et vidéos</Text>
+                  <Text style={styles.duoTitle}>{t('home.support')}</Text>
+                  <Text style={styles.duoSub}>{t('home.supportSub')}</Text>
                 </LinearGradient>
               </PressableScale>
             </View>

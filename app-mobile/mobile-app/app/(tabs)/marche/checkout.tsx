@@ -10,10 +10,11 @@ import { useCart } from '../../../src/marketplace/CartProvider';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
 import { Icon } from '../../../src/components/Icons';
+import { useI18n } from '../../../src/i18n';
 
 const PAYMENT_METHODS: { id: MarketplacePaymentMethod; icon: string; name: string; sub: string }[] = [
-  { id: 'mtn_momo', icon: '📱', name: 'MTN Mobile Money', sub: 'Confirmation par le vendeur' },
-  { id: 'orange_money', icon: '📱', name: 'Orange Money', sub: 'Confirmation par le vendeur' },
+  { id: 'mtn_momo', icon: '📱', name: 'MTN Mobile Money', sub: 'checkout.sellerConfirms' },
+  { id: 'orange_money', icon: '📱', name: 'Orange Money', sub: 'checkout.sellerConfirms' },
 ];
 
 /**
@@ -26,6 +27,7 @@ const PAYMENT_METHODS: { id: MarketplacePaymentMethod; icon: string; name: strin
  * contrairement au "✅ Commande confirmée !" de la maquette d'origine.
  */
 function CheckoutScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const cart = useCart();
   const [nomComplet, setNomComplet] = useState('');
@@ -41,7 +43,7 @@ function CheckoutScreen() {
   const submit = async () => {
     if (placing) return;
     if (!nomComplet.trim() || !adresse.trim() || !ville.trim() || !telephone.trim()) {
-      setError('Tous les champs de livraison sont obligatoires.');
+      setError(t('checkout.required'));
       return;
     }
     if (cart.items.length === 0) return;
@@ -62,7 +64,7 @@ function CheckoutScreen() {
     });
     setPlacing(false);
     if (apiError || orders.length === 0) {
-      setError(apiError ?? "Impossible d'enregistrer la commande pour le moment.");
+      setError(apiError ?? t('checkout.failed'));
       return;
     }
     setPlacedTotal(cart.subtotal);
@@ -77,55 +79,54 @@ function CheckoutScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Commande</Text>
+          <Text style={styles.title}>{t('checkout.title')}</Text>
         </View>
 
         {placed ? (
           <View style={styles.confirmed}>
             <Text style={styles.confirmedIcon}>📦</Text>
-            <Text style={styles.confirmedTitle}>Commande enregistrée</Text>
+            <Text style={styles.confirmedTitle}>{t('checkout.placed')}</Text>
             <Text style={styles.confirmedSub}>
-              Le paiement Mobile Money n'est pas encore intégré sur AFROBACK. Le ou les vendeurs te contacteront au{' '}
-              {telephone} pour finaliser le paiement ({formatFcfa(placedTotal)}) et organiser la livraison.
+              {t('checkout.placedText', { tel: telephone, total: formatFcfa(placedTotal) })}
             </Text>
-            <GoldButton label="Suivre mes commandes" onPress={() => router.replace('/marche/commandes')} />
+            <GoldButton label={t('checkout.track')} onPress={() => router.replace('/marche/commandes')} />
           </View>
         ) : (
           <>
-            <Text style={styles.sectionTitle}>LIVRAISON</Text>
+            <Text style={styles.sectionTitle}>{t('checkout.delivery')}</Text>
             <View style={styles.form}>
               <TextInput
                 value={nomComplet}
                 onChangeText={setNomComplet}
-                placeholder="Nom complet"
+                placeholder={t('checkout.fullName')}
                 placeholderTextColor={colors.textMuted}
                 style={styles.input}
               />
               <TextInput
                 value={adresse}
                 onChangeText={setAdresse}
-                placeholder="Adresse"
+                placeholder={t('checkout.address')}
                 placeholderTextColor={colors.textMuted}
                 style={styles.input}
               />
               <TextInput
                 value={ville}
                 onChangeText={setVille}
-                placeholder="Ville"
+                placeholder={t('checkout.city')}
                 placeholderTextColor={colors.textMuted}
                 style={styles.input}
               />
               <TextInput
                 value={telephone}
                 onChangeText={setTelephone}
-                placeholder="Téléphone"
+                placeholder={t('checkout.phone')}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="phone-pad"
                 style={styles.input}
               />
             </View>
 
-            <Text style={styles.sectionTitle}>PAIEMENT</Text>
+            <Text style={styles.sectionTitle}>{t('checkout.payment')}</Text>
             <View style={styles.methods}>
               {PAYMENT_METHODS.map((m) => {
                 const active = methode === m.id;
@@ -134,7 +135,7 @@ function CheckoutScreen() {
                     <Text style={styles.methodIcon}>{m.icon}</Text>
                     <View style={styles.methodBody}>
                       <Text style={styles.methodName}>{m.name}</Text>
-                      <Text style={styles.methodSub}>{m.sub}</Text>
+                      <Text style={styles.methodSub}>{t(m.sub)}</Text>
                     </View>
                     <View style={[styles.radio, active && styles.radioActive]} />
                   </Pressable>
@@ -145,20 +146,19 @@ function CheckoutScreen() {
             <View style={styles.notice}>
               <Text style={styles.noticeIcon}>ℹ</Text>
               <Text style={styles.noticeText}>
-                Le paiement en ligne n'est pas encore actif sur AFROBACK. Ta commande sera enregistrée, et le vendeur te
-                contactera directement pour convenir du paiement et de la livraison.
+                {t('checkout.notice')}
               </Text>
             </View>
 
             <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalLabel}>{t('checkout.total')}</Text>
               <Text style={styles.totalValue}>{formatFcfa(cart.subtotal)}</Text>
             </View>
 
             {error && <Text style={styles.error}>{error}</Text>}
 
             <GoldButton
-              label={placing ? 'Enregistrement...' : 'Enregistrer la commande'}
+              label={placing ? t('checkout.saving') : t('checkout.place')}
               onPress={submit}
               disabled={placing}
             />

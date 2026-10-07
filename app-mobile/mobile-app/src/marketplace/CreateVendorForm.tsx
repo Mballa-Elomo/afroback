@@ -5,6 +5,7 @@ import type { MarketplaceVendorOwn } from '../data/marketplaceTypes';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { GoldButton } from '../components/Buttons';
 import { AvatarPicker } from '../components/AvatarPicker';
+import { useI18n } from '../i18n';
 
 /**
  * Inscription vendeur — contrairement au profil communautaire pseudonyme,
@@ -13,6 +14,7 @@ import { AvatarPicker } from '../components/AvatarPicker';
  */
 export function CreateVendorForm({ onCreated }: { onCreated: (vendor: MarketplaceVendorOwn) => void }) {
   const [nomBoutique, setNomBoutique] = useState('');
+  const { t } = useI18n();
   const [region, setRegion] = useState('');
   const [artisanat, setArtisanat] = useState('');
   const [bio, setBio] = useState('');
@@ -23,7 +25,7 @@ export function CreateVendorForm({ onCreated }: { onCreated: (vendor: Marketplac
   const submit = async () => {
     if (loading) return;
     if (nomBoutique.trim().length < 2 || region.trim().length < 2 || artisanat.trim().length < 2) {
-      setError('Nom de boutique, région et artisanat sont obligatoires.');
+      setError(t('createVendor.required'));
       return;
     }
     setError(null);
@@ -37,7 +39,7 @@ export function CreateVendorForm({ onCreated }: { onCreated: (vendor: Marketplac
     });
     setLoading(false);
     if (apiError || !vendor) {
-      setError(apiError ?? 'Impossible de créer ta boutique pour le moment.');
+      setError(apiError ?? t('createVendor.failed'));
       return;
     }
     onCreated(vendor);
@@ -45,42 +47,41 @@ export function CreateVendorForm({ onCreated }: { onCreated: (vendor: Marketplac
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.title}>Ouvre ta boutique sur AFROBACK</Text>
+      <Text style={styles.title}>{t('createVendor.title')}</Text>
       <Text style={styles.subtitle}>
-        Ton nom de boutique et ta région seront visibles publiquement — c'est une vitrine commerciale, pas un profil
-        anonyme.
+        {t('createVendor.subtitle')}
       </Text>
       <AvatarPicker folder="avatars-marche" value={avatarUrl} onChange={setAvatarUrl} />
-      <Text style={styles.label}>NOM DE LA BOUTIQUE</Text>
+      <Text style={styles.label}>{t('createVendor.name')}</Text>
       <TextInput
         value={nomBoutique}
         onChangeText={setNomBoutique}
-        placeholder="Ex. Atelier Nji Mama"
+        placeholder={t('createVendor.namePh')}
         placeholderTextColor={colors.textMuted}
         style={styles.input}
         maxLength={60}
       />
-      <Text style={styles.label}>RÉGION</Text>
+      <Text style={styles.label}>{t('createVendor.region')}</Text>
       <TextInput
         value={region}
         onChangeText={setRegion}
-        placeholder="Ex. Foumban, Cameroun"
+        placeholder={t('createVendor.regionPh')}
         placeholderTextColor={colors.textMuted}
         style={styles.input}
       />
-      <Text style={styles.label}>ARTISANAT</Text>
+      <Text style={styles.label}>{t('createVendor.craft')}</Text>
       <TextInput
         value={artisanat}
         onChangeText={setArtisanat}
-        placeholder="Ex. Sculpture bamoun"
+        placeholder={t('createVendor.craftPh')}
         placeholderTextColor={colors.textMuted}
         style={styles.input}
       />
-      <Text style={styles.label}>BIO (optionnel)</Text>
+      <Text style={styles.label}>{t('createVendor.bio')}</Text>
       <TextInput
         value={bio}
         onChangeText={setBio}
-        placeholder="Présente ton savoir-faire..."
+        placeholder={t('createVendor.bioPh')}
         placeholderTextColor={colors.textMuted}
         style={[styles.input, styles.textarea]}
         multiline
@@ -88,7 +89,7 @@ export function CreateVendorForm({ onCreated }: { onCreated: (vendor: Marketplac
       />
       {error && <Text style={styles.error}>{error}</Text>}
       <View style={styles.cta}>
-        <GoldButton label={loading ? 'Création...' : 'Créer ma boutique'} onPress={submit} disabled={loading} />
+        <GoldButton label={loading ? t('createVendor.creating') : t('createVendor.create')} onPress={submit} disabled={loading} />
       </View>
     </View>
   );

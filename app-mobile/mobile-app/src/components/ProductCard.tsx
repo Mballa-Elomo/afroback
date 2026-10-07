@@ -4,6 +4,7 @@ import { formatFcfa } from '../data/marketplaceDisplay';
 import { colors, typography } from '../theme/tokens';
 import { HeroPlaceholder } from './HeroVisual';
 import { PressableScale } from '../ui/modern';
+import { useI18n } from '../i18n';
 
 /**
  * Tuile produit de la grille catalogue (refonte moderne du 2026-09-30). Pas
@@ -20,6 +21,7 @@ export function ProductCard({
   onPress: () => void;
 }) {
   const isNew = Date.now() - new Date(product.created_at).getTime() < 14 * 24 * 3600 * 1000;
+  const { t } = useI18n();
   const soldOut = product.statut === 'rupture';
 
   return (
@@ -27,12 +29,12 @@ export function ProductCard({
       <HeroPlaceholder style={styles.visual} radius={0} imageUrl={product.image_url} fallbackIcon="store">
         {isNew && !soldOut && (
           <View style={styles.newBadge}>
-            <Text style={styles.newBadgeText}>Nouveau</Text>
+            <Text style={styles.newBadgeText}>{t('productCard.new')}</Text>
           </View>
         )}
         {soldOut && (
           <View style={styles.soldOut}>
-            <Text style={styles.soldOutText}>Épuisé</Text>
+            <Text style={styles.soldOutText}>{t('productCard.soldOut')}</Text>
           </View>
         )}
       </HeroPlaceholder>

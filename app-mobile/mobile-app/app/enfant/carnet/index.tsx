@@ -5,6 +5,7 @@ import { ErrorState, LoadingState } from '../../../src/components/LoadingState';
 import { DecouverteItemRow } from '../../../src/components/DecouverteItemRow';
 import { useDecouverteItems } from '../../../src/data/useDecouverteData';
 import { colors, spacing, typography } from '../../../src/theme/tokens';
+import { useI18n } from '../../../src/i18n';
 
 /**
  * Carnet d'explorateur (enfant) — vrai contenu Découverte (les 10 fiches
@@ -15,6 +16,7 @@ import { colors, spacing, typography } from '../../../src/theme/tokens';
  * du pilier Histoires & Héros (voir enfant/histoire.tsx).
  */
 export default function CarnetExplorateurScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const itemsState = useDecouverteItems();
 
@@ -22,10 +24,10 @@ export default function CarnetExplorateurScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
-          <Text style={styles.back}>‹ Retour</Text>
+          <Text style={styles.back}>{t('kids.back')}</Text>
         </Pressable>
-        <Text style={styles.title}>Carnet d'explorateur</Text>
-        <Text style={styles.subtitle}>Découvre un village, une coutume ou un objet africain !</Text>
+        <Text style={styles.title}>{t('notebook.title')}</Text>
+        <Text style={styles.subtitle}>{t('notebook.subtitle')}</Text>
       </View>
 
       {itemsState.status === 'loading' && <LoadingState />}

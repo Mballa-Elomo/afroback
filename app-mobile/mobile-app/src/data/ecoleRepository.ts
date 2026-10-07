@@ -1,4 +1,6 @@
 import { supabase } from './supabaseClient';
+import i18n from '../i18n';
+import { NIVEAUX_EN_FIELDS, localize } from '../i18n/content';
 import type {
   EcoleLecon,
   EcoleLeconStatut,
@@ -22,12 +24,15 @@ import type {
  */
 
 let niveauxCache: EcoleNiveau[] | null = null;
+i18n.on('languageChanged', () => {
+  niveauxCache = null;
+});
 
 export async function getNiveaux(): Promise<EcoleNiveau[]> {
   if (niveauxCache) return niveauxCache;
   const { data, error } = await supabase.from('ecole_niveaux').select('*').order('niveau', { ascending: true });
   if (error) throw new Error(`Impossible de charger les niveaux : ${error.message}`);
-  niveauxCache = (data ?? []) as EcoleNiveau[];
+  niveauxCache = ((data ?? []) as EcoleNiveau[]).map((n) => localize(n, NIVEAUX_EN_FIELDS));
   return niveauxCache;
 }
 

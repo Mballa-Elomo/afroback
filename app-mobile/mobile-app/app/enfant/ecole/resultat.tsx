@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GoldButton, GhostButton } from '../../../src/components/Buttons';
 import { colors, typography } from '../../../src/theme/tokens';
+import { useI18n } from '../../../src/i18n';
 
 /**
  * Résultat de quiz — fidèle dans l'esprit à
@@ -13,6 +14,7 @@ import { colors, typography } from '../../../src/theme/tokens';
  * bloquant — l'enfant peut toujours retenter.
  */
 export default function EcoleResultatScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { score, total, reussi, mode, leconId } = useLocalSearchParams<{
     score: string;
@@ -39,12 +41,12 @@ export default function EcoleResultatScreen() {
       <View style={styles.container}>
         <Text style={styles.icon}>{isReussi ? '🎉' : '💪'}</Text>
         <Text style={styles.score}>
-          {scoreNum} sur {totalNum} !
+          {t('result.score', { s: scoreNum, t: totalNum })}
         </Text>
         <Text style={styles.message}>
           {isReussi
-            ? 'Bravo, tu as bien retenu cette histoire !'
-            : "Presque ! Regarde encore la leçon et réessaie, tu vas y arriver."}
+            ? t('result.good')
+            : t('result.retry')}
         </Text>
         <View style={styles.stars}>
           <Text style={styles.star}>{stars >= 1 ? '⭐' : '☆'}</Text>
@@ -53,12 +55,12 @@ export default function EcoleResultatScreen() {
         </View>
 
         {isReussi ? (
-          <GoldButton label="Continuer" onPress={continuer} />
+          <GoldButton label={t('kids.continue')} onPress={continuer} />
         ) : (
           <>
-            <GoldButton label="Revoir la leçon" onPress={revoir} />
+            <GoldButton label={t('result.review')} onPress={revoir} />
             <View style={styles.spacer} />
-            <GhostButton label="Retour à la carte" onPress={continuer} />
+            <GhostButton label={t('result.map')} onPress={continuer} />
           </>
         )}
       </View>

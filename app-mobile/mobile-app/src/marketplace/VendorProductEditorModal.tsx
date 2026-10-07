@@ -5,6 +5,7 @@ import { MARKETPLACE_CATEGORIE_LABEL } from '../data/marketplaceDisplay';
 import type { MarketplaceCategorie, MarketplaceProduct } from '../data/marketplaceTypes';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { PhotoPicker } from '../components/PhotoPicker';
+import { useI18n } from '../i18n';
 
 /**
  * Éditeur produit vendeur — fidèle à design-reference-marketplace.dc.excerpt.html
@@ -29,6 +30,7 @@ export function VendorProductEditorModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t } = useI18n();
   const [nom, setNom] = useState('');
   const [description, setDescription] = useState('');
   const [categorie, setCategorie] = useState<MarketplaceCategorie>('autre');
@@ -53,15 +55,15 @@ export function VendorProductEditorModal({
     const prixNum = Number(prix.replace(/[^\d]/g, ''));
     const stockNum = Number(stock.replace(/[^\d]/g, ''));
     if (nom.trim().length < 2) {
-      setError('Le nom du produit est obligatoire.');
+      setError(t('productEditor.nameRequired'));
       return;
     }
     if (!prixNum || prixNum <= 0) {
-      setError('Indique un prix valide (en FCFA).');
+      setError(t('productEditor.priceInvalid'));
       return;
     }
     if (!Number.isFinite(stockNum) || stockNum < 0) {
-      setError('Indique un stock valide (0 ou plus).');
+      setError(t('productEditor.stockInvalid'));
       return;
     }
     setError(null);
@@ -98,7 +100,7 @@ export function VendorProductEditorModal({
         <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={styles.handle} />
           <ScrollView keyboardShouldPersistTaps="handled">
-            <Text style={styles.title}>{product ? 'Modifier le produit' : 'Nouveau produit'}</Text>
+            <Text style={styles.title}>{product ? t('productEditor.edit') : t('productEditor.new')}</Text>
 
             <View style={styles.photoWrap}>
               <PhotoPicker folder="products" value={imageUrl} onChange={setImageUrl} />
@@ -107,7 +109,7 @@ export function VendorProductEditorModal({
             <TextInput
               value={nom}
               onChangeText={setNom}
-              placeholder="Nom du produit"
+              placeholder={t('productEditor.name')}
               placeholderTextColor={colors.textMuted}
               style={styles.input}
               maxLength={80}
@@ -115,7 +117,7 @@ export function VendorProductEditorModal({
             <TextInput
               value={description}
               onChangeText={setDescription}
-              placeholder="Décris ce produit, son origine, son histoire..."
+              placeholder={t('productEditor.description')}
               placeholderTextColor={colors.textMuted}
               style={[styles.input, styles.textarea]}
               multiline
@@ -128,7 +130,7 @@ export function VendorProductEditorModal({
                 return (
                   <Pressable key={c} onPress={() => setCategorie(c)} style={[styles.catChip, active && styles.catChipActive]}>
                     <Text style={[styles.catChipLabel, active && styles.catChipLabelActive]}>
-                      {MARKETPLACE_CATEGORIE_LABEL[c]}
+                      {t(`marketCat.${c}`)}
                     </Text>
                   </Pressable>
                 );
@@ -139,7 +141,7 @@ export function VendorProductEditorModal({
               <TextInput
                 value={prix}
                 onChangeText={setPrix}
-                placeholder="Prix (FCFA)"
+                placeholder={t('productEditor.price')}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="number-pad"
                 style={[styles.input, styles.rowInput]}
@@ -147,7 +149,7 @@ export function VendorProductEditorModal({
               <TextInput
                 value={stock}
                 onChangeText={setStock}
-                placeholder="Stock"
+                placeholder={t('productEditor.stock')}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="number-pad"
                 style={[styles.input, styles.rowInput]}
@@ -157,7 +159,7 @@ export function VendorProductEditorModal({
             {error && <Text style={styles.error}>{error}</Text>}
 
             <Pressable onPress={save} style={styles.saveBtn} disabled={saving}>
-              <Text style={styles.saveBtnLabel}>{saving ? 'Enregistrement...' : 'Enregistrer'}</Text>
+              <Text style={styles.saveBtnLabel}>{saving ? t('productEditor.saving') : t('productEditor.save')}</Text>
             </Pressable>
           </ScrollView>
         </Pressable>

@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { Icon } from '../../../src/components/Icons';
+import { useI18n } from '../../../src/i18n';
 
 /**
  * Charte communautaire — contenu statique (voir data-model-communaute.md
@@ -13,37 +14,38 @@ import { Icon } from '../../../src/components/Icons';
 const RULES = [
   {
     icon: '🤝',
-    title: 'Respecte les personnes et les cultures',
-    text: "Les désaccords existent, les insultes n'ont pas leur place. On ne se moque pas d'une tradition, d'une langue ou d'une origine.",
+    title: 'charter.r1t',
+    text: 'charter.r1',
   },
   {
     icon: '🔎',
-    title: 'Partage avec honnêteté',
-    text: "Ne présente pas une rumeur ou une opinion comme un fait établi. Si tu n'es pas sûr, dis-le.",
+    title: 'charter.r2t',
+    text: 'charter.r2',
   },
   {
     icon: '🚫',
-    title: 'Pas de haine, pas de harcèlement',
-    text: 'Contenu raciste, sexiste, homophobe ou tout appel à la violence : suppression immédiate et bannissement possible.',
+    title: 'charter.r3t',
+    text: 'charter.r3',
   },
   {
     icon: '📢',
-    title: 'Pas de spam',
-    text: "Pas de publicité non sollicitée. Ce n'est pas une vitrine commerciale.",
+    title: 'charter.r4t',
+    text: 'charter.r4',
   },
   {
     icon: '🔒',
-    title: 'Protège la vie privée',
-    text: 'Ne partage pas d’informations personnelles (numéro, adresse) sans consentement — la tienne ou celle des autres.',
+    title: 'charter.r5t',
+    text: 'charter.r5',
   },
   {
     icon: '⚑',
-    title: 'Signale plutôt que de réagir seul',
-    text: "Un contenu qui te semble poser problème ? Utilise le bouton de signalement, l'équipe AFROBACK le traite.",
+    title: 'charter.r6t',
+    text: 'charter.r6',
   },
 ];
 
 export default function CharterScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -52,13 +54,11 @@ export default function CharterScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Charte communautaire</Text>
+          <Text style={styles.title}>{t('charter.title')}</Text>
         </View>
 
         <Text style={styles.intro}>
-          AFROBACK est un espace pour célébrer, apprendre et transmettre la richesse des cultures africaines. Ici,
-          chaque histoire partagée, chaque question posée, chaque souvenir raconté nourrit une mémoire collective.
-          Pour que cet espace reste digne de ce qu'il célèbre, quelques règles simples :
+          {t('charter.intro')}
         </Text>
 
         <View style={styles.rules}>
@@ -66,8 +66,8 @@ export default function CharterScreen() {
             <View key={r.title} style={styles.rule}>
               <Text style={styles.ruleIcon}>{r.icon}</Text>
               <View style={styles.ruleBody}>
-                <Text style={styles.ruleTitle}>{r.title}</Text>
-                <Text style={styles.ruleText}>{r.text}</Text>
+                <Text style={styles.ruleTitle}>{t(r.title)}</Text>
+                <Text style={styles.ruleText}>{t(r.text)}</Text>
               </View>
             </View>
           ))}

@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import i18n from '../i18n';
 import type {
   MarketplaceCategorie,
   MarketplaceOrder,
@@ -43,7 +44,7 @@ export async function createOwnVendor(params: {
 }): Promise<{ vendor: MarketplaceVendorOwn | null; error: string | null }> {
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
-  if (!userId) return { vendor: null, error: 'Aucune session active.' };
+  if (!userId) return { vendor: null, error: i18n.t('repoErrors.noSession') };
 
   const { data, error } = await supabase
     .from('marketplace_vendors')
@@ -194,7 +195,7 @@ export async function placeOrder(params: {
 }): Promise<{ orders: MarketplaceOrder[]; error: string | null }> {
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
-  if (!userId) return { orders: [], error: 'Aucune session active.' };
+  if (!userId) return { orders: [], error: i18n.t('repoErrors.noSession') };
 
   const rows = Array.from(params.itemsByVendor.entries()).map(([vendorId, items]) => ({
     buyer_user_id: userId,
@@ -264,7 +265,7 @@ export async function createReview(params: {
 }): Promise<{ error: string | null }> {
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
-  if (!userId) return { error: 'Aucune session active.' };
+  if (!userId) return { error: i18n.t('repoErrors.noSession') };
   const { error } = await supabase.from('marketplace_reviews').insert({
     product_id: params.productId,
     buyer_user_id: userId,
@@ -327,10 +328,10 @@ export async function replyToReview(reviewId: string, reponse: string): Promise<
 function translateMarketError(message: string): string {
   const lower = message.toLowerCase();
   if (lower.includes('row-level security') || lower.includes('policy')) {
-    return 'Action non autorisée pour ce compte.';
+    return i18n.t('repoErrors.marketDenied');
   }
   if (lower.includes('duplicate key') && lower.includes('marketplace_vendors')) {
-    return 'Tu as déjà une boutique enregistrée sur ce compte.';
+    return i18n.t('repoErrors.shopExists');
   }
   return message;
 }

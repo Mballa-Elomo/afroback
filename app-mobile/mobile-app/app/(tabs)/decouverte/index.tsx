@@ -13,6 +13,7 @@ import { colors, typography } from '../../../src/theme/tokens';
 import { AccessBadge } from '../../../src/access/Access';
 import { Bone, FilterChips, LikeBadge, PressableScale, ScreenHeader, SkeletonScreen } from '../../../src/ui/modern';
 import { useLikeCounts } from '../../../src/stats/contentStats';
+import { useI18n } from '../../../src/i18n';
 
 type Filtre = DecouverteType | 'tous';
 const ORDER: DecouverteType[] = ['village', 'coutume', 'objet', 'personnage', 'fait'];
@@ -24,6 +25,7 @@ const ORDER: DecouverteType[] = ['village', 'coutume', 'objet', 'personnage', 'f
  * son état "bientôt disponible" (aucun contenu produit).
  */
 export default function DecouverteScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const itemsState = useDecouverteItems();
   const paysState = useDecouvertePays();
@@ -36,10 +38,10 @@ export default function DecouverteScreen() {
   const options = useMemo(() => {
     const present = new Set(items.map((it) => it.type));
     return [
-      { id: 'tous' as Filtre, label: 'Tout' },
-      ...ORDER.filter((t) => present.has(t)).map((t) => ({ id: t as Filtre, label: DECOUVERTE_TYPE_LABEL[t] })),
+      { id: 'tous' as Filtre, label: t('discovery.all') },
+      ...ORDER.filter((t) => present.has(t)).map((ty) => ({ id: ty as Filtre, label: t(`decouverteType.${ty}`) })),
     ];
-  }, [items]);
+  }, [items, t]);
 
   const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
@@ -51,7 +53,7 @@ export default function DecouverteScreen() {
     });
   }, [items, query, filtre]);
 
-  const openMuseum = () => Alert.alert('Bientôt disponible', "La visite virtuelle des musées en 360° n'est pas encore construite.");
+  const openMuseum = () => Alert.alert(t('content.soon'), t('discovery.museumSoon'));
 
   if (itemsState.status === 'error') {
     return (
@@ -64,19 +66,19 @@ export default function DecouverteScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <ScreenHeader title="Découverte" subtitle="Villages, coutumes, objets et figures du patrimoine" />
+        <ScreenHeader title={t('discovery.title')} subtitle={t('discovery.subtitle')} />
 
         <View style={styles.pad}>
           {pays[0] && (
-            <PressableScale onPress={() => router.push(`/decouverte/pays/${pays[0].slug}`)} accessibilityLabel={`Explorer ${pays[0].nom}`}>
+            <PressableScale onPress={() => router.push(`/decouverte/pays/${pays[0].slug}`)} accessibilityLabel={t('discovery.explore', { pays: pays[0].nom })}>
               <LinearGradient colors={['#2F5A3A', '#1B2A18', '#120D08']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.country}>
                 <View style={styles.countryIcon}>
                   <Icon name="mapPin" size={24} color={colors.accentGoldBright} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.countryKicker}>EXPLORER LE PAYS</Text>
+                  <Text style={styles.countryKicker}>{t('discovery.exploreCountry')}</Text>
                   <Text style={styles.countryTitle}>{pays[0].nom}</Text>
-                  <Text style={styles.countrySub}>Tout le patrimoine du pays, réuni au même endroit</Text>
+                  <Text style={styles.countrySub}>{t('discovery.countrySub')}</Text>
                 </View>
                 <Icon name="chevronRight" size={18} color={colors.accentGold} />
               </LinearGradient>
@@ -88,12 +90,12 @@ export default function DecouverteScreen() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Rechercher dans la Découverte…"
+              placeholder={t('discovery.search')}
               placeholderTextColor={colors.textMuted}
               style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
             />
             {hasQuery && (
-              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Effacer">
+              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t('content.clear')}>
                 <Text style={styles.clear}>✕</Text>
               </Pressable>
             )}
@@ -127,7 +129,7 @@ export default function DecouverteScreen() {
               </View>
               {filtered.length === 0 && (
                 <Text style={styles.empty}>
-                  {hasQuery ? `Aucun contenu ne correspond à « ${query} ».` : 'Aucun contenu dans cette catégorie pour l’instant.'}
+                  {hasQuery ? t('discovery.noMatch', { q: query }) : t('discovery.emptyCat')}
                 </Text>
               )}
 
@@ -136,8 +138,8 @@ export default function DecouverteScreen() {
                   <Icon name="sparkle" size={20} color={colors.accentGoldBright} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.museumTitle}>Visite virtuelle des musées · 360°</Text>
-                  <Text style={styles.museumSub}>Bientôt disponible</Text>
+                  <Text style={styles.museumTitle}>{t('discovery.museum')}</Text>
+                  <Text style={styles.museumSub}>{t('content.soon')}</Text>
                 </View>
               </Pressable>
             </>
@@ -149,6 +151,7 @@ export default function DecouverteScreen() {
 }
 
 function ItemCard({ item, onPress, likes }: { item: DecouverteItem; onPress: () => void; likes?: number }) {
+  const { t } = useI18n();
   return (
     <PressableScale onPress={onPress} wrapperStyle={styles.cardWrap} accessibilityLabel={item.titre}>
       <HeroPlaceholder style={styles.card} radius={20} imageUrl={item.image_url} fallbackIcon="compass">
@@ -157,7 +160,7 @@ function ItemCard({ item, onPress, likes }: { item: DecouverteItem; onPress: () 
         <LikeBadge count={likes} />
         <View style={[styles.cardText, !!likes && { right: 56 }]}>
           <Text style={styles.cardKicker} numberOfLines={1}>
-            {DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()}
+            {t(`decouverteType.${item.type}`).toUpperCase()}
           </Text>
           <Text style={styles.cardTitle} numberOfLines={2}>
             {item.titre}

@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+/* Identité AFROBACK (mêmes valeurs que l'app : src/theme/tokens.ts), version cinéma. */
+@theme {
+  --color-ink: #070504;
+  --color-ink-2: #0d0906;
+  --color-surface: #16100b;
+  --color-surface-2: #21170f;
+  --color-gold: #f0c36b;
+  --color-gold-pale: #f7d98b;
+  --color-gold-soft: #c99a5b;
+  --color-gold-deep: #b9792f;
+  --color-ivory: #fff4e0;
+  --color-heading: #f7e7c8;
+  --color-text: #ede3d4;
+  --color-body: #cdbda8;
+  --color-muted: #8c7b67;
+  --color-terra: #e3a277;
+  --color-terra-deep: #a0522d;
+  --color-free: #8fd18a;
+
+  --font-display: var(--font-cinzel), Georgia, serif;
+  --font-sans: var(--font-manrope), Arial, sans-serif;
+
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-shine: shine 4.5s linear infinite;
+  --animate-pulse-ring: pulse-ring 2.4s ease-out infinite;
+}
+
+html {
+  background: var(--color-ink);
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(240, 195, 107, 0.35);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(240, 195, 107, 0.35) transparent;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Texte doré brillant (titres). */
+.text-gold-gradient {
+  background: linear-gradient(100deg, #b9792f 0%, #f7d98b 28%, #fff4e0 42%, #f0c36b 58%, #b9792f 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.text-gold-gradient.is-animated {
+  animation: shine 6s linear infinite;
+}
+
+/* Motif géométrique africain (losanges) en filigrane. */
+.bg-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23f0c36b' stroke-width='1.2'%3E%3Cpath d='M32 4 60 32 32 60 4 32Z'/%3E%3Cpath d='M32 18 46 32 32 46 18 32Z'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='2.5' fill='%23f0c36b'/%3E%3C/svg%3E");
+  background-size: 64px 64px;
+}
+
+/* Grain de film (fixe, très léger). */
+.film-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: -50%;
+  z-index: 100;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1.2s steps(6) infinite;
+}
+
+/* Bordure dorée lumineuse au survol des cartes (utilitaire, utilisable avec group-hover:). */
+@utility glow-gold {
+  box-shadow:
+    0 0 0 1px rgba(240, 195, 107, 0.55),
+    0 18px 50px -8px rgba(240, 195, 107, 0.35),
+    0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@keyframes shine {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -20% 0;
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(240, 195, 107, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 22px rgba(240, 195, 107, 0);
+  }
+}
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-5%, 4%);
+  }
+  40% {
+    transform: translate(4%, -6%);
+  }
+  60% {
+    transform: translate(-3%, 7%);
+  }
+  80% {
+    transform: translate(6%, 2%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .film-grain,
+  .animate-marquee,
+  .text-gold-gradient.is-animated {
+    animation: none;
+  }
+}
+
+/* Espace enfant (lot 6) : fond plus lumineux et joueur que l'espace adulte. */
+@utility bg-kid {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(91, 75, 138, 0.55), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(194, 94, 46, 0.35), transparent 60%),
+    linear-gradient(180deg, #1a1030 0%, #120a1f 100%);
+}

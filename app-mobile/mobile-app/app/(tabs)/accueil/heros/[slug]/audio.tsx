@@ -13,7 +13,7 @@ import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import type { Heros } from '../../../../../src/data/types';
 import { withAccount } from '../../../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../../../src/access/Access';
-import { useI18n } from '../../../../../src/i18n';
+import { currentLanguage, useI18n } from '../../../../../src/i18n';
 
 /**
  * Lecteur audio plein écran. Quand aucune narration n'est disponible pour
@@ -30,7 +30,7 @@ function LecteurAudioScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const herosState = useHero(slug);
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
 
   // Engagement réel par langue (voir "ENGAGEMENT GLOBAL" et les compteurs
@@ -84,7 +84,7 @@ function LecteurAudioScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10} style={styles.topBtn}>
             <Text style={styles.chevronDown}>⌄</Text>
           </Pressable>
-          <Text style={styles.topLabel}>NARRATION · HISTOIRE</Text>
+          <Text style={styles.topLabel}>{t('heroAudio.top')}</Text>
           <Pressable onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} hitSlop={10} style={styles.topBtn}>
             <Text style={styles.readIcon}>≡</Text>
           </Pressable>
@@ -109,8 +109,7 @@ function LecteurAudioScreen() {
             <>
               <View style={styles.missingBanner}>
                 <Text style={styles.missingText}>
-                  🎙️ La narration audio de ce récit est en cours de production. En attendant, tu peux lire le récit
-                  du griot.
+                  {t('heroAudio.missing')}
                 </Text>
               </View>
               <Waveform />
@@ -119,7 +118,7 @@ function LecteurAudioScreen() {
 
           {heros.chapitres_storyboard.length > 0 && (
             <View style={styles.chapters}>
-              <Text style={styles.chaptersLabel}>CHAPITRES</Text>
+              <Text style={styles.chaptersLabel}>{t('heroAudio.chapters')}</Text>
               {heros.chapitres_storyboard.map((c) => (
                 <View key={c.numero} style={styles.chapterRow}>
                   <Text style={styles.chapterIcon}>○</Text>
@@ -132,7 +131,7 @@ function LecteurAudioScreen() {
           )}
 
           <View style={styles.cta}>
-            <GoldButton label="Lire le récit en attendant" onPress={() => router.replace(`/accueil/heros/${heros.slug}/recit`)} />
+            <GoldButton label={t('heroAudio.readMeanwhile')} onPress={() => router.replace(`/accueil/heros/${heros.slug}/recit`)} />
           </View>
         </View>
       </SafeAreaView>
@@ -150,7 +149,7 @@ function formatTime(seconds: number) {
 /** Lecteur audio réel (expo-audio) une fois qu'une narration existe pour ce héros. Bascule FR/EN quand les deux versions sont disponibles (ex. Reine Nzinga, Ruben Um Nyobè). */
 function AudioPlayerBlock({ heros }: { heros: Heros }) {
   const hasBoth = Boolean(heros.narration_audio_fr_url && heros.narration_audio_en_url);
-  const [lang, setLang] = useState<'fr' | 'en'>('fr');
+  const [lang, setLang] = useState<'fr' | 'en'>(currentLanguage());
   // La langue RÉELLEMENT jouée peut différer du réglage `lang` : si une
   // seule langue existe, le lecteur bascule dessus automatiquement (voir le
   // repli `?? heros.narration_audio_fr_url ?? heros.narration_audio_en_url`

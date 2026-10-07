@@ -1,24 +1,27 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { colors, spacing, typography } from '../theme/tokens';
+import { useI18n } from '../i18n';
 
-export function LoadingState({ message = 'Le récit se prépare...' }: { message?: string }) {
+export function LoadingState({ message }: { message?: string }) {
+  const { t } = useI18n();
   return (
     <View style={styles.container}>
       <ActivityIndicator color={colors.accentGold} />
-      <Text style={styles.message}>{message}</Text>
+      <Text style={styles.message}>{message ?? t('states.loading')}</Text>
     </View>
   );
 }
 
 export function ErrorState({
-  message = "Impossible de charger ce contenu pour l'instant. Vérifie ta connexion et réessaie.",
+  message,
 }: {
   message?: string;
 }) {
+  const { t } = useI18n();
   return (
     <View style={styles.container}>
-      <Text style={styles.errorTitle}>Un souci de connexion</Text>
-      <Text style={styles.message}>{message}</Text>
+      <Text style={styles.errorTitle}>{t('states.errorTitle')}</Text>
+      <Text style={styles.message}>{message ?? t('states.error')}</Text>
     </View>
   );
 }

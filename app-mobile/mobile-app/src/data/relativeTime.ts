@@ -1,14 +1,16 @@
 /** Horodatage relatif court ("à l'instant", "il y a 2h", "il y a 3j") — pas de librairie externe pour un besoin aussi simple. */
+import i18n from '../i18n';
+
 export function relativeTime(isoDate: string): string {
   const diffMs = Date.now() - new Date(isoDate).getTime();
   const minutes = Math.floor(diffMs / 60000);
-  if (minutes < 1) return "à l'instant";
-  if (minutes < 60) return `il y a ${minutes} min`;
+  if (minutes < 1) return i18n.t('time.now');
+  if (minutes < 60) return i18n.t('time.min', { n: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `il y a ${hours}h`;
+  if (hours < 24) return i18n.t('time.hours', { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 30) return `il y a ${days}j`;
+  if (days < 30) return i18n.t('time.days', { n: days });
   const months = Math.floor(days / 30);
-  if (months < 12) return `il y a ${months} mois`;
-  return `il y a ${Math.floor(months / 12)} an(s)`;
+  if (months < 12) return i18n.t('time.months', { n: months });
+  return i18n.t('time.years', { n: Math.floor(months / 12) });
 }

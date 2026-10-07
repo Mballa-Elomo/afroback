@@ -1,6 +1,8 @@
 import { supabase } from './supabaseClient';
 import type { DecouverteItem, DecouvertePays } from './decouverteTypes';
 import { getContentDetail } from './contentAccess';
+import i18n from '../i18n';
+import { DECOUVERTE_EN_COLUMNS, DECOUVERTE_EN_FIELDS, PAYS_EN_FIELDS, localize } from '../i18n/content';
 
 /**
  * Source de données réelle : tables `decouverte_items` et `decouverte_pays`
@@ -20,16 +22,23 @@ let itemsCache: DecouverteItem[] | null = null;
 let itemsInflight: Promise<DecouverteItem[]> | null = null;
 let paysCache: DecouvertePays[] | null = null;
 let paysInflight: Promise<DecouvertePays[]> | null = null;
+i18n.on('languageChanged', () => {
+  itemsCache = null;
+  paysCache = null;
+});
 
 async function fetchDecouverteItems(): Promise<DecouverteItem[]> {
-  const { data, error } = await supabase
+  let { data, error }: { data: unknown; error: { message: string } | null } = await supabase
     .from('decouverte_items')
-    .select(DECOUVERTE_CATALOGUE)
+    .select(DECOUVERTE_CATALOGUE + DECOUVERTE_EN_COLUMNS)
     .order('ordre_affichage', { ascending: true });
+  if (error) {
+    ({ data, error } = await supabase.from('decouverte_items').select(DECOUVERTE_CATALOGUE).order('ordre_affichage', { ascending: true }));
+  }
   if (error) {
     throw new Error(`Impossible de charger le contenu Découverte depuis Supabase : ${error.message}`);
   }
-  const items = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
+  const items = ((data ?? []) as unknown as Record<string, unknown>[]).map((raw) => localize(raw, DECOUVERTE_EN_FIELDS)).map((row) => ({
     contenu_fr_texte: '',
     contenu_en_texte: null,
     statut_fait_legende: [],
@@ -78,7 +87,7 @@ export async function getDecouverteItemBySlug(slug: string): Promise<DecouverteI
   if (detail.verrouille) {
     return { ...base, acces: { verrouille: true, apercu_fr: detail.apercu_fr, apercu_en: detail.apercu_en } };
   }
-  const row = detail.row;
+  const row = localize(detail.row, DECOUVERTE_EN_FIELDS);
   return {
     ...base,
     ...(row as unknown as DecouverteItem),
@@ -119,7 +128,7 @@ async function fetchDecouvertePays(): Promise<DecouvertePays[]> {
   if (error) {
     throw new Error(`Impossible de charger les pays Découverte depuis Supabase : ${error.message}`);
   }
-  return (data ?? []) as DecouvertePays[];
+  return ((data ?? []) as DecouvertePays[]).map((p) => localize(p, PAYS_EN_FIELDS));
 }
 
 export async function getDecouvertePays(): Promise<DecouvertePays[]> {

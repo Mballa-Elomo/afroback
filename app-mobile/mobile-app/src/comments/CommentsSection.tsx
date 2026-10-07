@@ -22,6 +22,7 @@ import {
   type CommentSort,
   type ContentComment,
 } from './commentsApi';
+import { useI18n } from '../i18n';
 
 const GOLD = colors.accentGoldBright;
 const BUBBLE = 'rgba(237,227,212,.08)';
@@ -38,6 +39,7 @@ const BUBBLE = 'rgba(237,227,212,.08)';
 export function CommentsSection({ type, slug }: { type: ContentType; slug: string }) {
   const { session } = useAuth();
   const requireAccount = useRequireAccount();
+  const { t } = useI18n();
   const { requireSubscription } = useAccess();
   const me = useOwnProfile();
   const [installed, setInstalled] = useState(true);
@@ -150,7 +152,7 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
       setItems((list) => [comment, ...list]);
       if (comment.statut === 'publie') setTotal((n) => n + 1);
     }
-    if (comment.statut !== 'publie') flash('Ton commentaire est en attente de vérification.');
+    if (comment.statut !== 'publie') flash(t('comments.pending'));
     return true;
   };
 
@@ -185,7 +187,7 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
   const onReport = async (c: ContentComment) => {
     setMenuFor(null);
     const { error } = await reportComment(c.id);
-    flash(error ? commentErrorMessage(error) : 'Merci, le commentaire a été signalé à l’équipe.');
+    flash(error ? commentErrorMessage(error) : t('comments.reported'));
   };
 
   if (!installed) return null;
@@ -196,7 +198,7 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
         <View style={[styles.row, isReply && styles.rowReply]}>
           <ProfileAvatar value={c.author?.avatar_url} size={isReply ? 28 : 36} name={c.author?.pseudo} />
           <View style={{ flex: 1 }}>
-            <Composer initial={c.texte ?? ''} placeholder="Modifier ton commentaire…" autoFocus onSubmit={saveEdit} onCancel={() => setEditing(null)} />
+            <Composer initial={c.texte ?? ''} placeholder={t('comments.editPh')} autoFocus onSubmit={saveEdit} onCancel={() => setEditing(null)} />
           </View>
         </View>
       ) : (
@@ -217,7 +219,7 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
       <View style={styles.head}>
         <Icon name="chat" size={18} color={GOLD} />
         <Text style={styles.title}>
-          {total} commentaire{total > 1 ? 's' : ''}
+          {total > 1 ? t('comments.countPlural', { n: total }) : t('comments.count', { n: total })}
         </Text>
         <View style={{ flex: 1 }} />
         {total > 1 && (
@@ -227,7 +229,7 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
             style={styles.sortBtn}
             accessibilityRole="button"
           >
-            <Text style={styles.sortText}>{sort === 'pertinents' ? 'Les plus pertinents' : 'Les plus récents'}</Text>
+            <Text style={styles.sortText}>{sort === 'pertinents' ? t('comments.relevant') : t('comments.recent')}</Text>
             <View style={{ transform: [{ rotate: '90deg' }] }}>
               <Icon name="chevronRight" size={12} color={colors.textMuted} strokeWidth={2.4} />
             </View>
@@ -239,7 +241,7 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
       {session && !canPost ? (
         <Pressable style={styles.locked} onPress={() => requireSubscription(() => {}, type)} accessibilityRole="button">
           <Icon name="lock" size={16} color={GOLD} />
-          <Text style={styles.lockedText}>Débloque ce contenu pour participer à la discussion</Text>
+          <Text style={styles.lockedText}>{t('comments.locked')}</Text>
         </Pressable>
       ) : (
         <View style={styles.row}>
@@ -252,10 +254,10 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
           )}
           <View style={{ flex: 1 }}>
             {session ? (
-              <Composer placeholder="Écrire un commentaire…" onSubmit={(v) => submit(v, null)} />
+              <Composer placeholder={t('comments.write')} onSubmit={(v) => submit(v, null)} />
             ) : (
               <Pressable style={styles.fakeInput} onPress={() => requireAccount(undefined, 'comment')} accessibilityRole="button">
-                <Text style={styles.fakeInputText}>Écrire un commentaire…</Text>
+                <Text style={styles.fakeInputText}>{t('comments.write')}</Text>
               </Pressable>
             )}
           </View>
@@ -280,7 +282,7 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
                     <Pressable onPress={() => toggleReplies(c)} style={styles.repliesToggle} accessibilityRole="button">
                       <View style={styles.repliesLine} />
                       <Text style={styles.repliesToggleText}>
-                        {r?.open ? 'Masquer les réponses' : `Voir ${c.reply_count > 1 ? `les ${c.reply_count} réponses` : 'la réponse'}`}
+                        {r?.open ? t('comments.hideReplies') : c.reply_count > 1 ? t('comments.seeReplies', { n: c.reply_count }) : t('comments.seeReply')}
                       </Text>
                     </Pressable>
                   )}
@@ -292,7 +294,7 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
                         <Composer
                           key={`${replyTo?.parentId}`}
                           initial={replyTo && replyTo.parentId !== c.id ? `@${replyTo.pseudo} ` : ''}
-                          placeholder={`Répondre à ${replyTo?.pseudo ?? ''}…`}
+                          placeholder={t('comments.replyTo', { pseudo: replyTo?.pseudo ?? '' })}
                           autoFocus
                           onSubmit={(v) => submit(v.replace(new RegExp(`^@${replyTo?.pseudo ?? ''}\\s*`), ''), replyTo)}
                           onCancel={() => setReplyTo(null)}
@@ -306,10 +308,10 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
           })}
           {hasMore && (
             <Pressable onPress={loadMore} style={styles.more} accessibilityRole="button">
-              {loadingMore ? <ActivityIndicator color={GOLD} /> : <Text style={styles.moreText}>Voir plus de commentaires</Text>}
+              {loadingMore ? <ActivityIndicator color={GOLD} /> : <Text style={styles.moreText}>{t('comments.more')}</Text>}
             </Pressable>
           )}
-          {items.length === 0 && <Text style={styles.empty}>Sois le premier à commenter.</Text>}
+          {items.length === 0 && <Text style={styles.empty}>{t('comments.beFirst')}</Text>}
         </View>
       )}
 
@@ -321,19 +323,19 @@ export function CommentsSection({ type, slug }: { type: ContentType; slug: strin
               <>
                 <MenuItem
                   icon="pencil"
-                  label="Modifier"
+                  label={t('comments.edit')}
                   onPress={() => {
                     setReplyTo(null);
                     setEditing(menuFor);
                     setMenuFor(null);
                   }}
                 />
-                <MenuItem icon="trash" label="Supprimer" danger onPress={() => menuFor && onDelete(menuFor)} />
+                <MenuItem icon="trash" label={t('comments.delete')} danger onPress={() => menuFor && onDelete(menuFor)} />
               </>
             ) : (
-              <MenuItem icon="flag" label="Signaler" onPress={() => menuFor && onReport(menuFor)} />
+              <MenuItem icon="flag" label={t('comments.report')} onPress={() => menuFor && onReport(menuFor)} />
             )}
-            <MenuItem icon="close" label="Annuler" onPress={() => setMenuFor(null)} />
+            <MenuItem icon="close" label={t('comments.cancel')} onPress={() => setMenuFor(null)} />
           </View>
         </Pressable>
       </Modal>
@@ -356,6 +358,7 @@ function Composer({
   onCancel?: () => void;
 }) {
   const [text, setText] = useState(initial);
+  const { t } = useI18n();
   const [sending, setSending] = useState(false);
   const ref = useRef<TextInput>(null);
   useEffect(() => {
@@ -383,14 +386,14 @@ function Composer({
           style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
         />
         {!!text.trim() && (
-          <Pressable onPress={send} disabled={sending} hitSlop={8} style={styles.send} accessibilityRole="button" accessibilityLabel="Publier">
+          <Pressable onPress={send} disabled={sending} hitSlop={8} style={styles.send} accessibilityRole="button" accessibilityLabel={t('comments.post')}>
             {sending ? <ActivityIndicator size="small" color={GOLD} /> : <Icon name="send" size={18} color={GOLD} strokeWidth={2.2} />}
           </Pressable>
         )}
       </View>
       {!!onCancel && (
         <Pressable onPress={onCancel} hitSlop={8} style={{ alignSelf: 'flex-start' }}>
-          <Text style={styles.cancel}>Annuler</Text>
+          <Text style={styles.cancel}>{t('comments.cancel')}</Text>
         </Pressable>
       )}
     </View>
@@ -411,6 +414,7 @@ function CommentRow({
   onMenu: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const { t } = useI18n();
   const deleted = c.statut === 'supprime';
   const pending = c.mine && c.statut !== 'publie' && !deleted;
   const long = (c.texte?.length ?? 0) > 220;
@@ -420,7 +424,7 @@ function CommentRow({
       <View style={{ flex: 1, alignItems: 'flex-start' }}>
         <Pressable onLongPress={onMenu} delayLongPress={350} style={styles.bubble}>
           {deleted ? (
-            <Text style={styles.deleted}>Ce commentaire a été supprimé.</Text>
+            <Text style={styles.deleted}>{t('comments.deleted')}</Text>
           ) : (
             <>
               <View style={styles.nameRow}>
@@ -439,7 +443,7 @@ function CommentRow({
               </Text>
               {long && !expanded && (
                 <Text style={styles.seeMore} onPress={() => setExpanded(true)}>
-                  Voir plus
+                  {t('comments.seeMore')}
                 </Text>
               )}
             </>
@@ -453,20 +457,20 @@ function CommentRow({
             </View>
           )}
         </Pressable>
-        {pending && <Text style={styles.pending}>Visible par toi seul, en attente de vérification</Text>}
+        {pending && <Text style={styles.pending}>{t('comments.pendingMine')}</Text>}
         {!deleted && (
           <View style={styles.actions}>
             <Text style={styles.time}>
               {relativeTime(c.created_at)}
-              {c.edited ? ' · Modifié' : ''}
+              {c.edited ? t('comments.edited') : ''}
             </Text>
-            <Pressable onPress={onLike} hitSlop={8} accessibilityRole="button" accessibilityLabel={c.liked ? "Je n'aime plus" : "J'aime"}>
-              <Text style={[styles.action, c.liked && styles.actionOn]}>J'aime</Text>
+            <Pressable onPress={onLike} hitSlop={8} accessibilityRole="button" accessibilityLabel={c.liked ? t('comments.unlike') : t('comments.like')}>
+              <Text style={[styles.action, c.liked && styles.actionOn]}>{t('comments.like')}</Text>
             </Pressable>
             <Pressable onPress={onReply} hitSlop={8} accessibilityRole="button">
-              <Text style={styles.action}>Répondre</Text>
+              <Text style={styles.action}>{t('comments.reply')}</Text>
             </Pressable>
-            <Pressable onPress={onMenu} hitSlop={10} accessibilityRole="button" accessibilityLabel="Plus d'options">
+            <Pressable onPress={onMenu} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('comments.options')}>
               <Icon name="dots" size={15} color={colors.textMuted} />
             </Pressable>
           </View>

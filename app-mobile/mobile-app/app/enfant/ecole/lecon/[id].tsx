@@ -10,12 +10,13 @@ import { GoldButton } from '../../../../src/components/Buttons';
 import { LoadingState } from '../../../../src/components/LoadingState';
 import { colors, typography } from '../../../../src/theme/tokens';
 import { Icon } from '../../../../src/components/Icons';
+import { useI18n } from '../../../../src/i18n';
 
 const FORMATS: { id: EcoleFormat; icon: string; label: string }[] = [
-  { id: 'lire', icon: '📖', label: 'Lire' },
-  { id: 'ecouter', icon: '🎧', label: 'Écouter' },
-  { id: 'regarder', icon: '🎬', label: 'Regarder' },
-  { id: 'bd', icon: '💬', label: 'BD' },
+  { id: 'lire', icon: '📖', label: 'lesson.read' },
+  { id: 'ecouter', icon: '🎧', label: 'lesson.listen' },
+  { id: 'regarder', icon: '🎬', label: 'lesson.watch' },
+  { id: 'bd', icon: '💬', label: 'lesson.comic' },
 ];
 
 /**
@@ -29,6 +30,7 @@ const FORMATS: { id: EcoleFormat; icon: string; label: string }[] = [
  * chance d'exister avant les autres en pratique).
  */
 export default function EcoleLeconScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const heroesState = useHeroesList();
@@ -57,7 +59,7 @@ export default function EcoleLeconScreen() {
   if (loading || heroesState.status === 'loading') {
     return (
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="La leçon se prépare..." />
+        <LoadingState message={t('lesson.loading')} />
       </SafeAreaView>
     );
   }
@@ -66,8 +68,8 @@ export default function EcoleLeconScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>Cette leçon n'existe pas ou plus.</Text>
-          <GoldButton label="Retour" onPress={() => router.back()} />
+          <Text style={styles.notFoundText}>{t('lesson.notFound')}</Text>
+          <GoldButton label={t('kids.backPlain')} onPress={() => router.back()} />
         </View>
       </SafeAreaView>
     );
@@ -87,7 +89,7 @@ export default function EcoleLeconScreen() {
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <View style={styles.coverContent}>
-            <Text style={styles.heroName}>{heros?.nom_affiche ?? 'Héros'}</Text>
+            <Text style={styles.heroName}>{heros?.nom_affiche ?? t('hero.fallback')}</Text>
             <Text style={styles.heroContext}>{heros ? `${heros.epoque} · ${heros.region}` : '—'}</Text>
           </View>
         </View>
@@ -103,7 +105,7 @@ export default function EcoleLeconScreen() {
             return (
               <Pressable key={f.id} onPress={() => setFormat(f.id)} style={[styles.tab, active && styles.tabActive]}>
                 <Text style={styles.tabIcon}>{f.icon}</Text>
-                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{f.label}</Text>
+                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{t(f.label)}</Text>
                 {!available && <Text style={styles.tabLock}>🔒</Text>}
               </Pressable>
             );
@@ -124,7 +126,7 @@ export default function EcoleLeconScreen() {
                 <View style={styles.audioButton}>
                   <Text style={styles.audioIcon}>▶</Text>
                 </View>
-                <Text style={styles.audioLabel}>Narration pour les enfants</Text>
+                <Text style={styles.audioLabel}>{t('lesson.narration')}</Text>
               </View>
             ) : (
               <SoonState icon="🎧" />
@@ -137,7 +139,7 @@ export default function EcoleLeconScreen() {
 
       <View style={styles.ctaWrap}>
         <GoldButton
-          label={canQuiz ? 'Je suis prêt pour le quiz !' : 'Contenu pas encore disponible'}
+          label={canQuiz ? t('lesson.ready') : t('lesson.notAvailable')}
           onPress={() => router.push(`/enfant/ecole/quiz/${lecon.id}`)}
           disabled={!canQuiz}
         />
@@ -147,10 +149,11 @@ export default function EcoleLeconScreen() {
 }
 
 function SoonState({ icon }: { icon: string }) {
+  const { t } = useI18n();
   return (
     <View style={styles.soon}>
       <Text style={styles.soonIcon}>{icon}</Text>
-      <Text style={styles.soonText}>Ce contenu n'est pas encore prêt — reviens bientôt !</Text>
+      <Text style={styles.soonText}>{t('lesson.soon')}</Text>
     </View>
   );
 }

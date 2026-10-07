@@ -7,6 +7,7 @@ import { useActiveProfile } from '../../src/profils/ActiveProfileProvider';
 import { PinGate } from '../../src/profils/PinGate';
 import { AVATAR_GRADIENTS } from '../../src/profils/enfantPalette';
 import { colors, radii, spacing, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
 
 /**
  * "Qui est-ce ?" — sélecteur de profil façon Netflix, fidèle à
@@ -16,12 +17,13 @@ import { colors, radii, spacing, typography } from '../../src/theme/tokens';
  * comme avant ce chantier.
  */
 export default function ProfileSelectorScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { session } = useAuth();
   const { children, chooseAdult, chooseChild } = useActiveProfile();
   const [pinVisible, setPinVisible] = useState(false);
 
-  const prenom = (session?.user?.user_metadata?.prenom as string | undefined) || 'Toi';
+  const prenom = (session?.user?.user_metadata?.prenom as string | undefined) || t('selector.you');
   const initiale = prenom.charAt(0).toUpperCase();
 
   const openParentSpace = () => setPinVisible(true);
@@ -32,8 +34,8 @@ export default function ProfileSelectorScreen() {
         <View style={styles.logo}>
           <Text style={styles.logoLetter}>A</Text>
         </View>
-        <Text style={styles.title}>QUI EST-CE ?</Text>
-        <Text style={styles.subtitle}>Un seul compte, plusieurs profils. Choisis le tien pour retrouver ton fil.</Text>
+        <Text style={styles.title}>{t('selector.title')}</Text>
+        <Text style={styles.subtitle}>{t('selector.subtitle')}</Text>
 
         <View style={styles.grid}>
           <Pressable style={styles.tile} onPress={chooseAdult}>
@@ -41,7 +43,7 @@ export default function ProfileSelectorScreen() {
               <Text style={styles.avatarLetter}>{initiale}</Text>
             </View>
             <Text style={styles.tileName}>{prenom}</Text>
-            <Text style={styles.tileMeta}>Adulte</Text>
+            <Text style={styles.tileMeta}>{t('selector.adult')}</Text>
           </Pressable>
 
           {children.map((c) => (
@@ -50,9 +52,9 @@ export default function ProfileSelectorScreen() {
                 <Text style={styles.avatarLetterChild}>{c.prenom.charAt(0).toUpperCase()}</Text>
               </View>
               <Text style={styles.tileName}>
-                {c.prenom} <Text style={styles.tileNameTag}>· enfant</Text>
+                {c.prenom} <Text style={styles.tileNameTag}>{t('selector.child')}</Text>
               </Text>
-              <Text style={styles.tileMeta}>{c.age} ans</Text>
+              <Text style={styles.tileMeta}>{t('selector.age', { n: c.age })}</Text>
             </Pressable>
           ))}
 
@@ -65,7 +67,7 @@ export default function ProfileSelectorScreen() {
         </View>
 
         <Pressable onPress={openParentSpace}>
-          <Text style={styles.parentLink}>Gérer les profils (Espace Parent)</Text>
+          <Text style={styles.parentLink}>{t('selector.manage')}</Text>
         </Pressable>
       </View>
 

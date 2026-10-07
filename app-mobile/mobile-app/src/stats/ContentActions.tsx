@@ -8,6 +8,7 @@ import type { ContentType } from '../data/contentAccess';
 import { listComments } from '../comments/commentsApi';
 import { colors, typography } from '../theme/tokens';
 import { getContentStats, likeContent, plural, compactNumber, type ContentStats } from './contentStats';
+import i18n, { useI18n } from '../i18n';
 
 const GOLD = colors.accentGoldBright;
 const SITE = 'https://afroback-test.vercel.app';
@@ -15,9 +16,9 @@ const SITE = 'https://afroback-test.vercel.app';
 const CODE: Record<ContentType, string> = { heros: 'h', mythe: 'm', decouverte: 'd' };
 
 function accroche(type: ContentType, title: string): string {
-  if (type === 'heros') return `Découvre l'histoire de ${title} sur AFROBACK`;
-  if (type === 'mythe') return `Découvre le mythe « ${title} » sur AFROBACK`;
-  return `À découvrir sur AFROBACK : ${title}`;
+  if (type === 'heros') return i18n.t('actions.heroShare', { title });
+  if (type === 'mythe') return i18n.t('actions.mythShare', { title });
+  return i18n.t('actions.otherShare', { title });
 }
 
 /** Première phrase, ou coupe propre à ~160 caractères. */
@@ -51,6 +52,7 @@ export function ContentActions({
   /** Fait défiler jusqu'aux commentaires. */
   onOpenComments?: () => void;
 }) {
+  const { t } = useI18n();
   const { session } = useAuth();
   const requireAccount = useRequireAccount();
   const { requireSubscription } = useAccess();
@@ -94,7 +96,7 @@ export function ContentActions({
   const share = async () => {
     const url = `${SITE}/s/${CODE[type]}-${slug}`;
     const desc = shortDescription(description);
-    const message = [`✨ ${accroche(type, title)}`, desc, `👉 Clique ici pour en savoir plus : ${url}`].filter(Boolean).join('\n\n');
+    const message = [`✨ ${accroche(type, title)}`, desc, t('actions.more', { url })].filter(Boolean).join('\n\n');
     const nav = Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator : null;
     if (nav && !nav.share) {
       // Ordinateur sans partage natif : le message est copié, prêt à coller.
@@ -111,9 +113,9 @@ export function ContentActions({
   };
 
   const parts: string[] = [];
-  if (stats?.lectures) parts.push(plural(stats.lectures, 'lecture', 'lectures'));
-  if (stats?.ecoutes) parts.push(plural(stats.ecoutes, 'écoute', 'écoutes'));
-  if (stats?.vues) parts.push(plural(stats.vues, 'vue', 'vues'));
+  if (stats?.lectures) parts.push(plural(stats.lectures, t('actions.read'), t('actions.reads')));
+  if (stats?.ecoutes) parts.push(plural(stats.ecoutes, t('actions.listen'), t('actions.listens')));
+  if (stats?.vues) parts.push(plural(stats.vues, t('actions.view'), t('actions.views')));
 
   return (
     <View style={styles.wrap}>
@@ -124,24 +126,24 @@ export function ContentActions({
           style={[styles.pill, stats?.aime && styles.pillOn]}
           accessibilityRole="button"
           accessibilityState={{ selected: !!stats?.aime }}
-          accessibilityLabel={stats?.aime ? "Je n'aime plus" : "J'aime"}
+          accessibilityLabel={stats?.aime ? t('actions.unlike') : t('actions.like')}
         >
           <Animated.View style={{ transform: [{ scale: pop }] }}>
             <Icon name="thumbUp" size={17} color={stats?.aime ? colors.ctaTextOnGold : colors.textPrimary} strokeWidth={stats?.aime ? 2.4 : 1.9} />
           </Animated.View>
           <Text style={[styles.pillText, stats?.aime && styles.pillTextOn]}>
-            {stats && stats.likes > 0 ? compactNumber(stats.likes) : "J'aime"}
+            {stats && stats.likes > 0 ? compactNumber(stats.likes) : t('actions.like')}
           </Text>
         </Pressable>
         {!!onOpenComments && (
           <Pressable onPress={onOpenComments} style={styles.pill} accessibilityRole="button">
             <Icon name="chat" size={17} color={colors.textPrimary} strokeWidth={1.9} />
-            <Text style={styles.pillText}>{comments ? compactNumber(comments) : 'Commenter'}</Text>
+            <Text style={styles.pillText}>{comments ? compactNumber(comments) : t('actions.comment')}</Text>
           </Pressable>
         )}
         <Pressable onPress={share} style={styles.pill} accessibilityRole="button">
           <Icon name="share" size={17} color={colors.textPrimary} strokeWidth={1.9} />
-          <Text style={styles.pillText}>{copied ? 'Message copié !' : 'Partager'}</Text>
+          <Text style={styles.pillText}>{copied ? t('actions.copied') : t('actions.share')}</Text>
         </Pressable>
       </View>
     </View>

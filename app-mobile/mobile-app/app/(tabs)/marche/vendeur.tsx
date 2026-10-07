@@ -20,14 +20,15 @@ import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
 import { withSubscription } from '../../../src/access/Access';
 import { Icon } from '../../../src/components/Icons';
+import i18n, { useI18n } from '../../../src/i18n';
 
 type VendorTab = 'dash' | 'products' | 'orders' | 'reviews' | 'revenue' | 'plans';
 
-const ORDER_STATUT_LABEL: Record<MarketplaceOrderStatut, string> = {
-  en_attente_paiement: 'En attente',
-  expediee: 'Expédiée',
-  livree: 'Livrée',
-  annulee: 'Annulée',
+const ORDER_STATUT_KEY: Record<MarketplaceOrderStatut, string> = {
+  en_attente_paiement: 'orderStatus.en_attente_court',
+  expediee: 'orderStatus.expediee',
+  livree: 'orderStatus.livree',
+  annulee: 'orderStatus.annulee',
 };
 
 /**
@@ -45,6 +46,7 @@ const ORDER_STATUT_LABEL: Record<MarketplaceOrderStatut, string> = {
 function VendorSpaceScreen() {
   const router = useRouter();
   const [vendorState, refreshVendor] = useOwnVendor();
+  const { t, lang } = useI18n();
   const [tab, setTab] = useState<VendorTab>('dash');
   const [products, setProducts] = useState<MarketplaceProduct[]>([]);
   const [orders, setOrders] = useState<MarketplaceOrder[]>([]);
@@ -94,7 +96,7 @@ function VendorSpaceScreen() {
       const day = new Date();
       day.setDate(day.getDate() - i);
       const count = orders.filter((o) => new Date(o.created_at).toDateString() === day.toDateString()).length;
-      days.push({ label: day.toLocaleDateString('fr-FR', { weekday: 'short' }), count });
+      days.push({ label: day.toLocaleDateString(i18n.language === 'en' ? 'en-GB' : 'fr-FR', { weekday: 'short' }), count });
     }
     const maxCount = Math.max(1, ...days.map((d) => d.count));
 
@@ -119,7 +121,7 @@ function VendorSpaceScreen() {
             <Pressable onPress={() => router.back()} hitSlop={10}>
               <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
             </Pressable>
-            <Text style={styles.title}>Espace vendeur</Text>
+            <Text style={styles.title}>{t('vendor.title')}</Text>
           </View>
           <CreateVendorForm onCreated={refreshVendor} />
         </ScrollView>
@@ -149,7 +151,7 @@ function VendorSpaceScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Espace vendeur</Text>
+          <Text style={styles.title}>{t('vendor.title')}</Text>
           <View style={{ flex: 1 }} />
           <View style={styles.shopBadge}>
             <Text style={styles.shopBadgeLabel}>{vendor.nom_boutique.toUpperCase()}</Text>
@@ -162,11 +164,11 @@ function VendorSpaceScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
           {(
             [
-              ['dash', 'Tableau de bord'],
-              ['products', 'Produits'],
-              ['orders', 'Commandes'],
-              ['reviews', 'Avis'],
-              ['revenue', 'Revenus'],
+              ['dash', t('vendor.tabDash')],
+              ['products', t('vendor.tabProducts')],
+              ['orders', t('vendor.tabOrders')],
+              ['reviews', t('vendor.tabReviews')],
+              ['revenue', t('vendor.tabRevenue')],
             ] as [VendorTab, string][]
           ).map(([id, label]) => (
             <Pressable key={id} onPress={() => setTab(id)} style={[styles.tabChip, tab === id && styles.tabChipActive]}>
@@ -183,18 +185,18 @@ function VendorSpaceScreen() {
               <View>
                 <View style={styles.statsGrid}>
                   <View style={styles.statCardHighlight}>
-                    <Text style={styles.statCardLabel}>COMMANDES CE MOIS</Text>
+                    <Text style={styles.statCardLabel}>{t('vendor.ordersThisMonth')}</Text>
                     <Text style={styles.statCardValue}>{formatFcfa(stats.salesThisMonth)}</Text>
                   </View>
                   <View style={styles.statCard}>
-                    <Text style={styles.statCardLabel}>EN ATTENTE</Text>
+                    <Text style={styles.statCardLabel}>{t('vendor.pending')}</Text>
                     <Text style={styles.statCardValue}>{formatFcfa(stats.pendingTotal)}</Text>
                     <Text style={styles.statCardSub}>{stats.pendingCount} commande(s)</Text>
                   </View>
                 </View>
 
                 <View style={styles.sparkCard}>
-                  <Text style={styles.sparkLabel}>COMMANDES · 7 DERNIERS JOURS</Text>
+                  <Text style={styles.sparkLabel}>{t('vendor.last7')}</Text>
                   <View style={styles.sparkRow}>
                     {stats.days.map((d, i) => (
                       <View key={i} style={styles.sparkBarWrap}>
@@ -208,19 +210,19 @@ function VendorSpaceScreen() {
                 <View style={styles.miniStatsRow}>
                   <Pressable style={styles.miniStat} onPress={() => setTab('orders')}>
                     <Text style={styles.miniStatValue}>{stats.toShip}</Text>
-                    <Text style={styles.miniStatLabel}>À expédier</Text>
+                    <Text style={styles.miniStatLabel}>{t('vendor.toShip')}</Text>
                   </Pressable>
                   <Pressable style={styles.miniStat} onPress={() => setTab('products')}>
                     <Text style={styles.miniStatValue}>{stats.online}</Text>
-                    <Text style={styles.miniStatLabel}>En ligne</Text>
+                    <Text style={styles.miniStatLabel}>{t('vendor.online')}</Text>
                   </Pressable>
                   <Pressable style={styles.miniStat} onPress={() => setTab('products')}>
                     <Text style={[styles.miniStatValue, styles.miniStatValueWarn]}>{stats.outOfStock}</Text>
-                    <Text style={styles.miniStatLabel}>Rupture</Text>
+                    <Text style={styles.miniStatLabel}>{t('vendor.outOfStock')}</Text>
                   </Pressable>
                 </View>
 
-                <Text style={styles.sectionTitle}>COMMANDES RÉCENTES</Text>
+                <Text style={styles.sectionTitle}>{t('vendor.recentOrders')}</Text>
                 <View style={styles.list}>
                   {orders.slice(0, 5).map((o) => (
                     <View key={o.id} style={styles.orderRow}>
@@ -231,10 +233,10 @@ function VendorSpaceScreen() {
                         </Text>
                         <Text style={styles.orderRowMeta}>{o.livraison_nom_complet}</Text>
                       </View>
-                      <Text style={styles.orderRowStatut}>{ORDER_STATUT_LABEL[o.statut]}</Text>
+                      <Text style={styles.orderRowStatut}>{t(ORDER_STATUT_KEY[o.statut])}</Text>
                     </View>
                   ))}
-                  {orders.length === 0 && <Text style={styles.empty}>Aucune commande pour l'instant.</Text>}
+                  {orders.length === 0 && <Text style={styles.empty}>{t('vendor.noOrders')}</Text>}
                 </View>
               </View>
             )}
@@ -251,13 +253,13 @@ function VendorSpaceScreen() {
                         </Text>
                         <Text style={styles.productPrice}>{formatFcfa(p.prix_fcfa)}</Text>
                         <Text style={styles.productMeta}>
-                          {p.stock} en stock · {p.vues} vue(s) · {MARKETPLACE_CATEGORIE_LABEL[p.categorie]}
+                          {t('vendor.stockLine', { stock: p.stock, vues: p.vues, cat: t(`marketCat.${p.categorie}`) })}
                         </Text>
                       </View>
                       <View style={styles.productActions}>
                         <View style={[styles.statusPill, p.statut === 'rupture' && styles.statusPillWarn]}>
                           <Text style={[styles.statusPillLabel, p.statut === 'rupture' && styles.statusPillLabelWarn]}>
-                            {p.statut === 'en_ligne' ? 'EN LIGNE' : 'RUPTURE'}
+                            {(p.statut === 'en_ligne' ? t('vendor.online') : t('vendor.outOfStock')).toUpperCase()}
                           </Text>
                         </View>
                         <Pressable
@@ -266,12 +268,12 @@ function VendorSpaceScreen() {
                             setEditorOpen(true);
                           }}
                         >
-                          <Text style={styles.editLink}>Modifier</Text>
+                          <Text style={styles.editLink}>{t('vendor.edit')}</Text>
                         </Pressable>
                       </View>
                     </View>
                   ))}
-                  {products.length === 0 && <Text style={styles.empty}>Aucun produit pour l'instant.</Text>}
+                  {products.length === 0 && <Text style={styles.empty}>{t('vendor.noProducts')}</Text>}
                 </View>
                 <Pressable
                   style={styles.addProductBtn}
@@ -280,7 +282,7 @@ function VendorSpaceScreen() {
                     setEditorOpen(true);
                   }}
                 >
-                  <Text style={styles.addProductBtnLabel}>+ Ajouter un produit</Text>
+                  <Text style={styles.addProductBtnLabel}>{t('vendor.addProduct')}</Text>
                 </Pressable>
               </View>
             )}
@@ -295,22 +297,22 @@ function VendorSpaceScreen() {
                           {o.items.map((it) => `${it.quantite}× ${it.nom}`).join(', ')}
                         </Text>
                         <Text style={styles.orderCardMeta}>
-                          {o.livraison_nom_complet} · {o.livraison_ville} · {new Date(o.created_at).toLocaleDateString('fr-FR')}
+                          {o.livraison_nom_complet} · {o.livraison_ville} · {new Date(o.created_at).toLocaleDateString(lang === 'en' ? 'en-GB' : 'fr-FR')}
                         </Text>
                       </View>
-                      <Text style={styles.orderCardStatut}>{ORDER_STATUT_LABEL[o.statut]}</Text>
+                      <Text style={styles.orderCardStatut}>{t(ORDER_STATUT_KEY[o.statut])}</Text>
                     </View>
                     <View style={styles.orderCardFooter}>
                       <Text style={styles.orderCardAmount}>{formatFcfa(o.montant_total_fcfa)}</Text>
                       {o.statut === 'en_attente_paiement' && (
                         <Pressable style={styles.shipBtn} onPress={() => markShipped(o.id)}>
-                          <Text style={styles.shipBtnLabel}>Marquer comme expédiée</Text>
+                          <Text style={styles.shipBtnLabel}>{t('vendor.markShipped')}</Text>
                         </Pressable>
                       )}
                     </View>
                   </View>
                 ))}
-                {orders.length === 0 && <Text style={styles.empty}>Aucune commande pour l'instant.</Text>}
+                {orders.length === 0 && <Text style={styles.empty}>{t('vendor.noOrders')}</Text>}
               </View>
             )}
 
@@ -327,7 +329,7 @@ function VendorSpaceScreen() {
                     <Text style={styles.reviewText}>{r.commentaire}</Text>
                     {r.reponse_vendeur ? (
                       <View style={styles.vendorReply}>
-                        <Text style={styles.vendorReplyLabel}>Ta réponse</Text>
+                        <Text style={styles.vendorReplyLabel}>{t('vendor.yourReply')}</Text>
                         <Text style={styles.vendorReplyText}>{r.reponse_vendeur}</Text>
                       </View>
                     ) : (
@@ -335,61 +337,59 @@ function VendorSpaceScreen() {
                         <TextInput
                           value={replyDrafts[r.id] ?? ''}
                           onChangeText={(t) => setReplyDrafts((prev) => ({ ...prev, [r.id]: t }))}
-                          placeholder="Répondre à cet avis..."
+                          placeholder={t('vendor.replyPlaceholder')}
                           placeholderTextColor={colors.textMuted}
                           style={styles.replyInput}
                         />
                         <Pressable onPress={() => submitReply(r.id)}>
-                          <Text style={styles.replySend}>↩ Répondre</Text>
+                          <Text style={styles.replySend}>{t('vendor.reply')}</Text>
                         </Pressable>
                       </View>
                     )}
                   </View>
                 ))}
-                {reviews.length === 0 && <Text style={styles.empty}>Aucun avis pour l'instant.</Text>}
+                {reviews.length === 0 && <Text style={styles.empty}>{t('vendor.noReviews')}</Text>}
               </View>
             )}
 
             {tab === 'revenue' && (
               <View>
                 <View style={styles.revenueHero}>
-                  <Text style={styles.sparkLabel}>COMMANDES ENREGISTRÉES (TOTAL)</Text>
+                  <Text style={styles.sparkLabel}>{t('vendor.totalOrders')}</Text>
                   <Text style={styles.revenueValue}>{formatFcfa(totalRegistered)}</Text>
                 </View>
                 <View style={styles.commissionCard}>
                   <Text style={styles.commissionNote}>
-                    Le paiement en ligne (Mobile Money) et le modèle de commission AFROBACK ne sont pas encore activés.
-                    Les montants ci-dessus reflètent les commandes enregistrées, pas des revenus réellement versés.
+                    {t('vendor.commissionNote')}
                   </Text>
                   <Pressable style={styles.changePlanBtn} onPress={() => setTab('plans')}>
-                    <Text style={styles.changePlanBtnLabel}>Voir les paliers vendeur</Text>
+                    <Text style={styles.changePlanBtnLabel}>{t('vendor.seePlans')}</Text>
                   </Pressable>
                 </View>
-                <Text style={styles.sectionTitle}>COMMANDES</Text>
+                <Text style={styles.sectionTitle}>{t('vendor.orders')}</Text>
                 <View style={styles.list}>
                   {orders.map((o) => (
                     <View key={o.id} style={styles.payoutRow}>
                       <View>
                         <Text style={styles.payoutAmount}>{formatFcfa(o.montant_total_fcfa)}</Text>
-                        <Text style={styles.payoutDate}>{new Date(o.created_at).toLocaleDateString('fr-FR')}</Text>
+                        <Text style={styles.payoutDate}>{new Date(o.created_at).toLocaleDateString(lang === 'en' ? 'en-GB' : 'fr-FR')}</Text>
                       </View>
-                      <Text style={styles.orderRowStatut}>{ORDER_STATUT_LABEL[o.statut]}</Text>
+                      <Text style={styles.orderRowStatut}>{t(ORDER_STATUT_KEY[o.statut])}</Text>
                     </View>
                   ))}
-                  {orders.length === 0 && <Text style={styles.empty}>Aucune commande pour l'instant.</Text>}
+                  {orders.length === 0 && <Text style={styles.empty}>{t('vendor.noOrders')}</Text>}
                 </View>
               </View>
             )}
 
             {tab === 'plans' && (
               <View>
-                <Text style={styles.sectionTitle}>PALIERS VENDEUR</Text>
+                <Text style={styles.sectionTitle}>{t('vendor.plans')}</Text>
                 <View style={styles.plansEmpty}>
                   <Text style={styles.plansEmptyIcon}>📊</Text>
-                  <Text style={styles.plansEmptyTitle}>Bientôt disponible</Text>
+                  <Text style={styles.plansEmptyTitle}>{t('vendor.soon')}</Text>
                   <Text style={styles.plansEmptyText}>
-                    AFROBACK n'a pas encore défini de paliers d'abonnement ni de taux de commission vendeur. Tant que
-                    ce n'est pas décidé, aucun taux ni prix n'est affiché ici — plutôt qu'un chiffre inventé.
+                    {t('vendor.plansText')}
                   </Text>
                 </View>
               </View>

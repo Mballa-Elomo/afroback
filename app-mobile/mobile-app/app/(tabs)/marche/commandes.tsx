@@ -9,13 +9,9 @@ import { formatFcfa } from '../../../src/data/marketplaceDisplay';
 import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
 import { Icon } from '../../../src/components/Icons';
+import { useI18n } from '../../../src/i18n';
 
-const STATUT_LABEL: Record<MarketplaceOrderStatut, string> = {
-  en_attente_paiement: 'En attente de paiement',
-  expediee: 'Expédiée',
-  livree: 'Livrée',
-  annulee: 'Annulée',
-};
+
 
 const STATUT_COLOR: Record<MarketplaceOrderStatut, string> = {
   en_attente_paiement: colors.terracottaTextAlt,
@@ -26,6 +22,7 @@ const STATUT_COLOR: Record<MarketplaceOrderStatut, string> = {
 
 /** Mes commandes (acheteur) — écran ajouté pour que "Suivre ma commande" (checkout) ait une vraie destination fonctionnelle, non prévu explicitement dans l'extrait de maquette fourni. */
 function MyOrdersScreen() {
+  const { t, lang } = useI18n();
   const router = useRouter();
   const [state, setState] = useState<{ status: 'loading' | 'error' | 'ready'; orders: MarketplaceOrder[] }>({
     status: 'loading',
@@ -49,23 +46,23 @@ function MyOrdersScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Mes commandes</Text>
+          <Text style={styles.title}>{t('orders.title')}</Text>
         </View>
 
         {state.status === 'loading' && <LoadingState />}
         {state.status === 'error' && <ErrorState />}
         {state.status === 'ready' && state.orders.length === 0 && (
-          <Text style={styles.empty}>Tu n'as pas encore passé de commande.</Text>
+          <Text style={styles.empty}>{t('orders.empty')}</Text>
         )}
         {state.status === 'ready' && (
           <View style={styles.list}>
             {state.orders.map((o) => (
               <View key={o.id} style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <Text style={styles.cardDate}>{new Date(o.created_at).toLocaleDateString('fr-FR')}</Text>
+                  <Text style={styles.cardDate}>{new Date(o.created_at).toLocaleDateString(lang === 'en' ? 'en-GB' : 'fr-FR')}</Text>
                   <View style={{ flex: 1 }} />
                   <View style={[styles.badge, { borderColor: STATUT_COLOR[o.statut] }]}>
-                    <Text style={[styles.badgeLabel, { color: STATUT_COLOR[o.statut] }]}>{STATUT_LABEL[o.statut]}</Text>
+                    <Text style={[styles.badgeLabel, { color: STATUT_COLOR[o.statut] }]}>{t(`orderStatus.${o.statut}`)}</Text>
                   </View>
                 </View>
                 {o.items.map((it) => (

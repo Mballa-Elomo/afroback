@@ -16,7 +16,7 @@ export default function CarnetItemEnfantScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const itemState = useDecouverteItem(slug);
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
 
   if (itemState.status === 'loading') {
     return (
@@ -51,13 +51,13 @@ export default function CarnetItemEnfantScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
-          <Text style={styles.back}>‹ Retour</Text>
+          <Text style={styles.back}>{t('kids.back')}</Text>
         </Pressable>
 
         <HeroPlaceholder style={styles.visual} radius={20} imageUrl={item.image_url} />
 
         <Text style={styles.meta}>
-          {DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()} · {item.region_ethnie}
+          {t(`decouverteType.${item.type}`).toUpperCase()} · {item.region_ethnie}
         </Text>
         <Text style={styles.title}>{item.titre}</Text>
         <Text style={styles.blurb}>{item.resume_liste}</Text>

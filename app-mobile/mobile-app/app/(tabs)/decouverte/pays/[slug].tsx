@@ -10,6 +10,7 @@ import { DECOUVERTE_TYPE_LABEL } from '../../../../src/data/decouverteDisplay';
 import type { DecouverteType } from '../../../../src/data/decouverteTypes';
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
 import { ScreenHeader } from '../../../../src/ui/modern';
+import { useI18n } from '../../../../src/i18n';
 
 /**
  * Hub pays — fidèle à design-reference-decouverte.dc.excerpt.html (section
@@ -23,13 +24,14 @@ import { ScreenHeader } from '../../../../src/ui/modern';
  * reflète des données réelles. Voir mobile-app/README.md.
  */
 export default function CountryHubScreen() {
+  const { t } = useI18n();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const paysState = useDecouvertePays();
   const itemsState = useDecouverteItems();
 
   const pays = paysState.status === 'ready' ? paysState.data.find((p) => p.slug === slug) : undefined;
-  const items = itemsState.status === 'ready' ? itemsState.data.filter((it) => it.pays === pays?.nom) : [];
+  const items = itemsState.status === 'ready' ? itemsState.data.filter((it) => it.pays === ((pays as { nom_fr?: string } | undefined)?.nom_fr ?? pays?.nom)) : [];
 
   const grouped = useMemo(() => {
     const order: DecouverteType[] = ['village', 'coutume', 'objet', 'personnage', 'fait'];
@@ -58,13 +60,13 @@ export default function CountryHubScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={{ marginHorizontal: -(spacing.md + 2) }}>
-          <ScreenHeader title={pays?.nom ?? ''} subtitle="Tout le patrimoine du pays" onBack={() => router.back()} />
+          <ScreenHeader title={pays?.nom ?? ''} subtitle={t('country.sub')} onBack={() => router.back()} />
         </View>
         {pays?.resume && <Text style={styles.intro}>{pays.resume}</Text>}
 
         {grouped.map((group) => (
           <View key={group.type} style={styles.section}>
-            <SectionTitle title={DECOUVERTE_TYPE_LABEL[group.type] + 's'} />
+            <SectionTitle title={t(`decouverteTypePlural.${group.type}`)} />
             <View style={styles.list}>
               {group.items.map((item) => (
                 <DecouverteItemRow key={item.slug} item={item} onPress={() => router.push(`/decouverte/${item.slug}`)} />

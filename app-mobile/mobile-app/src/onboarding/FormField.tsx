@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Platform, Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { colors, typography } from '../theme/tokens';
+import i18n from '../i18n';
 
 /**
  * Champs de formulaire de la maquette (écran 7 "Crée ton compte") : icône au
@@ -99,7 +100,7 @@ export function FormField({
             onPress={() => setVisible((v) => !v)}
             hitSlop={12}
             accessibilityRole="button"
-            accessibilityLabel={visible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+            accessibilityLabel={visible ? i18n.t('formField.hide') : i18n.t('formField.show')}
           >
             <EyeIcon open={!visible} />
           </Pressable>

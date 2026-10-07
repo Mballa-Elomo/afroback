@@ -72,15 +72,15 @@ export default function DonMontantScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Ton don</Text>
+          <Text style={styles.title}>{t('donateAmount.title')}</Text>
         </View>
 
         <View style={styles.causeCard}>
-          <Text style={styles.causeTag}>PLATEFORME</Text>
-          <Text style={styles.causeName}>Soutenir AFROBACK</Text>
+          <Text style={styles.causeTag}>{t('donate.platform')}</Text>
+          <Text style={styles.causeName}>{t('donate.title')}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>MONTANT</Text>
+        <Text style={styles.sectionTitle}>{t('donateAmount.amount')}</Text>
         <View style={styles.presetsGrid}>
           {PRESETS.map((amount) => {
             const active = preset === amount && custom.trim().length === 0;
@@ -101,7 +101,7 @@ export default function DonMontantScreen() {
             setCustom(v.replace(/[^0-9]/g, ''));
             setPreset(null);
           }}
-          placeholder="Autre montant (200 FCFA minimum)"
+          placeholder={t('donateAmount.other')}
           placeholderTextColor={colors.textMuted}
           keyboardType="number-pad"
           style={styles.input}
@@ -111,20 +111,20 @@ export default function DonMontantScreen() {
           <View style={[styles.checkbox, anonyme && styles.checkboxActive]}>
             {anonyme && <Text style={styles.checkboxMark}>✓</Text>}
           </View>
-          <Text style={styles.toggleLabel}>Faire un don anonyme</Text>
+          <Text style={styles.toggleLabel}>{t('donateAmount.anonymous')}</Text>
         </Pressable>
 
-        <Text style={styles.sectionTitle}>MODE DE PAIEMENT</Text>
+        <Text style={styles.sectionTitle}>{t('donateAmount.method')}</Text>
         <MobileMoneyBadges />
         <View style={{ height: 18 }} />
 
         <View style={styles.recapCard}>
           <View style={styles.recapRow}>
-            <Text style={styles.recapLabel}>Cause</Text>
-            <Text style={styles.recapValue}>Soutenir AFROBACK</Text>
+            <Text style={styles.recapLabel}>{t('donateAmount.cause')}</Text>
+            <Text style={styles.recapValue}>{t('donate.title')}</Text>
           </View>
           <View style={[styles.recapRow, styles.recapTotalRow]}>
-            <Text style={styles.recapTotalLabel}>Total</Text>
+            <Text style={styles.recapTotalLabel}>{t('donateAmount.total')}</Text>
             <Text style={styles.recapTotalValue}>
               {formatFcfa(montant)}
             </Text>

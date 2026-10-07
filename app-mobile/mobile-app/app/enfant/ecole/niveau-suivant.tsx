@@ -6,6 +6,7 @@ import { getNiveauByNumero } from '../../../src/data/ecoleRepository';
 import type { EcoleNiveau } from '../../../src/data/ecoleTypes';
 import { GoldButton } from '../../../src/components/Buttons';
 import { colors, typography } from '../../../src/theme/tokens';
+import { useI18n } from '../../../src/i18n';
 
 /**
  * Passage de niveau — fidèle dans l'esprit à
@@ -18,6 +19,7 @@ import { colors, typography } from '../../../src/theme/tokens';
  * "Niveau 4" une seconde fois.
  */
 export default function EcoleNiveauSuivantScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { niveau: niveauParam, complete } = useLocalSearchParams<{ niveau: string; complete?: string }>();
   const niveau = Number(niveauParam ?? 1);
@@ -33,13 +35,13 @@ export default function EcoleNiveauSuivantScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.container}>
         <Text style={styles.confetti}>🎊</Text>
-        <Text style={styles.kicker}>{isComplete ? 'ÉCOLE DES HÉROS TERMINÉE' : 'NIVEAU TERMINÉ'}</Text>
+        <Text style={styles.kicker}>{isComplete ? t('levelUp.done') : t('levelUp.levelDone')}</Text>
         {isComplete ? (
-          <Text style={styles.title}>Tu as terminé{'\n'}tous les niveaux !</Text>
+          <Text style={styles.title}>{t('levelUp.allDone', { br: '\n' })}</Text>
         ) : (
           <Text style={styles.title}>
-            Niveau suivant :{'\n'}
-            {niveauInfo?.nom ?? `Niveau ${niveau}`}
+            {t('levelUp.next')}{'\n'}
+            {niveauInfo?.nom ?? t('kids.level', { n: niveau })}
           </Text>
         )}
 
@@ -57,7 +59,7 @@ export default function EcoleNiveauSuivantScreen() {
           </View>
         )}
 
-        <GoldButton label={isComplete ? "Retour à l'accueil" : 'Continuer'} onPress={() => router.replace(isComplete ? '/enfant/accueil' : '/enfant/ecole')} />
+        <GoldButton label={isComplete ? t('levelUp.home') : t('kids.continue')} onPress={() => router.replace(isComplete ? '/enfant/accueil' : '/enfant/ecole')} />
       </View>
     </SafeAreaView>
   );

@@ -9,6 +9,7 @@ import type { EcoleLecon, EnfantLeconResultat } from '../../../src/data/ecoleTyp
 import { LoadingState } from '../../../src/components/LoadingState';
 import { colors, typography } from '../../../src/theme/tokens';
 import { Icon } from '../../../src/components/Icons';
+import { useI18n } from '../../../src/i18n';
 
 /**
  * Collection — fidèle dans l'esprit à
@@ -19,6 +20,7 @@ import { Icon } from '../../../src/components/Icons';
  * terminée.
  */
 export default function EcoleCollectionScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { state } = useActiveProfile();
   const heroesState = useHeroesList();
@@ -68,7 +70,7 @@ export default function EcoleCollectionScreen() {
   if (loading || heroesState.status === 'loading') {
     return (
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="Ta collection se prépare..." />
+        <LoadingState message={t('collection.loading')} />
       </SafeAreaView>
     );
   }
@@ -80,11 +82,11 @@ export default function EcoleCollectionScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Ma collection</Text>
+          <Text style={styles.title}>{t('collection.title')}</Text>
         </View>
 
         {cards.length === 0 ? (
-          <Text style={styles.empty}>Aucun héros configuré pour l'instant.</Text>
+          <Text style={styles.empty}>{t('collection.empty')}</Text>
         ) : (
           <View style={styles.grid}>
             {cards.map(({ heros, debloque }) => (

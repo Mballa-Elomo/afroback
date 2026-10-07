@@ -1,5 +1,6 @@
 import { supabase } from '../data/supabaseClient';
 import type { ContentType } from '../data/contentAccess';
+import i18n from '../i18n';
 
 /**
  * Commentaires façon YouTube (cdc-commentaires.md). L'app passe uniquement
@@ -82,20 +83,6 @@ export function reportComment(id: string) {
 
 /** Message affiché pour un code d'erreur serveur. */
 export function commentErrorMessage(code?: string): string {
-  switch (code) {
-    case 'trop_rapide':
-      return 'Tu commentes très vite. Patiente quelques minutes avant de publier à nouveau.';
-    case 'acces':
-      return 'Débloque ce contenu pour participer à la discussion.';
-    case 'longueur':
-      return 'Ton commentaire doit faire entre 1 et 2 000 caractères.';
-    case 'sans_profil':
-      return 'Crée ton pseudo (Profil, puis Modifier le profil) pour commenter.';
-    case 'banni':
-      return 'Ton compte ne peut plus publier de commentaires.';
-    case 'non_installe':
-      return "Les commentaires ne sont pas encore activés sur AFROBACK.";
-    default:
-      return "Ça n'a pas marché. Vérifie ta connexion et réessaie.";
-  }
+  const known = ['trop_rapide', 'acces', 'longueur', 'sans_profil', 'banni', 'non_installe'];
+  return i18n.t(`commentErrors.${code && known.includes(code) ? code : 'default'}`);
 }

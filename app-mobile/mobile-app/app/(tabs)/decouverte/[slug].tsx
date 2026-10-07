@@ -23,7 +23,7 @@ import { colors, spacing, typography } from '../../../src/theme/tokens';
 import { useAuth } from '../../../src/auth/AuthProvider';
 import { LockedActionCard } from '../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../src/access/Access';
-import { useI18n } from '../../../src/i18n';
+import { currentLanguage, useI18n } from '../../../src/i18n';
 import { CommentsSection } from '../../../src/comments/CommentsSection';
 import { ContentActions } from '../../../src/stats/ContentActions';
 
@@ -43,11 +43,11 @@ export default function DecouverteDetailScreen() {
   const { isGuest } = useAuth();
   const insets = useSafeAreaInsets();
   const itemState = useDecouverteItem(slug);
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const item = itemState.status === 'ready' ? itemState.data : undefined;
   const relatedItems = useRelatedDecouverteItems(item);
   const [relatedHeroes, setRelatedHeroes] = useState<Heros[]>([]);
-  const [langue, setLangue] = useState<'fr' | 'en'>('fr');
+  const [langue, setLangue] = useState<'fr' | 'en'>(currentLanguage());
   const consultationLoggedRef = useRef<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const bodyY = useRef(0);
@@ -141,7 +141,7 @@ export default function DecouverteDetailScreen() {
             </View>
             <View style={styles.immersiveBottom}>
               <View style={styles.typePill}>
-                <Text style={styles.typePillLabel}>{DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()}</Text>
+                <Text style={styles.typePillLabel}>{t(`decouverteType.${item.type}`).toUpperCase()}</Text>
               </View>
               <Text style={styles.immersiveTitle}>{item.titre}</Text>
               <View style={styles.metaRow}>
@@ -156,7 +156,7 @@ export default function DecouverteDetailScreen() {
               <BackButton onPress={() => router.back()} />
             </View>
             <Text style={styles.flatMeta}>
-              {DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()} · {item.region_ethnie}
+              {t(`decouverteType.${item.type}`).toUpperCase()} · {item.region_ethnie}
             </Text>
             <Text style={styles.flatTitle}>{item.titre}</Text>
           </View>
@@ -173,7 +173,7 @@ export default function DecouverteDetailScreen() {
           <Text style={styles.subtitle}>{item.sous_titre}</Text>
 
           <View style={styles.sectionHeaderRow}>
-            <SectionTitle title="En détail" />
+            <SectionTitle title={t('discoveryItem.detail')} />
             {hasEnglish && (
               <View style={styles.langToggle}>
                 <Pressable onPress={() => setLangue('fr')} style={[styles.langBtn, langue === 'fr' && styles.langBtnActive]}>
@@ -193,7 +193,7 @@ export default function DecouverteDetailScreen() {
 
           {videoCodes.length > 0 && (
             <View style={styles.videoSection}>
-              <SectionTitle title="Regarder" />
+              <SectionTitle title={t('content.watch')} />
               {isGuest ? (
                 <LockedActionCard label="video" reason={'video'} />
               ) : (
@@ -204,18 +204,18 @@ export default function DecouverteDetailScreen() {
 
           <FaitsList faits={item.statut_fait_legende} />
           {item.sources.length > 0 && (
-            <Collapsible icon="book" title="Sources" count={`${item.sources.length}`} preview={item.sources[0]}>
+            <Collapsible icon="book" title={t('content.sources')} count={`${item.sources.length}`} preview={item.sources[0]}>
               <SourcesList sources={item.sources} bare />
             </Collapsible>
           )}
           <View onLayout={(e) => (commentsY.current = e.nativeEvent.layout.y)}>
             <CommentsSection type="decouverte" slug={item.slug} />
           </View>
-          <RelatedHeroes heroes={relatedHeroes} title="Héros liés" />
+          <RelatedHeroes heroes={relatedHeroes} title={t('discoveryItem.relatedHeroes')} />
 
           {relatedItems.length > 0 && (
             <View style={styles.relatedItems}>
-              <SectionTitle title="À découvrir aussi" />
+              <SectionTitle title={t('discoveryItem.alsoDiscover')} />
               <View style={styles.relatedList}>
                 {relatedItems.map((it) => (
                   <DecouverteItemRow key={it.slug} item={it} onPress={() => router.push(`/decouverte/${it.slug}`)} />

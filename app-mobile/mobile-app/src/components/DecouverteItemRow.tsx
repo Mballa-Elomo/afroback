@@ -5,15 +5,17 @@ import { colors, typography } from '../theme/tokens';
 import { HeroPlaceholder } from './HeroVisual';
 import { AccessBadge } from '../access/Access';
 import { Icon } from './Icons';
+import { useI18n } from '../i18n';
 
 /** Ligne de liste (catalogue Découverte, hub pays) — fidèle à la maquette : photo 60x60, catégorie·région, nom, résumé tronqué. */
 export function DecouverteItemRow({ item, onPress }: { item: DecouverteItem; onPress: () => void }) {
+  const { t } = useI18n();
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
       <HeroPlaceholder style={styles.visual} radius={14} imageUrl={item.image_url} fallbackIcon="compass" />
       <View style={styles.body}>
         <Text style={styles.meta} numberOfLines={1}>
-          {DECOUVERTE_TYPE_LABEL[item.type].toUpperCase()} · {item.region_ethnie}
+          {t(`decouverteType.${item.type}`).toUpperCase()} · {item.region_ethnie}
         </Text>
         <Text style={styles.name} numberOfLines={1}>
           {item.titre}

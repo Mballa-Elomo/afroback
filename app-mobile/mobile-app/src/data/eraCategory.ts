@@ -1,10 +1,10 @@
 export type EraCategory = 'precolonial' | 'colonial' | 'independances';
 
 export const ERA_FILTERS: { id: EraCategory | 'tous'; label: string }[] = [
-  { id: 'tous', label: 'Tous' },
-  { id: 'precolonial', label: 'Précolonial' },
-  { id: 'colonial', label: 'Colonial' },
-  { id: 'independances', label: 'Indépendances' },
+  { id: 'tous', label: 'heroesList.eraAll' },
+  { id: 'precolonial', label: 'heroesList.eraPrecolonial' },
+  { id: 'colonial', label: 'heroesList.eraColonial' },
+  { id: 'independances', label: 'heroesList.eraIndependances' },
 ];
 
 /**

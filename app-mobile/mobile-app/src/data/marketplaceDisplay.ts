@@ -1,4 +1,5 @@
 import type { MarketplaceCategorie } from './marketplaceTypes';
+import { currentLanguage } from '../i18n';
 
 /** Libellés/icônes cosmétiques par catégorie — taxonomie de départ, pas une donnée commerciale sensible (contrairement aux commissions/paliers). */
 export const MARKETPLACE_CATEGORIE_LABEL: Record<MarketplaceCategorie, string> = {
@@ -22,5 +23,5 @@ export const MARKETPLACE_CATEGORIE_ICON: Record<MarketplaceCategorie, string> = 
 };
 
 export function formatFcfa(amount: number): string {
-  return `${amount.toLocaleString('fr-FR')} FCFA`;
+  return `${amount.toLocaleString(currentLanguage() === 'en' ? 'en-US' : 'fr-FR')} FCFA`;
 }

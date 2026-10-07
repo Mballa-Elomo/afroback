@@ -24,6 +24,7 @@ import { colors, spacing, typography } from '../../../src/theme/tokens';
 import { useRequireAccount } from '../../../src/auth/AccountWall';
 import { useAccess } from '../../../src/access/Access';
 import { Icon } from '../../../src/components/Icons';
+import { useI18n } from '../../../src/i18n';
 
 /**
  * Fiche produit — fidèle à design-reference-marketplace.dc.excerpt.html
@@ -35,6 +36,7 @@ import { Icon } from '../../../src/components/Icons';
  */
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useI18n();
   const router = useRouter();
   const requireAccount = useRequireAccount();
   const { requireSubscription } = useAccess();
@@ -153,14 +155,14 @@ export default function ProductDetailScreen() {
           <View style={styles.metaRow}>
             {rating && rating.total > 0 ? (
               <Text style={styles.ratingText}>
-                ★ {rating.moyenne.toFixed(1)} <Text style={styles.ratingSub}>· {rating.total} avis</Text>
+                ★ {rating.moyenne.toFixed(1)} <Text style={styles.ratingSub}>· {t('product.reviewsCount', { n: rating.total })}</Text>
               </Text>
             ) : (
-              <Text style={styles.ratingSub}>Aucun avis pour l'instant</Text>
+              <Text style={styles.ratingSub}>{t('product.noReviewsYet')}</Text>
             )}
             <View style={{ flex: 1 }} />
             <Text style={inStock ? styles.stockOk : styles.stockOut}>
-              ● {inStock ? `${product.stock} en stock` : 'Épuisé'}
+              ● {inStock ? t('product.inStock', { n: product.stock }) : t('product.soldOut')}
             </Text>
           </View>
 
@@ -168,7 +170,7 @@ export default function ProductDetailScreen() {
             <Pressable style={styles.artisanRow} onPress={() => router.push(`/marche/artisan/${product.vendor!.id}`)}>
               <HeroPlaceholder style={styles.artisanAvatar} radius={23} imageUrl={product.vendor.avatar_url} />
               <View style={styles.artisanBody}>
-                <Text style={styles.artisanEyebrow}>ARTISAN</Text>
+                <Text style={styles.artisanEyebrow}>{t('product.artisan')}</Text>
                 <Text style={styles.artisanName}>{product.vendor.nom_boutique}</Text>
                 <Text style={styles.artisanRegion}>{product.vendor.region}</Text>
               </View>
@@ -176,14 +178,14 @@ export default function ProductDetailScreen() {
             </Pressable>
           )}
 
-          <SectionTitle title="L'histoire de l'objet" />
-          <Text style={styles.description}>{product.description ?? 'Aucune description fournie pour ce produit.'}</Text>
+          <SectionTitle title={t('product.story')} />
+          <Text style={styles.description}>{product.description ?? t('product.noDescription')}</Text>
 
           <View style={styles.reviewsHeader}>
-            <SectionTitle title="Avis" />
+            <SectionTitle title={t('product.reviews')} />
             {session && (
               <Pressable onPress={() => requireSubscription(() => setReviewOpen((v) => !v), 'review')}>
-                <Text style={styles.addReviewLink}>{reviewOpen ? 'Annuler' : '+ Laisser un avis'}</Text>
+                <Text style={styles.addReviewLink}>{reviewOpen ? t('product.cancel') : t('product.leaveReview')}</Text>
               </Pressable>
             )}
           </View>
@@ -200,7 +202,7 @@ export default function ProductDetailScreen() {
               <TextInput
                 value={reviewAuteur}
                 onChangeText={setReviewAuteur}
-                placeholder="Ton nom (affiché avec l'avis)"
+                placeholder={t('product.yourName')}
                 placeholderTextColor={colors.textMuted}
                 style={styles.reviewInput}
                 maxLength={40}
@@ -208,14 +210,14 @@ export default function ProductDetailScreen() {
               <TextInput
                 value={reviewText}
                 onChangeText={setReviewText}
-                placeholder="Ton avis sur ce produit..."
+                placeholder={t('product.yourReview')}
                 placeholderTextColor={colors.textMuted}
                 style={[styles.reviewInput, styles.reviewTextarea]}
                 multiline
                 maxLength={1000}
               />
               <GoldButton
-                label={sendingReview ? 'Envoi...' : 'Publier mon avis'}
+                label={sendingReview ? t('product.sending') : t('product.post')}
                 onPress={sendReview}
                 disabled={sendingReview}
               />
@@ -233,18 +235,18 @@ export default function ProductDetailScreen() {
                 <Text style={styles.reviewText}>{r.commentaire}</Text>
                 {r.reponse_vendeur && (
                   <View style={styles.vendorReply}>
-                    <Text style={styles.vendorReplyLabel}>Réponse du vendeur</Text>
+                    <Text style={styles.vendorReplyLabel}>{t('product.sellerReply')}</Text>
                     <Text style={styles.vendorReplyText}>{r.reponse_vendeur}</Text>
                   </View>
                 )}
               </View>
             ))}
-            {reviews.length === 0 && <Text style={styles.noReviews}>Sois le premier à donner ton avis.</Text>}
+            {reviews.length === 0 && <Text style={styles.noReviews}>{t('product.beFirst')}</Text>}
           </View>
 
           {similar.length > 0 && (
             <>
-              <SectionTitle title="Du même artisan" />
+              <SectionTitle title={t('product.sameArtisan')} />
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.similarRow}>
                 {similar.map((p) => (
                   <Pressable key={p.id} style={styles.similarItem} onPress={() => router.push(`/marche/${p.id}`)}>
@@ -263,15 +265,15 @@ export default function ProductDetailScreen() {
 
       <View style={styles.bottomBar}>
         {inStock ? (
-          <GoldButton label="Ajouter au panier" onPress={addToCart} />
+          <GoldButton label={t('product.addToCart')} onPress={addToCart} />
         ) : (
           <View style={styles.soldOutBtn}>
-            <Text style={styles.soldOutBtnLabel}>Épuisé</Text>
+            <Text style={styles.soldOutBtnLabel}>{t('product.soldOut')}</Text>
           </View>
         )}
       </View>
 
-      {toast && <AddToCartToast message={`${product.nom} ajouté au panier`} onViewCart={() => router.push('/marche/cart')} />}
+      {toast && <AddToCartToast message={t('product.added', { nom: product.nom })} onViewCart={() => router.push('/marche/cart')} />}
     </SafeAreaView>
   );
 }

@@ -2,12 +2,14 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { FriseEvenement } from '../data/types';
 import { colors, spacing, typography } from '../theme/tokens';
 import { SectionTitle } from './SectionTitle';
+import { useI18n } from '../i18n';
 
 export function TimelineList({ evenements, bare = false }: { evenements: FriseEvenement[]; /** Sans titre ni marge (dans une section repliable). */ bare?: boolean }) {
+  const { t } = useI18n();
   if (evenements.length === 0) return null;
   return (
     <View style={bare ? undefined : styles.container}>
-      {!bare && <SectionTitle title="Frise chronologique" />}
+      {!bare && <SectionTitle title={t('hero.timeline')} />}
       {evenements.map((e, i) => (
         <View key={`${e.date}-${i}`} style={styles.row}>
           <View style={styles.markerColumn}>

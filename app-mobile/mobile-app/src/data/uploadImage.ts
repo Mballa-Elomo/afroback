@@ -1,5 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from './supabaseClient';
+import i18n from '../i18n';
 
 /**
  * Upload d'image générique, réutilisé par le pilier Communauté (photo de
@@ -56,7 +57,7 @@ export async function pickAndUploadImage(folder: UploadFolder, options?: { squar
     return {
       url: null,
       cancelled: false,
-      error: "Accès à tes photos refusé. Autorise AFROBACK dans les réglages de ton téléphone pour ajouter une image.",
+      error: i18n.t('photo.permissionDenied'),
     };
   }
 
@@ -74,13 +75,13 @@ export async function pickAndUploadImage(folder: UploadFolder, options?: { squar
 
   const asset = result.assets[0];
   if (!asset?.base64) {
-    return { url: null, cancelled: false, error: "Impossible de lire cette image, réessaie avec une autre." };
+    return { url: null, cancelled: false, error: i18n.t('photo.unreadable') };
   }
 
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
   if (!userId) {
-    return { url: null, cancelled: false, error: 'Aucune session active.' };
+    return { url: null, cancelled: false, error: i18n.t('repoErrors.noSession') };
   }
 
   const bytes = base64ToUint8Array(asset.base64);
@@ -93,7 +94,7 @@ export async function pickAndUploadImage(folder: UploadFolder, options?: { squar
     upsert: false,
   });
   if (uploadError) {
-    return { url: null, cancelled: false, error: `Échec de l'envoi de l'image : ${uploadError.message}` };
+    return { url: null, cancelled: false, error: i18n.t('photo.uploadFailed', { message: uploadError.message }) };
   }
 
   const { data: publicUrlData } = supabase.storage.from('user-uploads').getPublicUrl(path);

@@ -18,7 +18,7 @@ import { recordHeroEngagement } from '../../../../../src/data/engagementReposito
 import type { RecitChapitre } from '../../../../../src/data/types';
 import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import { LockedDetailScreen } from '../../../../../src/access/Access';
-import { useI18n } from '../../../../../src/i18n';
+import { currentLanguage, useI18n } from '../../../../../src/i18n';
 
 type Langue = 'fr' | 'en';
 type TailleTexte = 'S' | 'M' | 'L';
@@ -40,9 +40,9 @@ export default function LecteurDeRecitScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const herosState = useHero(slug);
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
-  const [langue, setLangue] = useState<Langue>('fr');
+  const [langue, setLangue] = useState<Langue>(currentLanguage());
   const [taille, setTaille] = useState<TailleTexte>('M');
   const [chapitreIdx, setChapitreIdx] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -148,7 +148,7 @@ export default function LecteurDeRecitScreen() {
               {heros.nom_affiche}
             </Text>
             <Text style={styles.headerSub}>
-              Chapitre {chapitreIdx + 1}/{NB_CHAPITRES} · {minutesTotal} min au total
+              {t('reader.header', { n: chapitreIdx + 1, total: NB_CHAPITRES, min: minutesTotal })}
             </Text>
           </View>
           <Pressable onPress={() => setSettingsOpen((v) => !v)} hitSlop={10} style={styles.headerBtn}>
@@ -162,7 +162,7 @@ export default function LecteurDeRecitScreen() {
 
       {settingsOpen && (
         <View style={styles.settingsPopover}>
-          <Text style={styles.settingsLabel}>TAILLE DU TEXTE</Text>
+          <Text style={styles.settingsLabel}>{t('reader.textSize')}</Text>
           <View style={styles.settingsRow}>
             {(['S', 'M', 'L'] as TailleTexte[]).map((t) => (
               <Pressable
@@ -203,7 +203,7 @@ export default function LecteurDeRecitScreen() {
         </Text>
         <Text style={styles.name}>{heros.nom_affiche}</Text>
         <Text style={styles.chapitreTitre}>
-          Chapitre {chapitreActuel.numero}/{NB_CHAPITRES} — {chapitreActuel.titre}
+          {t('reader.chapterTitle', { n: chapitreActuel.numero, total: NB_CHAPITRES, titre: chapitreActuel.titre })}
         </Text>
 
         <Text style={[styles.body, { fontSize: bodySize, lineHeight: bodyLineHeight }]}>
@@ -219,11 +219,11 @@ export default function LecteurDeRecitScreen() {
 
         {estDernierChapitre ? (
           <>
-            <Text style={styles.endLabel}>Fin du récit</Text>
-            <GhostButton label="Retour à la fiche" onPress={() => router.back()} />
+            <Text style={styles.endLabel}>{t('reader.end')}</Text>
+            <GhostButton label={t('reader.backToSheet')} onPress={() => router.back()} />
           </>
         ) : (
-          <Text style={styles.endLabel}>Fin du chapitre {chapitreActuel.numero}</Text>
+          <Text style={styles.endLabel}>{t('reader.endChapter', { n: chapitreActuel.numero })}</Text>
         )}
       </ScrollView>
 
@@ -233,7 +233,7 @@ export default function LecteurDeRecitScreen() {
           disabled={estPremierChapitre}
           style={[styles.pagerBtn, estPremierChapitre && styles.pagerBtnDisabled]}
         >
-          <Text style={[styles.pagerBtnLabel, estPremierChapitre && styles.pagerBtnLabelDisabled]}>‹ Chapitre précédent</Text>
+          <Text style={[styles.pagerBtnLabel, estPremierChapitre && styles.pagerBtnLabelDisabled]}>{t('content.prevChapter')}</Text>
         </Pressable>
         <View style={styles.pagerDots}>
           {(chapitres ?? []).map((c, i) => (
@@ -242,11 +242,11 @@ export default function LecteurDeRecitScreen() {
         </View>
         {estDernierChapitre ? (
           <Pressable onPress={() => router.back()} style={styles.pagerBtn}>
-            <Text style={styles.pagerBtnLabel}>Terminer ›</Text>
+            <Text style={styles.pagerBtnLabel}>{t('reader.finish')}</Text>
           </Pressable>
         ) : (
           <Pressable onPress={allerAuChapitreSuivant} style={styles.pagerBtn}>
-            <Text style={styles.pagerBtnLabel}>Chapitre suivant ›</Text>
+            <Text style={styles.pagerBtnLabel}>{t('content.nextChapter')}</Text>
           </Pressable>
         )}
       </View>

@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GoldButton } from '../../src/components/Buttons';
 import { colors, spacing, typography } from '../../src/theme/tokens';
 import { Icon } from '../../src/components/Icons';
+import { useI18n } from '../../src/i18n';
 
 /**
  * Écran mission du module Don — version volontairement simplifiée par
@@ -23,6 +24,7 @@ import { Icon } from '../../src/components/Icons';
  * vides) — jamais un chiffre ou un donateur inventé.
  */
 export default function DonMissionScreen() {
+  const { t } = useI18n();
   const router = useRouter();
 
   return (
@@ -34,22 +36,18 @@ export default function DonMissionScreen() {
           </Pressable>
           <View style={styles.coverContent}>
             <View style={styles.tag}>
-              <Text style={styles.tagLabel}>PLATEFORME</Text>
+              <Text style={styles.tagLabel}>{t('donate.platform')}</Text>
             </View>
-            <Text style={styles.title}>Soutenir AFROBACK</Text>
+            <Text style={styles.title}>{t('donate.title')}</Text>
           </View>
         </View>
 
         <View style={styles.body}>
           <Text style={styles.mission}>
-            AFROBACK fait vivre les histoires de héros africains, la découverte des cultures du continent et une
-            communauté qui les célèbre. Ton soutien finance directement le fonctionnement de la plateforme et la
-            production de contenu à venir : aujourd'hui, 6 des 9 héros du catalogue n'ont encore ni narration audio
-            ni vidéo, et les langues camerounaises de l'interface (ewondo, douala, bassa, bamiléké) restent à
-            traduire.
+            {t('donate.mission')}
           </Text>
           <Text style={styles.missionSecondary}>
-            Chaque don, ponctuel ou mensuel, aide à faire avancer ces chantiers.
+            {t('donate.secondary')}
           </Text>
         </View>
       </ScrollView>
@@ -60,7 +58,7 @@ export default function DonMissionScreen() {
           locations={[0, 0.4]}
           style={StyleSheet.absoluteFill}
         />
-        <GoldButton label="Faire un don" onPress={() => router.push('/don/montant')} />
+        <GoldButton label={t('donate.cta')} onPress={() => router.push('/don/montant')} />
       </View>
     </SafeAreaView>
   );

@@ -12,6 +12,7 @@ import { colors, typography } from '../../../../src/theme/tokens';
 import { AccessBadge } from '../../../../src/access/Access';
 import { Bone, LikeBadge, PressableScale, ScreenHeader, SkeletonScreen } from '../../../../src/ui/modern';
 import { useLikeCounts } from '../../../../src/stats/contentStats';
+import { useI18n } from '../../../../src/i18n';
 
 /**
  * Liste Mythologie, groupée par zone (refonte moderne du 2026-09-30) :
@@ -19,6 +20,7 @@ import { useLikeCounts } from '../../../../src/stats/contentStats';
  * formats disponibles. Filigrane quand l'illustration n'est pas encore en ligne.
  */
 export default function MythologieListScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const groupsState = useMythesGroupedByZone();
   const [query, setQuery] = useState('');
@@ -51,8 +53,8 @@ export default function MythologieListScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <ScreenHeader
-          title="Mythologie africaine"
-          subtitle={total > 0 ? `${total} mythes fondateurs, racontés par les peuples` : undefined}
+          title={t('myths.title')}
+          subtitle={total > 0 ? t('myths.count', { n: total }) : undefined}
           onBack={() => router.back()}
         />
 
@@ -62,12 +64,12 @@ export default function MythologieListScreen() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Un peuple, un dieu, un mythe…"
+              placeholder={t('myths.search')}
               placeholderTextColor={colors.textMuted}
               style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
             />
             {query.length > 0 && (
-              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Effacer">
+              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t('content.clear')}>
                 <Text style={styles.clear}>✕</Text>
               </Pressable>
             )}
@@ -99,6 +101,7 @@ export default function MythologieListScreen() {
 }
 
 function MytheCard({ mythe, onPress, likes }: { mythe: Mythe; onPress: () => void; likes?: number }) {
+  const { t } = useI18n();
   return (
     <PressableScale onPress={onPress} style={styles.card} accessibilityLabel={mythe.titre}>
       <HeroPlaceholder style={styles.cover} radius={0} imageUrl={mythe.image_url} fallbackIcon="book">
@@ -118,9 +121,9 @@ function MytheCard({ mythe, onPress, likes }: { mythe: Mythe; onPress: () => voi
           {mythe.sous_titre}
         </Text>
         <View style={styles.formats}>
-          <Format icon="book" label="Lire" />
-          <Format icon="play" label="Écouter" />
-          <Format icon="sparkle" label="Regarder" />
+          <Format icon="book" label={t('content.read')} />
+          <Format icon="play" label={t('content.listen')} />
+          <Format icon="sparkle" label={t('content.watch')} />
         </View>
       </View>
     </PressableScale>

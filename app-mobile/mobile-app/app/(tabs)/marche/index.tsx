@@ -15,6 +15,7 @@ import { colors, typography } from '../../../src/theme/tokens';
 import { useRequireAccount } from '../../../src/auth/AccountWall';
 import { useAccess } from '../../../src/access/Access';
 import { Bone, FilterChips, PressableScale, ScreenHeader, SkeletonScreen } from '../../../src/ui/modern';
+import { useI18n } from '../../../src/i18n';
 
 type Filtre = MarketplaceCategorie | 'tous';
 
@@ -24,6 +25,7 @@ type Filtre = MarketplaceCategorie | 'tous';
  * fictif, état vide honnête avec invitation à ouvrir sa boutique.
  */
 export default function MarketScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const requireAccount = useRequireAccount();
   const { requireSubscription } = useAccess();
@@ -48,12 +50,12 @@ export default function MarketScreen() {
   const options = useMemo(() => {
     const present = new Set(products.map((p) => p.categorie));
     return [
-      { id: 'tous' as Filtre, label: 'Tous' },
+      { id: 'tous' as Filtre, label: t('market.all') },
       ...(Object.keys(MARKETPLACE_CATEGORIE_LABEL) as MarketplaceCategorie[])
         .filter((c) => present.has(c))
-        .map((c) => ({ id: c as Filtre, label: MARKETPLACE_CATEGORIE_LABEL[c] })),
+        .map((c) => ({ id: c as Filtre, label: t(`marketCat.${c}`) })),
     ];
-  }, [products]);
+  }, [products, t]);
 
   const hasQuery = query.trim().length > 0;
   const filtered = useMemo(() => {
@@ -80,15 +82,15 @@ export default function MarketScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <ScreenHeader
-          title="Marché"
-          subtitle="Artisanat authentique, en direct des artisans"
+          title={t('market.title')}
+          subtitle={t('market.subtitle')}
           right={
             <Pressable
               onPress={() => requireAccount(() => router.push('/marche/cart'), 'cart')}
               style={styles.cartBtn}
               hitSlop={8}
               accessibilityRole="button"
-              accessibilityLabel={`Panier, ${cart.count} article${cart.count > 1 ? 's' : ''}`}
+              accessibilityLabel={t('market.cartA11y', { count: cart.count })}
             >
               <Icon name="cart" size={20} color={colors.accentGoldPale} />
               {cart.count > 0 && (
@@ -101,14 +103,14 @@ export default function MarketScreen() {
         />
 
         <View style={styles.pad}>
-          <PressableScale onPress={openVendor} accessibilityLabel="Espace vendeur">
+          <PressableScale onPress={openVendor} accessibilityLabel={t('market.vendorSpace')}>
             <LinearGradient colors={['#3B2A12', '#1A130B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.vendor}>
               <View style={styles.vendorIcon}>
                 <Icon name="store" size={22} color={colors.accentGoldBright} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.vendorTitle}>Espace vendeur</Text>
-                <Text style={styles.vendorSub}>Vends tes créations sur AFROBACK</Text>
+                <Text style={styles.vendorTitle}>{t('market.vendorSpace')}</Text>
+                <Text style={styles.vendorSub}>{t('market.vendorSub')}</Text>
               </View>
               <Icon name="chevronRight" size={18} color={colors.accentGold} />
             </LinearGradient>
@@ -119,12 +121,12 @@ export default function MarketScreen() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Un produit, un artisan…"
+              placeholder={t('market.search')}
               placeholderTextColor={colors.textMuted}
               style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
             />
             {hasQuery && (
-              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel="Effacer">
+              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityLabel={t('market.clear')}>
                 <Text style={styles.clear}>✕</Text>
               </Pressable>
             )}
@@ -151,16 +153,16 @@ export default function MarketScreen() {
               <View style={styles.emptyIcon}>
                 <Icon name="store" size={30} color={colors.accentGoldBright} />
               </View>
-              <Text style={styles.emptyTitle}>{products.length === 0 ? 'Le marché ouvre bientôt' : 'Aucun résultat'}</Text>
+              <Text style={styles.emptyTitle}>{products.length === 0 ? t('market.opensSoon') : t('market.noResult')}</Text>
               <Text style={styles.emptyText}>
                 {products.length === 0
-                  ? 'Aucun produit pour l’instant. Sois le premier artisan à ouvrir sa boutique sur AFROBACK.'
-                  : 'Aucun produit ne correspond à ta recherche.'}
+                  ? t('market.emptyText')
+                  : t('market.noMatch')}
               </Text>
               {products.length === 0 && (
                 <Pressable style={styles.emptyCta} onPress={openVendor} accessibilityRole="button">
                   <Icon name="plus" size={16} color={colors.ctaTextOnGold} strokeWidth={2.6} />
-                  <Text style={styles.emptyCtaText}>Devenir vendeur</Text>
+                  <Text style={styles.emptyCtaText}>{t('market.becomeSeller')}</Text>
                 </Pressable>
               )}
             </View>

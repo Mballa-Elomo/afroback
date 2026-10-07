@@ -5,6 +5,7 @@ import { GoldButton } from '../../src/components/Buttons';
 import { StepHeader } from '../../src/onboarding/StepHeader';
 import { useWizardState } from '../../src/onboarding/WizardState';
 import { colors, typography } from '../../src/theme/tokens';
+import { useI18n } from '../../src/i18n';
 
 /**
  * Étape 2/5 de l'assistant post-inscription — fidèle à la maquette
@@ -16,6 +17,7 @@ import { colors, typography } from '../../src/theme/tokens';
  * (voir context/AFROBACK.md — ewondo/douala/bassa/bamiléké non traduits).
  */
 export default function LanguageStepScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { langueInterface, setLangueInterface } = useWizardState();
 
@@ -25,8 +27,8 @@ export default function LanguageStepScreen() {
         <ScrollView contentContainerStyle={styles.scroll}>
           <StepHeader step={1} total={1} onBack={() => router.back()} />
 
-          <Text style={styles.title}>Langue de l'interface</Text>
-          <Text style={styles.subtitle}>Tu pourras la changer à tout moment dans les paramètres.</Text>
+          <Text style={styles.title}>{t('languageStep.title')}</Text>
+          <Text style={styles.subtitle}>{t('languageStep.subtitle')}</Text>
 
           <View style={styles.list}>
             <LanguageRow
@@ -43,21 +45,21 @@ export default function LanguageStepScreen() {
             />
           </View>
 
-          <Text style={styles.sectionLabel}>LANGUES DU CAMEROUN</Text>
+          <Text style={styles.sectionLabel}>{t('languageStep.cameroon')}</Text>
           <View style={styles.list}>
             {['Ewondo', 'Douala', 'Bassa', 'Bamiléké'].map((label) => (
               <View key={label} style={[styles.row, styles.rowDisabled]}>
                 <Text style={styles.silhouette}>👤</Text>
                 <Text style={styles.rowLabelDisabled}>{label}</Text>
                 <View style={styles.badge}>
-                  <Text style={styles.badgeLabel}>TRADUCTION EN COURS</Text>
+                  <Text style={styles.badgeLabel}>{t('languageStep.inProgress')}</Text>
                 </View>
               </View>
             ))}
           </View>
 
           <View style={styles.cta}>
-            <GoldButton label="Continuer" onPress={() => router.push('/onboarding/usage')} />
+            <GoldButton label={t('common.continue')} onPress={() => router.push('/onboarding/usage')} />
           </View>
         </ScrollView>
       </SafeAreaView>

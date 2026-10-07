@@ -1,6 +1,8 @@
 import { supabase } from './supabaseClient';
 import type { Heros, VideoChapitre } from './types';
 import { getContentDetail } from './contentAccess';
+import i18n from '../i18n';
+import { HEROS_EN_COLUMNS, HEROS_EN_FIELDS, localize } from '../i18n/content';
 
 /**
  * Source de données réelle : table `heros` sur Supabase (voir
@@ -64,19 +66,32 @@ const HERO_CONTENT_DEFAULTS = {
 
 let cache: Heros[] | null = null;
 let inflight: Promise<Heros[]> | null = null;
+// Les textes en cache sont dans la langue du moment : on les relit après un changement de langue.
+i18n.on('languageChanged', () => {
+  cache = null;
+});
 
 async function fetchHeroes(): Promise<Heros[]> {
-  const { data, error } = await supabase
+  let { data, error }: { data: unknown; error: { message: string } | null } = await supabase
     .from('heros')
-    .select(HEROS_CATALOGUE)
+    .select(HEROS_CATALOGUE + HEROS_EN_COLUMNS)
     .order('ordre_affichage', { ascending: true });
+  if (error) {
+    // Colonne récente (avertissement_lecture_en) pas encore ouverte en lecture : on garde les autres colonnes anglaises.
+    ({ data, error } = await supabase
+      .from('heros')
+      .select(HEROS_CATALOGUE + HEROS_EN_COLUMNS.replace(',avertissement_lecture_en', ''))
+      .order('ordre_affichage', { ascending: true }));
+  }
+  if (error) {
+    ({ data, error } = await supabase.from('heros').select(HEROS_CATALOGUE).order('ordre_affichage', { ascending: true }));
+  }
   if (error) {
     throw new Error(`Impossible de charger les héros depuis Supabase : ${error.message}`);
   }
-  const heroes = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
-    ...HERO_CONTENT_DEFAULTS,
-    ...row,
-  })) as unknown as Heros[];
+  const heroes = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) =>
+    localize({ ...HERO_CONTENT_DEFAULTS, ...row }, HEROS_EN_FIELDS),
+  ) as unknown as Heros[];
   // Filtré côté client, pas dans la requête Supabase : reste compatible même
   // si backoffice/supabase/schema-admin-heros.sql n'a pas encore été exécuté
   // par Yannick (colonne absente -> traité comme publié, comportement
@@ -133,7 +148,7 @@ export async function getHeroBySlug(slug: string): Promise<Heros | undefined> {
   if (detail.verrouille) {
     return { ...base, acces: { verrouille: true, apercu_fr: detail.apercu_fr, apercu_en: detail.apercu_en } };
   }
-  const row = detail.row;
+  const row = localize(detail.row, HEROS_EN_FIELDS);
   return {
     ...base,
     ...(row as unknown as Heros),

@@ -16,6 +16,7 @@ import type { Heros } from '../../../src/data/types';
 import { LoadingState } from '../../../src/components/LoadingState';
 import { colors, typography } from '../../../src/theme/tokens';
 import { Icon } from '../../../src/components/Icons';
+import { useI18n } from '../../../src/i18n';
 
 type LeconRow = {
   lecon: EcoleLecon;
@@ -33,6 +34,7 @@ type LeconRow = {
  * aucun quiz ne peut être réussi — comportement attendu, pas un bug.
  */
 export default function EcoleLevelMapScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const { state } = useActiveProfile();
   const heroesState = useHeroesList();
@@ -97,7 +99,7 @@ export default function EcoleLevelMapScreen() {
   if (loading || heroesState.status === 'loading') {
     return (
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <LoadingState message="Ta carte se prépare..." />
+        <LoadingState message={t('schoolMap.loading')} />
       </SafeAreaView>
     );
   }
@@ -110,8 +112,8 @@ export default function EcoleLevelMapScreen() {
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
           <View style={styles.headerBody}>
-            <Text style={styles.tag}>ÉCOLE DES HÉROS</Text>
-            <Text style={styles.levelName}>{niveauInfo?.nom ?? `Niveau ${niveauActuel}`}</Text>
+            <Text style={styles.tag}>{t('kids.school')}</Text>
+            <Text style={styles.levelName}>{niveauInfo?.nom ?? t('kids.level', { n: niveauActuel })}</Text>
           </View>
           <Pressable onPress={() => router.push('/enfant/ecole/collection')} style={styles.collectionBtn}>
             <Text style={styles.collectionIcon}>🏅</Text>
@@ -127,7 +129,7 @@ export default function EcoleLevelMapScreen() {
 
         <View style={styles.path}>
           {rows.length === 0 && (
-            <Text style={styles.empty}>Ce niveau n'a pas encore de héros configuré.</Text>
+            <Text style={styles.empty}>{t('schoolMap.noHero')}</Text>
           )}
           {rows.map((row) => (
             <Pressable
@@ -150,7 +152,7 @@ export default function EcoleLevelMapScreen() {
               </View>
               <View style={styles.rowBody}>
                 <Text style={[styles.rowName, row.etat === 'verrouille' && styles.rowNameMuted]}>
-                  {row.heros?.nom_affiche ?? 'Héros à venir'}
+                  {row.heros?.nom_affiche ?? t('schoolMap.heroSoon')}
                 </Text>
                 <Text style={styles.rowSub}>{row.heros?.epoque ?? '—'}</Text>
               </View>
@@ -166,9 +168,9 @@ export default function EcoleLevelMapScreen() {
               <Text style={styles.medalIconLarge}>{finalReussi ? '🏆' : finalUnlocked ? '🚪' : '🔒'}</Text>
             </View>
             <View style={styles.rowBody}>
-              <Text style={[styles.rowName, !finalUnlocked && styles.rowNameMuted]}>Grand Quiz du niveau</Text>
+              <Text style={[styles.rowName, !finalUnlocked && styles.rowNameMuted]}>{t('schoolMap.bigQuiz')}</Text>
               <Text style={styles.rowSub}>
-                {finalUnlocked ? 'Débloque le niveau suivant' : 'Termine tous les héros du niveau'}
+                {finalUnlocked ? t('schoolMap.unlocks') : t('schoolMap.finishAll')}
               </Text>
             </View>
           </Pressable>

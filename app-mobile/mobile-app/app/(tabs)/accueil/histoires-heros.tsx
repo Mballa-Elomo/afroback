@@ -11,6 +11,7 @@ import { ERA_FILTERS, eraCategory, type EraCategory } from '../../../src/data/er
 import { colors, typography } from '../../../src/theme/tokens';
 import { Bone, FilterChips, PressableScale, ScreenHeader, SkeletonScreen } from '../../../src/ui/modern';
 import { useLikeCounts } from '../../../src/stats/contentStats';
+import { useI18n } from '../../../src/i18n';
 
 /**
  * Catalogue "Histoires & Héros" (refonte moderne du 2026-09-30) : en-tête,
@@ -19,6 +20,7 @@ import { useLikeCounts } from '../../../src/stats/contentStats';
  * de navigation basse visible.
  */
 export default function HistoiresHerosScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const heroesState = useHeroesList();
   const heroes = heroesState.status === 'ready' ? heroesState.data : [];
@@ -26,7 +28,7 @@ export default function HistoiresHerosScreen() {
   const likes = useLikeCounts('heros', heroes.map((h) => h.slug));
 
   const filtered = useMemo(
-    () => (eraFilter === 'tous' ? heroes : heroes.filter((h) => eraCategory(h.epoque) === eraFilter)),
+    () => (eraFilter === 'tous' ? heroes : heroes.filter((h) => eraCategory((h as { epoque_fr?: string }).epoque_fr ?? h.epoque) === eraFilter)),
     [heroes, eraFilter]
   );
 
@@ -41,26 +43,26 @@ export default function HistoiresHerosScreen() {
   const header = (
     <View>
       <ScreenHeader
-        title="Histoires & Héros"
-        subtitle={heroesState.status === 'ready' ? `${heroes.length} figures qui ont marqué l'Afrique` : undefined}
+        title={t('heroesList.title')}
+        subtitle={heroesState.status === 'ready' ? t('heroesList.count', { n: heroes.length }) : undefined}
         onBack={() => router.back()}
       />
       <View style={styles.pad}>
-        <PressableScale onPress={() => router.push('/accueil/mythologie')} accessibilityLabel="Mythologie africaine">
+        <PressableScale onPress={() => router.push('/accueil/mythologie')} accessibilityLabel={t('heroesList.myths')}>
           <LinearGradient colors={['#3B2A12', '#1A130B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.myth}>
             <View style={styles.mythIcon}>
               <Icon name="book" size={22} color={colors.accentGoldBright} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.mythTitle}>Mythologie africaine</Text>
-              <Text style={styles.mythSub}>Les mythes par peuple : lire, écouter, BD</Text>
+              <Text style={styles.mythTitle}>{t('heroesList.myths')}</Text>
+              <Text style={styles.mythSub}>{t('heroesList.mythsSub')}</Text>
             </View>
             <Icon name="chevronRight" size={18} color={colors.accentGold} />
           </LinearGradient>
         </PressableScale>
       </View>
       <View style={{ marginTop: 16, marginBottom: 14 }}>
-        <FilterChips options={ERA_FILTERS} value={eraFilter} onChange={setEraFilter} />
+        <FilterChips options={ERA_FILTERS.map((f) => ({ ...f, label: t(f.label) }))} value={eraFilter} onChange={setEraFilter} />
       </View>
     </View>
   );
@@ -95,7 +97,7 @@ export default function HistoiresHerosScreen() {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Icon name="compass" size={36} color={colors.accentGoldSoft} />
-              <Text style={styles.emptyBody}>Aucune histoire dans cette période pour l'instant.</Text>
+              <Text style={styles.emptyBody}>{t('heroesList.empty')}</Text>
             </View>
           }
         />

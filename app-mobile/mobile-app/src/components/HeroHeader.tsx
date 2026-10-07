@@ -6,6 +6,7 @@ import type { Heros } from '../data/types';
 import { colors, typography } from '../theme/tokens';
 import { BackButton } from '../ui/modern';
 import { Icon } from './Icons';
+import { useI18n } from '../i18n';
 
 function heroYears(heros: Heros) {
   const from = heros.annee_naissance_indicative;
@@ -25,6 +26,7 @@ function shortEra(epoque: string) {
  * thème en pastilles, nom en grand, années et région.
  */
 export function HeroHeader({ heros, onBack }: { heros: Heros; onBack: () => void }) {
+  const { t } = useI18n();
   const insets = useSafeAreaInsets();
   return (
     <View style={styles.wrap}>
@@ -56,7 +58,7 @@ export function HeroHeader({ heros, onBack }: { heros: Heros; onBack: () => void
           </View>
           {!!heros.theme[0] && (
             <View style={[styles.pill, styles.pillGold]}>
-              <Text style={[styles.pillText, styles.pillGoldText]}>{heros.theme[0]}</Text>
+              <Text style={[styles.pillText, styles.pillGoldText]}>{t(`heroTheme.${heros.theme[0]}`, { defaultValue: heros.theme[0] })}</Text>
             </View>
           )}
         </View>

@@ -1,4 +1,5 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import i18n from '../i18n';
 import { colors } from '../theme/tokens';
 
 /**
@@ -9,7 +10,7 @@ import { colors } from '../theme/tokens';
  */
 export function BootScreen() {
   return (
-    <View style={styles.wrap} accessibilityLabel="Chargement">
+    <View style={styles.wrap} accessibilityLabel={i18n.t('ui.loading')}>
       <ActivityIndicator size="large" color={colors.accentGoldBright} />
     </View>
   );

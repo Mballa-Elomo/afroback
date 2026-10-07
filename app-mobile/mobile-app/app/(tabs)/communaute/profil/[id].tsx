@@ -10,6 +10,7 @@ import type { CommunityPost, CommunityProfilePublic } from '../../../../src/data
 import { colors, spacing, typography } from '../../../../src/theme/tokens';
 import { ProfileAvatar, presetKey } from '../../../../src/components/ProfileAvatar';
 import { Icon } from '../../../../src/components/Icons';
+import { useI18n } from '../../../../src/i18n';
 
 type State =
   | { status: 'loading' }
@@ -27,6 +28,7 @@ type State =
  * dans le modèle de données.
  */
 export default function MemberProfileScreen() {
+  const { t } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [state, setState] = useState<State>({ status: 'loading' });
@@ -89,7 +91,7 @@ export default function MemberProfileScreen() {
           <Text style={styles.statLabel}>Post{posts.length > 1 ? 's' : ''} publié{posts.length > 1 ? 's' : ''}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>PUBLICATIONS RÉCENTES</Text>
+        <Text style={styles.sectionTitle}>{t('member.recentPosts')}</Text>
         <View style={styles.list}>
           {posts.map((p) => (
             <Pressable key={p.id} style={styles.postCard} onPress={() => router.push(`/communaute/post/${p.id}`)}>
@@ -98,7 +100,7 @@ export default function MemberProfileScreen() {
               </Text>
             </Pressable>
           ))}
-          {posts.length === 0 && <Text style={styles.empty}>Ce membre n'a encore rien publié.</Text>}
+          {posts.length === 0 && <Text style={styles.empty}>{t('member.none')}</Text>}
         </View>
       </ScrollView>
     </SafeAreaView>

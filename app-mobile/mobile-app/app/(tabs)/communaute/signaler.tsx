@@ -12,13 +12,14 @@ import { colors, radii, spacing, typography } from '../../../src/theme/tokens';
 import { withAccount } from '../../../src/auth/AccountWall';
 import { withSubscription } from '../../../src/access/Access';
 import { Icon } from '../../../src/components/Icons';
+import { useI18n } from '../../../src/i18n';
 
 const REASONS: { id: CommunityReportMotif; label: string }[] = [
-  { id: 'contenu_inapproprie', label: 'Contenu inapproprié' },
-  { id: 'harcelement', label: 'Harcèlement ou intimidation' },
-  { id: 'desinformation', label: 'Désinformation' },
-  { id: 'spam', label: 'Spam ou publicité' },
-  { id: 'autre', label: 'Autre' },
+  { id: 'contenu_inapproprie', label: 'report.m_contenu_inapproprie' },
+  { id: 'harcelement', label: 'report.m_harcelement' },
+  { id: 'desinformation', label: 'report.m_desinformation' },
+  { id: 'spam', label: 'report.m_spam' },
+  { id: 'autre', label: 'report.m_autre' },
 ];
 
 /**
@@ -28,6 +29,7 @@ const REASONS: { id: CommunityReportMotif; label: string }[] = [
  * le message de confirmation reste honnête sur l'absence de suivi visible.
  */
 function ReportScreen() {
+  const { t } = useI18n();
   const { targetType, targetId, label } = useLocalSearchParams<{
     targetType: CommunityReportTargetType;
     targetId: string;
@@ -69,18 +71,17 @@ function ReportScreen() {
           <Pressable onPress={() => router.back()} hitSlop={10}>
             <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
           </Pressable>
-          <Text style={styles.title}>Signaler</Text>
+          <Text style={styles.title}>{t('report.title')}</Text>
         </View>
 
         {sent ? (
           <View style={styles.thanks}>
             <Text style={styles.thanksIcon}>🛡️</Text>
-            <Text style={styles.thanksTitle}>Merci pour ton signalement</Text>
+            <Text style={styles.thanksTitle}>{t('report.thanks')}</Text>
             <Text style={styles.thanksSub}>
-              Notre équipe va l'examiner. Pour rester simple au démarrage, il n'y a pas encore de suivi visible dans
-              l'app — mais chaque signalement est bien traité.
+              {t('report.thanksSub')}
             </Text>
-            <GhostButton label="Retour au fil" onPress={() => router.replace('/communaute')} />
+            <GhostButton label={t('report.backFeed')} onPress={() => router.replace('/communaute')} />
           </View>
         ) : ownProfileState.status === 'ready' && !ownProfileState.data ? (
           <CreateProfileForm onCreated={refreshOwnProfile} />
@@ -88,20 +89,20 @@ function ReportScreen() {
           <>
             {label && (
               <View style={styles.contextBox}>
-                <Text style={styles.contextLabel}>Tu signales :</Text>
+                <Text style={styles.contextLabel}>{t('report.youReport')}</Text>
                 <Text style={styles.contextText} numberOfLines={2}>
                   {label}
                 </Text>
               </View>
             )}
-            <Text style={styles.intro}>Pourquoi signales-tu ce contenu ?</Text>
+            <Text style={styles.intro}>{t('report.why')}</Text>
             <View style={styles.reasons}>
               {REASONS.map((r) => {
                 const active = motif === r.id;
                 return (
                   <Pressable key={r.id} onPress={() => setMotif(r.id)} style={[styles.reason, active && styles.reasonActive]}>
                     <View style={[styles.radio, active && styles.radioActive]} />
-                    <Text style={styles.reasonLabel}>{r.label}</Text>
+                    <Text style={styles.reasonLabel}>{t(r.label)}</Text>
                   </Pressable>
                 );
               })}
@@ -109,13 +110,13 @@ function ReportScreen() {
             <TextInput
               value={description}
               onChangeText={setDescription}
-              placeholder="Précise si besoin (optionnel)..."
+              placeholder={t('report.detailsPh')}
               placeholderTextColor={colors.textMuted}
               style={styles.description}
               multiline
               maxLength={500}
             />
-            <GoldButton label={sending ? 'Envoi...' : 'Envoyer le signalement'} onPress={send} />
+            <GoldButton label={sending ? t('report.sending') : t('report.send')} onPress={send} />
           </>
         )}
       </ScrollView>

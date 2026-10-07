@@ -24,7 +24,7 @@ export default function HistoireEnfantScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const herosState = useHero(slug);
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
 
   if (herosState.status === 'loading') {
     return (
@@ -59,7 +59,7 @@ export default function HistoireEnfantScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <Pressable onPress={() => router.back()} hitSlop={10}>
-          <Text style={styles.back}>‹ Retour</Text>
+          <Text style={styles.back}>{t('kids.back')}</Text>
         </Pressable>
 
         <HeroPlaceholder style={styles.portrait} radius={22} imageUrl={heros.image_carte_catalogue} />
@@ -71,7 +71,7 @@ export default function HistoireEnfantScreen() {
         <Text style={styles.resume}>{heros.resume_catalogue}</Text>
 
         <View style={styles.note}>
-          <Text style={styles.noteText}>Demande à un parent de te raconter l'histoire complète !</Text>
+          <Text style={styles.noteText}>{t('kidStory.askParent')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

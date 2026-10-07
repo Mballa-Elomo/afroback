@@ -11,6 +11,7 @@ import { DECOUVERTE_TYPE_LABEL } from '../src/data/decouverteDisplay';
 import type { ContentType } from '../src/data/contentAccess';
 import { colors, typography } from '../src/theme/tokens';
 import { Icon } from '../src/components/Icons';
+import i18n, { useI18n } from '../src/i18n';
 
 /**
  * Recherche globale (2026-09-30, retour de Yannick : "la recherche ne
@@ -30,9 +31,9 @@ interface Result {
 }
 
 const SECTIONS: { type: ContentType; label: string }[] = [
-  { type: 'heros', label: 'Héros' },
-  { type: 'mythe', label: 'Mythologie' },
-  { type: 'decouverte', label: 'Découverte' },
+  { type: 'heros', label: 'search.heroes' },
+  { type: 'mythe', label: 'search.myths' },
+  { type: 'decouverte', label: 'search.discovery' },
 ];
 
 function normalize(s: string | null | undefined): string {
@@ -43,6 +44,7 @@ function normalize(s: string | null | undefined): string {
 }
 
 export default function RechercheScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const [query, setQuery] = useState('');
   const heroesState = useHeroesList();
@@ -88,10 +90,10 @@ export default function RechercheScreen() {
           type: 'decouverte',
           slug: it.slug,
           title: it.titre,
-          subtitle: [DECOUVERTE_TYPE_LABEL[it.type], it.region_ethnie].filter(Boolean).join(' · '),
+          subtitle: [i18n.t(`decouverteType.${it.type}`), it.region_ethnie].filter(Boolean).join(' · '),
           image: it.image_url,
           href: `/decouverte/${it.slug}`,
-          haystack: normalize([it.titre, it.sous_titre, it.resume_liste, it.region_ethnie, it.pays, DECOUVERTE_TYPE_LABEL[it.type]].join(' ')),
+          haystack: normalize([it.titre, it.sous_titre, it.resume_liste, it.region_ethnie, it.pays, DECOUVERTE_TYPE_LABEL[it.type], i18n.t(`decouverteType.${it.type}`)].join(' ')),
         });
       }
     }
@@ -110,7 +112,7 @@ export default function RechercheScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button" accessibilityLabel="Retour">
+        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('search.back')}>
           <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
         </Pressable>
         <View style={styles.searchBox}>
@@ -118,17 +120,17 @@ export default function RechercheScreen() {
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="Un héros, un mythe, un lieu, un objet…"
+            placeholder={t('search.placeholder')}
             placeholderTextColor={colors.textMuted}
             // Web : retire le contour bleu du navigateur autour du champ.
             style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
             autoFocus
             autoCorrect={false}
             returnKeyType="search"
-            accessibilityLabel="Rechercher"
+            accessibilityLabel={t('search.search')}
           />
           {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Effacer">
+            <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('search.clear')}>
               <Text style={styles.clear}>✕</Text>
             </Pressable>
           )}
@@ -138,14 +140,14 @@ export default function RechercheScreen() {
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         {words.length === 0 ? (
           <View style={styles.hint}>
-            <Text style={styles.hintTitle}>Que cherches-tu ?</Text>
+            <Text style={styles.hintTitle}>{t('search.what')}</Text>
             <Text style={styles.hintText}>
-              Exemples : Njoya, Nzinga, Foumban, Bamoun, masque, indépendance…
+              {t('search.examples')}
             </Text>
-            {loading && <Text style={styles.hintText}>Chargement du catalogue…</Text>}
+            {loading && <Text style={styles.hintText}>{t('search.loadingCatalogue')}</Text>}
           </View>
         ) : results.length === 0 ? (
-          <Text style={styles.empty}>{loading ? 'Recherche en cours…' : `Aucun résultat pour « ${query.trim()} ».`}</Text>
+          <Text style={styles.empty}>{loading ? t('search.searching') : t('search.none', { q: query.trim() })}</Text>
         ) : (
           <>
             <Text style={styles.count}>
@@ -156,7 +158,7 @@ export default function RechercheScreen() {
               if (items.length === 0) return null;
               return (
                 <View key={type} style={styles.section}>
-                  <Text style={styles.sectionTitle}>{label.toUpperCase()}</Text>
+                  <Text style={styles.sectionTitle}>{t(label).toUpperCase()}</Text>
                   <View style={styles.card}>
                     {items.map((r, i) => (
                       <Pressable

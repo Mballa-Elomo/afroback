@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
+import i18n from '../i18n';
 
 /**
  * Identité de l'appareil (cdc-appareil-unique.md) : un identifiant aléatoire
@@ -37,8 +38,8 @@ export async function getDeviceId(): Promise<string> {
 
 /** Nom lisible pour l'email d'alerte ("Chrome sur Windows", "iPhone"…). */
 export function getDeviceName(): string {
-  if (Platform.OS === 'ios') return 'iPhone ou iPad';
-  if (Platform.OS === 'android') return 'Téléphone Android';
+  if (Platform.OS === 'ios') return i18n.t('device.nameIos');
+  if (Platform.OS === 'android') return i18n.t('device.nameAndroid');
   const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
   const browser = /Edg\//.test(ua)
     ? 'Edge'
@@ -50,7 +51,7 @@ export function getDeviceName(): string {
           ? 'Firefox'
           : /Safari\//.test(ua)
             ? 'Safari'
-            : 'Navigateur';
+            : i18n.t('device.nameBrowser');
   const os = /Windows/.test(ua)
     ? 'Windows'
     : /iPhone|iPad/.test(ua)
@@ -62,7 +63,7 @@ export function getDeviceName(): string {
           : /Linux/.test(ua)
             ? 'Linux'
             : 'web';
-  return `${browser} sur ${os}`;
+  return i18n.t('device.nameWeb', { browser, os });
 }
 
 /** "yannick@gmail.com" → "y•••••k@gmail.com" : montre à qui le code part, sans exposer l'adresse. */

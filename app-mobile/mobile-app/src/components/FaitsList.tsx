@@ -3,6 +3,7 @@ import type { AffirmationStatuee, StatutFactuel } from '../data/decouverteTypes'
 import { STATUT_FACTUEL_LABEL } from '../data/decouverteDisplay';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { SectionTitle } from './SectionTitle';
+import { useI18n } from '../i18n';
 
 const STATUT_COLOR: Record<StatutFactuel, string> = {
   atteste: colors.accentGoldSoft,
@@ -20,10 +21,11 @@ const STATUT_COLOR: Record<StatutFactuel, string> = {
  * qui ne mènerait nulle part.
  */
 export function FaitsList({ faits }: { faits: AffirmationStatuee[] }) {
+  const { t } = useI18n();
   if (faits.length === 0) return null;
   return (
     <View style={styles.section}>
-      <SectionTitle title="Faits" />
+      <SectionTitle title={t('facts.title')} />
       {faits.map((f, i) => {
         // `f.statut` vient d'un fichier markdown édité à la main par l'agent
         // afroback-decouverte : une valeur hors des 3 statuts attendus (vue
@@ -32,7 +34,7 @@ export function FaitsList({ faits }: { faits: AffirmationStatuee[] }) {
         // l'app — repli honnête sur la valeur brute plutôt qu'un statut
         // inventé, en attendant la correction de la fiche source.
         const color = STATUT_COLOR[f.statut] ?? colors.textMuted;
-        const label = STATUT_FACTUEL_LABEL[f.statut]?.toUpperCase() ?? f.statut.toUpperCase();
+        const label = (['atteste', 'tradition_orale', 'debattu'].includes(f.statut) ? t(`factStatus.${f.statut}`) : f.statut).toUpperCase();
         return (
           <View key={i} style={styles.row}>
             <Text style={[styles.bullet, { color }]}>◆</Text>

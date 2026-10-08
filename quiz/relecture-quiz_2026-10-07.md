@@ -422,18 +422,18 @@ A. Whether he was a collaborator or a pragmatic builder ✅ / B. The place of hi
 - C. Évangéliste
 - D. Médecin ✅
 
-*Explication :* Formé à Dakar dans les filières réservées aux auxiliaires africains, il revient en 1947 comme médecin colonial à l'hôpital de Lolodorf.
+*Explication :* Formé à Dakar dans les filières réservées aux auxiliaires africains, il revient en 1947 comme médecin colonial, affecté dans le sud du pays.
 
-*Récit (chapitre 1) :* « En 1947, Moumié revient au pays comme médecin colonial et rejoint l'hôpital de Lolodorf, près de Kribi. »
+*Récit (chapitre 1) :* « affecté dans le sud, à Lolodorf selon certaines sources, à Kribi selon d'autres. C'est à Kribi […] que sa vie bascule : il y rencontre Ruben Um Nyobè. » (récit corrigé le 2026-10-08)
 
 **Q2. Dans quelle ville Moumié rencontre-t-il Ruben Um Nyobè ?**
 
-- A. Lolodorf ✅
+- A. Kribi ✅
 - B. Douala
 - C. Dschang
 - D. Foumban
 
-*Explication :* C'est à Lolodorf, près de Kribi, que sa vie bascule : il y rencontre Um Nyobè, puis rejoint l'UPC, fondée à Douala en 1948.
+*Explication :* C'est à Kribi, petite ville côtière du sud, que sa vie bascule : il y rencontre Um Nyobè, puis rejoint l'UPC, fondée à Douala en 1948.
 
 *Récit (chapitre 1) :* « C'est là, dans cette petite ville du sud, que sa vie bascule : il y rencontre Ruben Um Nyobè. »
 
@@ -474,11 +474,11 @@ A. Whether he was a collaborator or a pragmatic builder ✅ / B. The place of hi
 
 **Q1. What was Félix Moumié's profession when he returned home in 1947?**  
 A. Teacher / B. Nurse / C. Evangelist / D. Physician ✅  
-*Trained in Dakar in the tracks reserved for African auxiliaries, he returned in 1947 as a colonial physician at the hospital of Lolodorf.*
+*Trained in Dakar in the tracks reserved for African auxiliaries, he returned in 1947 as a colonial physician, posted to the south of the country.*
 
 **Q2. In which town did Moumié meet Ruben Um Nyobè?**  
-A. Lolodorf ✅ / B. Douala / C. Dschang / D. Foumban  
-*It was in Lolodorf, near Kribi, that his life changed: he met Um Nyobè there, then joined the UPC, founded in Douala in 1948.*
+A. Kribi ✅ / B. Douala / C. Dschang / D. Foumban  
+*It was in Kribi, a small coastal town in the south, that his life changed: he met Um Nyobè there, then joined the UPC, founded in Douala in 1948.*
 
 **Q3. In exile in British Cameroons, what did the 'One Kamerun' movement co-founded by Moumié call for?**  
 A. The return of Cameroon to German rule / B. Independence for British Cameroons alone / C. The reunification of the two Cameroons ✅ / D. The union of Cameroon with Nigeria  

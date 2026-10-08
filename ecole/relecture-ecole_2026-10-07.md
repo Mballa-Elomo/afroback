@@ -877,7 +877,7 @@ Félix-Roland Moumié naît le 1er novembre 1925 à l'hôpital protestant de Nji
 
 À une époque où très peu d'enfants africains font des études, il réussit brillamment : l'école régionale de Dschang, puis l'école Édouard-Renard de Brazzaville en 1941. En 1945, il part à Dakar se former comme médecin. L'administration coloniale forme une poignée d'Africains pour en faire ses auxiliaires. Mais ce genre de formation produit parfois l'inverse : des hommes qui voient de l'intérieur comment fonctionne le système, et qui décident de le combattre.
 
-En 1947, Moumié devient médecin à l'hôpital de Lolodorf, près de Kribi, et rencontre Ruben Um Nyobè. Il rejoint l'Union des Populations du Cameroun (UPC), fondée en 1948. Son ascension est rapide : vice-président en 1950, il est élu président du parti en 1952, au congrès d'Éséka. Um Nyobè reste le stratège sur le terrain ; Moumié devient la voix qui porte le message au-delà des frontières.
+En 1947, Moumié devient médecin dans le sud du pays. À Kribi, petite ville de la côte, il rencontre Ruben Um Nyobè. Il rejoint l'Union des Populations du Cameroun (UPC), fondée en 1948. Son ascension est rapide : vice-président en 1950, il est élu président du parti en 1952, au congrès d'Éséka. Um Nyobè reste le stratège sur le terrain ; Moumié devient la voix qui porte le message au-delà des frontières.
 
 Le 22 mai 1955, l'UPC adopte son emblème, un crabe noir sur fond rouge. Quelques jours plus tard, des manifestations sont violemment réprimées, à Douala et ailleurs ; le nombre exact de morts reste discuté, mais l'ampleur du drame ne l'est pas. Le 13 juillet, l'UPC est interdite. Moumié passe au Cameroun britannique : c'est le début de cinq années d'exil.
 
@@ -899,7 +899,7 @@ Le 16 décembre 1991, le Cameroun le proclame héros national. Moumié n'a pas e
 - Médecin ✅
 - Journaliste
 
-> Le savais-tu ? À Dakar, il est formé comme médecin. En 1947, il exerce à l'hôpital de Lolodorf, près de Kribi.
+> Le savais-tu ? À Dakar, il est formé comme médecin. En 1947, il devient médecin dans le sud du pays, où il rencontre Um Nyobè à Kribi.
 
 **2. Que réclame le mouvement « One Kamerun » cofondé par Moumié ?**
 - L'union avec le Nigeria
@@ -940,7 +940,7 @@ Félix-Roland Moumié is born on 1 November 1925 at the Protestant hospital in N
 
 At a time when very few African children go on to study, he does brilliantly: the regional school in Dschang, then the Édouard-Renard school in Brazzaville in 1941. In 1945, he goes to Dakar to train as a doctor. The colonial administration trains a handful of Africans to become its assistants. But this kind of training sometimes produces the opposite: men who see from the inside how the system works, and who decide to fight it.
 
-In 1947, Moumié becomes a doctor at the hospital in Lolodorf, near Kribi, and meets Ruben Um Nyobè. He joins the Union of the Peoples of Cameroon (UPC), founded in 1948. He rises fast: vice-president in 1950, he is elected president of the party in 1952, at the Éséka congress. Um Nyobè remains the strategist on the ground; Moumié becomes the voice that carries the message beyond the borders.
+In 1947, Moumié becomes a doctor in the south of the country. In Kribi, a small coastal town, he meets Ruben Um Nyobè. He joins the Union of the Peoples of Cameroon (UPC), founded in 1948. He rises fast: vice-president in 1950, he is elected president of the party in 1952, at the Éséka congress. Um Nyobè remains the strategist on the ground; Moumié becomes the voice that carries the message beyond the borders.
 
 On 22 May 1955, the UPC adopts its emblem, a black crab on a red background. A few days later, demonstrations are violently put down, in Douala and elsewhere; the exact number of dead is still debated, but the scale of the tragedy is not. On 13 July, the UPC is banned. Moumié crosses into British Cameroon: it is the start of five years of exile.
 
@@ -957,7 +957,7 @@ On 16 December 1991, Cameroon proclaims him a national hero. Moumié did not nee
 _Quiz_
 
 1. Which profession does Félix Moumié train for in Dakar? : Teacher / Lawyer / Doctor ✅ / Journalist  
-   _Did you know?_ In Dakar, he trains as a doctor. In 1947, he works at the hospital in Lolodorf, near Kribi.
+   _Did you know?_ In Dakar, he trains as a doctor. In 1947, he becomes a doctor in the south, where he meets Um Nyobè in Kribi.
 2. What does the "One Kamerun" movement co-founded by Moumié call for? : Union with Nigeria / The reunification of the two Cameroons ✅ / Germany's return / A king for the whole country  
    _Did you know?_ From British Cameroon, Moumié co-founds "One Kamerun" to reunite the two Cameroons split by colonial rule.
 3. Who does Moumié become friends with in Accra in 1958? : Frantz Fanon ✅ / Patrice Lumumba / Ahmadou Ahidjo / William Bechtel  

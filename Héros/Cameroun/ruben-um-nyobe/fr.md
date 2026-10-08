@@ -1,6 +1,6 @@
 # Ruben Um Nyobè (le Mpodol)
 
-Fondateur et secrétaire général de l'Union des Populations du Cameroun (UPC), figure centrale de la lutte pour l'indépendance et la réunification du Cameroun, tué par l'armée française le 13 septembre 1958.
+Secrétaire général et principal dirigeant de l'Union des Populations du Cameroun (UPC), figure centrale de la lutte pour l'indépendance et la réunification du Cameroun, tué par l'armée française le 13 septembre 1958.
 
 ---
 
@@ -8,7 +8,7 @@ Fondateur et secrétaire général de l'Union des Populations du Cameroun (UPC),
 
 Écoute.
 
-Le 10 avril 1913, dans un pays qu'on appelle encore Kamerun et qui vient tout juste de changer de maître colonial, l'Allemagne ayant cédé la place à la France et à l'Angleterre au sortir de la Première Guerre mondiale, un enfant naît au village de Song Mpeck, non loin de Boumnyébel, en pays bassa, à quelques heures de marche d'Éséka. Ses parents, Nyobé Nsounga et Ngo Um Nonos, sont des paysans. Rien, à sa naissance, n'annonce qu'un jour tout un peuple l'appellera Mpodol, celui qui porte la parole des siens.
+Le 10 avril 1913, dans un pays qu'on appelle encore Kamerun, colonie allemande depuis 1884, et qui changera bientôt de maître colonial, l'Allemagne devant céder la place à la France et à l'Angleterre au sortir de la Première Guerre mondiale, un enfant naît au village de Song Mpeck, non loin de Boumnyébel, en pays bassa, à quelques heures de marche d'Éséka. Ses parents, Nyobé Nsounga et Ngo Um Nonos, sont des paysans. Rien, à sa naissance, n'annonce qu'un jour tout un peuple l'appellera Mpodol, celui qui porte la parole des siens.
 
 Il grandit dans les écoles de la mission presbytérienne, apprend à lire, à écrire, à compter dans la langue du colonisateur. Il met du temps à obtenir son baccalauréat, à vingt-six ans, à Édéa, pendant qu'il travaille déjà comme employé aux greffes des tribunaux. Imagine ce poste : un jeune Bassa assis chaque jour au cœur même de la machine judiciaire coloniale, à voir défiler les dossiers, les peines, les injustices infligées à ses frères par un droit qui n'est pas taillé pour eux. C'est là, dans ces couloirs de tribunaux, bien plus que dans n'importe quel livre, qu'Um Nyobè apprend ce que veut vraiment dire être colonisé.
 
@@ -30,7 +30,7 @@ Le 13 septembre 1958, après des mois de traque menée par le capitaine Agostini
 
 Cela n'a pas suffi. Deux ans plus tard, le 3 novembre 1960, Félix Moumié, qui avait succédé à Um Nyobè à la tête de l'UPC, meurt à son tour à Genève, empoisonné au thallium par un agent des services secrets français, William Bechtel, qui ne sera jamais réellement condamné. La lutte upéciste se poursuivra dans les maquis camerounais jusqu'au début des années 1970.
 
-Et pourtant, pendant plus de trente ans, au Cameroun même, prononcer le nom de Ruben Um Nyobè était interdit. La France a longtemps nié toute implication : en 2009, un Premier ministre français affirmera encore « nier absolument » toute participation de l'armée française à ces assassinats. Ce n'est qu'en 1991 que les choses commencent à changer : le 27 juin, l'Assemblée nationale camerounaise le proclame héros national, et le 16 décembre, la loi n°91/022 lève officiellement l'interdiction pesant sur sa mémoire, reconnaissant qu'il a « œuvré pour la naissance du sentiment national, l'indépendance ou la construction du pays ». En 2007, une statue de six mètres, posée sur un socle de cinq mètres, vingt tonnes de béton en tout, est inaugurée à Éséka, en son honneur, même si les autorités camerounaises se sont notablement fait discrètes ce jour-là.
+Et pourtant, pendant plus de trente ans, au Cameroun même, prononcer le nom de Ruben Um Nyobè était interdit. La France a longtemps nié toute implication : en 2009, un Premier ministre français affirmera encore « nier absolument » toute participation de l'armée française à ces assassinats. Ce n'est qu'en 1991 que les choses commencent à changer : le 16 décembre, la loi n°91/022, adoptée par l'Assemblée nationale camerounaise et promulguée par le président Paul Biya, le réhabilite officiellement et lève l'interdiction pesant sur sa mémoire, reconnaissant qu'il a « œuvré pour la naissance du sentiment national, l'indépendance ou la construction du pays ». Il est depuis honoré comme héros national. En 2007, une statue de six mètres, posée sur un socle de cinq mètres, vingt tonnes de béton en tout, est inaugurée à Éséka, en son honneur, même si les autorités camerounaises se sont notablement fait discrètes ce jour-là.
 
 Il aura fallu attendre 2025 pour que la France elle-même reconnaisse officiellement sa responsabilité. Une commission mixte d'historiens franco-camerounais, installée en 2022 lors d'une visite d'Emmanuel Macron à Yaoundé et dirigée par la chercheuse Karine Ramondy, a remis un rapport de mille pages sur les exactions commises entre 1945 et 1971, transmis au président français le 21 janvier 2025 puis au président camerounais Paul Biya le 28 janvier. Le 30 juillet 2025, dans une lettre adressée à Paul Biya, Emmanuel Macron a reconnu la responsabilité de la France dans la mort de Ruben Um Nyobè et d'autres dirigeants indépendantistes tués entre 1958 et 1960 lors d'opérations menées sous commandement français. Soixante-sept ans après sa mort dans la forêt de Boumnyébel, un État français a enfin dit, noir sur blanc, ce que le peuple camerounais savait depuis toujours.
 
@@ -54,7 +54,7 @@ Voilà ce que fut la vie du Mpodol : un fils de paysans devenu greffier, puis sy
 - 17 décembre 1952 (puis 1953 et 1954) : discours devant la Quatrième Commission de l'Assemblée générale de l'ONU, réclamant la révision des accords de tutelle, la réunification du Cameroun et un calendrier de dix ans vers l'indépendance
 - 13 juillet 1955 : décret du haut-commissaire Roland Pré dissolvant l'UPC après les émeutes de mai 1955 ; les dirigeants partent en exil, Um Nyobè entre dans la clandestinité au Cameroun
 - 13 septembre 1958 : tué par l'armée française près de Boumnyébel (lieu-dit Libog Li Ngoi), à 45 ans, après une traque menée par le capitaine Agostini et l'inspecteur Georges Conan ; son corps est mutilé et photographié par l'armée avant d'être enterré anonymement le 15 septembre dans un bloc de béton
-- 27 juin puis 16 décembre 1991 : proclamé héros national par l'Assemblée nationale camerounaise, puis réhabilité par la loi n°91/022 mettant fin à l'interdiction de mentionner son nom
+- 16 décembre 1991 : réhabilité par la loi n°91/022, adoptée par l'Assemblée nationale camerounaise et promulguée par le président Paul Biya, qui met fin à l'interdiction de mentionner son nom ; honoré depuis comme héros national
 - 30 juillet 2025 : la France, par une lettre du président Emmanuel Macron à Paul Biya, reconnaît officiellement sa responsabilité dans la mort de Um Nyobè et d'autres dirigeants indépendantistes camerounais
 
 **Citations marquantes**
@@ -86,3 +86,5 @@ Aucune légende populaire distincte (exploit surnaturel, tradition orale enjoliv
 - Ernest Ouandié, dirigeant historique de l'UPC, poursuivra la lutte armée dans le maquis jusqu'à son exécution en 1971
 - Isaac Nyobè Pandjock et Jérémie Ndéléné, dirigeants indépendantistes camerounais tués entre 1958 et 1960, cités aux côtés d'Um Nyobè dans la reconnaissance officielle française de 2025
 - Martin Paul Samba, chef bulu et résistant à la colonisation allemande, déjà couvert dans le pilier Histoires & Héros pour le même thème de résistance à la domination coloniale au Cameroun
+
+> Corrections factuelles du 2026-10-08 (dates, rôle de Ruben Um Nyobè dans l'UPC, loi n° 91/022) : voir `Héros/Cameroun/corrections_2026-10-08.md`, sources citées.

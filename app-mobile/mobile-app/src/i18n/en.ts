@@ -913,6 +913,9 @@ const en: Translation = {
     unlocked: '{{done}} of {{total}} heroes unlocked',
   },
   lesson: {
+    play: "Listen to the story",
+    pause: 'Pause',
+    listening: 'The griot is telling…',
     read: 'Read',
     listen: 'Listen',
     watch: 'Watch',

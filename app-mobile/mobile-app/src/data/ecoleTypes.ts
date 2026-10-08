@@ -32,6 +32,8 @@ export interface EcoleLecon {
   /** Version anglaise (schema-ecole-contenu.sql) ; repli sur le français si absente. */
   texte_adapte_en?: string | null;
   narration_audio_url: string | null;
+  /** Narration anglaise (prévue, schema-ecole-audio.sql) ; repli sur le français. */
+  narration_audio_url_en?: string | null;
   video_url: string | null;
   bd_planches: BdPlanche[];
   created_at: string;

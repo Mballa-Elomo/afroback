@@ -916,6 +916,9 @@ const fr = {
     unlocked: '{{done}} sur {{total}} héros débloqués',
   },
   lesson: {
+    play: "Écouter l'histoire",
+    pause: 'Pause',
+    listening: 'Le griot raconte…',
     read: 'Lire',
     listen: 'Écouter',
     watch: 'Regarder',

@@ -50,7 +50,8 @@ export default function LeconPage({ params }: { params: Promise<{ id: string }> 
 
   const planches = [...(l.bd_planches ?? [])].sort((a, b) => a.ordre - b.ordre);
   const texte = (lang === 'en' && l.texte_adapte_en) || l.texte_adapte;
-  const has: Record<Format, boolean> = { lire: !!texte, ecouter: !!l.narration_audio_url, regarder: !!l.video_url, bd: planches.length > 0 };
+  const audio = (lang === 'en' && l.narration_audio_url_en) || l.narration_audio_url;
+  const has: Record<Format, boolean> = { lire: !!texte, ecouter: !!audio, regarder: !!l.video_url, bd: planches.length > 0 };
   const canQuiz = Object.values(has).some(Boolean);
 
   return (
@@ -86,7 +87,7 @@ export default function LeconPage({ params }: { params: Promise<{ id: string }> 
           (has.ecouter ? (
             <div className="rounded-[28px] bg-white/8 p-7 text-center">
               <p className="text-lg font-black text-white">{tr('Narration pour les enfants', 'Narration for children')}</p>
-              <audio controls src={l.narration_audio_url!} className="mt-5 w-full" />
+              <audio controls src={audio!} className="mt-5 w-full" />
             </div>
           ) : (
             <Soon icon="🎧" />

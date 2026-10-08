@@ -11,6 +11,7 @@ import { LoadingState } from '../../../../src/components/LoadingState';
 import { colors, typography } from '../../../../src/theme/tokens';
 import { Icon } from '../../../../src/components/Icons';
 import { useI18n } from '../../../../src/i18n';
+import { LessonAudio } from '../../../../src/ecole/LessonAudio';
 
 const FORMATS: { id: EcoleFormat; icon: string; label: string }[] = [
   { id: 'lire', icon: '📖', label: 'lesson.read' },
@@ -77,7 +78,8 @@ export default function EcoleLeconScreen() {
 
   const texte = (lang === 'en' && lecon.texte_adapte_en) || lecon.texte_adapte;
   const hasTexte = !!texte;
-  const hasAudio = !!lecon.narration_audio_url;
+  const audio = (lang === 'en' && lecon.narration_audio_url_en) || lecon.narration_audio_url;
+  const hasAudio = !!audio;
   const hasVideo = !!lecon.video_url;
   const hasBd = lecon.bd_planches.length > 0;
   const canQuiz = hasTexte || hasAudio || hasVideo || hasBd;
@@ -129,12 +131,7 @@ export default function EcoleLeconScreen() {
           )}
           {format === 'ecouter' && (
             hasAudio ? (
-              <View style={styles.audioCenter}>
-                <View style={styles.audioButton}>
-                  <Text style={styles.audioIcon}>▶</Text>
-                </View>
-                <Text style={styles.audioLabel}>{t('lesson.narration')}</Text>
-              </View>
+              <LessonAudio uri={audio as string} />
             ) : (
               <SoonState icon="🎧" />
             )

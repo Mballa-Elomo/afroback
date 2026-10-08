@@ -150,6 +150,8 @@ export interface Lecon {
   /** Version anglaise (schema-ecole-contenu.sql, 2026-10-07) ; repli sur le français. */
   texte_adapte_en?: string | null;
   narration_audio_url: string | null;
+  /** Narration anglaise (prévue) ; repli sur le français. */
+  narration_audio_url_en?: string | null;
   video_url: string | null;
   bd_planches: { image_url: string; texte: string; ordre: number }[];
 }

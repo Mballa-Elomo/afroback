@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { KidButton, KidShell, Soon } from '@/components/kids';
 import { useKid } from '@/lib/kid';
-import { enregistrerLecon, enregistrerNiveau, PASS_RATIO, questionsLecon, questionsNiveau, type Question } from '@/lib/kids';
+import { enregistrerLecon, enregistrerNiveau, lecon, PASS_RATIO, questionLocale, questionsLecon, questionsNiveau, type Question } from '@/lib/kids';
 import { useLang } from '@/lib/lang-client';
 
 /**
@@ -34,10 +34,14 @@ function Quiz({ id }: { id: string }) {
   const [picked, setPicked] = useState<number | null>(null);
   const [good, setGood] = useState(0);
   const [saving, setSaving] = useState(false);
+  // Niveau 1 (3-5 ans) : quiz à faire avec un parent (décision de Yannick, 2026-10-07).
+  const [niveauLecon, setNiveauLecon] = useState<number | null>(null);
 
   useEffect(() => {
     (isFinal ? questionsNiveau(niveau) : questionsLecon(id)).then(setQs);
+    if (!isFinal) lecon(id).then((l) => setNiveauLecon(l?.niveau ?? null));
   }, [id, isFinal, niveau]);
+  const niveauQuiz = isFinal ? niveau : niveauLecon;
 
   const back = isFinal ? '/enfant/ecole' : `/enfant/ecole/lecon/${id}`;
   if (qs === null)
@@ -53,7 +57,8 @@ function Quiz({ id }: { id: string }) {
       </KidShell>
     );
 
-  const q = qs[i];
+  const lq = questionLocale(qs[i], lang);
+  const q = { question: lq.question, choix: lq.choix, reponse_correcte_index: lq.bonne };
   const last = i === qs.length - 1;
   const correct = picked === q.reponse_correcte_index;
 
@@ -90,6 +95,9 @@ function Quiz({ id }: { id: string }) {
             {i + 1}/{qs.length}
           </span>
         </div>
+        {niveauQuiz === 1 && (
+          <p className="mt-6 inline-block rounded-full bg-gold/15 px-4 py-2 font-bold text-gold">👨‍👩‍👧 {tr('À faire avec un parent', 'Do it with a parent')}</p>
+        )}
         <AnimatePresence mode="wait">
           {picked === null ? (
             <motion.div key={`q${i}`} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }}>
@@ -114,6 +122,12 @@ function Quiz({ id }: { id: string }) {
               <p className="text-7xl">{correct ? '🎉' : '💡'}</p>
               <p className="mt-4 text-4xl font-black text-white">{correct ? tr('Bravo !', 'Well done!') : tr('Presque !', 'Almost!')}</p>
               <p className="mt-3 text-xl text-white/80">{correct ? tr('Bonne réponse !', 'Right answer!') : tr(`La bonne réponse était : ${q.choix[q.reponse_correcte_index]}`, `The right answer was: ${q.choix[q.reponse_correcte_index]}`)}</p>
+              {lq.explication && (
+                <div className="mx-auto mt-6 max-w-lg rounded-[24px] bg-gold/10 p-5 text-left ring-2 ring-gold/30">
+                  <p className="font-black text-gold">💡 {tr('Le savais-tu ?', 'Did you know?')}</p>
+                  <p className="mt-1 text-lg leading-relaxed text-white/90">{lq.explication}</p>
+                </div>
+              )}
               <div className="mx-auto mt-8 max-w-sm">
                 <KidButton onClick={next} disabled={saving}>
                   {saving ? tr('Un instant…', 'One moment…') : last ? tr('Voir mon score', 'See my score') : tr('Continuer', 'Continue')}

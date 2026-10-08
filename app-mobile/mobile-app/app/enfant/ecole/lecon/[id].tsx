@@ -30,7 +30,7 @@ const FORMATS: { id: EcoleFormat; icon: string; label: string }[] = [
  * chance d'exister avant les autres en pratique).
  */
 export default function EcoleLeconScreen() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const heroesState = useHeroesList();
@@ -75,7 +75,8 @@ export default function EcoleLeconScreen() {
     );
   }
 
-  const hasTexte = !!lecon.texte_adapte;
+  const texte = (lang === 'en' && lecon.texte_adapte_en) || lecon.texte_adapte;
+  const hasTexte = !!texte;
   const hasAudio = !!lecon.narration_audio_url;
   const hasVideo = !!lecon.video_url;
   const hasBd = lecon.bd_planches.length > 0;
@@ -115,7 +116,13 @@ export default function EcoleLeconScreen() {
         <View style={styles.content}>
           {format === 'lire' && (
             hasTexte ? (
-              <Text style={styles.paragraph}>{lecon.texte_adapte}</Text>
+              <View>
+                {(texte ?? '').split(/\n\s*\n/).map((para, i) => (
+                  <Text key={i} style={[styles.paragraph, i > 0 && { marginTop: 12 }]}>
+                    {para.trim()}
+                  </Text>
+                ))}
+              </View>
             ) : (
               <SoonState icon="📖" />
             )

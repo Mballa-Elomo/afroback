@@ -928,6 +928,8 @@ const fr = {
     soon: 'Ce contenu n\'est pas encore prêt — reviens bientôt !',
   },
   quiz: {
+    didYouKnow: 'Le savais-tu ?',
+    withParent: 'À faire avec un parent',
     loading: 'Le quiz se prépare...',
     notReady: 'Quiz pas encore prêt',
     notReadyText: 'Reviens un peu plus tard, ce quiz n\'est pas encore disponible !',

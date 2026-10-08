@@ -925,6 +925,8 @@ const en: Translation = {
     soon: 'This content is not ready yet, come back soon!',
   },
   quiz: {
+    didYouKnow: 'Did you know?',
+    withParent: 'Do it with a parent',
     loading: 'The quiz is getting ready...',
     notReady: 'Quiz not ready yet',
     notReadyText: 'Come back a bit later, this quiz isn\'t available yet!',

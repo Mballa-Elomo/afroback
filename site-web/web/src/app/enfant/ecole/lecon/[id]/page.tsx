@@ -49,7 +49,8 @@ export default function LeconPage({ params }: { params: Promise<{ id: string }> 
     );
 
   const planches = [...(l.bd_planches ?? [])].sort((a, b) => a.ordre - b.ordre);
-  const has: Record<Format, boolean> = { lire: !!l.texte_adapte, ecouter: !!l.narration_audio_url, regarder: !!l.video_url, bd: planches.length > 0 };
+  const texte = (lang === 'en' && l.texte_adapte_en) || l.texte_adapte;
+  const has: Record<Format, boolean> = { lire: !!texte, ecouter: !!l.narration_audio_url, regarder: !!l.video_url, bd: planches.length > 0 };
   const canQuiz = Object.values(has).some(Boolean);
 
   return (
@@ -80,7 +81,7 @@ export default function LeconPage({ params }: { params: Promise<{ id: string }> 
       </div>
 
       <div className="mt-6">
-        {format === 'lire' && (has.lire ? <p className="whitespace-pre-line rounded-[28px] bg-white/8 p-7 text-xl leading-relaxed text-white/90">{l.texte_adapte}</p> : <Soon icon="📖" />)}
+        {format === 'lire' && (has.lire ? <p className="whitespace-pre-line rounded-[28px] bg-white/8 p-7 text-xl leading-relaxed text-white/90">{texte}</p> : <Soon icon="📖" />)}
         {format === 'ecouter' &&
           (has.ecouter ? (
             <div className="rounded-[28px] bg-white/8 p-7 text-center">

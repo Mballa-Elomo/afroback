@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useActiveProfile } from '../../../../src/profils/ActiveProfileProvider';
 import {
   advanceNiveau,
+  getLeconById,
   getQuizNiveauQuestions,
   getQuizQuestions,
   upsertLeconResultat,
@@ -22,7 +23,7 @@ import { useI18n } from '../../../../src/i18n';
  */
 const PASS_RATIO = 0.6;
 
-type Question = { question: string; choix: string[]; reponseCorrecteIndex: number };
+type Question = { question: string; choix: string[]; reponseCorrecteIndex: number; explication: string | null };
 
 /**
  * Quiz — fidèle dans l'esprit à design-reference-ecole-heros.dc.excerpt.html
@@ -33,7 +34,7 @@ type Question = { question: string; choix: string[]; reponseCorrecteIndex: numbe
  * encore disponible" plutôt qu'un quiz vide qui semble cassé.
  */
 export default function EcoleQuizScreen() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const router = useRouter();
   const { leconId, niveau: niveauParam } = useLocalSearchParams<{ leconId: string; niveau?: string }>();
   const { state } = useActiveProfile();
@@ -47,6 +48,8 @@ export default function EcoleQuizScreen() {
   const [selected, setSelected] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [saving, setSaving] = useState(false);
+  // Niveau 1 (3-5 ans) : quiz à faire avec un parent (décision de Yannick, 2026-10-07).
+  const [niveauQuiz, setNiveauQuiz] = useState<number | null>(isFinal ? niveau : null);
 
   useEffect(() => {
     let alive = true;
@@ -54,18 +57,21 @@ export default function EcoleQuizScreen() {
     const fetcher = isFinal ? getQuizNiveauQuestions(niveau) : getQuizQuestions(leconId);
     fetcher.then((rows) => {
       if (!alive) return;
+      const en = lang === 'en';
       const mapped = (rows as (EcoleQuizQuestion | EcoleQuizNiveauQuestion)[]).map((q) => ({
-        question: q.question,
-        choix: q.choix,
+        question: (en && q.question_en) || q.question,
+        choix: en && q.choix_en && q.choix_en.length === q.choix.length ? q.choix_en : q.choix,
         reponseCorrecteIndex: q.reponse_correcte_index,
+        explication: (en && q.explication_en) || q.explication || null,
       }));
       setQuestions(mapped);
       setLoading(false);
     });
+    if (!isFinal) getLeconById(leconId).then((l) => alive && l && setNiveauQuiz(l.niveau));
     return () => {
       alive = false;
     };
-  }, [isFinal, niveau, leconId]);
+  }, [isFinal, niveau, leconId, lang]);
 
   if (state.status !== 'child') return <Redirect href="/profils/selection" />;
   const childId = state.profil.id;
@@ -159,6 +165,8 @@ export default function EcoleQuizScreen() {
           </Text>
         </View>
 
+        {niveauQuiz === 1 && <Text style={styles.parentHint}>👨‍👩‍👧 {t('quiz.withParent')}</Text>}
+
         {phase === 'asking' && (
           <>
             <Text style={styles.question}>{current.question}</Text>
@@ -183,6 +191,12 @@ export default function EcoleQuizScreen() {
                 ? t('quiz.right')
                 : t('quiz.answerWas', { a: current.choix[current.reponseCorrecteIndex] })}
             </Text>
+            {!!current.explication && (
+              <View style={styles.didYouKnow}>
+                <Text style={styles.didYouKnowTitle}>💡 {t('quiz.didYouKnow')}</Text>
+                <Text style={styles.didYouKnowText}>{current.explication}</Text>
+              </View>
+            )}
             <Pressable onPress={next} disabled={saving} style={styles.continueBtn}>
               <Text style={styles.continueLabel}>{saving ? t('quiz.moment') : isLast ? t('quiz.score') : t('kids.continue')}</Text>
             </Pressable>
@@ -228,6 +242,39 @@ const styles = StyleSheet.create({
     fontFamily: typography.mono,
     fontSize: 11,
     color: colors.terracottaTextAlt,
+  },
+  parentHint: {
+    alignSelf: 'flex-start',
+    fontFamily: typography.bodyBold,
+    fontSize: 13,
+    color: colors.accentGoldPale,
+    backgroundColor: 'rgba(240,195,107,.12)',
+    borderRadius: 999,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  didYouKnow: {
+    alignSelf: 'stretch',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    backgroundColor: 'rgba(240,195,107,.08)',
+    padding: 14,
+    marginBottom: 22,
+    gap: 4,
+  },
+  didYouKnowTitle: {
+    fontFamily: typography.bodyExtraBold,
+    fontSize: 13,
+    color: colors.accentGoldBright,
+  },
+  didYouKnowText: {
+    fontFamily: typography.bodyMedium,
+    fontSize: 14,
+    lineHeight: 21,
+    color: colors.textPrimary,
   },
   question: {
     fontFamily: typography.display,

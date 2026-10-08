@@ -29,6 +29,8 @@ export interface EcoleLecon {
   niveau: number;
   ordre_dans_niveau: number;
   texte_adapte: string | null;
+  /** Version anglaise (schema-ecole-contenu.sql) ; repli sur le français si absente. */
+  texte_adapte_en?: string | null;
   narration_audio_url: string | null;
   video_url: string | null;
   bd_planches: BdPlanche[];
@@ -43,6 +45,11 @@ export interface EcoleQuizQuestion {
   choix: string[];
   reponse_correcte_index: number;
   ordre: number;
+  question_en?: string | null;
+  choix_en?: string[] | null;
+  /** « Le savais-tu ? » affiché après la réponse. */
+  explication?: string | null;
+  explication_en?: string | null;
 }
 
 export interface EcoleQuizNiveauQuestion {
@@ -52,6 +59,10 @@ export interface EcoleQuizNiveauQuestion {
   choix: string[];
   reponse_correcte_index: number;
   ordre: number;
+  question_en?: string | null;
+  choix_en?: string[] | null;
+  explication?: string | null;
+  explication_en?: string | null;
 }
 
 export interface EnfantEcoleProgression {

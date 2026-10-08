@@ -147,6 +147,8 @@ export interface Lecon {
   niveau: number;
   ordre_dans_niveau: number;
   texte_adapte: string | null;
+  /** Version anglaise (schema-ecole-contenu.sql, 2026-10-07) ; repli sur le français. */
+  texte_adapte_en?: string | null;
   narration_audio_url: string | null;
   video_url: string | null;
   bd_planches: { image_url: string; texte: string; ordre: number }[];
@@ -157,7 +159,27 @@ export interface Resultat {
   meilleur_score: number | null;
   tentatives: number;
 }
-export type Question = { question: string; choix: string[]; reponse_correcte_index: number };
+export type Question = {
+  question: string;
+  choix: string[];
+  reponse_correcte_index: number;
+  question_en?: string | null;
+  choix_en?: string[] | null;
+  /** « Le savais-tu ? » affiché après la réponse. */
+  explication?: string | null;
+  explication_en?: string | null;
+};
+
+/** Question dans la langue du site (repli sur le français si l'anglais manque). */
+export function questionLocale(q: Question, lang: string): { question: string; choix: string[]; bonne: number; explication: string | null } {
+  const en = lang === 'en';
+  return {
+    question: (en && q.question_en) || q.question,
+    choix: en && q.choix_en && q.choix_en.length === q.choix.length ? q.choix_en : q.choix,
+    bonne: q.reponse_correcte_index,
+    explication: (en && q.explication_en) || q.explication || null,
+  };
+}
 
 /** Seuil de réussite d'un quiz : 60 % (même valeur que l'app). */
 export const PASS_RATIO = 0.6;
@@ -180,11 +202,11 @@ export async function lecon(id: string): Promise<Lecon | null> {
   return (data as Lecon | null) ?? null;
 }
 export async function questionsLecon(leconId: string): Promise<Question[]> {
-  const { data } = await supabase.from('ecole_quiz_questions').select('question,choix,reponse_correcte_index').eq('lecon_id', leconId).order('ordre');
+  const { data } = await supabase.from('ecole_quiz_questions').select('*').eq('lecon_id', leconId).order('ordre');
   return (data ?? []) as Question[];
 }
 export async function questionsNiveau(n: number): Promise<Question[]> {
-  const { data } = await supabase.from('ecole_quiz_niveau').select('question,choix,reponse_correcte_index').eq('niveau', n).order('ordre');
+  const { data } = await supabase.from('ecole_quiz_niveau').select('*').eq('niveau', n).order('ordre');
   return (data ?? []) as Question[];
 }
 /** Crée la progression au niveau 1 au premier passage de l'enfant. */

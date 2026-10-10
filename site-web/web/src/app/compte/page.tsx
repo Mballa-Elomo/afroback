@@ -9,6 +9,9 @@ import { Avatar } from '@/components/Avatar';
 import { useLang } from '@/lib/lang-client';
 import { ProgressSummary } from '@/components/quiz';
 import { RenewBanner, SubscriptionControls } from '@/components/SubscriptionControls';
+import { usePaymentPolicy } from '@/lib/settings';
+import { useMfaPolicy, useModules } from '@/lib/settings';
+import { useAuth } from '@/lib/auth';
 
 const PLAN_NAME: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const PLAN_NAME_EN = PLAN_NAME; // noms de marque, identiques en anglais
@@ -16,6 +19,10 @@ const PLAN_NAME_EN = PLAN_NAME; // noms de marque, identiques en anglais
 export default function Compte() {
   const { ready, session, member, profile, subscription, signOut } = useMember();
   const { tr, locale } = useLang();
+  const pay = usePaymentPolicy();
+  const modules = useModules();
+  const mfa = useMfaPolicy();
+  const mfaState = useAuth().mfa;
   const router = useRouter();
   useEffect(() => {
     if (ready && !session) router.replace('/connexion?suite=/compte');
@@ -71,7 +78,9 @@ export default function Compte() {
       <ProgressSummary />
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {tiles.map((t, i) => (
+        {tiles
+          .filter((t) => (t.href !== "/don" || pay.dons) && (t.href !== "/profils" || modules.espace_enfant) && (t.href !== "/compte/securite" || mfa.disponible || mfaState !== "none"))
+          .map((t, i) => (
           <motion.div key={t.href} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}>
             <Link href={t.href} className="group block rounded-3xl bg-surface p-6 ring-1 ring-ivory/10 transition hover:-translate-y-1 hover:ring-gold/50">
               <p className="font-display text-xl font-bold text-ivory">{t.title}</p>

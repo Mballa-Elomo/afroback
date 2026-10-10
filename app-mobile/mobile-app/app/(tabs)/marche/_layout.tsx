@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { CartProvider } from '../../../src/marketplace/CartProvider';
 import { colors } from '../../../src/theme/tokens';
+import { ModuleGate } from '../../../src/settings/ModuleOff';
 
 /**
  * Pile interne de l'onglet Marché : catalogue → fiche produit → profil
@@ -12,6 +13,7 @@ import { colors } from '../../../src/theme/tokens';
  */
 export default function MarcheStackLayout() {
   return (
+    <ModuleGate module="marche">
     <CartProvider>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
         <Stack.Screen name="index" />
@@ -23,5 +25,6 @@ export default function MarcheStackLayout() {
         <Stack.Screen name="vendeur" />
       </Stack>
     </CartProvider>
+    </ModuleGate>
   );
 }

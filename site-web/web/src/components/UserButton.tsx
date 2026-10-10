@@ -7,6 +7,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/lib/auth';
 import { Avatar } from './Avatar';
 import { useLang } from '@/lib/lang-client';
+import { usePaymentPolicy } from '@/lib/settings';
+import { useModules } from '@/lib/settings';
 
 const PLAN: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const PLAN_EN = PLAN; // noms de marque, identiques en anglais (décision de l'app)
@@ -15,6 +17,8 @@ const PLAN_EN = PLAN; // noms de marque, identiques en anglais (décision de l'a
 export function UserButton({ compact }: { compact?: boolean }) {
   const { session, device, profile, subscription, signOut } = useAuth();
   const { tr } = useLang();
+  const pay = usePaymentPolicy();
+  const modules = useModules();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -60,7 +64,7 @@ export function UserButton({ compact }: { compact?: boolean }) {
               ['/compte', tr('Mon compte', 'My account')],
               ['/abonnement', subscription ? tr('Mon abonnement', 'My subscription') : tr("S'abonner", 'Subscribe')],
               ['/don', tr('Soutenir AFROBACK', 'Support AFROBACK')],
-            ].map(([href, label]) => (
+            ].filter(([href]) => (href !== '/don' || pay.dons) && (href !== '/profils' || modules.espace_enfant)).map(([href, label]) => (
               <Link key={href} href={href} onClick={() => setOpen(false)} className="block px-4 py-3 text-sm text-text hover:bg-ivory/5 hover:text-gold">
                 {label}
               </Link>

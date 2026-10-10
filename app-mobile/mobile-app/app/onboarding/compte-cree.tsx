@@ -7,6 +7,7 @@ import { AnimatedWords } from '../../src/onboarding/AnimatedText';
 import { BrandMark, GoldParticles, MotifFrieze, ONBOARDING_BG, PillButton, useReduceMotion } from '../../src/onboarding/ui';
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
+import { useMfaPolicy } from '../../src/settings/SettingsProvider';
 
 /**
  * Écran 9 — "Ton compte est créé !" (maquette de Yannick, 2026-09-29) :
@@ -20,6 +21,7 @@ const CHECK_LENGTH = 40;
 export default function CompteCreeScreen() {
   const router = useRouter();
   const { t } = useI18n();
+  const mfa = useMfaPolicy();
   const reduceMotion = useReduceMotion();
   const draw = useRef(new Animated.Value(reduceMotion ? 1 : 0)).current;
   const halo = useRef(new Animated.Value(reduceMotion ? 1 : 0)).current;
@@ -97,7 +99,7 @@ export default function CompteCreeScreen() {
         </View>
 
         <View style={styles.bottom}>
-          <PillButton label={t('common.continue')} onPress={() => router.replace('/onboarding/mfa-proposal')} />
+          <PillButton label={t('common.continue')} onPress={() => router.replace(mfa.proposee ? '/onboarding/mfa-proposal' : '/onboarding/plan')} />
         </View>
       </SafeAreaView>
     </View>

@@ -180,33 +180,35 @@ body {
 
 /* Protection du contenu (phase 2, app-mobile/securite-phase2-protection-contenu.md) :
    texte non sélectionnable hors des champs de saisie, images et vidéos non
-   glissables, impression remplacée par un message. */
-body {
+   glissables, impression remplacée par un message. Actif seulement avec la
+   classe `ab-protect` sur <html>, posée par ContentShield selon le réglage
+   « Anti-copie sur le web » du back-office (Paramètres). */
+html.ab-protect body {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
 }
-input,
-textarea,
-select,
-[contenteditable=''],
-[contenteditable='true'],
-[data-allow-copy] {
+html.ab-protect input,
+html.ab-protect textarea,
+html.ab-protect select,
+html.ab-protect [contenteditable=''],
+html.ab-protect [contenteditable='true'],
+html.ab-protect [data-allow-copy] {
   -webkit-user-select: text;
   user-select: text;
   -webkit-touch-callout: default;
 }
-img,
-video,
-audio,
-svg {
+html.ab-protect img,
+html.ab-protect video,
+html.ab-protect audio,
+html.ab-protect svg {
   -webkit-user-drag: none;
 }
 @media print {
-  body > * {
+  html.ab-protect body > * {
     display: none !important;
   }
-  body::after {
+  html.ab-protect body::after {
     content: 'Contenu protégé par AFROBACK · Content protected by AFROBACK';
     display: block;
     padding: 40vh 2rem 0;

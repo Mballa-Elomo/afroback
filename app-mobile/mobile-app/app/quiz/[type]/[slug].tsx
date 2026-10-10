@@ -21,7 +21,8 @@ import {
   type QuizResultat,
 } from '../../../src/quiz/quizApi';
 import { LevelBar, useNextLevelText } from '../../../src/quiz/QuizUI';
-import { IN_APP_DIGITAL_PAYMENTS } from '../../../src/payments/storePolicy';
+import { usePaymentPolicy } from '../../../src/settings/SettingsProvider';
+import { ModuleGate } from '../../../src/settings/ModuleOff';
 
 const BG = '#0B0906';
 const GOLD = colors.accentGoldBright;
@@ -62,7 +63,17 @@ function useContentInfo(type: QuizContentType | null, slug: string | undefined) 
  * question par écran, correction immédiate avec explication, résultat avec
  * points et niveau. Le score est celui recalculé par le serveur.
  */
+/** Écran « indisponible » quand le module Quiz est coupé (Paramètres → Modules). */
 export default function QuizScreen() {
+  return (
+    <ModuleGate module="quiz">
+      <QuizScreenInner />
+    </ModuleGate>
+  );
+}
+
+function QuizScreenInner() {
+  const pay = usePaymentPolicy();
   const { type, slug } = useLocalSearchParams<{ type: string; slug: string }>();
   const router = useRouter();
   const { t, lang } = useI18n();
@@ -189,7 +200,7 @@ export default function QuizScreen() {
           <Text style={styles.centerText}>{text}</Text>
           <View style={styles.actions}>
             {phase === 'error' && <GoldButton label={t('quizAdult.retryLoad')} onPress={start} />}
-            {isLocked && IN_APP_DIGITAL_PAYMENTS && <GoldButton label={t('paywall.see')} onPress={() => router.replace('/abonnement')} />}
+            {isLocked && pay.abonnements && <GoldButton label={t('paywall.see')} onPress={() => router.replace('/abonnement')} />}
             <TextButton label={t('quizAdult.backToStory')} onPress={goToStory} />
           </View>
         </View>

@@ -8,7 +8,7 @@ import { useWizardState } from '../../src/onboarding/WizardState';
 import { formatPlanPrice } from '../../src/onboarding/pricing';
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
-import { IN_APP_DIGITAL_PAYMENTS } from '../../src/payments/storePolicy';
+import { usePaymentPolicy } from '../../src/settings/SettingsProvider';
 
 /**
  * Étape 4/5 — fidèle à la maquette "CHOISIS TON FORFAIT". Racines et
@@ -20,6 +20,7 @@ import { IN_APP_DIGITAL_PAYMENTS } from '../../src/payments/storePolicy';
  * l'intégration existe.
  */
 export default function PlanStepScreen() {
+  const pay = usePaymentPolicy();
   const router = useRouter();
   const { billing, setBilling, setForfait } = useWizardState();
   const { t } = useI18n();
@@ -38,12 +39,12 @@ export default function PlanStepScreen() {
 
   // Version Play Store : pas de choix de forfait payant, compte Découverte directement (storePolicy.ts).
   useEffect(() => {
-    if (!IN_APP_DIGITAL_PAYMENTS) {
+    if (!pay.abonnements) {
       setForfait('decouverte');
       router.replace('/onboarding/welcome');
     }
-  }, [router, setForfait]);
-  if (!IN_APP_DIGITAL_PAYMENTS) return null;
+  }, [pay.abonnements, router, setForfait]);
+  if (!pay.abonnements) return null;
 
   return (
     <View style={styles.wrap}>

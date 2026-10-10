@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useLang } from '@/lib/lang-client';
+import { useSettings } from '@/lib/settings';
 
 /**
  * Protection du contenu (phase 2, app-mobile/securite-phase2-protection-contenu.md, lots B et C).
@@ -31,8 +32,13 @@ export function ContentShield() {
   const message = tr('Contenu protégé par AFROBACK', 'Content protected by AFROBACK');
   const messageRef = useRef(message);
   messageRef.current = message;
+  // Réglages du back-office (Paramètres → Sécurité).
+  const { protection_web: protection, voile_web: voile } = useSettings().securite;
 
   useEffect(() => {
+    document.documentElement.classList.toggle('ab-protect', protection);
+    setVeiled(false);
+    if (!protection && !voile) return;
     // Copier/couper visent l'élément actif (souvent body) : on regarde aussi où commence la sélection.
     const selectionEditable = () => isEditable(document.getSelection()?.anchorNode?.parentElement ?? null);
     const block = (e: Event) => {
@@ -47,7 +53,7 @@ export function ContentShield() {
       }
     };
     const onKeyUp = (e: KeyboardEvent) => {
-      if (e.key !== 'PrintScreen') return;
+      if (e.key !== 'PrintScreen' || !voile) return;
       navigator.clipboard?.writeText(messageRef.current).catch(() => {});
       setVeiled(true);
       if (flashTimer.current) clearTimeout(flashTimer.current);
@@ -58,14 +64,17 @@ export function ContentShield() {
     const onVisibility = () => setVeiled(document.visibilityState === 'hidden' || !document.hasFocus());
 
     const opts = { capture: true };
-    for (const type of ['copy', 'cut', 'contextmenu', 'dragstart', 'selectstart']) document.addEventListener(type, block, opts);
-    document.addEventListener('keydown', onKeyDown, opts);
+    const blocked = protection ? ['copy', 'cut', 'contextmenu', 'dragstart', 'selectstart'] : [];
+    for (const type of blocked) document.addEventListener(type, block, opts);
+    if (protection) document.addEventListener('keydown', onKeyDown, opts);
     document.addEventListener('keyup', onKeyUp, opts);
-    document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('blur', onBlur);
-    window.addEventListener('focus', onFocus);
+    if (voile) {
+      document.addEventListener('visibilitychange', onVisibility);
+      window.addEventListener('blur', onBlur);
+      window.addEventListener('focus', onFocus);
+    }
     return () => {
-      for (const type of ['copy', 'cut', 'contextmenu', 'dragstart', 'selectstart']) document.removeEventListener(type, block, opts);
+      for (const type of blocked) document.removeEventListener(type, block, opts);
       document.removeEventListener('keydown', onKeyDown, opts);
       document.removeEventListener('keyup', onKeyUp, opts);
       document.removeEventListener('visibilitychange', onVisibility);
@@ -73,7 +82,7 @@ export function ContentShield() {
       window.removeEventListener('focus', onFocus);
       if (flashTimer.current) clearTimeout(flashTimer.current);
     };
-  }, []);
+  }, [protection, voile]);
 
   return (
     <>

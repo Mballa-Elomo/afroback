@@ -9,6 +9,7 @@ import { AccountGate } from './ContentActions';
 import { Avatar } from './Avatar';
 import { useLang } from '@/lib/lang-client';
 import { tc, timeAgo } from '@/lib/lang';
+import { useModules } from '@/lib/settings';
 
 /**
  * Commentaires façon Facebook (cdc-commentaires.md de l'app), mêmes fonctions
@@ -51,7 +52,13 @@ async function call<T>(fn: string, args: Record<string, unknown>): Promise<{ dat
 }
 
 
-export function Comments({ type, slug }: { type: ContentType; slug: string }) {
+/** Masqué quand les commentaires sont coupés dans le back-office (Paramètres → Modules). */
+export function Comments(props: { type: ContentType; slug: string }) {
+  const modules = useModules();
+  return modules.commentaires ? <CommentsInner {...props} /> : null;
+}
+
+function CommentsInner({ type, slug }: { type: ContentType; slug: string }) {
   const { member, profile, session } = useMember();
   const { tr } = useLang();
   const [sort, setSort] = useState<'pertinents' | 'recents'>('pertinents');

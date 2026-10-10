@@ -14,6 +14,7 @@ import { AnimatedTitleBlock } from '../../src/onboarding/AnimatedText';
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
 import { SessionEndedNotice } from '../../src/security/SessionEndedNotice';
+import { useSettings } from '../../src/settings/SettingsProvider';
 
 /**
  * Écran 6 — "Bienvenue dans ton voyage" (maquette de Yannick, 2026-09-29).
@@ -28,6 +29,7 @@ export default function BienvenueScreen() {
   const router = useRouter();
   const { t } = useI18n();
   const { enterGuestMode, isGuest } = useAuth();
+  const { settings } = useSettings();
 
   useEffect(() => {
     markIntroSeen();
@@ -73,6 +75,7 @@ export default function BienvenueScreen() {
             </Text>
           </Pressable>
 
+          {settings.general.mode_invite && (
           <Pressable
             onPress={enterGuestMode}
             style={styles.guest}
@@ -82,6 +85,7 @@ export default function BienvenueScreen() {
           >
             <Text style={styles.guestText}>{t('bienvenue.guest')}</Text>
           </Pressable>
+          )}
         </View>
       </SafeAreaView>
     </IllustratedBackground>

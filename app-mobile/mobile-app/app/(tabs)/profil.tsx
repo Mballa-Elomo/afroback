@@ -17,7 +17,7 @@ import { APP_LANGUAGES, currentLanguage, useI18n, type AppLanguage } from '../..
 import { Flag } from '../../src/i18n/LanguageDropdown';
 import { ProgressCard } from '../../src/quiz/QuizUI';
 import { RenewBanner } from '../../src/payments/RenewBanner';
-import { IN_APP_DIGITAL_PAYMENTS } from '../../src/payments/storePolicy';
+import { useMfaPolicy, useModules, usePaymentPolicy } from '../../src/settings/SettingsProvider';
 
 const PLAN_LABELS: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const BG = '#0B0906';
@@ -32,9 +32,12 @@ const GOLD = colors.accentGoldBright;
  * métadonnées du compte, forfait serveur (mon_abonnement).
  */
 function ProfilScreen() {
+  const pay = usePaymentPolicy();
   const router = useRouter();
   const { t, lang } = useI18n();
-  const { session, signOut, updateLanguage } = useAuth();
+  const { session, signOut, updateLanguage, mfaStatus } = useAuth();
+  const modules = useModules();
+  const mfa = useMfaPolicy();
   const { children, returnToSelector } = useActiveProfile();
   const { subscription } = useAccess();
   const [pinVisible, setPinVisible] = useState(false);
@@ -118,7 +121,7 @@ function ProfilScreen() {
         <View style={styles.quick}>
           <QuickAction icon="pencil" label={t('profileTab.quickEdit')} onPress={() => router.push('/profil/modifier')} />
           <QuickAction icon="crown" label={t('profileTab.quickPlan')} onPress={() => router.push('/abonnement')} />
-          {IN_APP_DIGITAL_PAYMENTS && <QuickAction icon="heart" label={t('profileTab.quickDonate')} onPress={() => router.push('/don')} />}
+          {pay.dons && <QuickAction icon="heart" label={t('profileTab.quickDonate')} onPress={() => router.push('/don')} />}
         </View>
 
         <Section title={t('profileTab.sectionAccount')}>
@@ -144,15 +147,18 @@ function ProfilScreen() {
         </Section>
 
         <Section title={t('profileTab.sectionSecurity')}>
-          <SettingRow icon="shield" label={t('profileTab.twoStep')} onPress={() => router.push('/profil/mfa')} />
+          {/* Toujours visible pour un compte déjà protégé (il doit pouvoir gérer sa 2FA). */}
+          {(mfa.disponible || mfaStatus !== 'not_enrolled') && <SettingRow icon="shield" label={t('profileTab.twoStep')} onPress={() => router.push('/profil/mfa')} />}
           <SettingRow icon="key" label={t('profileTab.password')} onPress={() => router.push('/profil/mot-de-passe')} />
           <SettingRow icon="trash" label={t('deleteAccount.row')} onPress={() => router.push('/profil/supprimer-compte')} last />
         </Section>
 
+        {modules.espace_enfant && (
         <Section title={t('profileTab.sectionFamily')}>
           <SettingRow icon="users" label={t('profileTab.parent')} onPress={() => setPinVisible(true)} last={children.length === 0} />
           {children.length > 0 && <SettingRow icon="userPlus" label={t('profileTab.switchProfile')} onPress={returnToSelector} last />}
         </Section>
+        )}
 
         <Pressable style={styles.logout} onPress={() => signOut()} accessibilityRole="button">
           <Icon name="logout" size={18} color={colors.terracottaText} />

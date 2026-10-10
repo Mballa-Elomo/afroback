@@ -21,6 +21,7 @@ import {
   type Operateur,
   type PaymentRequest,
 } from '@/lib/payment';
+import { usePaymentPolicy } from '@/lib/settings';
 
 /**
  * Feuille « Paiement Mobile Money » (cdc-paiement-sans-sortie.md, section 4).
@@ -63,7 +64,10 @@ export function PaymentSheet({ request, onClose }: { request: PaymentRequest; on
   const isSub = request.type === 'abonnement';
   const amount = isSub ? price(request.plan, request.periode) : request.montant;
   const op = detectOperateur(phone);
-  const valid = isValidMobileMoney(phone);
+  // Opérateurs acceptés, réglés dans le back-office (Paramètres).
+  const policy = usePaymentPolicy();
+  const operatorOff = (op === 'MTN' && !policy.mtn) || (op === 'ORANGE' && !policy.orange);
+  const valid = isValidMobileMoney(phone) && !operatorOff;
   const planName = isSub ? PLAN_NAME[request.plan] : '';
   const recap = isSub
     ? `${planName} · ${request.periode === 'monthly' ? tr('1 mois', '1 month') : tr('12 mois', '12 months')} · ${fcfa(amount)}`
@@ -229,7 +233,9 @@ export function PaymentSheet({ request, onClose }: { request: PaymentRequest; on
                   <OperatorBadge op={op} />
                 </span>
                 <span id={`${titleId}-hint`} className="mt-1.5 block text-xs text-muted">
-                  {tr('MTN MoMo ou Orange Money, au Cameroun. Tu valideras sur ton téléphone.', 'MTN MoMo or Orange Money, in Cameroon. You will approve on your phone.')}
+                  {operatorOff
+                    ? tr(`${op === 'MTN' ? 'MTN MoMo' : 'Orange Money'} est momentanément indisponible. Utilise un numéro de l’autre opérateur.`, `${op === 'MTN' ? 'MTN MoMo' : 'Orange Money'} is temporarily unavailable. Use a number from the other operator.`)
+                    : tr('MTN MoMo ou Orange Money, au Cameroun. Tu valideras sur ton téléphone.', 'MTN MoMo or Orange Money, in Cameroon. You will approve on your phone.')}
                 </span>
               </label>
               {error && (

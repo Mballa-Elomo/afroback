@@ -12,7 +12,7 @@ import { supabase } from '../data/supabaseClient';
 import { useI18n } from '../i18n';
 import type { Translation } from '../i18n/fr';
 import { colors, typography } from '../theme/tokens';
-import { IN_APP_DIGITAL_PAYMENTS } from '../payments/storePolicy';
+import { usePaymentPolicy } from '../settings/SettingsProvider';
 
 /**
  * Accès gratuit / abonné côté app (cdc-acces-gratuit-abonnement.md, lot A).
@@ -144,6 +144,7 @@ export function useAccess(): AccessValue {
 }
 
 function PaywallContent({ reason, onDone, inline = false }: { reason: PaywallReason; onDone?: () => void; inline?: boolean }) {
+  const pay = usePaymentPolicy();
   const { t } = useI18n();
   const router = useRouter();
   const { isGuest } = useAuth();
@@ -169,7 +170,7 @@ function PaywallContent({ reason, onDone, inline = false }: { reason: PaywallRea
         ))}
       </View>
       {/* Version Play Store : aucun chemin d'achat (storePolicy.ts). */}
-      {IN_APP_DIGITAL_PAYMENTS && (
+      {pay.abonnements && (
       <PremiumButton
         label={t('paywall.see')}
         icon="sparkle"
@@ -297,11 +298,12 @@ export function LockedDetailScreen({
 
 /** Bandeau de l'accueil pour un compte gratuit : "Débloque tous les récits". */
 export function UpgradeBanner() {
+  const pay = usePaymentPolicy();
   const { t } = useI18n();
   const router = useRouter();
   const { session } = useAuth();
   const { systemActive, isSubscribed } = useAccess();
-  if (!session || !systemActive || isSubscribed || !IN_APP_DIGITAL_PAYMENTS) return null;
+  if (!session || !systemActive || isSubscribed || !pay.abonnements) return null;
   return (
     <Pressable
       onPress={() => router.push('/abonnement')}

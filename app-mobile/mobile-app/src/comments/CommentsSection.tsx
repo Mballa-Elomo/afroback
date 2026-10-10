@@ -23,6 +23,7 @@ import {
   type ContentComment,
 } from './commentsApi';
 import { useI18n } from '../i18n';
+import { useModules } from '../settings/SettingsProvider';
 
 const GOLD = colors.accentGoldBright;
 const BUBBLE = 'rgba(237,227,212,.08)';
@@ -36,7 +37,13 @@ const BUBBLE = 'rgba(237,227,212,.08)';
  * ("Voir les 3 réponses") avec leur propre zone de réponse. Un seul fil par
  * contenu, partagé entre la fiche et le lecteur vidéo.
  */
-export function CommentsSection({ type, slug }: { type: ContentType; slug: string }) {
+/** Masqué quand les commentaires sont coupés dans le back-office (Paramètres → Modules). */
+export function CommentsSection(props: { type: ContentType; slug: string }) {
+  const modules = useModules();
+  return modules.commentaires ? <CommentsSectionInner {...props} /> : null;
+}
+
+function CommentsSectionInner({ type, slug }: { type: ContentType; slug: string }) {
   const { session } = useAuth();
   const requireAccount = useRequireAccount();
   const { t } = useI18n();

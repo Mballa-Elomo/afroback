@@ -4,7 +4,7 @@ import { useAccess } from '../access/Access';
 import { Icon } from '../components/Icons';
 import { colors, typography } from '../theme/tokens';
 import { currentLanguage, useI18n } from '../i18n';
-import { IN_APP_DIGITAL_PAYMENTS } from './storePolicy';
+import { usePaymentPolicy } from '../settings/SettingsProvider';
 
 const THREE_DAYS = 3 * 24 * 3600 * 1000;
 
@@ -15,10 +15,11 @@ const THREE_DAYS = 3 * 24 * 3600 * 1000;
  * débiter sans validation : pas de renouvellement automatique).
  */
 export function RenewBanner({ style }: { style?: object }) {
+  const pay = usePaymentPolicy();
   const router = useRouter();
   const { t } = useI18n();
   const { subscription } = useAccess();
-  if (!IN_APP_DIGITAL_PAYMENTS) return null;
+  if (!pay.abonnements) return null;
   if (!subscription?.ends_at || !subscription.resiliable || subscription.resilie_le) return null;
   const end = new Date(subscription.ends_at);
   if (end.getTime() - Date.now() > THREE_DAYS) return null;

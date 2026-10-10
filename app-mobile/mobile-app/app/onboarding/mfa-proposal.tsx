@@ -6,6 +6,7 @@ import { useAuth } from '../../src/auth/AuthProvider';
 import { BrandMark, ONBOARDING_BG, PillButton } from '../../src/onboarding/ui';
 import { colors, spacing, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
+import { useMfaPolicy } from '../../src/settings/SettingsProvider';
 
 /**
  * Écran "Protège ton compte" — proposé activement juste après l'inscription
@@ -33,6 +34,7 @@ export default function MfaProposalScreen() {
 
   const activated = checkedOnce && mfaStatus === 'satisfied';
 
+  const mfa = useMfaPolicy();
   const goNext = () => router.replace('/onboarding/plan');
   const activateNow = () => router.push('/profil/mfa');
 
@@ -60,8 +62,12 @@ export default function MfaProposalScreen() {
             ) : (
               <>
                 <PillButton label={t('mfaProposal.activateNow')} icon="shield" onPress={activateNow} />
-                <View style={{ height: 12 }} />
-                <PillButton label={t('mfaProposal.later')} variant="outline" onPress={goNext} />
+                {!mfa.obligatoire && (
+                  <>
+                    <View style={{ height: 12 }} />
+                    <PillButton label={t('mfaProposal.later')} variant="outline" onPress={goNext} />
+                  </>
+                )}
               </>
             )}
           </View>

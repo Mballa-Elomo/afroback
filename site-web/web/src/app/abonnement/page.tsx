@@ -9,6 +9,7 @@ import { Notice } from '@/components/auth-ui';
 import { PaymentSheet } from '@/components/PaymentSheet';
 import { SubscriptionControls } from '@/components/SubscriptionControls';
 import { useLang } from '@/lib/lang-client';
+import { usePaymentPolicy } from '@/lib/settings';
 
 /**
  * Abonnements (lot 4) : mêmes forfaits et mêmes prix que l'app, paiement
@@ -46,6 +47,7 @@ const NAME_EN = NAME; // noms de marque, identiques en anglais
 function Abonnement() {
   const { session, member, subscription } = useMember();
   const { lang, tr, locale } = useLang();
+  const pay = usePaymentPolicy();
   const router = useRouter();
   const wanted = useSearchParams().get('forfait');
   const [periode, setPeriode] = useState<Periode>('monthly');
@@ -121,13 +123,15 @@ function Abonnement() {
                     </li>
                   ))}
                 </ul>
-                {paid ? (
+                {paid && pay.abonnements ? (
                   <button
                     onClick={() => choose(p.id as Plan)}
                     className={`mt-8 rounded-full py-4 font-extrabold transition hover:-translate-y-0.5 ${p.highlight || isWanted ? 'bg-gold text-ink shadow-[0_10px_30px_rgba(240,195,107,0.35)]' : 'bg-ivory/10 text-ivory ring-1 ring-ivory/20 hover:ring-gold'}`}
                   >
                     {isCurrent ? tr(`Renouveler ${p.name}`, `Renew ${p.nameEn}`) : tr(`Choisir ${p.name}`, `Choose ${p.nameEn}`)}
                   </button>
+                ) : paid ? (
+                  <p className="mt-8 rounded-full py-4 text-center text-sm font-bold text-muted ring-1 ring-ivory/10">{isCurrent ? tr('Ton forfait actuel', 'Your current plan') : tr('Momentanément indisponible', 'Temporarily unavailable')}</p>
                 ) : (
                   <p className="mt-8 rounded-full py-4 text-center text-sm font-bold text-muted ring-1 ring-ivory/10">{isCurrent ? tr('Ton forfait actuel', 'Your current plan') : tr('Inclus avec ton compte', 'Included with your account')}</p>
                 )}
@@ -137,8 +141,8 @@ function Abonnement() {
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-center gap-4 text-sm text-body">
-          <span className="rounded-full bg-[#ffcc00] px-4 py-1.5 font-extrabold text-black">MTN MoMo</span>
-          <span className="rounded-full bg-[#ff7900] px-4 py-1.5 font-extrabold text-black">Orange Money</span>
+          {pay.mtn && <span className="rounded-full bg-[#ffcc00] px-4 py-1.5 font-extrabold text-black">MTN MoMo</span>}
+          {pay.orange && <span className="rounded-full bg-[#ff7900] px-4 py-1.5 font-extrabold text-black">Orange Money</span>}
           <span>{tr('Paiement sécurisé par Campay · sans engagement', 'Secure payment by Campay · no commitment')}</span>
         </div>
       </div>

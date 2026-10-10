@@ -9,6 +9,7 @@ import { TYPE_PATH } from '@/lib/catalogue';
 import type { ContentType } from '@/lib/types';
 import { etatQuiz, isQuizType, maProgression, niveauNom, niveauRatio, type EtatQuiz, type Niveau, type Progression } from '@/lib/quiz';
 import { AccountGate } from './ContentActions';
+import { useModules } from '@/lib/settings';
 
 /**
  * Points d'entrée du quiz (cdc-quiz-progression.md, 4.1) : tuile sur la
@@ -93,7 +94,13 @@ export function QuizTile({ type, slug }: { type: ContentType; slug: string }) {
 }
 
 /** Carte dorée de fin de contenu : « Teste ce que tu as retenu ». */
-export function QuizEndCard({ type, slug, className = '' }: { type: ContentType; slug: string; className?: string }) {
+/** Masquée quand le module Quiz est coupé dans le back-office (Paramètres → Modules). */
+export function QuizEndCard(props: { type: ContentType; slug: string; className?: string }) {
+  const modules = useModules();
+  return modules.quiz ? <QuizEndCardInner {...props} /> : null;
+}
+
+function QuizEndCardInner({ type, slug, className = '' }: { type: ContentType; slug: string; className?: string }) {
   const etat = useEtatQuiz(type, slug);
   const { tr } = useLang();
   if (!etat?.disponible) return null;

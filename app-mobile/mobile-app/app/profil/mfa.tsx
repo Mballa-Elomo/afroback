@@ -9,6 +9,7 @@ import { GoldButton, GhostButton } from '../../src/components/Buttons';
 import { colors, spacing, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
 import { Icon } from '../../src/components/Icons';
+import { useMfaPolicy } from '../../src/settings/SettingsProvider';
 
 /**
  * Activation/désactivation de la vérification en 2 étapes (MFA/TOTP).
@@ -26,7 +27,10 @@ type EnrollState = {
 
 export default function MfaSetupScreen() {
   const router = useRouter();
-  const { refreshMfaStatus, confirmMfaChallengePassed } = useAuth();
+  const { refreshMfaStatus, confirmMfaChallengePassed, mfaStatus } = useAuth();
+  const mfa = useMfaPolicy();
+  // Obligatoire (back-office) et pas encore activée : pas de retour possible, l'activer d'abord.
+  const forced = mfa.obligatoire && mfaStatus === 'not_enrolled';
   const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [enabled, setEnabled] = useState(false);
@@ -79,6 +83,11 @@ export default function MfaSetupScreen() {
     // l'écran de connexion juste après (voir AuthProvider.tsx).
     confirmMfaChallengePassed();
     await loadStatus();
+    if (forced) {
+      await refreshMfaStatus();
+      router.replace('/');
+      return;
+    }
     Alert.alert(t('mfa.activatedTitle'), t('mfa.activatedBody'));
   };
 
@@ -120,12 +129,14 @@ export default function MfaSetupScreen() {
     <View style={styles.wrap}>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.scroll}>
-          <Pressable onPress={() => router.back()} hitSlop={10} style={styles.back}>
-            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
-          </Pressable>
+          {!forced && (
+            <Pressable onPress={() => router.back()} hitSlop={10} style={styles.back}>
+              <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
+            </Pressable>
+          )}
 
           <Text style={styles.title}>{t('mfa.title')}</Text>
-          <Text style={styles.subtitle}>{t('mfa.subtitle')}</Text>
+          <Text style={styles.subtitle}>{forced ? t('mfa.required') : t('mfa.subtitle')}</Text>
 
           {loading ? (
             <ActivityIndicator color={colors.accentGold} style={{ marginTop: 30 }} />
@@ -162,7 +173,7 @@ export default function MfaSetupScreen() {
               <Text style={styles.statusOn}>{t('mfa.statusOn')}</Text>
               <Text style={styles.statusDetail}>{t('mfa.statusOnDetail')}</Text>
               <View style={{ height: 18 }} />
-              <GhostButton label={busy ? t('mfa.disabling') : t('mfa.disable')} onPress={disableMfa} />
+              {!mfa.obligatoire && <GhostButton label={busy ? t('mfa.disabling') : t('mfa.disable')} onPress={disableMfa} />}
             </View>
           ) : (
             <View style={styles.card}>

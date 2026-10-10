@@ -10,6 +10,7 @@ import { useI18n } from '../../src/i18n';
 import { PasswordStrength, meetsPasswordRule } from '../../src/onboarding/PasswordStrength';
 import { COUNTRIES, CountryPicker, type Country } from '../../src/components/CountryPicker';
 import { Icon } from '../../src/components/Icons';
+import { useSettings } from '../../src/settings/SettingsProvider';
 
 /**
  * Écran 7 — "Crée ton compte", identique à la maquette de Yannick du
@@ -27,6 +28,7 @@ export default function SignupScreen() {
   const router = useRouter();
   const { signUpWithEmail } = useAuth();
   const { t } = useI18n();
+  const { settings } = useSettings();
   const [prenom, setPrenom] = useState('');
   const [email, setEmail] = useState('');
   // Téléphone : second identifiant de connexion (demande de Yannick du 2026-09-29).
@@ -54,6 +56,11 @@ export default function SignupScreen() {
 
   const onSubmit = async () => {
     if (loading) return;
+    // Inscriptions fermées depuis le back-office : les comptes existants continuent de se connecter.
+    if (!settings.general.inscriptions_ouvertes) {
+      setErrors({ form: t('signup.closed') });
+      return;
+    }
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length > 0) return;

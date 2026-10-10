@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, typography } from '../theme/tokens';
 import { Icon, type IconName } from './Icons';
 import { useI18n } from '../i18n';
+import { useModules } from '../settings/SettingsProvider';
 
 /**
  * Barre de navigation basse. Refonte moderne du 2026-09-30 (demande de
@@ -29,6 +30,9 @@ const ROUTES_SANS_BARRE = new Set(['heros/[slug]/audio', 'heros/[slug]/video']);
 export function BottomTabBar(props: BottomTabBarProps) {
   const { t } = useI18n();
   const { state, navigation } = props;
+  // Onglets des modules coupés dans le back-office (Paramètres → Modules).
+  const modules = useModules();
+  const hidden = (name: string) => (name === 'marche' && !modules.marche) || (name === 'communaute' && !modules.communaute);
   const focusedTabRoute = state.routes[state.index];
   const focusedRouteName = getFocusedRouteNameFromRoute(focusedTabRoute);
   if (focusedRouteName && ROUTES_SANS_BARRE.has(focusedRouteName)) {
@@ -38,6 +42,7 @@ export function BottomTabBar(props: BottomTabBarProps) {
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <View style={styles.bar}>
         {state.routes.map((route, index) => {
+          if (hidden(route.name)) return null;
           const meta = TAB_META[route.name] ?? { icon: 'compass' as IconName, label: route.name };
           const focused = state.index === index;
 

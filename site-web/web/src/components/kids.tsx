@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { useKid } from '@/lib/kid';
 import { AVATAR_GRADIENTS, childProfiles, getPin, setPin, type AvatarCouleur } from '@/lib/kids';
 import { useLang } from '@/lib/lang-client';
+import { useModules } from '@/lib/settings';
 
 export function KidAvatar({ prenom, couleur, size = 96 }: { prenom: string; couleur: AvatarCouleur; size?: number }) {
   const [a, b] = AVATAR_GRADIENTS[couleur] ?? AVATAR_GRADIENTS.or;
@@ -149,8 +150,15 @@ export function KidGuard() {
     if (session && device === 'ok') childProfiles().then((l) => setHasKids(l.length > 0)).catch(() => setHasKids(false));
   }, [session, device]);
 
+  const enfantOn = useModules().espace_enfant;
+
   useEffect(() => {
     if (!ready || !authReady) return;
+    // Espace enfant coupé dans le back-office : jamais de mode enfant ni de « Qui regarde ? ».
+    if (!enfantOn) {
+      if (path.startsWith('/enfant')) router.replace('/');
+      return;
+    }
     if (kid) {
       if (!path.startsWith('/enfant') && !DEVICE_PATHS.some((p) => path.startsWith(p))) router.replace('/enfant');
       return;
@@ -160,7 +168,7 @@ export function KidGuard() {
       return;
     }
     if (path === '/' && session && device === 'ok' && onboardingComplete && hasKids && !chosen) router.replace('/profils');
-  }, [ready, authReady, kid, path, session, device, onboardingComplete, hasKids, chosen, router]);
+  }, [ready, authReady, kid, path, session, device, onboardingComplete, hasKids, chosen, router, enfantOn]);
 
   return null;
 }
@@ -169,7 +177,8 @@ export function KidGuard() {
 export function AdultOnly({ children }: { children: React.ReactNode }) {
   const { kid } = useKid();
   const path = usePathname();
-  if (kid || path.startsWith('/enfant')) return null;
+  const enfantOn = useModules().espace_enfant;
+  if (enfantOn && (kid || path.startsWith('/enfant'))) return null;
   return <>{children}</>;
 }
 

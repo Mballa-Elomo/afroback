@@ -8,6 +8,7 @@ import { fcfa, type PaymentRequest } from '@/lib/payment';
 import { Notice } from '@/components/auth-ui';
 import { PaymentSheet } from '@/components/PaymentSheet';
 import { useLang } from '@/lib/lang-client';
+import { usePaymentPolicy } from '@/lib/settings';
 
 /**
  * Soutenir AFROBACK : don ponctuel par Mobile Money (entre 200 et 1 000 000 FCFA,
@@ -26,8 +27,10 @@ export default function Don() {
   const [error, setError] = useState<string | null>(null);
   const [sheet, setSheet] = useState<PaymentRequest | null>(null);
   const value = custom ? Number(custom.replace(/\D/g, '')) : amount;
+  const pay = usePaymentPolicy();
 
   const give = () => {
+    if (!pay.dons) return setError(tr('Les dons sont momentanément indisponibles.', 'Donations are temporarily unavailable.'));
     if (!session) return router.push('/connexion?suite=/don');
     if (!member) return;
     if (!(value >= 200 && value <= 1_000_000)) return setError(tr('Montant entre 200 et 1 000 000 FCFA.', 'Amount between 200 and 1,000,000 FCFA.'));

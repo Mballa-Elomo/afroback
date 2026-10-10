@@ -2,6 +2,7 @@ import { Redirect } from 'expo-router';
 import { useAuth } from '../src/auth/AuthProvider';
 import { useActiveProfile } from '../src/profils/ActiveProfileProvider';
 import { BootScreen } from '../src/components/BootScreen';
+import { useSettings } from '../src/settings/SettingsProvider';
 
 /**
  * Point d'entrée réel de l'app (route "/"). Aucun écran de contenu ici :
@@ -16,6 +17,7 @@ import { BootScreen } from '../src/components/BootScreen';
 export default function Index() {
   const { session, onboardingComplete, isGuest, mfaStatus, deviceStatus } = useAuth();
   const { state: profileState } = useActiveProfile();
+  const { settings } = useSettings();
 
   if (session === undefined) return <BootScreen />;
   if (!session) return <Redirect href={isGuest ? '/accueil' : '/onboarding'} />;
@@ -28,6 +30,10 @@ export default function Index() {
   if (mfaStatus === 'unknown') return <BootScreen />;
   if (mfaStatus === 'challenge_required') return <Redirect href="/onboarding/mfa-challenge" />;
   if (!onboardingComplete) return <Redirect href="/onboarding/profil" />;
+  // Vérification en 2 étapes rendue obligatoire dans le back-office : l'activer avant tout contenu.
+  if (settings.securite.mfa_obligatoire && mfaStatus === 'not_enrolled') return <Redirect href="/profil/mfa" />;
+  // Espace enfant coupé dans le back-office : accueil adulte pour tous.
+  if (!settings.modules.espace_enfant) return <Redirect href="/accueil" />;
   if (profileState.status === 'checking') return <BootScreen />;
   if (profileState.status === 'selecting') return <Redirect href="/profils/selection" />;
   if (profileState.status === 'child') return <Redirect href="/enfant/accueil" />;

@@ -14,6 +14,15 @@ const fr = {
     comingSoon: 'Bientôt disponible',
     error: 'Erreur',
   },
+  moduleOff: {
+    title: 'Momentanément indisponible',
+    body: 'Cette partie d’AFROBACK revient très bientôt.',
+    home: 'Retour à l’accueil',
+  },
+  maintenance: {
+    title: 'AFROBACK est en maintenance',
+    body: 'Nous revenons très vite. Merci de ta patience.',
+  },
   brand: {
     tagline: 'Retour aux origines',
     protectedContent: 'Contenu protégé par AFROBACK',
@@ -58,6 +67,7 @@ const fr = {
     guestHint: 'Découvre les contenus sans créer de compte. Certaines actions demanderont un compte.',
   },
   signup: {
+    closed: 'Les inscriptions sont momentanément fermées. Réessaie plus tard.',
     title: 'Crée ton compte',
     subtitle: 'Ton aventure commence ici.',
     firstName: 'Prénom',
@@ -237,6 +247,7 @@ const fr = {
     later: 'Plus tard',
   },
   mfa: {
+    required: 'La vérification en 2 étapes est désormais obligatoire sur AFROBACK. Active-la pour continuer : elle protège ton compte même si ton mot de passe est volé.',
     title: 'Vérification en 2 étapes',
     subtitle:
       "Protège ton compte avec un code temporaire généré par une application d'authentification (Google Authenticator, Authy…), en plus de ton mot de passe.",
@@ -327,6 +338,8 @@ const fr = {
     later: 'Plus tard',
     donate: 'Donner {{amount}}',
     errors: {
+      disabled: 'Ce paiement est momentanément indisponible. Réessaie plus tard.',
+      operator: 'Cet opérateur est momentanément indisponible. Utilise un numéro de l’autre opérateur.',
       notConfigured: "Le paiement en ligne n'est pas encore activé. Réessaie un peu plus tard.",
       amount: 'Le montant minimum est de 200 FCFA.',
       session: 'Ta session a expiré. Reconnecte-toi puis réessaie.',
@@ -354,6 +367,7 @@ const fr = {
     activeUntil: 'Ton abonnement est actif jusqu’au {{date}}. Tous les récits sont débloqués.',
     errors: {
       number: 'Numéro MTN ou Orange invalide (ex. 677 12 34 56).',
+      operatorOff: '{{operator}} est momentanément indisponible. Utilise un numéro de l’autre opérateur.',
       tooMany: 'Trop de demandes en une heure. Réessaie un peu plus tard.',
       gateway: 'Le service de paiement a refusé la demande.',
     },
@@ -393,6 +407,7 @@ const fr = {
     childLocked: 'Cette histoire est réservée. Demande à ton parent de débloquer tous les récits.',
   },
   abonnement: {
+    unavailable: 'Les abonnements sont momentanément indisponibles.',
     storeNote: "Les abonnements ne peuvent pas être souscrits dans cette version de l'application.",
     title: 'Abonnements',
     subtitle: "Débloque tous les récits d'AFROBACK.",

@@ -8,6 +8,7 @@ import { useAuth } from '../auth/AuthProvider';
 import { colors, typography } from '../theme/tokens';
 import { useI18n } from '../i18n';
 import { quizHref, useProgression, useQuizEtat, type QuizContentType, type QuizNiveau } from './quizApi';
+import { useModules } from '../settings/SettingsProvider';
 
 const GOLD = colors.accentGoldBright;
 
@@ -23,7 +24,13 @@ function useOpenQuiz(type: QuizContentType, slug: string) {
  * largeur pour que le meilleur score reste lisible. Cachée tant qu'aucun
  * quiz n'existe pour ce contenu.
  */
-export function QuizTile({ type, slug, style }: { type: QuizContentType; slug: string; style?: StyleProp<ViewStyle> }) {
+/** Masqué quand le module Quiz est coupé dans le back-office (Paramètres → Modules). */
+export function QuizTile(props: Parameters<typeof QuizTileInner>[0]) {
+  const modules = useModules();
+  return modules.quiz ? <QuizTileInner {...props} /> : null;
+}
+
+function QuizTileInner({ type, slug, style }: { type: QuizContentType; slug: string; style?: StyleProp<ViewStyle> }) {
   const { t } = useI18n();
   const etat = useQuizEtat(type, slug);
   const open = useOpenQuiz(type, slug);
@@ -48,7 +55,13 @@ export function QuizTile({ type, slug, style }: { type: QuizContentType; slug: s
 }
 
 /** Carte dorée de fin de contenu (fin du récit, de l'audio, de la vidéo). */
-export function QuizEndCard({ type, slug, style }: { type: QuizContentType; slug: string; style?: StyleProp<ViewStyle> }) {
+/** Masqué quand le module Quiz est coupé dans le back-office (Paramètres → Modules). */
+export function QuizEndCard(props: Parameters<typeof QuizEndCardInner>[0]) {
+  const modules = useModules();
+  return modules.quiz ? <QuizEndCardInner {...props} /> : null;
+}
+
+function QuizEndCardInner({ type, slug, style }: { type: QuizContentType; slug: string; style?: StyleProp<ViewStyle> }) {
   const { t } = useI18n();
   const etat = useQuizEtat(type, slug);
   const open = useOpenQuiz(type, slug);
@@ -107,7 +120,13 @@ export function useNextLevelText() {
 }
 
 /** Carte "Ma progression" de l'écran Profil, ouvre l'écran complet. */
-export function ProgressCard({ style }: { style?: StyleProp<ViewStyle> }) {
+/** Masqué quand le module Quiz est coupé dans le back-office (Paramètres → Modules). */
+export function ProgressCard(props: Parameters<typeof ProgressCardInner>[0]) {
+  const modules = useModules();
+  return modules.quiz ? <ProgressCardInner {...props} /> : null;
+}
+
+function ProgressCardInner({ style }: { style?: StyleProp<ViewStyle> }) {
   const router = useRouter();
   const { t } = useI18n();
   const { isGuest } = useAuth();

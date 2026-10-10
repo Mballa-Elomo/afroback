@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { usePaymentPolicy } from '../settings/SettingsProvider';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../auth/AuthProvider';
 import { useAccess } from '../access/Access';
@@ -50,6 +51,10 @@ function errorText(t: (k: string, o?: Record<string, unknown>) => string, raw?: 
       non_authentifie: 'paiement.errors.session',
       reseau: 'paiement.errors.network',
       passerelle: 'momo.errors.gateway',
+      paiements_desactives: 'paiement.errors.disabled',
+      dons_desactives: 'paiement.errors.disabled',
+      abonnements_desactives: 'paiement.errors.disabled',
+      operateur_indisponible: 'paiement.errors.operator',
     }[code] ?? 'paiement.errors.generic';
   return detail && code === 'passerelle' ? `${t(key)} (${detail})` : t(key);
 }
@@ -112,7 +117,10 @@ export function PaymentSheet({
   useEffect(() => stopTimers, []);
 
   const operator = detectOperator(phone);
-  const valid = isValidMobileMoney(phone);
+  // Opérateurs acceptés, réglés dans le back-office (onglet Paramètres).
+  const policy = usePaymentPolicy();
+  const operatorOff = (operator === 'MTN' && !policy.mtn) || (operator === 'ORANGE' && !policy.orange);
+  const valid = isValidMobileMoney(phone) && !operatorOff;
   const amountLabel = `${amount.toLocaleString(currentLanguage() === 'en' ? 'en-GB' : 'fr-FR')} FCFA`;
 
   const startWaiting = (p: DirectPayment) => {
@@ -236,7 +244,7 @@ export function PaymentSheet({
                 )}
               </View>
               <Text style={styles.hint}>
-                {!!phone && !valid && localDigits(phone).length === 9 ? t('momo.errors.number') : t('momo.numberHint')}
+                {operatorOff ? t('momo.errors.operatorOff', { operator: operator === 'MTN' ? 'MTN MoMo' : 'Orange Money' }) : !!phone && !valid && localDigits(phone).length === 9 ? t('momo.errors.number') : t('momo.numberHint')}
               </Text>
               {!!error && <Text style={styles.error}>{error}</Text>}
 

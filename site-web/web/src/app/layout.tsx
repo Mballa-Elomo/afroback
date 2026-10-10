@@ -14,6 +14,7 @@ import { getLang } from '@/lib/lang-server';
 import { pick } from '@/lib/lang';
 import { LangProvider } from '@/lib/lang-client';
 import './globals.css';
+import { MaintenanceGate, SettingsProvider } from '@/lib/settings';
 
 const cinzel = Cinzel({ subsets: ['latin', 'latin-ext'], weight: ['600', '700', '800', '900'], variable: '--font-cinzel' });
 const manrope = Manrope({ subsets: ['latin', 'latin-ext'], weight: ['400', '500', '600', '700', '800'], variable: '--font-manrope' });
@@ -30,9 +31,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await getLang();
   return (
-    <html lang={lang} className={`${cinzel.variable} ${manrope.variable}`}>
+    <html lang={lang} className={`ab-protect ${cinzel.variable} ${manrope.variable}`}>
       <body className="min-h-screen bg-ink">
         <LangProvider initial={lang}>
+        <SettingsProvider>
+        <MaintenanceGate>
         <AuthProvider>
         <CartProvider>
         <KidProvider>
@@ -52,6 +55,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </KidProvider>
         </CartProvider>
         </AuthProvider>
+        </MaintenanceGate>
+        </SettingsProvider>
         </LangProvider>
       </body>
     </html>

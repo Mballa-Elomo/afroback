@@ -7,6 +7,12 @@ function errorKey(code?: string): string {
   switch (code) {
     case 'non_configure':
       return 'paiement.errors.notConfigured';
+    case 'paiements_desactives':
+    case 'dons_desactives':
+    case 'abonnements_desactives':
+      return 'paiement.errors.disabled';
+    case 'operateur_indisponible':
+      return 'paiement.errors.operator';
     case 'montant_invalide':
       return 'paiement.errors.amount';
     case 'non_authentifie':

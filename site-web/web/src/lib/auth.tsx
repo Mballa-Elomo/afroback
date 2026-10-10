@@ -104,6 +104,8 @@ interface AuthValue {
   /** Suppression définitive du compte (exigence Google Play, app-mobile/cdc-play-store.md). */
   deleteAccount: (password: string) => Promise<Result & { wrongPassword?: boolean }>;
   signOut: () => Promise<void>;
+  /** Vérification en 2 étapes tout juste activée sur ce navigateur : le code vient d'être prouvé. */
+  mfaEnrolled: () => void;
 }
 
 const Ctx = createContext<AuthValue | null>(null);
@@ -402,6 +404,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         mfaPassed.current = false;
         await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
         return { error: null };
+      },
+      mfaEnrolled() {
+        mfaPassed.current = true;
+        setMfa('ok');
       },
       async signOut() {
         mfaPassed.current = false;

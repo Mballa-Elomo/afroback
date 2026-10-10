@@ -24,7 +24,15 @@ export type Operateur = 'MTN' | 'ORANGE';
 export type PaymentRequest = { type: 'abonnement'; plan: Plan; periode: Periode } | { type: 'don'; montant: number; anonyme?: boolean };
 
 export const PRICES: Record<Plan, number> = { racines: 1500, heritage: 3000 };
-export const price = (plan: Plan, periode: Periode) => (periode === 'monthly' ? PRICES[plan] : Math.round(PRICES[plan] * 12 * 0.83));
+let YEARLY_FACTOR = 0.83;
+export const price = (plan: Plan, periode: Periode) => (periode === 'monthly' ? PRICES[plan] : Math.round(PRICES[plan] * 12 * YEARLY_FACTOR));
+
+/** Prix réglés dans le back-office (Paramètres), appliqués par SettingsProvider. Le serveur de paiement calcule le même montant. */
+export function setPricing(racines: number, heritage: number, reductionPct: number) {
+  if (racines > 0) PRICES.racines = racines;
+  if (heritage > 0) PRICES.heritage = heritage;
+  if (reductionPct >= 0 && reductionPct <= 90) YEARLY_FACTOR = 1 - reductionPct / 100;
+}
 export const fcfa = (n: number) => `${n.toLocaleString('fr-FR')} FCFA`;
 /** Noms de marque, identiques en anglais. */
 export const PLAN_NAME: Record<Plan, string> = { racines: 'Racines', heritage: 'Héritage' };
@@ -105,6 +113,10 @@ const MESSAGES: Record<string, [string, string]> = {
   non_configure: ['Le paiement n’est pas encore disponible. Réessaie plus tard.', 'Payment is not available yet. Try again later.'],
   montant_invalide: ['Montant invalide (entre 200 et 1 000 000 FCFA).', 'Invalid amount (between 200 and 1,000,000 FCFA).'],
   forfait_invalide: ['Ce forfait n’existe pas. Choisis Racines ou Héritage.', 'This plan does not exist. Choose Racines or Héritage.'],
+  paiements_desactives: ['Le paiement est momentanément indisponible. Réessaie plus tard.', 'Payment is temporarily unavailable. Please try again later.'],
+  dons_desactives: ['Les dons sont momentanément indisponibles.', 'Donations are temporarily unavailable.'],
+  abonnements_desactives: ['Les abonnements sont momentanément indisponibles.', 'Subscriptions are temporarily unavailable.'],
+  operateur_indisponible: ['Cet opérateur est momentanément indisponible. Utilise un numéro de l’autre opérateur.', 'This operator is temporarily unavailable. Use a number from the other operator.'],
   reseau: ['Connexion au service de paiement impossible. Vérifie ta connexion et réessaie.', 'Could not reach the payment service. Check your connection and try again.'],
 };
 export const paymentError = (code?: string) =>

@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import { colors } from '../../../src/theme/tokens';
+import { ModuleGate } from '../../../src/settings/ModuleOff';
 
 /**
  * Pile interne de l'onglet Communauté : fil → détail de post → créer un
@@ -10,6 +11,7 @@ import { colors } from '../../../src/theme/tokens';
  */
 export default function CommunauteStackLayout() {
   return (
+    <ModuleGate module="communaute">
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="post/[id]" />
@@ -18,5 +20,6 @@ export default function CommunauteStackLayout() {
       <Stack.Screen name="signaler" />
       <Stack.Screen name="charte" />
     </Stack>
+    </ModuleGate>
   );
 }

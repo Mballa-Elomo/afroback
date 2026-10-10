@@ -21,7 +21,7 @@ import { AccessBadge, UpgradeBanner } from '../../../src/access/Access';
 import { RenewBanner } from '../../../src/payments/RenewBanner';
 import { Bone, PressableScale, RailSection, SkeletonScreen } from '../../../src/ui/modern';
 import i18n, { useI18n } from '../../../src/i18n';
-import { IN_APP_DIGITAL_PAYMENTS } from '../../../src/payments/storePolicy';
+import { useModules, usePaymentPolicy } from '../../../src/settings/SettingsProvider';
 
 const GOLD = colors.accentGoldBright;
 
@@ -72,6 +72,8 @@ const PILLARS: { icon: IconName; label: string; href: string }[] = [
  * sans useCallback), ce qui relançait l'affichage en continu.
  */
 export default function AccueilScreen() {
+  const pay = usePaymentPolicy();
+  const modules = useModules();
   const { t } = useI18n();
   const router = useRouter();
   const { session } = useAuth();
@@ -149,7 +151,7 @@ export default function AccueilScreen() {
 
         {/* Piliers */}
         <View style={styles.pillars}>
-          {PILLARS.map((p) => (
+          {PILLARS.filter((p) => p.href !== '/marche' || modules.marche).map((p) => (
             <PressableScale key={p.label} onPress={() => router.push(p.href as never)} style={styles.pillar} accessibilityLabel={t(p.label)}>
               <View style={styles.pillarIcon}>
                 <Icon name={p.icon} size={22} color={GOLD} />
@@ -289,6 +291,7 @@ export default function AccueilScreen() {
 
             {/* Marché & Soutenir */}
             <View style={styles.duo}>
+              {modules.marche && (
               <PressableScale onPress={() => router.push('/marche')} wrapperStyle={{ flex: 1 }} accessibilityLabel={t('home.market')}>
                 <LinearGradient colors={['#3B2A12', '#1A130B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.duoCard}>
                   <View style={styles.duoIcon}>
@@ -298,8 +301,9 @@ export default function AccueilScreen() {
                   <Text style={styles.duoSub}>{t('home.marketSub')}</Text>
                 </LinearGradient>
               </PressableScale>
+              )}
               {/* Dons masqués dans la version Play Store (storePolicy.ts). */}
-              {IN_APP_DIGITAL_PAYMENTS && (
+              {pay.dons && (
                 <PressableScale onPress={() => requireAccount(() => router.push('/don'), 'don')} wrapperStyle={{ flex: 1 }} accessibilityLabel={t('home.supportA11y')}>
                   <LinearGradient colors={['#4A2317', '#1A0F0B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.duoCard}>
                     <View style={[styles.duoIcon, { backgroundColor: 'rgba(227,162,119,.15)' }]}>

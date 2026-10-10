@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { UserButton } from './UserButton';
 import { useCart } from '@/lib/cart';
 import { LangSwitch, useLang } from '@/lib/lang-client';
+import { useModules } from '@/lib/settings';
 
 /**
  * Barre du site : transparente au-dessus du carrousel, puis verre dépoli qui
@@ -59,7 +60,10 @@ export function TopNav() {
     const query = q.trim();
     router.push(query ? `/recherche?q=${encodeURIComponent(query)}` : '/recherche');
   };
-  const active = LINKS.find((l) => l.match(pathname))?.href ?? null;
+  // Modules coupés dans le back-office (Paramètres → Modules) : retirés du menu.
+  const modules = useModules();
+  const links = LINKS.filter((l) => (l.href !== '/marche' || modules.marche) && (l.href !== '/communaute' || modules.communaute));
+  const active = links.find((l) => l.match(pathname))?.href ?? null;
   const pill = hover ?? active;
 
   return (
@@ -86,7 +90,7 @@ export function TopNav() {
           </Link>
 
           <ul className="hidden items-center lg:flex" onMouseLeave={() => setHover(null)}>
-            {LINKS.map((l) => {
+            {links.map((l) => {
               const isActive = l.href === active;
               return (
                 <li key={l.href} className="relative">
@@ -169,7 +173,7 @@ export function TopNav() {
             className="bg-pattern fixed inset-0 z-[45] flex flex-col justify-center bg-ink/95 px-8 backdrop-blur-xl lg:hidden"
           >
             <ul className="space-y-2">
-              {LINKS.map((l, i) => (
+              {links.map((l, i) => (
                 <motion.li key={l.href} initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 * i }}>
                   <Link href={l.href} className={`font-display text-4xl font-bold ${l.match(pathname) ? 'text-gold' : 'text-ivory'}`}>
                     {tr(l.label, l.en)}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import * as ScreenCapture from 'expo-screen-capture';
 import { useI18n } from '../i18n';
+import { useSettings } from '../settings/SettingsProvider';
 import { colors, typography } from '../theme/tokens';
 
 /**
@@ -16,17 +17,25 @@ import { colors, typography } from '../theme/tokens';
  *   hors des champs de saisie ; page floutée quand la fenêtre perd le focus ;
  *   presse-papiers remplacé après Impr. écran. Mêmes règles que le site.
  * Filigrane retiré le 2026-10-08 à la demande de Yannick.
+ * Chaque protection s'active ou se coupe depuis le back-office (onglet
+ * Paramètres, section Sécurité), sans nouvelle version de l'app.
  */
 
 export function ContentProtection() {
   const { t } = useI18n();
-  const veiled = useWebShield(t('brand.protectedContent'));
+  const { securite } = useSettings().settings;
+  const veiled = useWebShield(t('brand.protectedContent'), securite.protection_web, securite.voile_web);
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    ScreenCapture.preventScreenCaptureAsync('afroback-contenu').catch(() => {});
-    if (Platform.OS === 'ios') ScreenCapture.enableAppSwitcherProtectionAsync(0.9).catch(() => {});
-  }, []);
+    if (securite.anti_capture_app) {
+      ScreenCapture.preventScreenCaptureAsync('afroback-contenu').catch(() => {});
+      if (Platform.OS === 'ios') ScreenCapture.enableAppSwitcherProtectionAsync(0.9).catch(() => {});
+    } else {
+      ScreenCapture.allowScreenCaptureAsync('afroback-contenu').catch(() => {});
+      if (Platform.OS === 'ios') ScreenCapture.disableAppSwitcherProtectionAsync().catch(() => {});
+    }
+  }, [securite.anti_capture_app]);
 
   return (
     <>
@@ -60,18 +69,20 @@ function isEditable(target: EventTarget | null) {
   return !!el?.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"], [data-allow-copy]');
 }
 
-/** Freins web ; renvoie true quand la page doit être voilée. */
-function useWebShield(message: string) {
+/** Freins web ; renvoie true quand la page doit être voilée. `protection` : anti-copie, `voile` : flou à la perte du focus. */
+function useWebShield(message: string, protection: boolean, voile: boolean) {
   const [veiled, setVeiled] = useState(false);
   const messageRef = useRef(message);
   messageRef.current = message;
 
   useEffect(() => {
     if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+    setVeiled(false);
+    if (!protection && !voile) return;
     const style = document.createElement('style');
     style.setAttribute('data-afroback', 'protection');
     style.textContent = WEB_CSS;
-    document.head.appendChild(style);
+    if (protection) document.head.appendChild(style);
 
     let flash: ReturnType<typeof setTimeout> | null = null;
     // Copier/couper visent l'élément actif (souvent body) : on regarde aussi où commence la sélection.
@@ -88,7 +99,7 @@ function useWebShield(message: string) {
       }
     };
     const onKeyUp = (e: KeyboardEvent) => {
-      if (e.key !== 'PrintScreen') return;
+      if (e.key !== 'PrintScreen' || !voile) return;
       navigator.clipboard?.writeText(messageRef.current).catch(() => {});
       setVeiled(true);
       if (flash) clearTimeout(flash);
@@ -106,17 +117,21 @@ function useWebShield(message: string) {
       });
     };
     const observer = new MutationObserver(lockMedia);
-    observer.observe(document.body, { childList: true, subtree: true });
-    lockMedia();
+    if (protection) {
+      observer.observe(document.body, { childList: true, subtree: true });
+      lockMedia();
+    }
 
     const opts = { capture: true };
-    const blocked = ['copy', 'cut', 'contextmenu', 'dragstart', 'selectstart'];
+    const blocked = protection ? ['copy', 'cut', 'contextmenu', 'dragstart', 'selectstart'] : [];
     for (const type of blocked) document.addEventListener(type, block, opts);
-    document.addEventListener('keydown', onKeyDown, opts);
+    if (protection) document.addEventListener('keydown', onKeyDown, opts);
     document.addEventListener('keyup', onKeyUp, opts);
-    document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('blur', onBlur);
-    window.addEventListener('focus', onFocus);
+    if (voile) {
+      document.addEventListener('visibilitychange', onVisibility);
+      window.addEventListener('blur', onBlur);
+      window.addEventListener('focus', onFocus);
+    }
     return () => {
       for (const type of blocked) document.removeEventListener(type, block, opts);
       document.removeEventListener('keydown', onKeyDown, opts);
@@ -128,7 +143,7 @@ function useWebShield(message: string) {
       if (flash) clearTimeout(flash);
       style.remove();
     };
-  }, []);
+  }, [protection, voile]);
 
   return veiled;
 }

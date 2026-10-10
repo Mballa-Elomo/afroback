@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { useMfaPolicy } from '@/lib/settings';
 
 /**
  * Aiguillage du compte, comme dans l'application : navigateur à vérifier →
@@ -14,6 +15,7 @@ const FREE = ['/nouvel-appareil', '/double-authentification', '/bienvenue', '/le
 
 export function SessionGuard() {
   const { ready, session, device, mfa, onboardingComplete } = useAuth();
+  const mfaObligatoire = useMfaPolicy().obligatoire;
   const path = usePathname();
   const router = useRouter();
 
@@ -30,8 +32,13 @@ export function SessionGuard() {
       return;
     }
     if (mfa === 'unknown') return;
-    if (!onboardingComplete && !free) router.replace('/bienvenue');
-  }, [ready, session, device, mfa, onboardingComplete, path, router]);
+    if (!onboardingComplete && !free) {
+      router.replace('/bienvenue');
+      return;
+    }
+    // Vérification en 2 étapes rendue obligatoire dans le back-office (Paramètres → Sécurité).
+    if (mfaObligatoire && mfa === 'none' && !free && !path.startsWith('/compte/securite')) router.replace('/compte/securite');
+  }, [ready, session, device, mfa, onboardingComplete, path, router, mfaObligatoire]);
 
   return null;
 }

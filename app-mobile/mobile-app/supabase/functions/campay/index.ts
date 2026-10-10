@@ -47,33 +47,66 @@ const cors = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Tarifs : doivent rester identiques à src/onboarding/pricing.ts (source d'affichage de l'app).
-const PRIX_MENSUEL: Record<string, number> = { racines: 1500, heritage: 3000 };
-const REDUCTION_ANNUELLE = 0.83;
+// Tarifs et règles : réglés dans le back-office (onglet Paramètres, table
+// app_settings, backoffice/cdc-parametres-administration.md). Valeurs par
+// défaut = celles d'avant, utilisées si la table n'existe pas encore.
 const NOMS: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const DON_MIN = 200;
 const DON_MAX = 1_000_000;
 
-function prix(plan: string, periode: string): number {
-  const m = PRIX_MENSUEL[plan];
-  return periode === 'yearly' ? Math.round(m * 12 * REDUCTION_ANNUELLE) : m;
+type Reglages = {
+  actifs: boolean;
+  mtn: boolean;
+  orange: boolean;
+  abonnements_site: boolean;
+  abonnements_app: boolean;
+  dons: boolean;
+  prix_racines: number;
+  prix_heritage: number;
+  reduction_annuelle_pct: number;
+};
+const REGLAGES_DEFAUT: Reglages = {
+  actifs: true,
+  mtn: true,
+  orange: true,
+  abonnements_site: true,
+  abonnements_app: true,
+  dons: true,
+  prix_racines: 1500,
+  prix_heritage: 3000,
+  reduction_annuelle_pct: 17,
+};
+
+// deno-lint-ignore no-explicit-any
+async function reglagesPaiement(db: any): Promise<Reglages> {
+  const { data, error } = await db.from('app_settings').select('data').eq('id', 1).maybeSingle();
+  if (error || !data) return REGLAGES_DEFAUT;
+  return { ...REGLAGES_DEFAUT, ...((data.data as { paiements?: Partial<Reglages> })?.paiements ?? {}) };
+}
+
+function prix(r: Reglages, plan: string, periode: string): number {
+  const m = plan === 'heritage' ? r.prix_heritage : r.prix_racines;
+  return periode === 'yearly' ? Math.round(m * 12 * (1 - r.reduction_annuelle_pct / 100)) : m;
 }
 
 // Ce qui est acheté : montant et libellé TOUJOURS calculés ici, jamais repris de l'app.
-function preparer(body: Record<string, any>):
+function preparer(body: Record<string, any>, r: Reglages):
   | { type: 'abonnement' | 'don'; montant: number; description: string; plan: string | null; periode: string | null }
   | { erreur: string } {
+  if (!r.actifs) return { erreur: 'paiements_desactives' };
   if (body.type === 'don') {
+    if (!r.dons) return { erreur: 'dons_desactives' };
     const montant = Math.round(Number(body.montant));
     if (!Number.isFinite(montant) || montant < DON_MIN || montant > DON_MAX) return { erreur: 'montant_invalide' };
     return { type: 'don', montant, description: 'Don - Soutenir AFROBACK', plan: null, periode: null };
   }
   const plan = String(body.plan);
   const periode = body.periode === 'yearly' ? 'yearly' : 'monthly';
-  if (!PRIX_MENSUEL[plan]) return { erreur: 'forfait_invalide' };
+  if (!NOMS[plan]) return { erreur: 'forfait_invalide' };
+  if (!r.abonnements_site && !r.abonnements_app) return { erreur: 'abonnements_desactives' };
   return {
     type: 'abonnement',
-    montant: prix(plan, periode),
+    montant: prix(r, plan, periode),
     description: `AFROBACK ${NOMS[plan]} - ${periode === 'yearly' ? '12 mois' : '1 mois'}`,
     plan,
     periode,
@@ -275,7 +308,8 @@ Deno.serve(async (req) => {
     if (body.action !== 'creer' && body.action !== 'demander') return json({ ok: false, error: 'action_inconnue' }, 400);
     if (!TOKEN) return json({ ok: false, error: 'non_configure' }, 503);
 
-    const commande = preparer(body);
+    const reglages = await reglagesPaiement(db);
+    const commande = preparer(body, reglages);
     if ('erreur' in commande) return json({ ok: false, error: commande.erreur }, 400);
     const { type, montant, description, plan, periode } = commande;
     // En demo, Campay plafonne les montants : CAMPAY_MONTANT_TEST remplace le vrai prix (le crédit reste celui du forfait).
@@ -284,6 +318,10 @@ Deno.serve(async (req) => {
     if (body.action === 'demander') {
       const tel = numeroCamerounais(body.telephone);
       if (!tel) return json({ ok: false, error: 'numero_invalide' }, 400);
+      const op = operateurDe(tel);
+      if ((op === 'MTN' && !reglages.mtn) || (op === 'ORANGE' && !reglages.orange)) {
+        return json({ ok: false, error: 'operateur_indisponible' }, 400);
+      }
       // Garde-fou : 5 demandes par heure et par compte au maximum.
       const uneHeure = new Date(Date.now() - 3600 * 1000).toISOString();
       const { count } = await db.from('paiements').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', uneHeure);

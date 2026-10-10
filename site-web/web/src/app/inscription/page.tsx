@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { AuthShell, Field, Notice, PhoneField, Submit, TextLink } from '@/components/auth-ui';
 import { useAuth } from '@/lib/auth';
 import { useLang } from '@/lib/lang-client';
+import { useSettings } from '@/lib/settings';
 
 const strong = (p: string) => p.length >= 8 && /[A-Za-z]/.test(p) && /\d/.test(p);
 
 export default function Inscription() {
   const { signUp } = useAuth();
+  const settings = { general: useSettings().general };
   const { tr } = useLang();
   const router = useRouter();
   const [prenom, setPrenom] = useState('');
@@ -22,6 +24,7 @@ export default function Inscription() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!settings.general.inscriptions_ouvertes) return setError(tr('Les inscriptions sont momentanément fermées. Réessaie plus tard.', 'Sign-ups are temporarily closed. Please try again later.'));
     if (!strong(pwd)) return setError(tr('Mot de passe : au moins 8 caractères, avec des lettres et des chiffres.', 'Password: at least 8 characters, with letters and numbers.'));
     setBusy(true);
     setError(null);

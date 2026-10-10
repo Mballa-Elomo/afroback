@@ -13,6 +13,8 @@ import { colors } from '../src/theme/tokens';
 import { loadInitialLanguage } from '../src/i18n';
 import { BootScreen } from '../src/components/BootScreen';
 import { ContentProtection } from '../src/security/ContentProtection';
+import { SettingsProvider, useSettings } from '../src/settings/SettingsProvider';
+import { MaintenanceGate } from '../src/settings/MaintenanceGate';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -42,6 +44,9 @@ export default function RootLayout() {
   const content = (
     <>
       <StatusBar style="light" />
+      {/* Paramètres réglés dans le back-office (cdc-parametres-administration.md). */}
+      <SettingsProvider>
+      <MaintenanceGate>
       <AuthProvider>
         <WizardStateProvider>
           <ActiveProfileProvider>
@@ -55,6 +60,8 @@ export default function RootLayout() {
           </ActiveProfileProvider>
         </WizardStateProvider>
       </AuthProvider>
+      </MaintenanceGate>
+      </SettingsProvider>
     </>
   );
 
@@ -108,6 +115,7 @@ const styles = StyleSheet.create({
 function RootNavigator() {
   const { session, onboardingComplete, mfaStatus, isGuest, deviceStatus } = useAuth();
   const { state: profileState } = useActiveProfile();
+  const { settings } = useSettings();
 
   // session === undefined tant que la lecture de la session locale (AsyncStorage) n'est pas terminée.
   if (session === undefined) return <BootScreen />;
@@ -126,6 +134,11 @@ function RootNavigator() {
   // 'not_enrolled' (pas de 2FA activée) et 'satisfied' (2FA validée) se comportent pareil.
   const mfaPassed = !session || mfaStatus !== 'challenge_required';
   const mfaOk = deviceOk && mfaPassed;
+  // Paramètres du back-office : espace enfant coupé → tout le monde sur l'accueil adulte ;
+  // 2 étapes obligatoire → seul l'écran d'activation reste joignable tant qu'elle n'est pas activée.
+  const enfantOn = settings.modules.espace_enfant;
+  const mustEnroll = !!session && mfaOk && onboardingComplete && settings.securite.mfa_obligatoire && mfaStatus === 'not_enrolled';
+  const adultProfile = profileState.status === 'adult' || (!enfantOn && (profileState.status === 'selecting' || profileState.status === 'child'));
 
   return (
     // Chaque écran construit son propre en-tête (retour, titre) pour coller
@@ -176,10 +189,10 @@ function RootNavigator() {
         {/* Confirmation de paiement (Campay) : pendant l'inscription (forfait) comme après. */}
         <Stack.Screen name="paiement/retour" options={{ animation: 'fade', gestureEnabled: false }} />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && profileState.status === 'selecting'}>
+      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && enfantOn && !mustEnroll && profileState.status === 'selecting'}>
         <Stack.Screen name="profils/selection" />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && profileState.status === 'child'}>
+      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && enfantOn && !mustEnroll && profileState.status === 'child'}>
         <Stack.Screen name="enfant/accueil" />
         <Stack.Screen name="enfant/histoire" />
         <Stack.Screen name="enfant/carnet/index" />
@@ -194,13 +207,13 @@ function RootNavigator() {
       {/* Invité ("Explorer sans compte") : accès aux onglets en lecture, les
           actions réservées passent par AccountWall (cdc-onboarding.md, section 4). */}
       <Stack.Protected
-        guard={(!!session && mfaOk && onboardingComplete && profileState.status === 'adult') || isGuest}
+        guard={(!!session && mfaOk && onboardingComplete && !mustEnroll && adultProfile) || isGuest}
       >
         <Stack.Screen name="(tabs)" />
         {/* Recherche globale (héros, mythes, Découverte), 2026-09-30. */}
         <Stack.Screen name="recherche" options={{ animation: 'fade' }} />
       </Stack.Protected>
-      <Stack.Protected guard={!!session && mfaOk && onboardingComplete}>
+      <Stack.Protected guard={!!session && mfaOk && onboardingComplete && !mustEnroll}>
         <Stack.Screen name="profils/ajouter" />
         <Stack.Screen name="profils/parent" />
         <Stack.Screen name="abonnement" />

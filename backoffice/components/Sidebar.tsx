@@ -129,9 +129,18 @@ export function Sidebar({ admin }: { admin: AdminUser }) {
           <div style={{ fontWeight: 700, fontSize: 12.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{admin.nom}</div>
           <div style={{ fontFamily: fonts.mono, fontSize: 9, color: colors.textMuted }}>ADMIN COMPLET</div>
         </div>
-        <Link href="/logout" title="Se déconnecter" style={{ fontSize: 14, color: colors.textMuted }}>
-          ⏻
-        </Link>
+        {/* Formulaire POST et non <Link> : Next.js préchargeait /logout dès l'affichage du menu, ce qui
+            déconnectait l'administrateur sans clic (bug trouvé le 2026-10-10). */}
+        <form action="/logout" method="post" style={{ margin: 0 }}>
+          <button
+            type="submit"
+            title="Se déconnecter"
+            aria-label="Se déconnecter"
+            style={{ fontSize: 14, color: colors.textMuted, background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
+          >
+            ⏻
+          </button>
+        </form>
       </div>
     </aside>
   );

@@ -10,7 +10,7 @@ import { useAuth } from '@/lib/auth';
  * inscription pas terminée → « Bienvenue ». Les pages publiques restent
  * visitables en invité.
  */
-const FREE = ['/nouvel-appareil', '/double-authentification', '/bienvenue', '/legal', '/verification', '/connexion', '/inscription', '/mot-de-passe-oublie'];
+const FREE = ['/nouvel-appareil', '/double-authentification', '/bienvenue', '/legal', '/verification', '/connexion', '/inscription', '/mot-de-passe-oublie', '/supprimer-mon-compte'];
 
 export function SessionGuard() {
   const { ready, session, device, mfa, onboardingComplete } = useAuth();

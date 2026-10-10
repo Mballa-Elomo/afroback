@@ -1,0 +1,726 @@
+[
+ {
+  "n": 1,
+  "start": 0.15,
+  "dur": 1.044,
+  "text": "Tu connais Napoléon ?",
+  "words": [
+   [
+    "Tu",
+    0.15
+   ],
+   [
+    "connais",
+    0.29
+   ],
+   [
+    "Napoléon",
+    0.6
+   ],
+   [
+    "?",
+    0.95
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 1.45,
+  "dur": 2.199,
+  "text": "Mais tu connais Ruben Um Nyobè ?",
+  "words": [
+   [
+    "Mais",
+    1.45
+   ],
+   [
+    "tu",
+    1.75
+   ],
+   [
+    "connais",
+    1.95
+   ],
+   [
+    "Ruben",
+    2.4
+   ],
+   [
+    "Um",
+    2.75
+   ],
+   [
+    "Nyobè",
+    2.95
+   ],
+   [
+    "?",
+    3.3
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 3.9,
+  "dur": 2.768,
+  "text": "Louis Quatorze ? Mais la reine Nzinga ?",
+  "words": [
+   [
+    "Louis",
+    3.9
+   ],
+   [
+    "Quatorze",
+    4.25
+   ],
+   [
+    "?",
+    4.74
+   ],
+   [
+    "Mais",
+    5.09
+   ],
+   [
+    "la",
+    5.38
+   ],
+   [
+    "reine",
+    5.58
+   ],
+   [
+    "Nzinga",
+    5.93
+   ],
+   [
+    "?",
+    6.32
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 6.9,
+  "dur": 3.367,
+  "text": "L'alphabet latin ? Mais l'écriture du roi Njoya ?",
+  "words": [
+   [
+    "L'alphabet",
+    6.9
+   ],
+   [
+    "latin",
+    7.5
+   ],
+   [
+    "?",
+    7.85
+   ],
+   [
+    "Mais",
+    8.21
+   ],
+   [
+    "l'écriture",
+    8.51
+   ],
+   [
+    "du",
+    9.11
+   ],
+   [
+    "roi",
+    9.31
+   ],
+   [
+    "Njoya",
+    9.56
+   ],
+   [
+    "?",
+    9.92
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 10.5,
+  "dur": 2.144,
+  "text": "On nous a raconté l'histoire des autres.",
+  "words": [
+   [
+    "On",
+    10.5
+   ],
+   [
+    "nous",
+    10.66
+   ],
+   [
+    "a",
+    10.91
+   ],
+   [
+    "raconté",
+    11.04
+   ],
+   [
+    "l'histoire",
+    11.41
+   ],
+   [
+    "des",
+    11.9
+   ],
+   [
+    "autres.",
+    12.11
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 12.85,
+  "dur": 4.104,
+  "text": "Nos héros, nos légendes, nos traditions ? Silence.",
+  "words": [
+   [
+    "Nos",
+    12.85
+   ],
+   [
+    "héros,",
+    13.12
+   ],
+   [
+    "nos",
+    13.78
+   ],
+   [
+    "légendes,",
+    14.05
+   ],
+   [
+    "nos",
+    14.87
+   ],
+   [
+    "traditions",
+    15.15
+   ],
+   [
+    "?",
+    15.8
+   ],
+   [
+    "Silence.",
+    16.19
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 17.2,
+  "dur": 2.708,
+  "text": "Um Nyobè : un nom interdit, plus de trente ans.",
+  "words": [
+   [
+    "Um",
+    17.2
+   ],
+   [
+    "Nyobè",
+    17.35
+   ],
+   [
+    ":",
+    17.63
+   ],
+   [
+    "un",
+    17.9
+   ],
+   [
+    "nom",
+    18.05
+   ],
+   [
+    "interdit,",
+    18.24
+   ],
+   [
+    "plus",
+    18.82
+   ],
+   [
+    "de",
+    19.06
+   ],
+   [
+    "trente",
+    19.21
+   ],
+   [
+    "ans.",
+    19.52
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 20.2,
+  "dur": 3.103,
+  "text": "Alors voici AFROBACK. Le retour aux origines.",
+  "words": [
+   [
+    "Alors",
+    20.2
+   ],
+   [
+    "voici",
+    20.56
+   ],
+   [
+    "AFROBACK.",
+    20.91
+   ],
+   [
+    "Le",
+    21.68
+   ],
+   [
+    "retour",
+    21.88
+   ],
+   [
+    "aux",
+    22.29
+   ],
+   [
+    "origines.",
+    22.54
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 23.5,
+  "dur": 3.018,
+  "text": "Nos héros africains, racontés comme le ferait un griot.",
+  "words": [
+   [
+    "Nos",
+    23.5
+   ],
+   [
+    "héros",
+    23.71
+   ],
+   [
+    "africains,",
+    24.0
+   ],
+   [
+    "racontés",
+    24.66
+   ],
+   [
+    "comme",
+    25.07
+   ],
+   [
+    "le",
+    25.36
+   ],
+   [
+    "ferait",
+    25.53
+   ],
+   [
+    "un",
+    25.86
+   ],
+   [
+    "griot.",
+    26.02
+   ]
+  ]
+ },
+ {
+  "n": 10,
+  "start": 26.75,
+  "dur": 3.075,
+  "text": "Lis leur histoire, chapitre après chapitre. Ou écoute-la.",
+  "words": [
+   [
+    "Lis",
+    26.75
+   ],
+   [
+    "leur",
+    26.95
+   ],
+   [
+    "histoire,",
+    27.18
+   ],
+   [
+    "chapitre",
+    27.77
+   ],
+   [
+    "après",
+    28.17
+   ],
+   [
+    "chapitre.",
+    28.45
+   ],
+   [
+    "Ou",
+    29.04
+   ],
+   [
+    "écoute-la.",
+    29.19
+   ]
+  ]
+ },
+ {
+  "n": 11,
+  "start": 30.1,
+  "dur": 4.279,
+  "text": "Entre dans nos mythes : le serpent Ngan Medza, les géants Sao…",
+  "words": [
+   [
+    "Entre",
+    30.1
+   ],
+   [
+    "dans",
+    30.44
+   ],
+   [
+    "nos",
+    30.74
+   ],
+   [
+    "mythes",
+    30.99
+   ],
+   [
+    ":",
+    31.38
+   ],
+   [
+    "le",
+    31.72
+   ],
+   [
+    "serpent",
+    31.92
+   ],
+   [
+    "Ngan",
+    32.36
+   ],
+   [
+    "Medza,",
+    32.66
+   ],
+   [
+    "les",
+    33.25
+   ],
+   [
+    "géants",
+    33.49
+   ],
+   [
+    "Sao…",
+    33.89
+   ]
+  ]
+ },
+ {
+  "n": 12,
+  "start": 34.6,
+  "dur": 4.416,
+  "text": "Découvre nos villages, nos palais, nos rites et nos objets sacrés.",
+  "words": [
+   [
+    "Découvre",
+    34.6
+   ],
+   [
+    "nos",
+    35.09
+   ],
+   [
+    "villages,",
+    35.34
+   ],
+   [
+    "nos",
+    36.07
+   ],
+   [
+    "palais,",
+    36.32
+   ],
+   [
+    "nos",
+    36.96
+   ],
+   [
+    "rites",
+    37.2
+   ],
+   [
+    "et",
+    37.54
+   ],
+   [
+    "nos",
+    37.74
+   ],
+   [
+    "objets",
+    37.99
+   ],
+   [
+    "sacrés.",
+    38.38
+   ]
+  ]
+ },
+ {
+  "n": 13,
+  "start": 39.8,
+  "dur": 1.729,
+  "text": "Tout est là. Dans ta poche.",
+  "words": [
+   [
+    "Tout",
+    39.8
+   ],
+   [
+    "est",
+    40.05
+   ],
+   [
+    "là.",
+    40.25
+   ],
+   [
+    "Dans",
+    40.62
+   ],
+   [
+    "ta",
+    40.87
+   ],
+   [
+    "poche.",
+    41.03
+   ]
+  ]
+ },
+ {
+  "n": 14,
+  "start": 41.8,
+  "dur": 4.221,
+  "text": "Rejoins la communauté : aime, commente, partage avec les tiens.",
+  "words": [
+   [
+    "Rejoins",
+    41.8
+   ],
+   [
+    "la",
+    42.22
+   ],
+   [
+    "communauté",
+    42.41
+   ],
+   [
+    ":",
+    42.97
+   ],
+   [
+    "aime,",
+    43.3
+   ],
+   [
+    "commente,",
+    43.82
+   ],
+   [
+    "partage",
+    44.52
+   ],
+   [
+    "avec",
+    44.94
+   ],
+   [
+    "les",
+    45.22
+   ],
+   [
+    "tiens.",
+    45.46
+   ]
+  ]
+ },
+ {
+  "n": 15,
+  "start": 46.25,
+  "dur": 3.055,
+  "text": "Et transmets-les à tes enfants, dans leur propre espace.",
+  "words": [
+   [
+    "Et",
+    46.25
+   ],
+   [
+    "transmets-les",
+    46.42
+   ],
+   [
+    "à",
+    47.03
+   ],
+   [
+    "tes",
+    47.16
+   ],
+   [
+    "enfants,",
+    47.36
+   ],
+   [
+    "dans",
+    47.94
+   ],
+   [
+    "leur",
+    48.19
+   ],
+   [
+    "propre",
+    48.44
+   ],
+   [
+    "espace.",
+    48.77
+   ]
+  ]
+ },
+ {
+  "n": 16,
+  "start": 49.55,
+  "dur": 1.266,
+  "text": "Commencer ne te coûte rien.",
+  "words": [
+   [
+    "Commencer",
+    49.55
+   ],
+   [
+    "ne",
+    49.93
+   ],
+   [
+    "te",
+    50.06
+   ],
+   [
+    "coûte",
+    50.2
+   ],
+   [
+    "rien.",
+    50.44
+   ]
+  ]
+ },
+ {
+  "n": 17,
+  "start": 51.4,
+  "dur": 3.946,
+  "text": "Télécharge AFROBACK. Disponible sur l'App Store et Google Play.",
+  "words": [
+   [
+    "Télécharge",
+    51.4
+   ],
+   [
+    "AFROBACK.",
+    51.98
+   ],
+   [
+    "Disponible",
+    52.72
+   ],
+   [
+    "sur",
+    53.3
+   ],
+   [
+    "l'App",
+    53.54
+   ],
+   [
+    "Store",
+    53.88
+   ],
+   [
+    "et",
+    54.23
+   ],
+   [
+    "Google",
+    54.42
+   ],
+   [
+    "Play.",
+    54.81
+   ]
+  ]
+ },
+ {
+  "n": 18,
+  "start": 55.6,
+  "dur": 3.109,
+  "text": "Nos histoires t'attendent. Rejoins-nous sur AFROBACK.",
+  "words": [
+   [
+    "Nos",
+    55.6
+   ],
+   [
+    "histoires",
+    55.83
+   ],
+   [
+    "t'attendent.",
+    56.33
+   ],
+   [
+    "Rejoins-nous",
+    57.15
+   ],
+   [
+    "sur",
+    57.79
+   ],
+   [
+    "AFROBACK.",
+    58.02
+   ]
+  ]
+ }
+]

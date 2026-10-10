@@ -13,6 +13,7 @@ const en: Translation = {
   },
   brand: {
     tagline: 'Back to our roots',
+    protectedContent: 'Content protected by AFROBACK',
   },
   splash: {
     chooseLanguage: 'Choose your language',
@@ -389,6 +390,7 @@ const en: Translation = {
     childLocked: 'This story is locked. Ask your parent to unlock all the stories.',
   },
   abonnement: {
+    storeNote: 'Subscriptions cannot be purchased in this version of the app.',
     title: 'Plans',
     subtitle: 'Unlock every AFROBACK story.',
     current: 'Your plan',
@@ -508,6 +510,25 @@ const en: Translation = {
     submit: 'Change password',
     done: 'Password changed. Your other devices have been logged out.',
     error: "The password couldn't be changed. Please try again.",
+  },
+  deleteAccount: {
+    row: 'Delete my account',
+    title: 'Delete my account',
+    subtitle: 'This is permanent: your account cannot be recovered.',
+    deletedTitle: 'What will be deleted',
+    deleted: 'Your account (email, phone, password), your Community profile and posts, your comments and likes, child profiles and their progress, your Market shop and orders, your quiz progress, your photos.',
+    keptTitle: 'What is kept',
+    kept: 'Your payment history, with no link to you (accounting obligation).',
+    subscriptionWarning: 'Your current subscription will be lost, with no refund.',
+    password: 'Your password',
+    confirmLabel: 'I understand that deletion is permanent',
+    submit: 'Delete permanently',
+    confirmTitle: 'Delete your account?',
+    confirmBody: 'All your AFROBACK data will be erased. This cannot be undone.',
+    confirmYes: 'Delete',
+    wrongPassword: 'Wrong password.',
+    error: 'Your account could not be deleted. Please try again shortly.',
+    done: 'Your account has been deleted. Thank you for being part of AFROBACK.',
   },
   authErrors: {
     invalidEmail: 'Invalid email address.',

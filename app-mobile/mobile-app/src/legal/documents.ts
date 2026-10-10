@@ -12,7 +12,7 @@
  * (`user_metadata.consent_version`) : la changer à chaque nouvelle version.
  */
 
-export const LEGAL_VERSION = 'provisoire-2026-09-29';
+export const LEGAL_VERSION = 'provisoire-2026-10-08';
 
 export interface LegalSection {
   title: string;
@@ -33,7 +33,7 @@ const CONTACT = 'afroback3d@gmail.com';
 
 const cguFr: LegalDocument = {
   title: "Conditions d'utilisation",
-  updated: 'Version provisoire du 29 septembre 2026',
+  updated: 'Version provisoire du 8 octobre 2026',
   draftNotice:
     "Ce document est une version provisoire, en cours de relecture juridique. Il sera finalisé avant l'ouverture d'AFROBACK au public.",
   sections: [
@@ -76,7 +76,7 @@ const cguFr: LegalDocument = {
       title: '6. Forfaits et abonnements',
       paragraphs: [
         "Le forfait Découverte est gratuit et donne accès à une sélection de contenus. Les forfaits Racines et Héritage donnent accès à l'ensemble des contenus et fonctions décrits dans l'application, aux prix qui y sont affichés.",
-        "Le paiement par Mobile Money (Orange Money, MTN MoMo) sera ouvert prochainement. Les conditions de paiement, de renouvellement et de résiliation seront précisées à ce moment-là, avant tout prélèvement. D'ici là, aucun montant n'est débité et des accès peuvent être offerts par AFROBACK.",
+        "Le paiement se fait par Mobile Money (Orange Money, MTN MoMo), par l'intermédiaire de notre prestataire de paiement Campay. Un abonnement couvre la durée choisie (un mois ou un an) ; tu peux le renouveler avant son échéance. Tu peux le résilier à tout moment : l'accès est conservé jusqu'à la date de fin, sans remboursement de la période en cours. AFROBACK peut aussi offrir des accès.",
       ],
     },
     {
@@ -108,7 +108,7 @@ const cguFr: LegalDocument = {
     {
       title: '11. Suspension et suppression du compte',
       paragraphs: [
-        `Tu peux demander la suppression de ton compte à tout moment en écrivant à ${CONTACT}. AFROBACK peut suspendre ou supprimer un compte en cas de manquement grave à ces conditions, après t'en avoir informé lorsque c'est possible.`,
+        `Tu peux supprimer ton compte à tout moment, toi-même : dans l'application (Profil → Sécurité → Supprimer mon compte) ou sur https://afroback-web.vercel.app/supprimer-mon-compte. Tu peux aussi écrire à ${CONTACT}. AFROBACK peut suspendre ou supprimer un compte en cas de manquement grave à ces conditions, après t'en avoir informé lorsque c'est possible.`,
       ],
     },
     {
@@ -128,7 +128,7 @@ const cguFr: LegalDocument = {
 
 const cguEn: LegalDocument = {
   title: 'Terms of use',
-  updated: 'Provisional version of 29 September 2026',
+  updated: 'Provisional version of 8 October 2026',
   draftNotice:
     'This document is a provisional version under legal review. It will be finalised before AFROBACK opens to the public.',
   sections: [
@@ -171,7 +171,7 @@ const cguEn: LegalDocument = {
       title: '6. Plans and subscriptions',
       paragraphs: [
         'The Découverte plan is free and gives access to a selection of content. The Racines and Héritage plans give access to all the content and features described in the app, at the prices shown there.',
-        'Mobile Money payment (Orange Money, MTN MoMo) will open soon. Payment, renewal and cancellation terms will be specified at that time, before any charge. Until then, nothing is charged and access may be offered by AFROBACK.',
+        'Payment is made by Mobile Money (Orange Money, MTN MoMo), through our payment provider Campay. A subscription covers the chosen period (one month or one year); you can renew it before it ends. You can cancel it at any time: access is kept until the end date, with no refund of the current period. AFROBACK may also offer access.',
       ],
     },
     {
@@ -203,7 +203,7 @@ const cguEn: LegalDocument = {
     {
       title: '11. Account suspension and deletion',
       paragraphs: [
-        `You can ask for your account to be deleted at any time by writing to ${CONTACT}. AFROBACK may suspend or delete an account in case of serious breach of these terms, after informing you when possible.`,
+        `You can delete your account yourself at any time: in the app (Profile → Security → Delete my account) or at https://afroback-web.vercel.app/supprimer-mon-compte. You can also write to ${CONTACT}. AFROBACK may suspend or delete an account in case of serious breach of these terms, after informing you when possible.`,
       ],
     },
     {
@@ -223,7 +223,7 @@ const cguEn: LegalDocument = {
 
 const privFr: LegalDocument = {
   title: 'Politique de confidentialité',
-  updated: 'Version provisoire du 29 septembre 2026',
+  updated: 'Version provisoire du 8 octobre 2026',
   draftNotice:
     "Ce document est une version provisoire, en cours de relecture juridique. Il sera finalisé avant l'ouverture d'AFROBACK au public.",
   sections: [
@@ -240,7 +240,9 @@ const privFr: LegalDocument = {
         "Ton compte : prénom, adresse e-mail, numéro de téléphone, mot de passe (enregistré chiffré, jamais lisible par nous), langue choisie, date et version des conditions acceptées.",
         "Ton profil public : pseudo et photo ou avatar, visibles par les autres membres. Ton e-mail et ton numéro ne sont jamais affichés.",
         "Ce que tu nous indiques : l'usage prévu de l'application, le forfait qui t'intéresse, les profils de tes enfants (prénom, âge, couleur d'avatar, langues souhaitées).",
-        "Ce que tu publies ou fais : publications, commentaires et signalements dans la Communauté ; boutique, produits, commandes et avis dans la Marketplace ; dons ; abonnements.",
+        "Ce que tu publies ou fais : publications, commentaires et signalements dans la Communauté ; boutique, produits, commandes (dont l'adresse de livraison) et avis dans la Marketplace ; dons ; abonnements ; résultats aux quiz.",
+        "Paiements : numéro Mobile Money utilisé, montant, date, statut et référence de la transaction.",
+        "Ton appareil : un identifiant créé par l'application et le nom de l'appareil, pour n'autoriser qu'un appareil connecté à la fois et t'alerter d'une nouvelle connexion.",
         "Sécurité : les tentatives de connexion (identifiant utilisé, réussite ou échec, date) pour bloquer les tentatives d'intrusion ; si tu l'actives, la clé de ta vérification en 2 étapes, enregistrée chiffrée.",
         "Statistiques : le nombre de lectures, d'écoutes et de vidéos vues par contenu, sans lien avec ton identité.",
         "Sur ton téléphone uniquement (jamais envoyés) : la langue choisie, le fait d'avoir déjà vu l'introduction et ta progression de lecture.",
@@ -256,7 +258,7 @@ const privFr: LegalDocument = {
     {
       title: '4. Qui y a accès',
       paragraphs: [
-        "L'équipe AFROBACK, pour faire fonctionner et modérer le service. Nos prestataires techniques, uniquement pour ce qui les concerne : Supabase (hébergement de la base de données, des comptes et des fichiers), Google (envoi des e-mails depuis afroback3d@gmail.com), Vercel (version web de test) et Expo (distribution de l'application).",
+        "L'équipe AFROBACK, pour faire fonctionner et modérer le service. Nos prestataires techniques, uniquement pour ce qui les concerne : Supabase (hébergement de la base de données, des comptes et des fichiers), Google (envoi des e-mails depuis afroback3d@gmail.com), Campay (paiements Mobile Money), Vercel (version web et site) et Expo (distribution de l'application).",
         "Certains de ces prestataires hébergent les données hors du Cameroun. [à compléter : région d'hébergement Supabase et garanties applicables aux transferts.]",
         "Les autres membres ne voient que ton pseudo, ta photo ou ton avatar et ce que tu publies. Un vendeur de la Marketplace reçoit les informations nécessaires à la livraison de ta commande.",
       ],
@@ -264,7 +266,7 @@ const privFr: LegalDocument = {
     {
       title: '5. Combien de temps nous les gardons',
       paragraphs: [
-        "Tant que ton compte existe. Quand tu supprimes ton compte, tes données personnelles sont effacées, sauf ce que la loi nous oblige à conserver (par exemple les traces de paiement) pour la durée prévue par la loi.",
+        "Tant que ton compte existe. Quand tu supprimes ton compte (dans l'application : Profil → Sécurité → Supprimer mon compte, ou sur https://afroback-web.vercel.app/supprimer-mon-compte), tes données personnelles sont effacées immédiatement. Seules les traces de paiement sont conservées, sans lien avec toi, pour la durée prévue par la loi.",
       ],
     },
     {
@@ -297,7 +299,7 @@ const privFr: LegalDocument = {
 
 const privEn: LegalDocument = {
   title: 'Privacy policy',
-  updated: 'Provisional version of 29 September 2026',
+  updated: 'Provisional version of 8 October 2026',
   draftNotice:
     'This document is a provisional version under legal review. It will be finalised before AFROBACK opens to the public.',
   sections: [
@@ -314,7 +316,9 @@ const privEn: LegalDocument = {
         'Your account: first name, email address, phone number, password (stored encrypted, never readable by us), chosen language, date and version of the accepted terms.',
         'Your public profile: username and photo or avatar, visible to other members. Your email and phone number are never displayed.',
         'What you tell us: how you plan to use the app, the plan you are interested in, your children\'s profiles (first name, age, avatar colour, preferred languages).',
-        'What you post or do: posts, comments and reports in the Community; shop, products, orders and reviews on the Marketplace; donations; subscriptions.',
+        'What you post or do: posts, comments and reports in the Community; shop, products, orders (including the delivery address) and reviews on the Marketplace; donations; subscriptions; quiz results.',
+        'Payments: Mobile Money number used, amount, date, status and transaction reference.',
+        'Your device: an identifier created by the app and the device name, to allow only one connected device at a time and alert you of a new login.',
         'Security: login attempts (identifier used, success or failure, date) to block intrusion attempts; if you enable it, your 2-step verification key, stored encrypted.',
         'Statistics: the number of reads, listens and video views per content, not linked to your identity.',
         'On your phone only (never sent): your chosen language, whether you have seen the introduction, and your reading progress.',
@@ -330,7 +334,7 @@ const privEn: LegalDocument = {
     {
       title: '4. Who can access it',
       paragraphs: [
-        'The AFROBACK team, to run and moderate the service. Our technical providers, only for what concerns them: Supabase (hosting of the database, accounts and files), Google (sending emails from afroback3d@gmail.com), Vercel (test web version) and Expo (app distribution).',
+        'The AFROBACK team, to run and moderate the service. Our technical providers, only for what concerns them: Supabase (hosting of the database, accounts and files), Google (sending emails from afroback3d@gmail.com), Campay (Mobile Money payments), Vercel (web version and website) and Expo (app distribution).',
         'Some of these providers host data outside Cameroon. [to be completed: Supabase hosting region and safeguards applying to transfers.]',
         'Other members only see your username, your photo or avatar and what you post. A Marketplace seller receives the information needed to deliver your order.',
       ],
@@ -338,7 +342,7 @@ const privEn: LegalDocument = {
     {
       title: '5. How long we keep it',
       paragraphs: [
-        'As long as your account exists. When you delete your account, your personal data is erased, except what the law requires us to keep (for example payment records) for the period set by law.',
+        'As long as your account exists. When you delete your account (in the app: Profile → Security → Delete my account, or at https://afroback-web.vercel.app/supprimer-mon-compte), your personal data is erased immediately. Only payment records are kept, with no link to you, for the period set by law.',
       ],
     },
     {

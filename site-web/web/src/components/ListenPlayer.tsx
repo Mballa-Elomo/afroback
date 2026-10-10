@@ -98,6 +98,7 @@ export function ListenPlayer({ type, tile, detail: initial }: { type: ContentTyp
           ref={audio}
           src={src}
           preload="metadata"
+          controlsList="nodownload"
           onPlay={onPlay}
           onPause={() => setPlaying(false)}
           onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}

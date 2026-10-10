@@ -21,6 +21,7 @@ import {
   type QuizResultat,
 } from '../../../src/quiz/quizApi';
 import { LevelBar, useNextLevelText } from '../../../src/quiz/QuizUI';
+import { IN_APP_DIGITAL_PAYMENTS } from '../../../src/payments/storePolicy';
 
 const BG = '#0B0906';
 const GOLD = colors.accentGoldBright;
@@ -188,7 +189,7 @@ export default function QuizScreen() {
           <Text style={styles.centerText}>{text}</Text>
           <View style={styles.actions}>
             {phase === 'error' && <GoldButton label={t('quizAdult.retryLoad')} onPress={start} />}
-            {isLocked && <GoldButton label={t('paywall.see')} onPress={() => router.replace('/abonnement')} />}
+            {isLocked && IN_APP_DIGITAL_PAYMENTS && <GoldButton label={t('paywall.see')} onPress={() => router.replace('/abonnement')} />}
             <TextButton label={t('quizAdult.backToStory')} onPress={goToStory} />
           </View>
         </View>

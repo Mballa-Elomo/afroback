@@ -12,6 +12,7 @@ import { supabase } from '../data/supabaseClient';
 import { useI18n } from '../i18n';
 import type { Translation } from '../i18n/fr';
 import { colors, typography } from '../theme/tokens';
+import { IN_APP_DIGITAL_PAYMENTS } from '../payments/storePolicy';
 
 /**
  * Accès gratuit / abonné côté app (cdc-acces-gratuit-abonnement.md, lot A).
@@ -167,6 +168,8 @@ function PaywallContent({ reason, onDone, inline = false }: { reason: PaywallRea
           </View>
         ))}
       </View>
+      {/* Version Play Store : aucun chemin d'achat (storePolicy.ts). */}
+      {IN_APP_DIGITAL_PAYMENTS && (
       <PremiumButton
         label={t('paywall.see')}
         icon="sparkle"
@@ -177,6 +180,7 @@ function PaywallContent({ reason, onDone, inline = false }: { reason: PaywallRea
           else router.push('/abonnement');
         }}
       />
+      )}
       {!inline && (
         <Pressable onPress={onDone} style={styles.later} hitSlop={8} accessibilityRole="button">
           <Text style={styles.laterText}>{t('paywall.later')}</Text>
@@ -297,7 +301,7 @@ export function UpgradeBanner() {
   const router = useRouter();
   const { session } = useAuth();
   const { systemActive, isSubscribed } = useAccess();
-  if (!session || !systemActive || isSubscribed) return null;
+  if (!session || !systemActive || isSubscribed || !IN_APP_DIGITAL_PAYMENTS) return null;
   return (
     <Pressable
       onPress={() => router.push('/abonnement')}

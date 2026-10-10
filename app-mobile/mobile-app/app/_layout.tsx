@@ -12,6 +12,7 @@ import { useAppFonts } from '../src/theme/useAppFonts';
 import { colors } from '../src/theme/tokens';
 import { loadInitialLanguage } from '../src/i18n';
 import { BootScreen } from '../src/components/BootScreen';
+import { ContentProtection } from '../src/security/ContentProtection';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -47,6 +48,8 @@ export default function RootLayout() {
             <AccountWallProvider>
               <AccessProvider>
                 <RootNavigator />
+                {/* Anti-capture, anti-copie, filigrane (securite-phase2-protection-contenu.md). */}
+                <ContentProtection />
               </AccessProvider>
             </AccountWallProvider>
           </ActiveProfileProvider>
@@ -204,6 +207,8 @@ function RootNavigator() {
         {/* Modifier le profil et changer le mot de passe (cdc-edition-profil.md, 2026-09-30). */}
         <Stack.Screen name="profil/modifier" />
         <Stack.Screen name="profil/mot-de-passe" />
+        {/* Suppression du compte (exigence Google Play, cdc-play-store.md). */}
+        <Stack.Screen name="profil/supprimer-compte" />
         <Stack.Screen name="don/index" />
         <Stack.Screen name="don/montant" />
         {/* Quiz de fin de contenu et progression (cdc-quiz-progression.md, 2026-10-07) : réservés aux comptes. */}

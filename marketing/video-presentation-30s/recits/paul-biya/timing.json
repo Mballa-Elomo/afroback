@@ -1,0 +1,362 @@
+[
+ {
+  "n": 1,
+  "start": 0.15,
+  "dur": 3.035,
+  "text": "Depuis 1982, un seul président.",
+  "words": [
+   [
+    "Depuis",
+    0.15
+   ],
+   [
+    "1982,",
+    0.69
+   ],
+   [
+    "un",
+    1.43
+   ],
+   [
+    "seul",
+    1.7
+   ],
+   [
+    "président.",
+    2.11
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 3.55,
+  "dur": 1.846,
+  "text": "Paul Biya. Connais-tu son histoire ?",
+  "words": [
+   [
+    "Paul",
+    3.55
+   ],
+   [
+    "Biya.",
+    3.77
+   ],
+   [
+    "Connais-tu",
+    4.17
+   ],
+   [
+    "son",
+    4.6
+   ],
+   [
+    "histoire",
+    4.78
+   ],
+   [
+    "?",
+    5.14
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 5.85,
+  "dur": 1.929,
+  "text": "Il naît à Mvomeka'a, dans le Sud.",
+  "words": [
+   [
+    "Il",
+    5.85
+   ],
+   [
+    "naît",
+    6.01
+   ],
+   [
+    "à",
+    6.24
+   ],
+   [
+    "Mvomeka'a,",
+    6.36
+   ],
+   [
+    "dans",
+    6.99
+   ],
+   [
+    "le",
+    7.23
+   ],
+   [
+    "Sud.",
+    7.39
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 8.15,
+  "dur": 2.691,
+  "text": "Séminariste, puis étudiant en droit à Paris.",
+  "words": [
+   [
+    "Séminariste,",
+    8.15
+   ],
+   [
+    "puis",
+    8.96
+   ],
+   [
+    "étudiant",
+    9.23
+   ],
+   [
+    "en",
+    9.67
+   ],
+   [
+    "droit",
+    9.85
+   ],
+   [
+    "à",
+    10.17
+   ],
+   [
+    "Paris.",
+    10.3
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 11.25,
+  "dur": 1.99,
+  "text": "Haut fonctionnaire, puis Premier ministre.",
+  "words": [
+   [
+    "Haut",
+    11.25
+   ],
+   [
+    "fonctionnaire,",
+    11.46
+   ],
+   [
+    "puis",
+    12.17
+   ],
+   [
+    "Premier",
+    12.39
+   ],
+   [
+    "ministre.",
+    12.71
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 13.65,
+  "dur": 3.057,
+  "text": "Ahidjo démissionne : la Constitution le fait président.",
+  "words": [
+   [
+    "Ahidjo",
+    13.65
+   ],
+   [
+    "démissionne",
+    13.99
+   ],
+   [
+    ":",
+    14.54
+   ],
+   [
+    "la",
+    14.84
+   ],
+   [
+    "Constitution",
+    15.01
+   ],
+   [
+    "le",
+    15.6
+   ],
+   [
+    "fait",
+    15.77
+   ],
+   [
+    "président.",
+    16.03
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 17.1,
+  "dur": 2.957,
+  "text": "Puis un putsch manqué, la crise, le multipartisme.",
+  "words": [
+   [
+    "Puis",
+    17.1
+   ],
+   [
+    "un",
+    17.35
+   ],
+   [
+    "putsch",
+    17.52
+   ],
+   [
+    "manqué,",
+    17.85
+   ],
+   [
+    "la",
+    18.39
+   ],
+   [
+    "crise,",
+    18.56
+   ],
+   [
+    "le",
+    19.06
+   ],
+   [
+    "multipartisme.",
+    19.22
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 20.45,
+  "dur": 4.1,
+  "text": "Bakassi gagné en justice. Des guerres. Des élections contestées.",
+  "words": [
+   [
+    "Bakassi",
+    20.45
+   ],
+   [
+    "gagné",
+    20.88
+   ],
+   [
+    "en",
+    21.21
+   ],
+   [
+    "justice.",
+    21.4
+   ],
+   [
+    "Des",
+    22.07
+   ],
+   [
+    "guerres.",
+    22.31
+   ],
+   [
+    "Des",
+    22.98
+   ],
+   [
+    "élections",
+    23.22
+   ],
+   [
+    "contestées.",
+    23.74
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 25.0,
+  "dur": 2.196,
+  "text": "L'histoire n'a pas encore rendu son verdict.",
+  "words": [
+   [
+    "L'histoire",
+    25.0
+   ],
+   [
+    "n'a",
+    25.47
+   ],
+   [
+    "pas",
+    25.67
+   ],
+   [
+    "encore",
+    25.86
+   ],
+   [
+    "rendu",
+    26.18
+   ],
+   [
+    "son",
+    26.45
+   ],
+   [
+    "verdict.",
+    26.65
+   ]
+  ]
+ },
+ {
+  "n": 10,
+  "start": 27.6,
+  "dur": 2.651,
+  "text": "Connais les faits. Écoute son histoire sur AFROBACK.",
+  "words": [
+   [
+    "Connais",
+    27.6
+   ],
+   [
+    "les",
+    27.95
+   ],
+   [
+    "faits.",
+    28.14
+   ],
+   [
+    "Écoute",
+    28.6
+   ],
+   [
+    "son",
+    28.91
+   ],
+   [
+    "histoire",
+    29.1
+   ],
+   [
+    "sur",
+    29.48
+   ],
+   [
+    "AFROBACK.",
+    29.67
+   ]
+  ]
+ }
+]

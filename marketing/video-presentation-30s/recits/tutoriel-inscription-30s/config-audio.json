@@ -1,0 +1,22 @@
+{
+  "voice_dir": "C:/Users/Yannico/Music/Afroback Stories Audio/Voix Inscription 30s EN",
+  "lines": [
+    {"start": 0.15, "text": "Join AFROBACK. Follow me."},
+    {"start": 1.85, "text": "One: choose English, tap Get started."},
+    {"start": 5.55, "text": "Two: tap Create my account."},
+    {"start": 8.1, "text": "Three: first name, email, phone number."},
+    {"start": 11.25, "text": "A strong password, then tick the box."},
+    {"start": 14.1, "text": "Four: enter the code from your email."},
+    {"start": 17.0, "text": "Five: pick a username and avatar."},
+    {"start": 20.5, "text": "One last choice… your account is ready!"},
+    {"start": 22.9, "text": "Welcome to the AFROBACK family."},
+    {"start": 26.0, "text": "Download AFROBACK. Your journey starts here."}
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Baobab Oath.mp3",
+  "music_offset": 110.0,
+  "music_volume": 0.3,
+  "sfx": [],
+  "duration": 30,
+  "out": "public/audio/mix-tutoriel-inscription-30s-en.wav",
+  "timing_out": "recits/tutoriel-inscription-30s/timing.json"
+}

@@ -16,6 +16,7 @@ const fr = {
   },
   brand: {
     tagline: 'Retour aux origines',
+    protectedContent: 'Contenu protégé par AFROBACK',
   },
   splash: {
     chooseLanguage: 'Choisis ta langue',
@@ -392,6 +393,7 @@ const fr = {
     childLocked: 'Cette histoire est réservée. Demande à ton parent de débloquer tous les récits.',
   },
   abonnement: {
+    storeNote: "Les abonnements ne peuvent pas être souscrits dans cette version de l'application.",
     title: 'Abonnements',
     subtitle: "Débloque tous les récits d'AFROBACK.",
     current: 'Ton forfait',
@@ -511,6 +513,25 @@ const fr = {
     submit: 'Changer le mot de passe',
     done: 'Mot de passe changé. Tes autres appareils ont été déconnectés.',
     error: "Le mot de passe n'a pas pu être changé. Réessaie.",
+  },
+  deleteAccount: {
+    row: 'Supprimer mon compte',
+    title: 'Supprimer mon compte',
+    subtitle: 'Cette action est définitive : ton compte ne pourra pas être récupéré.',
+    deletedTitle: 'Ce qui sera supprimé',
+    deleted: 'Ton compte (email, téléphone, mot de passe), ton profil et tes publications dans la Communauté, tes commentaires et « j’aime », les profils enfants et leur progression, ta boutique et tes commandes au Marché, ta progression aux quiz, tes photos.',
+    keptTitle: 'Ce qui est conservé',
+    kept: 'L’historique de tes paiements, sans aucun lien avec toi (obligation comptable).',
+    subscriptionWarning: 'Ton abonnement en cours sera perdu, sans remboursement.',
+    password: 'Ton mot de passe',
+    confirmLabel: 'Je comprends que la suppression est définitive',
+    submit: 'Supprimer définitivement',
+    confirmTitle: 'Supprimer ton compte ?',
+    confirmBody: 'Toutes tes données AFROBACK seront effacées. Cette action est irréversible.',
+    confirmYes: 'Supprimer',
+    wrongPassword: 'Mot de passe incorrect.',
+    error: "Le compte n'a pas pu être supprimé. Réessaie dans un instant.",
+    done: 'Ton compte a été supprimé. Merci d’avoir fait partie d’AFROBACK.',
   },
   authErrors: {
     invalidEmail: 'Adresse e-mail invalide.',

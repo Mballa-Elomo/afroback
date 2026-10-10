@@ -1,6 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from './supabaseClient';
 import i18n from '../i18n';
+import { Platform } from 'react-native';
 
 /**
  * Upload d'image générique, réutilisé par le pilier Communauté (photo de
@@ -52,7 +53,9 @@ export interface PickAndUploadResult {
  * force un cadrage carré (avatars) ; sinon l'utilisateur cadre librement.
  */
 export async function pickAndUploadImage(folder: UploadFolder, options?: { square?: boolean }): Promise<PickAndUploadResult> {
-  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  // Android : sélecteur photo du système, sans permission de lire la galerie (exigence Google Play
+  // depuis 2025, cdc-play-store.md) ; la permission est d'ailleurs retirée de l'app (app.json).
+  const permission = Platform.OS === 'android' ? { granted: true } : await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (!permission.granted) {
     return {
       url: null,

@@ -210,6 +210,9 @@ export function WatchPlayer({
               key={chap.src}
               src={chap.src}
               controls
+              controlsList="nodownload noremoteplayback"
+              disablePictureInPicture
+              disableRemotePlayback
               autoPlay
               playsInline
               preload="metadata"

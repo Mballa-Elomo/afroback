@@ -111,6 +111,8 @@ interface AuthState {
   updateLanguage: (lang: 'fr' | 'en') => Promise<void>;
   /** Changement de mot de passe connecté : revérifie l'actuel, puis déconnecte les autres appareils. */
   changePassword: (params: { current: string; next: string }) => Promise<{ error: string | null; wrongCurrent?: boolean }>;
+  /** Suppression définitive du compte (exigence Google Play, cdc-play-store.md) : mot de passe revérifié, photos effacées, puis `delete_my_account`. */
+  deleteAccount: (password: string) => Promise<{ error: string | null; wrongPassword?: boolean }>;
   signOut: () => Promise<void>;
   deviceStatus: DeviceStatus;
   /** 'autre_appareil' : cet appareil vient d'être déconnecté parce que le compte a été validé ailleurs. */
@@ -499,6 +501,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await supabase.rpc('revoquer_autres_appareils', { p_device_id: await getDeviceId() });
         return { error: null };
       },
+      async deleteAccount(password) {
+        const user = session?.user;
+        const identifier = user?.email ?? (user?.phone ? `+${user.phone}` : null);
+        if (!user || !identifier) return { error: i18n.t('deleteAccount.error') };
+        const { data: lockout } = await supabase.rpc('check_login_lockout', { p_phone: identifier });
+        if (lockout?.locked) return { error: i18n.t('changePassword.tooMany') };
+        // Mot de passe revérifié sur un client jetable : une session laissée ouverte ne suffit pas.
+        const verifier = createVerificationClient();
+        const { error: checkError } = await verifier.auth.signInWithPassword(
+          user.email ? { email: user.email, password } : { phone: identifier, password }
+        );
+        await supabase.rpc('record_login_attempt', { p_phone: identifier, p_success: !checkError });
+        if (checkError) return { error: i18n.t('deleteAccount.wrongPassword'), wrongPassword: true };
+        await verifier.auth.signOut({ scope: 'local' }).catch(() => {});
+        // Photos envoyées (posts, produits, avatars) : effacées avant le compte, le SQL ne peut pas toucher au stockage.
+        await removeUserUploads(user.id).catch(() => {});
+        const { error } = await supabase.rpc('delete_my_account');
+        if (error) return { error: i18n.t('deleteAccount.error') };
+        mfaChallengeSatisfiedRef.current = false;
+        // Le compte n'existe plus : seule la session locale reste à effacer.
+        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        return { error: null };
+      },
       async signOut() {
         // scope 'global' explicite (gestion de session, lot cybersécurité du
         // 2026-09-25) : révoque la session sur TOUS les appareils connectés
@@ -552,4 +577,21 @@ export function useAuth(): AuthState {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth doit être utilisé à l’intérieur de <AuthProvider>.');
   return ctx;
+}
+
+/** Efface tous les fichiers du compte dans `user-uploads/{uid}/` (sous-dossiers compris). */
+async function removeUserUploads(uid: string) {
+  const bucket = supabase.storage.from('user-uploads');
+  const files: string[] = [];
+  const walk = async (prefix: string, depth: number) => {
+    const { data } = await bucket.list(prefix, { limit: 1000 });
+    for (const entry of data ?? []) {
+      const path = `${prefix}/${entry.name}`;
+      // Les dossiers n'ont pas d'identifiant dans la liste du stockage Supabase.
+      if (entry.id) files.push(path);
+      else if (depth < 4) await walk(path, depth + 1);
+    }
+  };
+  await walk(uid, 0);
+  for (let i = 0; i < files.length; i += 100) await bucket.remove(files.slice(i, i + 100));
 }

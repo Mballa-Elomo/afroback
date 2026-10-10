@@ -21,6 +21,7 @@ import { AccessBadge, UpgradeBanner } from '../../../src/access/Access';
 import { RenewBanner } from '../../../src/payments/RenewBanner';
 import { Bone, PressableScale, RailSection, SkeletonScreen } from '../../../src/ui/modern';
 import i18n, { useI18n } from '../../../src/i18n';
+import { IN_APP_DIGITAL_PAYMENTS } from '../../../src/payments/storePolicy';
 
 const GOLD = colors.accentGoldBright;
 
@@ -297,15 +298,18 @@ export default function AccueilScreen() {
                   <Text style={styles.duoSub}>{t('home.marketSub')}</Text>
                 </LinearGradient>
               </PressableScale>
-              <PressableScale onPress={() => requireAccount(() => router.push('/don'), 'don')} wrapperStyle={{ flex: 1 }} accessibilityLabel={t('home.supportA11y')}>
-                <LinearGradient colors={['#4A2317', '#1A0F0B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.duoCard}>
-                  <View style={[styles.duoIcon, { backgroundColor: 'rgba(227,162,119,.15)' }]}>
-                    <Icon name="heart" size={22} color={colors.terracottaText} />
-                  </View>
-                  <Text style={styles.duoTitle}>{t('home.support')}</Text>
-                  <Text style={styles.duoSub}>{t('home.supportSub')}</Text>
-                </LinearGradient>
-              </PressableScale>
+              {/* Dons masqués dans la version Play Store (storePolicy.ts). */}
+              {IN_APP_DIGITAL_PAYMENTS && (
+                <PressableScale onPress={() => requireAccount(() => router.push('/don'), 'don')} wrapperStyle={{ flex: 1 }} accessibilityLabel={t('home.supportA11y')}>
+                  <LinearGradient colors={['#4A2317', '#1A0F0B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.duoCard}>
+                    <View style={[styles.duoIcon, { backgroundColor: 'rgba(227,162,119,.15)' }]}>
+                      <Icon name="heart" size={22} color={colors.terracottaText} />
+                    </View>
+                    <Text style={styles.duoTitle}>{t('home.support')}</Text>
+                    <Text style={styles.duoSub}>{t('home.supportSub')}</Text>
+                  </LinearGradient>
+                </PressableScale>
+              )}
             </View>
           </>
         )}

@@ -1,0 +1,23 @@
+{
+  "voice_dir": "recits/paul-biya/voix-preparees",
+  "voice_ext": "wav",
+  "lines": [
+    {"start": 0.15, "text": "Depuis 1982, un seul président."},
+    {"start": 3.55, "text": "Paul Biya. Connais-tu son histoire ?"},
+    {"start": 5.85, "text": "Il naît à Mvomeka'a, dans le Sud."},
+    {"start": 8.15, "text": "Séminariste, puis étudiant en droit à Paris."},
+    {"start": 11.25, "text": "Haut fonctionnaire, puis Premier ministre."},
+    {"start": 13.65, "text": "Ahidjo démissionne : la Constitution le fait président."},
+    {"start": 17.1, "text": "Puis un putsch manqué, la crise, le multipartisme."},
+    {"start": 20.45, "text": "Bakassi gagné en justice. Des guerres. Des élections contestées."},
+    {"start": 25.0, "text": "L'histoire n'a pas encore rendu son verdict."},
+    {"start": 27.6, "text": "Connais les faits. Écoute son histoire sur AFROBACK."}
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Legends by the Fire.mp3",
+  "music_offset": 0.0,
+  "music_volume": 0.3,
+  "sfx": [],
+  "duration": 31,
+  "out": "public/audio/mix-paul-biya.wav",
+  "timing_out": "recits/paul-biya/timing.json"
+}

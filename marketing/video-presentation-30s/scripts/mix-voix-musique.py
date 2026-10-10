@@ -6,10 +6,12 @@ Config (JSON) :
 {
   "voice_dir": "C:/Users/Yannico/Music/Afroback Stories Audio/Voix Ngan Medza",  # 1.mp3, 2.mp3, ...
   "lines": [{"start": 0.4, "text": "Écoute."}, ...],                             # une entrée par fichier, dans l'ordre
+  "voice_ext": "mp3",            # facultatif (ex. "wav" pour des voix préparées par scripts/preparer-voix.py)
   "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Baobab Oath (1).mp3",
   "music_offset": 8.0,           # seconde du morceau où commencer (sauter une intro silencieuse)
   "music_volume": 0.30,          # avant compression latérale
   "sfx": [{"file": "C:/.../tonnerre.mp3", "at": 12.0, "gain": 0.8}],          # facultatif
+  "music_dips": [{"start": 39.3, "end": 39.8, "level": 0.15}],                # facultatif : creux de musique (relance)
   "duration": 30,
   "out": "public/audio/mix-<slug>.wav",
   "timing_out": "public/audio/mix-<slug>.timing.json"
@@ -38,7 +40,7 @@ def main(cfg_path):
     lines = cfg["lines"]
     timing = []
     for i, ln in enumerate(lines, 1):
-        src = os.path.join(cfg["voice_dir"], f"{i}.mp3")
+        src = os.path.join(cfg["voice_dir"], f"{i}.{cfg.get('voice_ext', 'mp3')}")
         if not os.path.exists(src):
             sys.exit(f"Fichier manquant : {src}")
         wav = os.path.join(tmp, f"v{i}.wav")
@@ -76,7 +78,8 @@ def main(cfg_path):
     duck = "sidechaincompress=threshold=0.05:ratio=3:attack=20:release=500"
     fc = ";".join(parts)
     fc += ";" + "".join(f"[d{k}]" for k in range(1, n + 1)) + f"amix=inputs={n}:normalize=0,apad=whole_dur={D},atrim=0:{D},equalizer=f=120:t=q:w=1:g=3,aecho=0.8:0.5:45:0.12,volume=1.8,asplit=2[sc][vo]"
-    fc += f";[0:a]atrim=0:{D},asetpts=PTS-STARTPTS,volume={cfg.get('music_volume', 0.30)},afade=t=out:st={D - 1.4}:d=1.4[mu]"
+    dips = "".join(f",volume={dp.get('level', 0.15)}:enable='between(t,{dp['start']},{dp['end']})'" for dp in cfg.get("music_dips", []))
+    fc += f";[0:a]atrim=0:{D},asetpts=PTS-STARTPTS,volume={cfg.get('music_volume', 0.30)}{dips},afade=t=out:st={D - 1.4}:d=1.4[mu]"
     fc += f";[mu][sc]{duck}[duck]"
     mix_in = "[duck][vo]" + "".join(f"[s{j}]" for j in range(len(sfx)))
     fc += f";{mix_in}amix=inputs={2 + len(sfx)}:normalize=0,alimiter=limit=0.9[out]"

@@ -6,6 +6,7 @@ import { InfoProvider } from '@/components/InfoModal';
 import { Ambient } from '@/components/Ambient';
 import { AuthProvider } from '@/lib/auth';
 import { SessionGuard } from '@/components/SessionGuard';
+import { ContentShield } from '@/components/ContentShield';
 import { CartProvider } from '@/lib/cart';
 import { KidProvider } from '@/lib/kid';
 import { AdultOnly, KidGuard } from '@/components/kids';
@@ -36,6 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <CartProvider>
         <KidProvider>
         <SessionGuard />
+        <ContentShield />
         <KidGuard />
         <InfoProvider>
           <Ambient />

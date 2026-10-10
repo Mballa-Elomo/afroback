@@ -101,6 +101,8 @@ interface AuthValue {
   verifyMfa: (code: string) => Promise<Result & { locked?: boolean }>;
   completeOnboarding: (data: Record<string, unknown>) => Promise<Result>;
   changePassword: (current: string, next: string) => Promise<Result & { wrongCurrent?: boolean }>;
+  /** Suppression définitive du compte (exigence Google Play, app-mobile/cdc-play-store.md). */
+  deleteAccount: (password: string) => Promise<Result & { wrongPassword?: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -381,6 +383,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await supabase.rpc('revoquer_autres_appareils', { p_device_id: getDeviceId() });
         return { error: null };
       },
+      async deleteAccount(password) {
+        const user = session?.user;
+        const identifier = user?.email ?? (user?.phone ? `+${user.phone}` : null);
+        if (!user || !identifier) return { error: tc('Impossible de vérifier ton compte.', 'Unable to verify your account.') };
+        const { data: lockout } = await supabase.rpc('check_login_lockout', { p_phone: identifier });
+        if ((lockout as { locked?: boolean })?.locked) return { error: tc('Trop de tentatives. Patiente quelques minutes.', 'Too many attempts. Wait a few minutes.') };
+        // Mot de passe revérifié sur un client jetable : une session laissée ouverte ne suffit pas.
+        const verifier = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false, storageKey: 'afroback-web-verif' } });
+        const { error: checkError } = await verifier.auth.signInWithPassword(user.email ? { email: user.email, password } : { phone: identifier, password });
+        await supabase.rpc('record_login_attempt', { p_phone: identifier, p_success: !checkError });
+        if (checkError) return { error: tc('Mot de passe incorrect.', 'Wrong password.'), wrongPassword: true };
+        await verifier.auth.signOut({ scope: 'local' }).catch(() => {});
+        // Photos envoyées : effacées avant le compte (le SQL ne peut pas toucher au stockage).
+        await removeUserUploads(user.id).catch(() => {});
+        const { error } = await supabase.rpc('delete_my_account');
+        if (error) return { error: tc("Le compte n'a pas pu être supprimé. Réessaie dans un instant.", 'Your account could not be deleted. Please try again shortly.') };
+        mfaPassed.current = false;
+        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        return { error: null };
+      },
       async signOut() {
         mfaPassed.current = false;
         await supabase.auth.signOut({ scope: 'local' });
@@ -397,4 +419,21 @@ export function useMember() {
   const a = useAuth();
   const ok = !!a.session && a.device === 'ok' && (a.mfa === 'none' || a.mfa === 'ok');
   return { ...a, member: ok };
+}
+
+/** Efface tous les fichiers du compte dans `user-uploads/{uid}/` (sous-dossiers compris). */
+async function removeUserUploads(uid: string) {
+  const bucket = supabase.storage.from('user-uploads');
+  const files: string[] = [];
+  const walk = async (prefix: string, depth: number) => {
+    const { data } = await bucket.list(prefix, { limit: 1000 });
+    for (const entry of data ?? []) {
+      const path = `${prefix}/${entry.name}`;
+      // Les dossiers n'ont pas d'identifiant dans la liste du stockage Supabase.
+      if (entry.id) files.push(path);
+      else if (depth < 4) await walk(path, depth + 1);
+    }
+  };
+  await walk(uid, 0);
+  for (let i = 0; i < files.length; i += 100) await bucket.remove(files.slice(i, i + 100));
 }

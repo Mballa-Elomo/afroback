@@ -86,7 +86,7 @@ export default function Securite() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={enroll.qr} alt={tr('QR code de vérification', 'Verification QR code')} className="mx-auto h-60 w-60 rounded-2xl" />
             <p className="text-center text-sm text-body">
-              {tr('Ou saisis ce code :', 'Or enter this code:')} <code className="break-all font-bold text-gold">{enroll.secret}</code>
+              {tr('Ou saisis ce code :', 'Or enter this code:')} <code data-allow-copy className="break-all font-bold text-gold">{enroll.secret}</code>
             </p>
             <p className="font-bold text-ivory">{tr('2. Entre le code à 6 chiffres affiché', '2. Enter the 6-digit code shown')}</p>
             <CodeInput value={code} onChange={setCode} />

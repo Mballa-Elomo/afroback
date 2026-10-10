@@ -1,0 +1,358 @@
+[
+ {
+  "n": 1,
+  "start": 1.2,
+  "dur": 0.431,
+  "text": "Écoute.",
+  "words": [
+   [
+    "Écoute.",
+    1.2
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 3.1,
+  "dur": 2.935,
+  "text": "Ce jour-là, à Zama, un prince allait être couronné.",
+  "words": [
+   [
+    "Ce",
+    3.1
+   ],
+   [
+    "jour-là,",
+    3.26
+   ],
+   [
+    "à",
+    3.82
+   ],
+   [
+    "Zama,",
+    3.94
+   ],
+   [
+    "un",
+    4.39
+   ],
+   [
+    "prince",
+    4.55
+   ],
+   [
+    "allait",
+    4.87
+   ],
+   [
+    "être",
+    5.19
+   ],
+   [
+    "couronné.",
+    5.43
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 7.4,
+  "dur": 2.721,
+  "text": "Enzo Kori-Odan. Et sa fiancée, Erine.",
+  "words": [
+   [
+    "Enzo",
+    7.4
+   ],
+   [
+    "Kori-Odan.",
+    7.69
+   ],
+   [
+    "Et",
+    8.47
+   ],
+   [
+    "sa",
+    8.66
+   ],
+   [
+    "fiancée,",
+    8.86
+   ],
+   [
+    "Erine.",
+    9.54
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 12.0,
+  "dur": 2.156,
+  "text": "Mais, quelques instants avant le couronnement…",
+  "words": [
+   [
+    "Mais,",
+    12.0
+   ],
+   [
+    "quelques",
+    12.39
+   ],
+   [
+    "instants",
+    12.74
+   ],
+   [
+    "avant",
+    13.1
+   ],
+   [
+    "le",
+    13.34
+   ],
+   [
+    "couronnement…",
+    13.48
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 15.35,
+  "dur": 2.538,
+  "text": "Trahison ! Le frère d'Erine s'empare du trône.",
+  "words": [
+   [
+    "Trahison",
+    15.35
+   ],
+   [
+    "!",
+    15.75
+   ],
+   [
+    "Le",
+    16.03
+   ],
+   [
+    "frère",
+    16.2
+   ],
+   [
+    "d'Erine",
+    16.48
+   ],
+   [
+    "s'empare",
+    16.84
+   ],
+   [
+    "du",
+    17.24
+   ],
+   [
+    "trône.",
+    17.4
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 21.0,
+  "dur": 2.167,
+  "text": "Enzo est chassé de son propre palais.",
+  "words": [
+   [
+    "Enzo",
+    21.0
+   ],
+   [
+    "est",
+    21.27
+   ],
+   [
+    "chassé",
+    21.49
+   ],
+   [
+    "de",
+    21.84
+   ],
+   [
+    "son",
+    22.02
+   ],
+   [
+    "propre",
+    22.24
+   ],
+   [
+    "palais.",
+    22.59
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 29.9,
+  "dur": 2.909,
+  "text": "Alors il invoque l'Aurion, la force des ancêtres.",
+  "words": [
+   [
+    "Alors",
+    29.9
+   ],
+   [
+    "il",
+    30.21
+   ],
+   [
+    "invoque",
+    30.38
+   ],
+   [
+    "l'Aurion,",
+    30.78
+   ],
+   [
+    "la",
+    31.44
+   ],
+   [
+    "force",
+    31.62
+   ],
+   [
+    "des",
+    31.93
+   ],
+   [
+    "ancêtres.",
+    32.15
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 35.0,
+  "dur": 3.317,
+  "text": "Avec Erine, il part chercher des alliés dans d'autres nations.",
+  "words": [
+   [
+    "Avec",
+    35.0
+   ],
+   [
+    "Erine,",
+    35.25
+   ],
+   [
+    "il",
+    35.74
+   ],
+   [
+    "part",
+    35.9
+   ],
+   [
+    "chercher",
+    36.15
+   ],
+   [
+    "des",
+    36.56
+   ],
+   [
+    "alliés",
+    36.76
+   ],
+   [
+    "dans",
+    37.09
+   ],
+   [
+    "d'autres",
+    37.33
+   ],
+   [
+    "nations.",
+    37.74
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 41.25,
+  "dur": 1.213,
+  "text": "Pour reprendre son trône.",
+  "words": [
+   [
+    "Pour",
+    41.25
+   ],
+   [
+    "reprendre",
+    41.46
+   ],
+   [
+    "son",
+    41.86
+   ],
+   [
+    "trône.",
+    42.03
+   ]
+  ]
+ },
+ {
+  "n": 10,
+  "start": 47.0,
+  "dur": 2.285,
+  "text": "À toi de vivre la légende. Joue à Aurion !",
+  "words": [
+   [
+    "À",
+    47.0
+   ],
+   [
+    "toi",
+    47.11
+   ],
+   [
+    "de",
+    47.3
+   ],
+   [
+    "vivre",
+    47.45
+   ],
+   [
+    "la",
+    47.71
+   ],
+   [
+    "légende.",
+    47.86
+   ],
+   [
+    "Joue",
+    48.39
+   ],
+   [
+    "à",
+    48.61
+   ],
+   [
+    "Aurion",
+    48.72
+   ],
+   [
+    "!",
+    49.02
+   ]
+  ]
+ }
+]

@@ -1,0 +1,123 @@
+# Paul Biya
+
+President of the Republic of Cameroon since 6 November 1982, after seven years as Prime Minister under Ahmadou Ahidjo. Born in 1933 in Mvomeka'a, he is, in 2026, at 93, the oldest head of state in office in the world, and one of the longest-serving (among non-royal heads of state, only Teodoro Obiang, in power in Equatorial Guinea since 1979, has served longer). Story told in "Memory" mode: factual, without glorification or denigration.
+
+---
+
+## The griot's tale
+
+Listen. Tonight, the griot does not sing a praise song, and he does not hurl an accusation. He does what the keepers of memory do when history is not yet finished: he lays the facts out on the mat, one by one, he tells you where each one comes from, and he leaves you to judge.
+
+We are in 1933, in the forest of southern Cameroon, in Bulu country, in the department that will later be called Dja-et-Lobo. Cameroon is then a territory under French mandate. On 13 February, in the village of Mvomeka'a, a boy is born to Étienne Mvondo Assam and Anastasie Eyenga Elle. He will be named Paul Barthélémy Biya'a bi Mvondo. No one, that day, can imagine that this village child will be, nearly a century later, the man who has governed his country for longer than almost any leader on the planet.
+
+The child is entrusted to the Catholic missionaries. He passes through the Saint-Tharcissius pre-seminary in Édéa, from 1948 to 1950, then through the minor seminary of Akono, until 1954. Many around him imagine him as a priest. But he leaves the seminary and enters the Lycée Leclerc in Yaoundé, from which he graduates with his baccalaureate in 1956. Then comes the great journey: Paris. The Lycée Louis-le-Grand, the Sorbonne's faculty of law, the Institut d'études politiques, which everyone calls Sciences Po, and the Institut des hautes études d'outre-mer, the school where France trained the administrators of its colonies. A degree in public law in 1960, a Sciences Po diploma in 1961, an IHEOM diploma in 1962, a postgraduate diploma (DES) in public law in 1963. Remember this portrait well: a man trained in the schools of the former colonial power, at the very moment his country becomes independent, on 1 January 1960. It is a thread that runs beneath his whole story.
+
+When he returns home, in 1962, independent Cameroon has a master: Ahmadou Ahidjo. And Paul Biya does not enter politics through the street, the maquis or the speaker's platform. He enters through the offices. Chargé de mission at the presidency in October 1962. Chief of staff to the Minister of National Education in 1964. Secretary general of that ministry in 1965. Director of the president's civil cabinet in 1967. Secretary general of the presidency in 1968. Minister of State in 1970. See the staircase: each step is a file, a decree, a signature, in the shadow of an all-powerful president. Biya is then known as a discreet technocrat, an insider of the regime, not a tribune.
+
+On 30 June 1975, Ahidjo appoints him Prime Minister. And in June 1979, a constitutional amendment makes the Prime Minister the president's constitutional successor in the event of a vacancy. The piece is set on the chessboard.
+
+On 4 November 1982, the country learns news no one expected: Ahmadou Ahidjo, in power since independence, announces his resignation. On 6 November, Paul Biya is sworn in as the second President of the Republic of Cameroon. No election, no seizure of power: a succession provided for by the Constitution, wanted by his predecessor himself. Ahidjo, moreover, keeps the leadership of the single party, the Cameroon National Union. Two men, two powers. It could not last.
+
+And it does not last. In 1983, the relationship between the former and the new president breaks down. In August, the authorities announce the discovery of a plot. Ahidjo goes into exile in France. In September, Biya takes over the leadership of the party. In January 1984, he is elected president, as sole candidate, with an official score of 99.98%. In February 1984, Ahidjo is tried in absentia for his alleged involvement in the 1983 plot and sentenced to death, a sentence Biya later commutes. Then, in the night of 6 April 1984, at three in the morning, elements of the Republican Guard, the presidential guard, rise up in Yaoundé. Tanks, gunfire, fighting around the capital's strategic points. The president holds on. Loyalists retake the city within a few days. How many dead? The government speaks of 71. Other estimates speak of around a thousand. More than a thousand people are arrested, and dozens of those convicted are executed, around thirty according to available sources. Ahidjo was never formally established as the organiser of this putsch, but many believed it, then as now. He will die in exile, in Dakar, on 30 November 1989, without ever seeing his country again. That is how the reign began: with a peaceful succession, then a brutal break between two men who had trusted each other.
+
+Biya then gives his era a name: the New Deal, the "Renouveau". He speaks of rigour and of the moralisation of public life. In 1985, in Bamenda, the former single party becomes the Cameroon People's Democratic Movement, the CPDM, which is still the ruling party today.
+
+But the New Deal has barely been launched when the economy turns. Oil falls, coffee and cocoa prices collapse, the CFA franc grows stronger. In 1987, the crisis is officially acknowledged. In 1988, Cameroon signs with the International Monetary Fund and the World Bank; it is the time of structural adjustment. Imagine what that means in a Cameroonian home: in January and then in November 1993, civil servants' salaries are cut, by around half or more depending on the studies. In January 1994, the CFA franc is devalued by half. A whole generation remembers those years, the making-do, the families tightening their belts. Economists also point out that growth returns after the devaluation. Both memories exist, side by side.
+
+Then the wind of 1990 blows across Africa, the wind of the fall of the Berlin Wall and of the national conferences. On 19 December 1990, a law restores the multiparty system in Cameroon. But the opposition wants more: a sovereign national conference. The authorities refuse. In 1991, the opposition launches the "ghost towns" operation, the "villes mortes": many of the country's towns come to a standstill, day after day, except Yaoundé, which is largely spared. At the end of the year, from 30 October to 15 November 1991, a tripartite meeting between the government, the opposition and civil society leads to a joint declaration in Yaoundé.
+
+And then comes 11 October 1992, the first multiparty presidential election. There is only one round. The Supreme Court declares Paul Biya the winner with 39.98% of the vote, against around 36% for John Fru Ndi, leader of the Social Democratic Front, the man from Bamenda. The margin is thin. The opposition claims that Fru Ndi came first and denounces irregularities; the government and the Court uphold the result. Unrest follows, and a state of emergency is declared in the North-West Province. This vote remains, to this day, one of the most disputed elections in the country's history. The griot tells it to you as it is: it is an official result, and it is a contested result. Both are true at once.
+
+The following presidential elections give the incumbent far wider margins: 92.6% in 1997, a vote boycotted by the main opposition parties, 70.92% in 2004, 77.9% in 2011, 71.3% in 2018. Each time, the government speaks of a victory of the people. Each time, the opposition and some observers denounce a locked electoral system.
+
+And yet, in this long reign, there is one battle that Biya fought without firing a decisive shot, and won before the judges. It is Bakassi. A peninsula of mangroves and fish-rich waters, deep in the Gulf of Guinea, claimed by both Cameroon and Nigeria, the scene of armed clashes. In 1994, Cameroon takes the case to the International Court of Justice (ICJ) in The Hague. On 10 October 2002, the Court, relying mainly on the Anglo-German agreements of the colonial era, recognises Cameroon's sovereignty over Bakassi. The ruling must then be enforced. On 12 June 2006, at Greentree, near New York, under the auspices of UN Secretary-General Kofi Annan, Paul Biya and Nigerian President Olusegun Obasanjo sign the agreement organising the withdrawal, the Greentree Agreement. On 14 August 2008, the transfer of authority is complete. A border dispute settled by law rather than by war: it is a fact that even many of his critics acknowledge. It must be added, to be fair, that the peninsula later experienced insecurity, and that inhabitants who felt Nigerian lived through this transfer as a wrenching loss.
+
+But 2008 is also the year of another story. The 1996 Constitution limited the president to two seven-year terms. Biya's was due to end in 2011. At the end of February 2008, while the draft amendment is on the table and fuel prices are rising, a transport workers' strike turns into rioting in several cities, from Douala to Yaoundé. The crackdown is harsh. The government acknowledges 40 dead and more than 1,600 people arrested. Human rights organisations, including the National Observatory of Human Rights and ACAT, put forward a toll of around 136 to 139 dead. In April 2008, Parliament adopts the constitutional amendment: the limit on the number of terms is removed. The president can run again. He will do so in 2011, in 2018 and in 2025.
+
+Then come the years of fire. In the north, first. In the country's Far North, on the borders of Nigeria, the group Boko Haram, from 2014 onwards, steps up its attacks, its kidnappings, then its suicide bombings in markets, mosques, schools and camps for displaced people. On 17 May 2014, in Paris, at a summit on security in Nigeria, Paul Biya declares: "We are here to declare war on Boko Haram." The Cameroonian army, together with neighbouring countries, goes into action. The tolls are heavy and vary by period and source: around 1,500 dead for the period from March 2014 to June 2015 alone according to the International Crisis Group, hundreds more civilians killed in the following years according to Amnesty International, and more than 300,000 people driven from their homes according to Human Rights Watch in 2021. NGOs have also documented abuses committed by security forces against civilians suspected of complicity. The threat has receded without disappearing.
+
+Then, in the west, the so-called Anglophone crisis. The North-West and South-West regions, heirs of the Cameroon once under British administration, reunified with francophone Cameroon in 1961, have always kept their own legal and school systems. In October and November 2016, anglophone lawyers and teachers go on strike: they are protesting against the appointment of francophone judges and teachers to their courts and schools. The repression of the demonstrations, the arrests, and the Internet shutdown of January 2017 radicalise part of the movement. On 1 October 2017, separatists symbolically proclaim an independent "Ambazonia". The conflict becomes armed. Villages burned, schools closed, kidnappings, executions: reports by NGOs and the UN attribute serious violations to both sides, to the security forces as well as to the armed separatist groups. From 30 September to 4 October 2019, the government holds a Major National Dialogue, which leads to a special status for the two regions. The armed separatists do not recognise themselves in it, and the war goes on. According to the International Crisis Group, as of April 2026, the conflict has caused more than 7,000 deaths and displaced around one million people; at the height of the crisis, 600,000 pupils were deprived of school. The UN noted at the end of 2024 a decrease in the intensity of the fighting, not its end.
+
+That same year, 2018, the presidential election gives Paul Biya 71.3%. His main opponent, Maurice Kamto, credited with around 14%, claims victory. In January 2019, he is arrested along with around two hundred supporters after demonstrations, then released in October 2019, just after the Major National Dialogue.
+
+And here we are in the present, where memory still touches the embers. On 12 October 2025, Paul Biya, aged 92, seeks an eighth term. Maurice Kamto cannot run: his candidacy, set aside by the electoral body over a question of party nomination, is definitively rejected by the Constitutional Council in early August. Facing the incumbent stands a man who was long in his camp: Issa Tchiroma Bakary, former Minister of Communication, a native of Garoua, who has gone over to the opposition. On 27 October 2025, the Constitutional Council declares Biya elected with 53.66% of the vote, against 35.19% for Tchiroma, on a turnout of 57.76%. Tchiroma, who had declared himself the winner even before the official announcement, claims to have won a majority, around 55 to 60% according to his own counts, and rejects the results. The National Episcopal Conference notes irregularities, such as relocated polling stations or electoral rolls containing the names of deceased people.
+
+The streets catch fire, from Garoua to Douala, to Dschang, to Yaoundé. And here the griot must be precise, because every figure is a life. According to United Nations data provided to the Reuters news agency in early November 2025, at least 48 civilians were killed by the security forces, most of them with live ammunition, and three gendarmes died in Douala. The government, for its part, has not released an official toll; unofficial compilations put forward much lower figures, around fifteen dead. The opposition, for its part, speaks of around fifty victims or more. Hundreds of people are arrested. On 1 December 2025, opposition figure Anicet Ekane, aged 74, president of the Manidem, arrested on 24 October, dies in detention in Yaoundé; his family and his party accuse the State of having caused his death by depriving him of medical care, and the Minister of Territorial Administration announces an investigation. Paul Biya is sworn in on 6 November 2025. The next day, Issa Tchiroma arrives in the Gambia, which takes him in on humanitarian grounds, and he continues to call himself "president-elect".
+
+And 2026? On 4 April, Parliament, meeting in congress, adopts a constitutional amendment creating the post of Vice-President of the Republic, appointed and removable by the head of state, and called upon to succeed him in the event of a vacancy until the end of the current term. The text is promulgated on 14 April. Its supporters see it as a guarantee of stability; its critics, including the Cameroon Bar, object that an unelected successor could govern without going through the ballot box. As of the date this story is written, early October 2026, no vice-president has been appointed, according to the sources consulted. The legislative and municipal elections, postponed several times, are announced for 20 December 2026. On 7 June 2026, the president leaves Yaoundé for a "short private stay" in Europe; he does not return until 20 August, seventy-three days later. During this absence, rumours about his health spread. The government denies them; the griot, for his part, does not repeat rumours, he only notes that they exist, and that no serious source has confirmed what they claimed.
+
+So, what should we remember? Here are the facts, laid out on the mat. A child of Mvomeka'a, a seminarian, then a student in Paris, then a senior civil servant, then Prime Minister, then president by the Constitution, in 1982. A man who survived a coup attempt, weathered an economic crisis, accepted the multiparty system under pressure from the street, won Bakassi before international justice, waged war on Boko Haram, faced a war in the anglophone regions that he either did not know how or was not able to put out, removed the limit on terms, and won elections of which several remain contested, sometimes in blood. For some, he is the guarantor of peace and unity in a country of more than two hundred peoples. For others, he is the face of a power that has never renewed itself. In July 1990, asked about the image he wanted to leave behind, he reportedly replied that he wished to be remembered as the one who brought democracy and prosperity to Cameroon. History has not yet delivered its verdict, and it is not for the griot to deliver it in its place.
+
+What the griot asks of you, you who are listening, is something else: know these dates. Know these figures, and where they come from. Learn to tell apart the official statement, the NGO report, the corridor rumour. For a people that knows its recent history, without painting it in gold or in black, is a people that is not easily deceived. You come from there, from this history too. Carry it with clear eyes.
+
+---
+
+## Reference sheet
+
+**Paul Biya (Paul Barthélémy Biya'a bi Mvondo)**
+
+- **Era**: contemporary
+- **Region**: Central Africa (Cameroon, born in Bulu country, South region, Dja-et-Lobo department)
+- **Theme**: politics
+
+**Editorial note**
+
+A living figure, still in office. This story is told in "Memory" mode: factual and neutral, without glorification or denigration. All contested points (the 1992, 2018 and 2025 elections, the death tolls of 1984, 2008, the Anglophone crisis, Boko Haram and the 2025 protests, the death of Anicet Ekane, the 2026 constitutional amendment) are presented with the positions involved and their sources. Rumours about the president's health are mentioned only as rumours, without repeating their content. Events of 2026 are recorded up to 8 October 2026 and will need to be updated. **To be reviewed by Yannick before any publication.**
+
+**Timeline**
+
+- 13 February 1933: born in Mvomeka'a (southern Cameroon, then under French mandate), son of Étienne Mvondo Assam and Anastasie Eyenga Elle
+- 1948-1963: seminaries of Édéa and Akono, Lycée Leclerc in Yaoundé (baccalaureate 1956), then in Paris Louis-le-Grand, faculty of law, Sciences Po (1961), IHEOM (1962), DES in public law (1963)
+- 1962-1975: career in the senior civil service under Ahidjo (chargé de mission at the presidency in 1962, secretary general of the presidency in 1968, Minister of State in 1970), then Prime Minister on 30 June 1975
+- 4 and 6 November 1982: resignation of Ahmadou Ahidjo, then Paul Biya sworn in as constitutional successor
+- 6 April 1984: coup attempt by elements of the Republican Guard, after the break with Ahidjo (sentenced to death in absentia in February 1984, sentence commuted); toll of 71 dead according to the government, up to around 1,000 according to other estimates
+- 1987-1994: economic crisis, agreement with the IMF and the World Bank (1988), cuts to civil servants' salaries (1993), devaluation of the CFA franc (January 1994)
+- 19 December 1990 and 11 October 1992: return of the multiparty system, then first multiparty presidential election (Biya 39.98%, John Fru Ndi around 36%, result contested by the opposition)
+- 10 October 2002, 12 June 2006, 14 August 2008: ICJ ruling recognising Cameroon's sovereignty over Bakassi, Greentree Agreement with Nigeria, completion of the transfer of authority
+- February-April 2008: riots (40 dead according to the government, 136 to 139 according to NGOs), then constitutional amendment removing term limits
+- 2014: entry into war against Boko Haram in the Far North (Paris declaration, 17 May 2014)
+- Since October 2016: Anglophone crisis, which became an armed conflict in 2017 (more than 7,000 dead and around one million displaced according to the International Crisis Group in 2026); Major National Dialogue from 30 September to 4 October 2019
+- 12 and 27 October 2025: presidential election, Biya declared elected with 53.66% against 35.19% for Issa Tchiroma Bakary, who contests the result; protests repressed (48 dead according to UN sources cited by Reuters, lower official figures); inauguration on 6 November 2025
+- 4 and 14 April 2026: adoption and then promulgation of the constitutional amendment creating the post of appointed vice-president (not filled as of 8 October 2026)
+
+**Notable quotes**
+
+- "We are here to declare war on Boko Haram.": statement by Paul Biya at the joint press conference of the Paris summit on security in Nigeria, on 17 May 2014, reported by the press and reproduced in documents of the Cameroonian presidency (prc.cm). Attested. (Original in French: « Nous sommes ici pour déclarer la guerre à Boko Haram. » The English wording is the one used in the international press at the time.)
+- Wish to leave "the image of the one who brought democracy and prosperity" (our translation from the French: « l'image de celui qui a apporté la démocratie et la prospérité »): words attributed to Paul Biya in an interview from July 1990, cited by the Osidimbea entry and regularly repeated in the Cameroonian press. The exact wording and the outlet that originally published the interview could not be verified against a primary source: to be presented as "reported words", not as a certain verbatim quote.
+- No other quote is included. Several famous sentences attributed to Paul Biya circulate (notably about Yaoundé during the 1991 "ghost towns") without any primary source having been found: they have been deliberately left out.
+
+**Sources used**
+
+Official and government sources
+- Presidency of the Republic of Cameroon (prc.cm), official biography, statement on the appointment of the government of 4 January 2019, news item on the president's return on 20 August 2026
+- Cameroon Tribune (government daily), articles on the fight against Boko Haram
+- Osidimbea.cm, entry "Biya Paul" (encyclopedia of Cameroon's memory)
+
+Encyclopedias and reference works
+- Encyclopaedia Britannica, "Paul Biya"
+- Larousse, "Paul Biya"
+- Encyclopedia.com, "Biya, Paul 1933-"
+- Wikipedia (English), "Paul Biya", "1984 Cameroonian coup attempt", "2025 Cameroonian presidential election", "2025 Cameroonian protests", "2026 Cameroonian parliamentary election", "Bakassi"
+- IRD documents (horizon.documentation.ird.fr) on the Cameroonian financial crisis and on the 1991 "ghost towns" (villes mortes); Global Nonviolent Action Database (Swarthmore) on the "ghost towns" operation
+
+International press, NGOs, institutions
+- Reuters, via The Citizen and Gulf Times (4 November 2025), "Cameroon security forces killed 48 in election protests, UN sources say"
+- France 24, PBS NewsHour, Al Jazeera, The Africa Report, Africanews on the 2025 presidential election, its aftermath and the postponement of the legislative elections
+- International Crisis Group on the Anglophone crisis (April 2026 toll) and on Boko Haram in the Far North
+- Amnesty International (2015 and 2019) and Human Rights Watch on Boko Haram and the repression
+- Office of the United Nations High Commissioner for Human Rights (December 2024 mission), cited via ecoi.net
+- PBS, Al Jazeera, UNOWA (UN) documents on the ICJ ruling, the Greentree Agreement and the transfer of Bakassi
+- Le Temps, Le360, allAfrica on the rejection of Maurice Kamto's candidacy (August 2025)
+- allAfrica, camer.be, Journal du Cameroun, Wakatsera, afrik.com, 237online, APA News on the death of Anicet Ekane, the April 2026 constitutional amendment, the president's absence (June-August 2026) and the news of October 2026
+- The Point (Gambia), Gulf Times on the Gambia taking in Issa Tchiroma
+
+**Associated legends (if applicable)**
+
+No legend in the sense of oral tradition. This story does, however, sit alongside a large volume of **rumours** (the president's health, his supposed death during his absences, his personal fortune, the designation of a successor, fake decrees or fake statements circulating online, including a fake statement appointing his son as vice-president, debunked by Africa Check). None of them is presented as fact. They are mentioned only as a phenomenon, during the absences of 2024 and 2026.
+
+**Related heroes**
+
+- Ruben Um Nyobè, Félix Moumié, Ernest Ouandié: figures of the UPC and of the struggle for independence, whose memory was rehabilitated by the law of December 1991 under the presidency of Paul Biya; it was also to Paul Biya that France addressed, in 2025, its acknowledgement of its responsibility in the death of Um Nyobè
+- Charles Atangana and Martin Paul Samba: figures in the history of southern and central Cameroon (Beti and Bulu country), already covered by AFROBACK
+- Ahmadou Ahidjo (not yet covered): first president of Cameroon, predecessor and mentor of Paul Biya, an essential figure for understanding this story
+- John Fru Ndi (not yet covered): historic leader of the opposition, opponent in 1992

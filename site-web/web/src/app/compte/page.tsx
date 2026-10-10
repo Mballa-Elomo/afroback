@@ -32,6 +32,7 @@ export default function Compte() {
     { href: '/compte/securite', title: tr('Sécurité', 'Security'), text: tr('Vérification en 2 étapes', '2-step verification') },
     { href: '/profils', title: tr('Qui regarde ?', "Who's watching?"), text: tr('Ton profil et ceux de tes enfants', "Your profile and your children's") },
     { href: '/don', title: tr('Soutenir AFROBACK', 'Support AFROBACK'), text: tr('Financer les prochains récits', 'Fund the next stories') },
+    { href: '/supprimer-mon-compte', title: tr('Supprimer mon compte', 'Delete my account'), text: tr('Suppression définitive de tes données', 'Permanently erase your data') },
   ];
 
   return (

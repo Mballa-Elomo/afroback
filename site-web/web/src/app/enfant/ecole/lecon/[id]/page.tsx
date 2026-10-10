@@ -87,12 +87,12 @@ export default function LeconPage({ params }: { params: Promise<{ id: string }> 
           (has.ecouter ? (
             <div className="rounded-[28px] bg-white/8 p-7 text-center">
               <p className="text-lg font-black text-white">{tr('Narration pour les enfants', 'Narration for children')}</p>
-              <audio controls src={audio!} className="mt-5 w-full" />
+              <audio controls controlsList="nodownload" src={audio!} className="mt-5 w-full" />
             </div>
           ) : (
             <Soon icon="🎧" />
           ))}
-        {format === 'regarder' && (has.regarder ? <video controls src={l.video_url!} className="w-full rounded-[28px] bg-black" /> : <Soon icon="🎬" />)}
+        {format === 'regarder' && (has.regarder ? <video controls controlsList="nodownload noremoteplayback" disablePictureInPicture src={l.video_url!} className="w-full rounded-[28px] bg-black" /> : <Soon icon="🎬" />)}
         {format === 'bd' &&
           (has.bd ? (
             <div className="grid gap-5 md:grid-cols-2">

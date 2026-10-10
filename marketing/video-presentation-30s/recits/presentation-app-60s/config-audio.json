@@ -1,0 +1,91 @@
+{
+  "voice_dir": "C:/Users/Yannico/Music/Afroback Stories Audio/Voix Presentation 60s",
+  "lines": [
+    {
+      "start": 0.15,
+      "text": "Tu connais Napoléon ?"
+    },
+    {
+      "start": 1.45,
+      "text": "Mais tu connais Ruben Um Nyobè ?"
+    },
+    {
+      "start": 3.9,
+      "text": "Louis Quatorze ? Mais la reine Nzinga ?"
+    },
+    {
+      "start": 6.9,
+      "text": "L'alphabet latin ? Mais l'écriture du roi Njoya ?"
+    },
+    {
+      "start": 10.5,
+      "text": "On nous a raconté l'histoire des autres."
+    },
+    {
+      "start": 12.85,
+      "text": "Nos héros, nos légendes, nos traditions ? Silence."
+    },
+    {
+      "start": 17.2,
+      "text": "Um Nyobè : un nom interdit, plus de trente ans."
+    },
+    {
+      "start": 20.2,
+      "text": "Alors voici AFROBACK. Le retour aux origines."
+    },
+    {
+      "start": 23.5,
+      "text": "Nos héros africains, racontés comme le ferait un griot."
+    },
+    {
+      "start": 26.75,
+      "text": "Lis leur histoire, chapitre après chapitre. Ou écoute-la."
+    },
+    {
+      "start": 30.1,
+      "text": "Entre dans nos mythes : le serpent Ngan Medza, les géants Sao…"
+    },
+    {
+      "start": 34.6,
+      "text": "Découvre nos villages, nos palais, nos rites et nos objets sacrés."
+    },
+    {
+      "start": 39.8,
+      "text": "Tout est là. Dans ta poche."
+    },
+    {
+      "start": 41.8,
+      "text": "Rejoins la communauté : aime, commente, partage avec les tiens."
+    },
+    {
+      "start": 46.25,
+      "text": "Et transmets-les à tes enfants, dans leur propre espace."
+    },
+    {
+      "start": 49.55,
+      "text": "Commencer ne te coûte rien."
+    },
+    {
+      "start": 51.4,
+      "text": "Télécharge AFROBACK. Disponible sur l'App Store et Google Play."
+    },
+    {
+      "start": 55.6,
+      "text": "Nos histoires t'attendent. Rejoins-nous sur AFROBACK."
+    }
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Legends by the Fire.mp3",
+  "music_offset": 8.4,
+  "music_volume": 0.3,
+  "music_dips": [
+    {
+      "start": 39.3,
+      "end": 39.8,
+      "level": 0.15
+    }
+  ],
+  "sfx": [],
+  "duration": 60,
+  "out": "public/audio/mix-presentation-app-60s.wav",
+  "timing_out": "recits/presentation-app-60s/timing.json"
+}

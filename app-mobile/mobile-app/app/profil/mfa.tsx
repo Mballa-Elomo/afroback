@@ -136,7 +136,8 @@ export default function MfaSetupScreen() {
                 <QRCode value={enroll.otpauthUri} size={200} />
               </View>
               <Text style={styles.step}>{t('mfa.manual')}</Text>
-              <Text style={styles.secret} selectable>
+              {/* data-allow-copy (web) : exception à l'anti-copie, la clé doit pouvoir être copiée dans l'application d'authentification. */}
+              <Text style={styles.secret} selectable {...({ dataSet: { allowCopy: '' } } as object)}>
                 {enroll.secretBase32}
               </Text>
               <Text style={styles.step}>{t('mfa.step2')}</Text>

@@ -1,0 +1,41 @@
+{
+  "voice_dir": "C:/Users/Yannico/Downloads/ORION/Voix off",
+  "lines": [
+    {"start": 1.2, "text": "Écoute."},
+    {"start": 3.1, "text": "Ce jour-là, à Zama, un prince allait être couronné."},
+    {"start": 7.4, "text": "Enzo Kori-Odan. Et sa fiancée, Erine."},
+    {"start": 12.0, "text": "Mais, quelques instants avant le couronnement…"},
+    {"start": 15.35, "text": "Trahison ! Le frère d'Erine s'empare du trône."},
+    {"start": 21.0, "text": "Enzo est chassé de son propre palais."},
+    {"start": 29.9, "text": "Alors il invoque l'Aurion, la force des ancêtres."},
+    {"start": 35.0, "text": "Avec Erine, il part chercher des alliés dans d'autres nations."},
+    {"start": 41.25, "text": "Pour reprendre son trône."},
+    {"start": 47.0, "text": "À toi de vivre la légende. Joue à Aurion !"}
+  ],
+  "music": "recits/aurion-kiroo/audio-src/musique-aurion-59s.wav",
+  "music_offset": 0,
+  "music_volume": 0.36,
+  "sfx": [
+    {"file": "recits/aurion-kiroo/audio-src/impact.wav", "at": 1.2, "gain": 0.35},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 2.75, "gain": 0.55},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 6.95, "gain": 0.55},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 11.45, "gain": 0.45},
+    {"file": "recits/aurion-kiroo/audio-src/fissure.wav", "at": 15.2, "gain": 0.7},
+    {"file": "recits/aurion-kiroo/audio-src/impact.wav", "at": 15.25, "gain": 0.75},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 19.45, "gain": 0.55},
+    {"file": "recits/aurion-kiroo/audio-src/impact.wav", "at": 25.05, "gain": 0.45},
+    {"file": "recits/aurion-kiroo/audio-src/montee.wav", "at": 29.15, "gain": 0.7},
+    {"file": "recits/aurion-kiroo/audio-src/impact.wav", "at": 30.75, "gain": 0.95},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 34.45, "gain": 0.55},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 40.45, "gain": 0.55},
+    {"file": "recits/aurion-kiroo/audio-src/impact.wav", "at": 41.85, "gain": 0.45},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 43.4, "gain": 0.4},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 44.4, "gain": 0.4},
+    {"file": "recits/aurion-kiroo/audio-src/whoosh.wav", "at": 45.4, "gain": 0.4},
+    {"file": "recits/aurion-kiroo/audio-src/impact.wav", "at": 46.75, "gain": 0.6},
+    {"file": "recits/aurion-kiroo/audio-src/impact.wav", "at": 48.75, "gain": 0.85}
+  ],
+  "duration": 59,
+  "out": "public/audio/mix-aurion-kiroo-59s.wav",
+  "timing_out": "recits/aurion-kiroo/timing.json"
+}

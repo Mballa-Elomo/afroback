@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +8,7 @@ import { useWizardState } from '../../src/onboarding/WizardState';
 import { formatPlanPrice } from '../../src/onboarding/pricing';
 import { colors, typography } from '../../src/theme/tokens';
 import { useI18n } from '../../src/i18n';
+import { IN_APP_DIGITAL_PAYMENTS } from '../../src/payments/storePolicy';
 
 /**
  * Étape 4/5 — fidèle à la maquette "CHOISIS TON FORFAIT". Racines et
@@ -33,6 +35,15 @@ export default function PlanStepScreen() {
     setForfait('decouverte');
     router.push('/onboarding/welcome');
   };
+
+  // Version Play Store : pas de choix de forfait payant, compte Découverte directement (storePolicy.ts).
+  useEffect(() => {
+    if (!IN_APP_DIGITAL_PAYMENTS) {
+      setForfait('decouverte');
+      router.replace('/onboarding/welcome');
+    }
+  }, [router, setForfait]);
+  if (!IN_APP_DIGITAL_PAYMENTS) return null;
 
   return (
     <View style={styles.wrap}>

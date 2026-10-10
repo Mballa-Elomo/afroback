@@ -17,6 +17,7 @@ import { APP_LANGUAGES, currentLanguage, useI18n, type AppLanguage } from '../..
 import { Flag } from '../../src/i18n/LanguageDropdown';
 import { ProgressCard } from '../../src/quiz/QuizUI';
 import { RenewBanner } from '../../src/payments/RenewBanner';
+import { IN_APP_DIGITAL_PAYMENTS } from '../../src/payments/storePolicy';
 
 const PLAN_LABELS: Record<string, string> = { racines: 'Racines', heritage: 'Héritage' };
 const BG = '#0B0906';
@@ -117,7 +118,7 @@ function ProfilScreen() {
         <View style={styles.quick}>
           <QuickAction icon="pencil" label={t('profileTab.quickEdit')} onPress={() => router.push('/profil/modifier')} />
           <QuickAction icon="crown" label={t('profileTab.quickPlan')} onPress={() => router.push('/abonnement')} />
-          <QuickAction icon="heart" label={t('profileTab.quickDonate')} onPress={() => router.push('/don')} />
+          {IN_APP_DIGITAL_PAYMENTS && <QuickAction icon="heart" label={t('profileTab.quickDonate')} onPress={() => router.push('/don')} />}
         </View>
 
         <Section title={t('profileTab.sectionAccount')}>
@@ -144,7 +145,8 @@ function ProfilScreen() {
 
         <Section title={t('profileTab.sectionSecurity')}>
           <SettingRow icon="shield" label={t('profileTab.twoStep')} onPress={() => router.push('/profil/mfa')} />
-          <SettingRow icon="key" label={t('profileTab.password')} onPress={() => router.push('/profil/mot-de-passe')} last />
+          <SettingRow icon="key" label={t('profileTab.password')} onPress={() => router.push('/profil/mot-de-passe')} />
+          <SettingRow icon="trash" label={t('deleteAccount.row')} onPress={() => router.push('/profil/supprimer-compte')} last />
         </Section>
 
         <Section title={t('profileTab.sectionFamily')}>

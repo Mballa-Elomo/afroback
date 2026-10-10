@@ -12,6 +12,7 @@ import { PaymentSheet } from '../src/payments/PaymentSheet';
 import { BrandMark } from '../src/onboarding/ui';
 import { colors, typography } from '../src/theme/tokens';
 import { Icon } from '../src/components/Icons';
+import { IN_APP_DIGITAL_PAYMENTS } from '../src/payments/storePolicy';
 
 /**
  * Écran "Abonnements" (cdc-acces-gratuit-abonnement.md, lot A), ouvert
@@ -48,7 +49,7 @@ export default function AbonnementScreen() {
 
   // Bandeau « Renouveler » : ouvre directement le paiement du forfait en cours.
   useEffect(() => {
-    if (params.renouveler === '1' && subscription?.plan) setSheetPlan(subscription.plan);
+    if (IN_APP_DIGITAL_PAYMENTS && params.renouveler === '1' && subscription?.plan) setSheetPlan(subscription.plan);
   }, [params.renouveler, subscription?.plan]);
 
   const toggleCancelled = async (cancel: boolean) => {
@@ -143,6 +144,8 @@ export default function AbonnementScreen() {
             )}
           </View>
 
+          {/* Version Play Store : forfaits présentés sans prix ni achat (storePolicy.ts). */}
+          {IN_APP_DIGITAL_PAYMENTS && (
           <View style={styles.toggle}>
             {(['monthly', 'yearly'] as const).map((b) => (
               <Pressable
@@ -158,6 +161,7 @@ export default function AbonnementScreen() {
               </Pressable>
             ))}
           </View>
+          )}
 
           <View style={styles.plans}>
             {plans.map((p) => {
@@ -171,10 +175,10 @@ export default function AbonnementScreen() {
                   )}
                   <View style={styles.planHead}>
                     <Text style={styles.planName}>{p.name}</Text>
-                    <Text style={styles.planPrice}>{p.price}</Text>
+                    {IN_APP_DIGITAL_PAYMENTS && <Text style={styles.planPrice}>{p.price}</Text>}
                   </View>
                   <Text style={styles.planDesc}>{p.desc}</Text>
-                  {p.id !== 'decouverte' && (
+                  {p.id !== 'decouverte' && IN_APP_DIGITAL_PAYMENTS && (
                     <View style={styles.planCta}>
                       <PremiumButton
                         label={isCurrent ? t('abonnement.renew') : t('plan.choose', { plan: p.name })}
@@ -192,9 +196,15 @@ export default function AbonnementScreen() {
           {!!error && <Text style={styles.error}>{error}</Text>}
           {!!pendingDiag && <Text style={styles.diag}>{t('abonnement.pendingCheck', { diag: pendingDiag })}</Text>}
 
-          <Text style={styles.sectionLabel}>{t('payment.methods')}</Text>
-          <MobileMoneyBadges />
-          <Text style={styles.disclaimer}>{t('abonnement.payNote')}</Text>
+          {IN_APP_DIGITAL_PAYMENTS ? (
+            <>
+              <Text style={styles.sectionLabel}>{t('payment.methods')}</Text>
+              <MobileMoneyBadges />
+              <Text style={styles.disclaimer}>{t('abonnement.payNote')}</Text>
+            </>
+          ) : (
+            <Text style={styles.disclaimer}>{t('abonnement.storeNote')}</Text>
+          )}
         </ScrollView>
       </SafeAreaView>
 

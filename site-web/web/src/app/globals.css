@@ -177,3 +177,41 @@ body {
     radial-gradient(900px 500px at 100% 0%, rgba(194, 94, 46, 0.35), transparent 60%),
     linear-gradient(180deg, #1a1030 0%, #120a1f 100%);
 }
+
+/* Protection du contenu (phase 2, app-mobile/securite-phase2-protection-contenu.md) :
+   texte non sélectionnable hors des champs de saisie, images et vidéos non
+   glissables, impression remplacée par un message. */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+input,
+textarea,
+select,
+[contenteditable=''],
+[contenteditable='true'],
+[data-allow-copy] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+img,
+video,
+audio,
+svg {
+  -webkit-user-drag: none;
+}
+@media print {
+  body > * {
+    display: none !important;
+  }
+  body::after {
+    content: 'Contenu protégé par AFROBACK · Content protected by AFROBACK';
+    display: block;
+    padding: 40vh 2rem 0;
+    text-align: center;
+    font: 700 18px Arial, sans-serif;
+    color: #000;
+  }
+}

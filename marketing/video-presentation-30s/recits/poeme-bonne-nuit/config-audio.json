@@ -1,0 +1,23 @@
+{
+  "voice": "C:/Users/Yannico/Music/Afroback Stories Audio/Voix Bonne nuit/ElevenLabs_2026-10-07T21_53_19_Paul K — Deep French Narrator_pvc_sp107_s50_sb80_se45_b_m2.mp3",
+  "segments": [
+    {"a": 0.0, "b": 11.3, "off": 1.0},
+    {"a": 11.3, "b": 23.4, "off": 1.7},
+    {"a": 23.4, "b": 34.35, "off": 2.4},
+    {"a": 34.35, "b": 46.05, "off": 3.1},
+    {"a": 46.05, "b": 49.5, "off": 3.8},
+    {"a": 49.5, "b": 50.83, "off": 4.2}
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Baobab Oath (1).mp3",
+  "music_offset": 0,
+  "music_volume": 0.32,
+  "music_up_at": 54.8,
+  "music_up_to": 0.5,
+  "music_fade_in": 2.5,
+  "music_fade_out": 1.6,
+  "duration": 59,
+  "words": "recits/poeme-bonne-nuit/whisper-mots-voix-brute.json",
+  "out": "public/audio/mix-poeme-bonne-nuit.wav",
+  "timing_out": "recits/poeme-bonne-nuit/timing.json",
+  "ts_out": "src/poemes/bonne-nuit-mots.ts"
+}

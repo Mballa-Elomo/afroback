@@ -563,6 +563,7 @@ const fr = {
     phoneProvider: "L'authentification par téléphone n'est pas encore activée côté Supabase.",
     samePassword: 'Le nouveau mot de passe doit être différent de l\'ancien.',
     signupsDisabled: 'Les inscriptions ne sont pas autorisées pour le moment.',
+    banned: 'Ce compte est suspendu. Contacte le support AFROBACK.',
   },
   marketCat: {
     sculpture: 'Sculpture',

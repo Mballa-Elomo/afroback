@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { LecteurVideo } from '@/src/video/LecteurVideo';
 import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
 import { GhostButton, OutlineButton } from '../../../../../src/components/Buttons';
 import { HeroPlaceholder } from '../../../../../src/components/HeroVisual';
@@ -232,20 +232,9 @@ function LecteurVideoScreen() {
   );
 }
 
-/** Lecteur vidéo réel (expo-video, contrôles natifs) une fois qu'une URL de documentaire existe pour ce héros. */
+/** Lecteur vidéo : lien YouTube / Vimeo (lecteur intégré) ou ancien fichier (expo-video), voir src/video/LecteurVideo.tsx. */
 function VideoPlayerArea({ uri }: { uri: string }) {
-  const player = useVideoPlayer(uri, (p) => {
-    p.loop = false;
-  });
-  return (
-    <VideoView
-      style={styles.videoArea}
-      player={player}
-      allowsFullscreen
-      allowsPictureInPicture
-      nativeControls
-    />
-  );
+  return <LecteurVideo uri={uri} style={styles.videoArea} />;
 }
 
 /**

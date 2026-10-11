@@ -5,7 +5,7 @@ import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { LecteurVideo } from '@/src/video/LecteurVideo';
 import { ErrorState, LoadingState } from '../../../../src/components/LoadingState';
 import { useMythe } from '../../../../src/data/useMythologieData';
 import { recordMytheAudioEngagement, recordMytheEngagement, recordMytheVideoChapterEngagement } from '../../../../src/data/engagementRepository';
@@ -346,10 +346,6 @@ function RegarderTab({ mythe, chapitres }: { mythe: Mythe; chapitres: { numero: 
     recordMytheVideoChapterEngagement(mythe.id, chapitreActuel.numero, actualLang);
   }, [mythe.id, chapitreActuel, actualLang]);
 
-  const player = useVideoPlayer(uri, (p) => {
-    p.loop = false;
-  });
-
   return (
     <View>
       {chapitres.length > 1 && (
@@ -369,7 +365,7 @@ function RegarderTab({ mythe, chapitres }: { mythe: Mythe; chapitres: { numero: 
 
       {uri ? (
         <>
-          <VideoView key={uri} style={styles.mytheVideoArea} player={player} allowsFullscreen allowsPictureInPicture nativeControls />
+          <LecteurVideo key={uri} uri={uri} style={styles.mytheVideoArea} />
           {codes.length > 1 && (
             <View style={[styles.langToggle, { justifyContent: 'center', marginTop: 10 }]}>
               {codes.map((code) => (

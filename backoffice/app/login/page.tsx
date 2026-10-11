@@ -1,127 +1,161 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { login } from './actions';
-import { colors, fonts } from '@/lib/theme';
+import { Sankofa } from '@/components/Sankofa';
+import { Icone } from '@/components/Icone';
+import s from './login.module.css';
+
+/**
+ * Écran de connexion (refonte « Sankofa », 2026-10-10) : à gauche, le symbole
+ * Sankofa se dessine au milieu de poussières d'or, avec des proverbes qui se
+ * succèdent ; à droite, le formulaire. Même logique qu'avant (actions.ts).
+ */
+
+const PROVERBES = [
+  { texte: 'Il n’est jamais interdit de revenir chercher ce que l’on a oublié.', source: 'Proverbe akan, sens du symbole Sankofa' },
+  { texte: 'En Afrique, un vieillard qui meurt est une bibliothèque qui brûle.', source: 'Amadou Hampâté Bâ, UNESCO, 1960' },
+  { texte: 'Tant que les lions n’auront pas leurs propres historiens, les histoires de chasse glorifieront le chasseur.', source: 'Proverbe africain' },
+  { texte: 'Quand tu ne sais pas où tu vas, regarde d’où tu viens.', source: 'Proverbe africain' },
+];
+
+// Positions fixes (pas de hasard au rendu) : pas d'écart entre serveur et navigateur.
+const POUSSIERES = Array.from({ length: 34 }, (_, i) => ({
+  left: (i * 37) % 100,
+  delai: (i * 0.73) % 9,
+  duree: 9 + ((i * 1.7) % 8),
+  taille: 2 + (i % 3),
+  derive: ((i % 5) - 2) * 18,
+}));
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, { error: null });
+  const [voir, setVoir] = useState(false);
+  const [majuscules, setMajuscules] = useState(false);
+  const [indice, setIndice] = useState(0);
+  const [email, setEmail] = useState('');
+  const carteRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    const t = setInterval(() => setIndice((i) => (i + 1) % PROVERBES.length), 7000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Secousse de la carte à chaque erreur (l'e-mail saisi est conservé).
+  useEffect(() => {
+    if (!state.error) return;
+    carteRef.current?.animate(
+      [{ transform: 'none' }, { transform: 'translateX(-9px)' }, { transform: 'translateX(9px)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(5px)' }, { transform: 'none' }],
+      { duration: 460, easing: 'ease-out' }
+    );
+  }, [state]);
+
+  const proverbe = PROVERBES[indice];
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: `radial-gradient(circle at 50% 20%, rgba(240,195,107,.08), transparent 60%), ${colors.background}`,
-      }}
-    >
-      <form
-        action={formAction}
-        style={{
-          width: '100%',
-          maxWidth: 380,
-          background: '#150e09',
-          border: `1px solid ${colors.border}`,
-          borderRadius: 20,
-          padding: 32,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 26 }}>
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, ${colors.accentGoldBright}, ${colors.terracotta})`,
-            }}
-          />
-          <div>
-            <div
-              style={{
-                fontFamily: fonts.display,
-                fontWeight: 800,
-                letterSpacing: '.14em',
-                fontSize: 16,
-                background: 'linear-gradient(135deg, #F7D98B, #C98A3D)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent',
-              }}
-            >
-              AFROBACK
-            </div>
-            <div style={{ fontFamily: fonts.mono, fontSize: 9, letterSpacing: '.14em', color: colors.textMuted }}>BACK-OFFICE</div>
-          </div>
+    <div className={s.page}>
+      <section className={s.scene} aria-hidden>
+        <div className={s.poussieres}>
+          {POUSSIERES.map((p, i) => (
+            <span
+              key={i}
+              style={
+                {
+                  left: `${p.left}%`,
+                  width: p.taille,
+                  height: p.taille,
+                  animationDelay: `${p.delai}s`,
+                  animationDuration: `${p.duree}s`,
+                  '--derive': `${p.derive}px`,
+                } as React.CSSProperties
+              }
+            />
+          ))}
         </div>
 
-        <label style={{ display: 'block', fontSize: 11, color: colors.textMuted, marginBottom: 6 }}>Email</label>
-        <input
-          name="email"
-          type="email"
-          required
-          autoComplete="username"
-          style={{
-            width: '100%',
-            marginBottom: 16,
-            background: '#170f0a',
-            border: `1px solid ${colors.border}`,
-            borderRadius: 10,
-            padding: '11px 13px',
-            color: colors.textPrimary,
-            fontSize: 13.5,
-            outline: 'none',
-          }}
-        />
+        <div className={s.embleme}>
+          <div className={`${s.anneau} ${s.anneau1}`} />
+          <div className={`${s.anneau} ${s.anneau2}`} />
+          <div className={`${s.anneau} ${s.anneau3}`} />
+          <div className={s.halo} />
+          <Sankofa size={190} anime epaisseur={5} className={s.symbole} />
+        </div>
 
-        <label style={{ display: 'block', fontSize: 11, color: colors.textMuted, marginBottom: 6 }}>Mot de passe</label>
-        <input
-          name="password"
-          type="password"
-          required
-          autoComplete="current-password"
-          style={{
-            width: '100%',
-            marginBottom: 20,
-            background: '#170f0a',
-            border: `1px solid ${colors.border}`,
-            borderRadius: 10,
-            padding: '11px 13px',
-            color: colors.textPrimary,
-            fontSize: 13.5,
-            outline: 'none',
-          }}
-        />
+        <div className={s.marque}>AFROBACK</div>
+        <div className={s.sousMarque}>Sankofa · retourne chercher ce qui t’appartient</div>
 
-        {state.error && (
-          <div style={{ fontSize: 12.5, color: colors.terracottaText, marginBottom: 16 }}>{state.error}</div>
-        )}
+        <figure key={indice} className={s.proverbe}>
+          <blockquote>« {proverbe.texte} »</blockquote>
+          <figcaption>{proverbe.source}</figcaption>
+        </figure>
+        <div className={s.points}>
+          {PROVERBES.map((_, i) => (
+            <span key={i} className={i === indice ? s.pointActif : ''} />
+          ))}
+        </div>
 
-        <button
-          type="submit"
-          disabled={pending}
-          style={{
-            width: '100%',
-            font: 'inherit',
-            fontSize: 14,
-            fontWeight: 700,
-            padding: 13,
-            borderRadius: 12,
-            border: 'none',
-            background: `linear-gradient(135deg, ${colors.accentGoldBright}, ${colors.terracotta})`,
-            color: colors.ctaTextOnGold,
-            cursor: pending ? 'default' : 'pointer',
-            opacity: pending ? 0.7 : 1,
-          }}
-        >
-          {pending ? 'Connexion...' : 'Se connecter'}
-        </button>
+        <div className={`${s.kente} afa-kente`} />
+      </section>
 
-        <p style={{ fontSize: 10.5, color: colors.textFaint, marginTop: 18, lineHeight: 1.5 }}>
-          Accès réservé aux comptes administrateurs d&apos;AFROBACK. Distinct du compte utilisateur de l&apos;app mobile.
-        </p>
-      </form>
+      <section className={s.cote}>
+        <form ref={carteRef} action={formAction} className={s.carte}>
+          <div className={s.enteteMobile}>
+            <Sankofa size={44} />
+            <span>AFROBACK</span>
+          </div>
+          <span className={s.badge}>
+            <span className={s.badgePoint} /> Back-office
+          </span>
+          <h1 className={s.titre}>Bon retour</h1>
+          <p className={s.intro}>Connectez-vous à la salle de contrôle d’AFROBACK.</p>
+
+          <label className={s.champ}>
+            <Icone nom="mail" taille={17} />
+            <input name="email" type="email" required autoComplete="username" placeholder=" " value={email} onChange={(e) => setEmail(e.target.value)} />
+            <span className={s.etiquette}>Adresse e-mail</span>
+          </label>
+
+          <label className={s.champ}>
+            <Icone nom="lock" taille={17} />
+            <input
+              name="password"
+              type={voir ? 'text' : 'password'}
+              required
+              autoComplete="current-password"
+              placeholder=" "
+              onKeyUp={(e) => setMajuscules(e.getModifierState('CapsLock'))}
+            />
+            <span className={s.etiquette}>Mot de passe</span>
+            <button type="button" className={s.oeil} onClick={() => setVoir((v) => !v)} aria-label={voir ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
+              <Icone nom={voir ? 'eyeOff' : 'eye'} taille={17} />
+            </button>
+          </label>
+          {majuscules && <div className={s.avertissement}>Majuscules activées</div>}
+
+          {state.error && (
+            <div className={s.erreur} role="alert">
+              {state.error}
+            </div>
+          )}
+
+          <button type="submit" disabled={pending} className={s.bouton}>
+            <span className={s.reflet} />
+            {pending ? (
+              <>
+                <span className={s.rouage} /> Connexion…
+              </>
+            ) : (
+              <>
+                Entrer <Icone nom="arrow" taille={17} />
+              </>
+            )}
+          </button>
+
+          <p className={s.mention}>
+            <Icone nom="shield" taille={14} /> Accès réservé aux administrateurs d’AFROBACK, distinct du compte de l’application.
+          </p>
+        </form>
+      </section>
     </div>
   );
 }

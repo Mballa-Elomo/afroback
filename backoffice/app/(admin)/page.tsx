@@ -1,214 +1,278 @@
 import Link from 'next/link';
 import { getHeroesAdmin, heroHasMedia } from '@/lib/data/heros';
-import { getPendingReportsCount, getUsersOverview } from '@/lib/data/overview';
+import { getPendingReportsCount } from '@/lib/data/overview';
 import { getTotalEngagement } from '@/lib/data/engagement';
-import { colors, fonts } from '@/lib/theme';
+import { chargerListe, type LigneUtilisateur } from '@/lib/utilisateurs';
+import { requireAdmin } from '@/lib/auth';
+import { relatif } from '@/lib/utilisateursFormat';
+import { Compteur } from '@/components/Compteur';
+import { Icone } from '@/components/Icone';
+import { Sankofa } from '@/components/Sankofa';
+import s from './dashboard.module.css';
 
 export const dynamic = 'force-dynamic';
 
-const FORFAIT_LABELS: Record<string, string> = { decouverte: 'Découverte', racines: 'Racines', heritage: 'Héritage', inconnu: 'Non renseigné' };
-const FORFAIT_COLORS: Record<string, string> = { decouverte: '#6f5f4d', racines: '#C98A3D', heritage: '#F0C36B', inconnu: '#5f5140' };
+/**
+ * Tableau de bord (refonte « Sankofa », 2026-10-10). Les chiffres
+ * utilisateurs viennent désormais des vrais abonnements (lib/utilisateurs.ts),
+ * et non plus du forfait choisi à l'inscription.
+ */
 
-function Kpi({ label, value, sub }: { label: string; value: string; sub: string }) {
-  return (
-    <div style={{ background: `linear-gradient(160deg, ${colors.row}, ${colors.panelDeep})`, border: `1px solid ${colors.border}`, borderRadius: 16, padding: 18 }}>
-      <div style={{ fontFamily: fonts.mono, fontSize: 9, letterSpacing: '.1em', color: colors.accentGoldAlt }}>{label}</div>
-      <div style={{ fontFamily: fonts.display, fontSize: 30, fontWeight: 700, color: colors.textHeading, margin: '8px 0 2px' }}>{value}</div>
-      <div style={{ fontSize: 11, color: colors.textMuted }}>{sub}</div>
-    </div>
-  );
+const FUSEAU = 'Africa/Douala';
+
+function salutation() {
+  const h = Number(new Intl.DateTimeFormat('fr-FR', { hour: 'numeric', hour12: false, timeZone: FUSEAU }).format(new Date()));
+  return h < 5 ? 'Bonne nuit' : h < 18 ? 'Bonjour' : 'Bonsoir';
 }
 
 export default async function DashboardPage() {
-  // 4 lectures indépendantes (aucune ne dépend du résultat d'une autre) —
-  // lancées en parallèle plutôt que séquentiellement. Retour de lenteur de
-  // Yannick le 2026-08-06 (Dashboard à 5,5s) : ces 4 appels s'additionnaient
-  // avant, chacun un aller-retour réseau Supabase/API admin distinct.
-  const [heroes, usersOverview, pendingReports, engagement] = await Promise.all([
+  const [heroes, comptes, pendingReports, engagement, admin] = await Promise.all([
     getHeroesAdmin(),
-    getUsersOverview(),
+    chargerListe().catch(() => [] as LigneUtilisateur[]),
     getPendingReportsCount(),
     getTotalEngagement(),
+    requireAdmin(),
   ]);
 
   const total = heroes.length;
-  const pubCount = heroes.filter((h) => h.statut_publication === 'publie').length;
-  const incompleteHeroes = heroes.filter((h) => {
+  const publies = heroes.filter((h) => h.statut_publication === 'publie').length;
+  const incomplets = heroes.filter((h) => {
     const m = heroHasMedia(h);
     return !(m.recitFr && m.photo && (m.audioFr || m.video));
   });
 
-  const mediaKeys: { key: keyof ReturnType<typeof heroHasMedia>; label: string }[] = [
-    { key: 'recitFr', label: 'Récit FR' },
-    { key: 'recitEn', label: 'Récit EN' },
-    { key: 'audioFr', label: 'Audio FR' },
-    { key: 'video', label: 'Vidéo' },
-    { key: 'photo', label: 'Photo' },
-  ];
-  const prodBars = mediaKeys.map(({ key, label }) => {
-    const count = heroes.filter((h) => heroHasMedia(h)[key]).length;
-    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-    return { label, count, pct };
+  const production = (
+    [
+      ['recitFr', 'Récit FR'],
+      ['recitEn', 'Récit EN'],
+      ['audioFr', 'Audio FR'],
+      ['video', 'Vidéo'],
+      ['photo', 'Photo'],
+    ] as const
+  ).map(([cle, label]) => {
+    const n = heroes.filter((h) => heroHasMedia(h)[cle]).length;
+    return { label, n, pct: total ? Math.round((n / total) * 100) : 0 };
   });
 
-  const forfaitEntries = usersOverview ? Object.entries(usersOverview.parForfait).sort((a, b) => b[1] - a[1]) : [];
+  const now = Date.now();
+  const nouveaux7 = comptes.filter((u) => now - new Date(u.inscrit_le).getTime() < 7 * 86400000).length;
+  const racines = comptes.filter((u) => u.forfait === 'racines').length;
+  const heritage = comptes.filter((u) => u.forfait === 'heritage').length;
+  const decouverte = comptes.length - racines - heritage;
+  const abonnes = racines + heritage;
+  const derniers = [...comptes].sort((a, b) => b.inscrit_le.localeCompare(a.inscrit_le)).slice(0, 5);
+  const pct = (n: number) => (comptes.length ? (n / comptes.length) * 100 : 0);
+  const anneau = `conic-gradient(#f0c36b 0 ${pct(racines)}%, #e3a277 ${pct(racines)}% ${pct(racines) + pct(heritage)}%, #3a2c1f ${pct(racines) + pct(heritage)}% 100%)`;
 
-  const abonnesPayants = usersOverview
-    ? (usersOverview.parForfait.racines ?? 0) + (usersOverview.parForfait.heritage ?? 0)
-    : null;
+  const prenom = (admin?.nom || '').split(/\s+/)[0];
+  const date = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: FUSEAU }).format(new Date());
 
   return (
-    <div>
-      <h1 style={{ fontFamily: fonts.display, fontSize: 26, fontWeight: 700, margin: '0 0 4px' }}>Tableau de bord</h1>
-      <p style={{ color: colors.textMuted, fontSize: 13, margin: '0 0 24px' }}>Salle de contrôle d&apos;AFROBACK — vue d&apos;ensemble et actions prioritaires.</p>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 16 }}>
-        <Kpi label="HÉROS PUBLIÉS" value={`${pubCount}/${total}`} sub="catalogue visible" />
-        <Kpi label="UTILISATEURS" value={usersOverview ? String(usersOverview.total) : '—'} sub="comptes app mobile" />
-        <Kpi label="ABONNÉS PAYANTS" value={abonnesPayants !== null ? String(abonnesPayants) : '—'} sub="Racines + Héritage" />
-        <Kpi label="SIGNALEMENTS" value={pendingReports !== null ? String(pendingReports) : '—'} sub="en attente de revue" />
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16, marginBottom: 16 }}>
-        <div style={{ background: colors.panel, border: `1px solid ${colors.border}`, borderRadius: 16, padding: 20 }}>
-          <div style={{ fontFamily: fonts.display, fontSize: 13, letterSpacing: '.1em', color: colors.accentGoldSoft, marginBottom: 16 }}>
-            ÉTAT DE PRODUCTION DES HÉROS
+    <div className={s.page}>
+      {/* Bandeau d'accueil */}
+      <section className={s.accueil}>
+        <div className={s.accueilTexte}>
+          <span className={s.date}>{date}</span>
+          <h1 className={s.titre}>
+            {salutation()}
+            {prenom ? `, ${prenom}` : ''}
+          </h1>
+          <p className={s.resume}>
+            AFROBACK compte <strong>{comptes.length}</strong> membre{comptes.length > 1 ? 's' : ''}, dont <strong>{abonnes}</strong> abonné
+            {abonnes > 1 ? 's' : ''}, et <strong>{publies}</strong> héros publié{publies > 1 ? 's' : ''}.
+            {nouveaux7 > 0 ? ` ${nouveaux7} nouvelle${nouveaux7 > 1 ? 's' : ''} inscription${nouveaux7 > 1 ? 's' : ''} cette semaine.` : ''}
+          </p>
+          <div className={s.raccourcisRapides}>
+            <Link href="/utilisateurs" className={s.puce}>
+              <Icone nom="users" taille={15} /> Utilisateurs
+            </Link>
+            <Link href="/abonnements" className={s.puce}>
+              <Icone nom="gift" taille={15} /> Offrir un abonnement
+            </Link>
+            <Link href="/heros" className={s.puce}>
+              <Icone nom="heroes" taille={15} /> Héros
+            </Link>
+            <Link href="/parametres" className={s.puce}>
+              <Icone nom="settings" taille={15} /> Paramètres
+            </Link>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {prodBars.map((b) => (
+        </div>
+        <div className={s.accueilEmbleme} aria-hidden>
+          <span className={s.cercle1} />
+          <span className={s.cercle2} />
+          <Sankofa size={120} epaisseur={5} className={s.accueilSankofa} />
+        </div>
+      </section>
+
+      {/* Chiffres clés */}
+      <section className={s.kpis}>
+        <Kpi icone="users" label="Comptes" valeur={comptes.length} detail={`+${nouveaux7} cette semaine`} href="/utilisateurs" />
+        <Kpi icone="revenue" label="Abonnés payants" valeur={abonnes} detail={`${racines} Racines · ${heritage} Héritage`} href="/abonnements" ton="terra" />
+        <Kpi icone="heroes" label="Héros publiés" valeur={publies} detail={`sur ${total} au catalogue`} href="/heros" />
+        <Kpi
+          icone="comments"
+          label="Signalements"
+          valeur={pendingReports ?? 0}
+          detail={pendingReports === null ? 'indisponible' : pendingReports > 0 ? 'en attente de revue' : 'rien à modérer'}
+          href="/commentaires"
+          ton={pendingReports ? 'rouge' : 'vert'}
+        />
+      </section>
+
+      <section className={s.grille2}>
+        <div className={s.carte}>
+          <h2 className={s.carteTitre}>Production des héros</h2>
+          <div className={s.barres}>
+            {production.map((b, i) => (
               <div key={b.label}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 5 }}>
-                  <span style={{ color: colors.textBody }}>{b.label}</span>
-                  <span style={{ fontFamily: fonts.mono, color: colors.accentGold }}>
-                    {b.count}/{total}
+                <div className={s.barreTete}>
+                  <span>{b.label}</span>
+                  <span className={s.mono}>
+                    {b.n}/{total} · {b.pct}%
                   </span>
                 </div>
-                <div style={{ height: 7, borderRadius: 9, background: '#2a1f14' }}>
-                  <div style={{ height: '100%', borderRadius: 9, background: `linear-gradient(90deg, ${colors.accentGoldBright}, #8B5A2B)`, width: `${b.pct}%` }} />
+                <div className={s.piste}>
+                  <div className={s.remplissage} style={{ width: `${b.pct}%`, animationDelay: `${0.2 + i * 0.08}s` }} />
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div style={{ background: colors.panel, border: `1px solid ${colors.border}`, borderRadius: 16, padding: 20 }}>
-          <div style={{ fontFamily: fonts.display, fontSize: 13, letterSpacing: '.1em', color: colors.accentGoldSoft, marginBottom: 16 }}>
-            RÉPARTITION PAR FORFAIT
-          </div>
-          {forfaitEntries.length === 0 ? (
-            <div style={{ fontSize: 12.5, color: colors.textFaint }}>Indisponible pour l&apos;instant.</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {forfaitEntries.map(([key, count]) => (
-                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: FORFAIT_COLORS[key] ?? '#6f5f4d', flex: 'none' }} />
-                  <span style={{ flex: 1, fontSize: 13, color: colors.textBody }}>{FORFAIT_LABELS[key] ?? key}</span>
-                  <span style={{ fontFamily: fonts.mono, fontSize: 13, color: colors.textHeading }}>{count}</span>
-                  <span style={{ fontFamily: fonts.mono, fontSize: 11, color: colors.textMuted, width: 40, textAlign: 'right' }}>
-                    {usersOverview && usersOverview.total > 0 ? `${Math.round((count / usersOverview.total) * 100)}%` : ''}
-                  </span>
-                </div>
-              ))}
+
+        <div className={s.carte}>
+          <h2 className={s.carteTitre}>Forfaits réels</h2>
+          <div className={s.forfaits}>
+            <div className={s.anneau} style={{ background: anneau }}>
+              <div className={s.anneauCentre}>
+                <span className={s.anneauValeur}>{comptes.length ? Math.round(pct(abonnes)) : 0}%</span>
+                <span className={s.anneauLabel}>abonnés</span>
+              </div>
             </div>
-          )}
-        </div>
-      </div>
-
-      <div style={{ background: colors.panel, border: `1px solid ${colors.border}`, borderRadius: 16, padding: 20, marginBottom: 16 }}>
-        <div style={{ fontFamily: fonts.display, fontSize: 13, letterSpacing: '.1em', color: colors.accentGoldSoft, marginBottom: 16 }}>
-          ENGAGEMENT GLOBAL — TOUS HÉROS CONFONDUS
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-          <Kpi label="LECTURES RÉCIT" value={engagement.lectures_recit.toLocaleString('fr-FR')} sub="ouvertures réelles, tous héros" />
-          <Kpi label="ÉCOUTES AUDIO" value={engagement.ecoutes_audio.toLocaleString('fr-FR')} sub="ouvertures réelles, tous héros" />
-          <Kpi label="VISIONNAGES VIDÉO" value={engagement.visionnages_video.toLocaleString('fr-FR')} sub="ouvertures réelles, tous héros" />
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        <div style={{ background: colors.panel, border: '1px solid rgba(160,82,45,.35)', borderRadius: 16, padding: 20 }}>
-          <div style={{ fontFamily: fonts.display, fontSize: 13, letterSpacing: '.1em', color: colors.terracottaText, marginBottom: 14 }}>⚠ ACTIONS REQUISES</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {incompleteHeroes.length > 0 && (
-              <AlertRow count={incompleteHeroes.length} label="Héros avec un média manquant" href="/heros?filtre=incomplets" />
-            )}
-            {pendingReports !== null && pendingReports > 0 && (
-              <AlertRow count={pendingReports} label="Signalements communauté à modérer" href="/heros" disabled note="Écran Communauté prévu au lot 3" />
-            )}
-            {incompleteHeroes.length === 0 && (pendingReports === null || pendingReports === 0) && (
-              <div style={{ fontSize: 12.5, color: colors.textFaint }}>Rien à traiter pour l&apos;instant.</div>
-            )}
+            <ul className={s.legende}>
+              <li>
+                <span className={s.pastille} style={{ background: '#f0c36b' }} /> Racines <strong>{racines}</strong>
+              </li>
+              <li>
+                <span className={s.pastille} style={{ background: '#e3a277' }} /> Héritage <strong>{heritage}</strong>
+              </li>
+              <li>
+                <span className={s.pastille} style={{ background: '#3a2c1f', border: '1px solid #5f5140' }} /> Découverte <strong>{decouverte}</strong>
+              </li>
+            </ul>
           </div>
         </div>
-        <div style={{ background: colors.panel, border: `1px solid ${colors.border}`, borderRadius: 16, padding: 20 }}>
-          <div style={{ fontFamily: fonts.display, fontSize: 13, letterSpacing: '.1em', color: colors.accentGoldSoft, marginBottom: 14 }}>RACCOURCIS</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <ShortcutRow icon="⭐" label="Mettre une histoire à la une" href="/heros" highlighted />
-            <ShortcutRow icon="⬆" label="Uploader un média" href="/media" />
+      </section>
+
+      <section className={s.carte}>
+        <h2 className={s.carteTitre}>Engagement, tous héros confondus</h2>
+        <div className={s.engagement}>
+          <Mini icone="dash" label="Lectures de récit" valeur={engagement.lectures_recit} />
+          <Mini icone="eye" label="Écoutes audio" valeur={engagement.ecoutes_audio} />
+          <Mini icone="media" label="Visionnages vidéo" valeur={engagement.visionnages_video} />
+        </div>
+      </section>
+
+      <section className={s.grille3}>
+        <div className={`${s.carte} ${s.carteAlerte}`}>
+          <h2 className={s.carteTitre}>À traiter</h2>
+          <div className={s.liste}>
+            {incomplets.length > 0 && <Ligne href="/heros?filtre=incomplets" nombre={incomplets.length} label="Héros avec un média manquant" />}
+            {!!pendingReports && <Ligne href="/commentaires" nombre={pendingReports} label="Signalements à modérer" />}
+            {comptes.filter((u) => u.statut === 'non_confirme').length > 0 && (
+              <Ligne href="/utilisateurs" nombre={comptes.filter((u) => u.statut === 'non_confirme').length} label="E-mails non confirmés" />
+            )}
+            {incomplets.length === 0 && !pendingReports && <p className={s.vide}>Rien à traiter. Tout est en ordre.</p>}
           </div>
         </div>
-      </div>
+
+        <div className={s.carte}>
+          <div className={s.carteTete}>
+            <h2 className={s.carteTitre}>Derniers inscrits</h2>
+            <Link href="/utilisateurs" className={s.voirTout}>
+              Tout voir
+            </Link>
+          </div>
+          <div className={s.liste}>
+            {derniers.length === 0 && <p className={s.vide}>Aucun compte pour l’instant.</p>}
+            {derniers.map((u) => (
+              <Link key={u.id} href={`/utilisateurs/${u.id}`} className={s.membre}>
+                <span className={s.membreAvatar}>{(u.prenom || u.email || '?').charAt(0).toUpperCase()}</span>
+                <span className={s.membreTexte}>
+                  <span>{u.prenom || u.email}</span>
+                  <span className={s.discret}>{relatif(u.inscrit_le)}</span>
+                </span>
+                {u.forfait !== 'decouverte' && <span className={s.membreForfait}>{u.forfait === 'heritage' ? 'Héritage' : 'Racines'}</span>}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className={s.carte}>
+          <h2 className={s.carteTitre}>Raccourcis</h2>
+          <div className={s.liste}>
+            <Raccourci icone="heroes" label="Mettre une histoire à la une" href="/heros" />
+            <Raccourci icone="media" label="Ajouter un média" href="/media" />
+            <Raccourci icone="translation" label="Suivre les traductions" href="/traduction" />
+            <Raccourci icone="shield" label="Réglages de sécurité" href="/parametres?section=securite" />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
 
-function AlertRow({ count, label, href, disabled, note }: { count: number; label: string; href: string; disabled?: boolean; note?: string }) {
-  const content = (
-    <div
-      style={{
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 11,
-        background: colors.row,
-        border: `1px solid ${colors.border}`,
-        borderRadius: 10,
-        padding: '11px 13px',
-      }}
-      title={note}
-    >
-      <span
-        style={{
-          width: 26,
-          height: 26,
-          flex: 'none',
-          borderRadius: 8,
-          background: 'rgba(139,58,47,.25)',
-          color: colors.terracottaText,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: fonts.mono,
-          fontSize: 12,
-          fontWeight: 700,
-        }}
-      >
-        {count}
-      </span>
-      <span style={{ flex: 1, fontSize: 12.5, color: colors.textBody }}>{label}</span>
-      {!disabled && <span style={{ color: colors.accentGold }}>›</span>}
-    </div>
-  );
-  return disabled ? content : <Link href={href}>{content}</Link>;
-}
-
-function ShortcutRow({ icon, label, href, highlighted }: { icon: string; label: string; href: string; highlighted?: boolean }) {
+function Kpi({ icone, label, valeur, detail, href, ton = 'or' }: { icone: string; label: string; valeur: number; detail: string; href: string; ton?: 'or' | 'terra' | 'rouge' | 'vert' }) {
   return (
-    <Link
-      href={href}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 11,
-        background: highlighted ? `linear-gradient(135deg, #241a11, #160f09)` : colors.row,
-        border: `1px solid ${highlighted ? colors.borderStrong : colors.border}`,
-        borderRadius: 10,
-        padding: '12px 13px',
-      }}
-    >
-      <span>{icon}</span>
-      <span style={{ flex: 1, fontSize: 12.5, fontWeight: 600, color: colors.textPrimary }}>{label}</span>
-      <span style={{ color: colors.accentGold }}>›</span>
+    <Link href={href} className={`${s.kpi} ${s['kpi_' + ton]}`} data-tilt>
+      <span className={s.kpiIcone}>
+        <Icone nom={icone} taille={18} />
+      </span>
+      <span className={s.kpiValeur}>
+        <Compteur valeur={valeur} />
+      </span>
+      <span className={s.kpiLabel}>{label}</span>
+      <span className={s.kpiDetail}>{detail}</span>
+      <span className={s.kpiFleche}>
+        <Icone nom="arrow" taille={15} />
+      </span>
+    </Link>
+  );
+}
+
+function Mini({ icone, label, valeur }: { icone: string; label: string; valeur: number }) {
+  return (
+    <div className={s.mini} data-tilt>
+      <span className={s.kpiIcone}>
+        <Icone nom={icone} taille={17} />
+      </span>
+      <span>
+        <span className={s.miniValeur}>
+          <Compteur valeur={valeur} />
+        </span>
+        <span className={s.kpiDetail}>{label}</span>
+      </span>
+    </div>
+  );
+}
+
+function Ligne({ href, nombre, label }: { href: string; nombre: number; label: string }) {
+  return (
+    <Link href={href} className={s.ligne}>
+      <span className={s.ligneNombre}>{nombre}</span>
+      <span className={s.ligneLabel}>{label}</span>
+      <Icone nom="arrow" taille={15} />
+    </Link>
+  );
+}
+
+function Raccourci({ icone, label, href }: { icone: string; label: string; href: string }) {
+  return (
+    <Link href={href} className={s.ligne}>
+      <span className={s.raccourciIcone}>
+        <Icone nom={icone} taille={16} />
+      </span>
+      <span className={s.ligneLabel}>{label}</span>
+      <Icone nom="arrow" taille={15} />
     </Link>
   );
 }

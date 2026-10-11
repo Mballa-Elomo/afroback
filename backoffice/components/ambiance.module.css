@@ -1,0 +1,134 @@
+/* Couche d'immersion (Ambiance.tsx). */
+
+.fond {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.orbe {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.55;
+  will-change: transform;
+}
+.orbe1 {
+  width: 520px;
+  height: 520px;
+  top: -140px;
+  right: 6%;
+  background: radial-gradient(circle, rgba(240, 195, 107, 0.22), transparent 70%);
+  animation: derive1 26s ease-in-out infinite alternate;
+}
+.orbe2 {
+  width: 620px;
+  height: 620px;
+  bottom: -220px;
+  left: 18%;
+  background: radial-gradient(circle, rgba(160, 82, 45, 0.26), transparent 70%);
+  animation: derive2 32s ease-in-out infinite alternate;
+}
+.orbe3 {
+  width: 380px;
+  height: 380px;
+  top: 38%;
+  left: 55%;
+  background: radial-gradient(circle, rgba(63, 107, 69, 0.16), transparent 70%);
+  animation: derive3 38s ease-in-out infinite alternate;
+}
+@keyframes derive1 {
+  to {
+    transform: translate(-260px, 180px) scale(1.15);
+  }
+}
+@keyframes derive2 {
+  to {
+    transform: translate(320px, -160px) scale(0.9);
+  }
+}
+@keyframes derive3 {
+  to {
+    transform: translate(-380px, 120px) scale(1.25);
+  }
+}
+.filigrane {
+  position: absolute;
+  right: -160px;
+  bottom: -200px;
+  opacity: 0.035;
+  animation: tourneLent 240s linear infinite;
+}
+@keyframes tourneLent {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.poussieres {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.lumiere {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 600px;
+  height: 600px;
+  z-index: 25;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 140, 0.075), rgba(240, 195, 107, 0.025) 40%, transparent 68%);
+  mix-blend-mode: screen;
+  transform: translate3d(-600px, -600px, 0);
+}
+
+/* Barre de chargement tissée. */
+.barre {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 3000;
+  pointer-events: none;
+  transform-origin: left;
+  transform: scaleX(0);
+  opacity: 0;
+  background: repeating-linear-gradient(90deg, #f0c36b 0 14px, #1a1109 14px 18px, #a0522d 18px 30px, #1a1109 30px 34px, #3f6b45 34px 42px, #1a1109 42px 46px, #e9be77 46px 52px, #1a1109 52px 56px);
+  box-shadow: 0 0 12px rgba(240, 195, 107, 0.7);
+}
+.barreEnCours {
+  opacity: 1;
+  animation: avance 8s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+.barreFin {
+  opacity: 0;
+  transform: scaleX(1);
+  transition: transform 0.25s ease, opacity 0.4s ease 0.25s;
+}
+@keyframes avance {
+  from {
+    transform: scaleX(0.05);
+  }
+  to {
+    transform: scaleX(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbe,
+  .filigrane {
+    animation: none;
+  }
+  .lumiere,
+  .poussieres {
+    display: none;
+  }
+}

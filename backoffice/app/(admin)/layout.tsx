@@ -1,10 +1,11 @@
+import { cookies } from 'next/headers';
 import { requireAdmin } from '@/lib/auth';
-import { Sidebar } from '@/components/Sidebar';
-import { Topbar } from '@/components/Topbar';
-import { colors } from '@/lib/theme';
+import { AdminShell } from '@/components/AdminShell';
+import { Sankofa } from '@/components/Sankofa';
+import { colors, fonts } from '@/lib/theme';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const admin = await requireAdmin();
+  const [admin, jar] = await Promise.all([requireAdmin(), cookies()]);
 
   if (!admin) {
     return (
@@ -15,35 +16,41 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'column',
-          gap: 14,
+          gap: 16,
           textAlign: 'center',
           padding: 24,
         }}
       >
-        <div style={{ fontSize: 40 }}>🔒</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: colors.textHeading }}>Accès refusé</div>
-        <p style={{ fontSize: 13, color: colors.textMutedAlt, maxWidth: 360 }}>
-          Ce compte est connecté mais n&apos;est pas enregistré comme administrateur AFROBACK. Contacte Yannick pour
-          être ajouté à <code>admin_users</code>.
+        <Sankofa size={72} anime />
+        <div style={{ fontFamily: fonts.display, fontSize: 22, fontWeight: 800, color: colors.textHeading, letterSpacing: '.04em' }}>Accès refusé</div>
+        <p style={{ fontSize: 13.5, color: colors.textMutedAlt, maxWidth: 380, lineHeight: 1.6 }}>
+          Ce compte est connecté mais n&apos;est pas enregistré comme administrateur AFROBACK. Contacte Yannick pour être ajouté à{' '}
+          <code>admin_users</code>.
         </p>
-        <a href="/logout" style={{ fontSize: 13, color: colors.accentGold }}>
-          Se déconnecter
-        </a>
+        <form action="/logout" method="post">
+          <button
+            type="submit"
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: colors.accentGold,
+              background: 'none',
+              border: `1px solid ${colors.borderStrong}`,
+              borderRadius: 999,
+              padding: '9px 18px',
+              cursor: 'pointer',
+            }}
+          >
+            Se déconnecter
+          </button>
+        </form>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: colors.background, fontFamily: "'Manrope', sans-serif", color: colors.textPrimary }}>
-      <Sidebar admin={admin} />
-      {/* marginLeft: 236 compense le sidebar en position:fixed (largeur 236px, hors flux).
-          id ciblé par RecitDrawer.tsx pour couper ce scroll pendant qu'un panneau latéral est ouvert. */}
-      <div id="afa-scroll-container" style={{ marginLeft: 236, height: '100vh', overflowY: 'auto' }}>
-        <Topbar />
-        <div style={{ padding: 28 }}>
-          <div className="afa-fade">{children}</div>
-        </div>
-      </div>
-    </div>
+    <AdminShell admin={admin} replieInitial={jar.get('afa-sb')?.value === '1'}>
+      {children}
+    </AdminShell>
   );
 }

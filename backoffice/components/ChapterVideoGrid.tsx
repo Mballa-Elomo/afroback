@@ -14,7 +14,8 @@ import type { ChapitreStoryboard, RecitChapitre, VideoChapitreAdmin } from '@/li
 // à travers la frontière Server/Client Component) : on reçoit un tableau
 // brut et on construit l'index localement.
 import type { VideoChapterEngagementRow } from '@/lib/data/engagement';
-import { ConfirmModal } from './ConfirmModal';
+import { LienVideoCellule } from './LienVideoCellule';
+import { definirLienVideoChapitre } from '@/lib/actionsLienVideo';
 
 const CHAPTERS = [1, 2, 3, 4] as const;
 
@@ -170,75 +171,14 @@ function ChapterVideoCell({
   url?: string;
   visionnages: number;
 }) {
-  const router = useRouter();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const present = !!url;
-
-  const onPick = (file: File | undefined) => {
-    if (!file) return;
-    setError(null);
-    startTransition(async () => {
-      try {
-        // Route Handler (pas une Server Action) — voir lib/uploadMedia.ts.
-        const fd = new FormData();
-        fd.set('chapterNum', String(numero));
-        fd.set('lang', lang);
-        fd.set('file', file);
-        const res = await fetch(`/api/heros/${slug}/chapter-video`, { method: 'POST', body: fd }).then((r) => r.json());
-        if (res.error) setError(res.error);
-        else router.refresh();
-      } catch {
-        // Même filet que MediaUploadSlot.tsx : un échec réseau/timeout ne
-        // doit jamais faire planter toute la fiche héros, juste afficher
-        // un message ici.
-        setError("Échec de l'upload (connexion interrompue). Réessaie.");
-      } finally {
-        if (inputRef.current) inputRef.current.value = '';
-      }
-    });
-  };
-
+  // Lien YouTube / Vimeo au lieu d'un fichier envoyé (2026-10-11), voir LienVideoCellule.tsx.
   return (
-    <div>
-      <div
-        onClick={() => !pending && inputRef.current?.click()}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          border: `1px dashed ${colors.borderStrong}`,
-          borderRadius: 9,
-          padding: '9px 11px',
-          cursor: pending ? 'default' : 'pointer',
-          opacity: pending ? 0.6 : 1,
-        }}
-      >
-        <span style={{ fontSize: 13 }}>⬆</span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 11.5, fontWeight: 600 }}>{label}</div>
-          <div style={{ fontSize: 9.5, color: colors.textMuted }}>
-            {pending ? 'Envoi…' : present ? `👁 ${visionnages.toLocaleString('fr-FR')} visionnage${visionnages === 1 ? '' : 's'}` : 'MP4'}
-          </div>
-        </div>
-        <span style={{ fontFamily: fonts.mono, fontSize: 8.5, fontWeight: 700, color: present ? colors.positive : colors.terracottaTextAlt }}>
-          {present ? 'EN LIGNE' : 'À PRODUIRE'}
-        </span>
-      </div>
-      <input ref={inputRef} type="file" accept="video/mp4" style={{ display: 'none' }} onChange={(e) => onPick(e.target.files?.[0])} />
-      {error && <div style={{ fontSize: 10, color: colors.terracottaText, marginTop: 4 }}>{error}</div>}
-      {present && (
-        <div style={{ marginTop: 4 }}>
-          <ConfirmModal
-            trigger={<span style={{ fontSize: 9.5, color: colors.textFaint, cursor: 'pointer', textDecoration: 'underline' }}>Retirer</span>}
-            title="Retirer cette vidéo ?"
-            description="Le fichier reste dans le stockage, mais l'app mobile ne l'affichera plus pour ce chapitre tant qu'une vidéo n'est pas ré-uploadée."
-            confirmLabel="Retirer"
-            onConfirm={() => removeChapterVideo(slug, numero, lang)}
-          />
-        </div>
-      )}
-    </div>
+    <LienVideoCellule
+      label={label}
+      url={url}
+      visionnages={visionnages}
+      enregistrer={(lien) => definirLienVideoChapitre('heros', slug, numero, lang, lien)}
+      retirer={() => removeChapterVideo(slug, numero, lang)}
+    />
   );
 }

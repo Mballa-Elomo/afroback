@@ -61,6 +61,7 @@ export function maskEmail(email: string) {
 }
 
 const ERRORS: [RegExp, () => string][] = [
+  [/user is banned|banned/i, () => tc('Ce compte est suspendu. Contacte le support AFROBACK.', 'This account is suspended. Contact AFROBACK support.')],
   [/invalid login credentials/i, () => tc('Identifiant ou mot de passe incorrect.', 'Incorrect username or password.')],
   [/email not confirmed/i, () => tc("Ton email n'est pas encore confirmé.", 'Your email is not confirmed yet.')],
   [/token has expired|invalid.*token|otp.*(expired|invalid)/i, () => tc('Code incorrect ou expiré. Demande un nouveau code.', 'Incorrect or expired code. Request a new code.')],

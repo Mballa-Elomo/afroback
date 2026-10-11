@@ -560,6 +560,7 @@ const en: Translation = {
     phoneProvider: 'Phone authentication is not enabled in Supabase yet.',
     samePassword: 'The new password must be different from the old one.',
     signupsDisabled: 'Sign-ups are not allowed at the moment.',
+    banned: 'This account is suspended. Contact AFROBACK support.',
   },
   marketCat: {
     sculpture: 'Sculpture',

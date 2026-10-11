@@ -51,7 +51,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     group: 'UTILISATEURS & SYSTÈME',
     items: [
-      { id: 'users', icon: '👥', label: 'Utilisateurs', enabled: false, lot: 3 },
+      { id: 'users', icon: '👥', label: 'Utilisateurs', href: '/utilisateurs', enabled: true },
       { id: 'settings', icon: '⚙', label: 'Paramètres', href: '/parametres', enabled: true },
     ],
   },

@@ -6,7 +6,7 @@ import { BackButton, Collapsible } from '../../../src/ui/modern';
 import { Icon } from '../../../src/components/Icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { LecteurVideo } from '@/src/video/LecteurVideo';
 import { DecouverteItemRow } from '../../../src/components/DecouverteItemRow';
 import { FaitsList } from '../../../src/components/FaitsList';
 import { SourcesList } from '../../../src/components/SourcesList';
@@ -243,13 +243,9 @@ function DecouverteVideoPlayer({ itemId, videos }: { itemId: string; videos: Rec
     recordDecouverteVideoEngagement(itemId, actualLang);
   }, [itemId, actualLang]);
 
-  const player = useVideoPlayer(uri, (p) => {
-    p.loop = false;
-  });
-
   return (
     <View>
-      <VideoView key={uri} style={styles.videoArea} player={player} allowsFullscreen allowsPictureInPicture nativeControls />
+      <LecteurVideo key={uri} uri={uri} style={styles.videoArea} />
       {codes.length > 1 && (
         <View style={styles.videoLangToggle}>
           {codes.map((code) => (

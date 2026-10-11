@@ -246,7 +246,7 @@
 /* ---------- Vue d'ensemble ---------- */
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
   gap: 14px;
   margin-bottom: 18px;
 }

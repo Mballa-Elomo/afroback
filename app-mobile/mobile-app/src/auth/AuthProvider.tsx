@@ -554,6 +554,7 @@ function isLikelyValidEmail(email: string): boolean {
 /** Messages Supabase Auth traduits pour l'UI (langue courante), sans changer le comportement (mêmes cas d'erreur). */
 const AUTH_ERROR_KEYS: Record<string, string> = {
   'Invalid login credentials': 'authErrors.invalidCredentials',
+  'User is banned': 'authErrors.banned',
   'User already registered': 'authErrors.alreadyRegistered',
   'Email not confirmed': 'authErrors.emailNotConfirmed',
   'Token has expired or is invalid': 'authErrors.tokenInvalid',

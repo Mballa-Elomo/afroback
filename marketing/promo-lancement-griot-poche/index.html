@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>AFROBACK · Le griot dans ta poche</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Cinzel"; src: url("assets/fonts/Cinzel_900Black.ttf") format("truetype"); font-weight: 900; }
+@font-face { font-family: "Cinzel"; src: url("assets/fonts/Cinzel_700Bold.ttf") format("truetype"); font-weight: 700; }
+@font-face { font-family: "Manrope"; src: url("assets/fonts/Manrope_600SemiBold.ttf") format("truetype"); font-weight: 600; }
+@font-face { font-family: "Manrope"; src: url("assets/fonts/Manrope_800ExtraBold.ttf") format("truetype"); font-weight: 800; }
+:root { --night: #0A0F14; --gold: #F0C36B; --ivory: #FFF4E0; --muted: #8C7B67; --p-from: #3a1d0a; --p-via: #1a1006; --p-to: #0c0805; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--night); font-family: "Manrope", sans-serif; }
+
+/* Plans vidéo : chaque clip (déjà recadré en 1080 × 1920) dans une enveloppe non minutée qui porte le léger mouvement de caméra */
+.vw { position: absolute; inset: 0; }
+.vw video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+#vw-bg video { filter: blur(16px) brightness(.45); }
+#vw-end video { filter: brightness(.42); }
+
+.shade { position: absolute; left: 0; top: 1180px; width: 1080px; height: 740px; background: linear-gradient(180deg, rgba(10,15,20,0), rgba(10,15,20,.6) 45%, rgba(10,15,20,.8)); }
+.vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.6) 100%); }
+#black { position: absolute; inset: 0; background: var(--night); }
+.title { position: absolute; left: 0; width: 1080px; text-align: center; font-family: "Cinzel"; font-weight: 900; line-height: 1.05; color: var(--gold); text-shadow: 0 8px 30px rgba(0,0,0,.85); }
+.title span { display: inline-block; white-space: pre; }
+
+/* Téléphone : lecteur de narration réel, reconstruit d'après app/(tabs)/accueil/heros/[slug]/audio.tsx */
+#phone-layer { position: absolute; inset: 0; }
+.phone { position: absolute; left: 140px; top: 100px; width: 800px; height: 1720px; border-radius: 104px; background: #17110c; padding: 16px;
+  box-shadow: 0 0 0 4px #2c2118, 0 0 90px rgba(240,195,107,.25), 0 50px 140px rgba(0,0,0,.7); }
+.screen { position: relative; width: 768px; height: 1688px; border-radius: 90px; overflow: hidden; }
+.island { position: absolute; left: 309px; top: 26px; width: 150px; height: 42px; border-radius: 21px; background: #0a0705; }
+.player { position: absolute; inset: 0; background: linear-gradient(180deg, var(--p-from), var(--p-via) 55%, var(--p-to)); }
+.p-top { position: absolute; top: 108px; left: 60px; right: 60px; height: 50px; }
+.p-top .l { position: absolute; left: 0; top: 0; font-size: 40px; color: var(--gold); }
+.p-top .c { position: absolute; left: 0; right: 0; top: 10px; text-align: center; font-size: 24px; letter-spacing: 4px; color: var(--muted); }
+.p-top .r { position: absolute; right: 0; top: 0; font-size: 40px; color: var(--gold); }
+.p-portrait { position: absolute; left: 154px; top: 230px; width: 460px; height: 460px; border-radius: 32px; background: url("assets/img/reine-nzinga.jpg") center 22% / cover; }
+.p-glow { position: absolute; left: 114px; top: 190px; width: 540px; height: 540px; border-radius: 50%; background: radial-gradient(circle, rgba(240,195,107,.35), rgba(240,195,107,0) 66%); }
+.p-note { position: absolute; left: 570px; top: 646px; width: 86px; height: 86px; border-radius: 50%; background: var(--gold); color: #1a1006; font-size: 44px; line-height: 86px; text-align: center; }
+.p-name { position: absolute; left: 0; width: 768px; top: 760px; text-align: center; font-family: "Cinzel"; font-weight: 700; font-size: 62px; color: #F7E7C8; }
+.p-sub { position: absolute; left: 0; width: 768px; top: 850px; text-align: center; font-size: 30px; color: var(--muted); }
+.p-wave { position: absolute; left: 60px; width: 648px; top: 930px; height: 170px; }
+.p-wave i { position: absolute; bottom: 0; width: 10px; border-radius: 5px; background: #C99A5B; }
+.p-play { position: absolute; left: 304px; top: 1150px; width: 160px; height: 160px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #8B5A2B); }
+.p-play b { position: absolute; top: 50px; width: 18px; height: 60px; border-radius: 4px; background: #1a1006; }
+.p-chap { position: absolute; left: 60px; right: 60px; font-size: 28px; color: var(--muted); }
+.p-chap span { color: var(--gold); }
+
+/* Fin */
+#end { position: absolute; inset: 0; }
+#end-logo { position: absolute; left: 350px; top: 330px; width: 380px; height: 380px; }
+#end-logo img { width: 380px; height: 380px; }
+#end-badges { position: absolute; left: 0; top: 1250px; width: 1080px; height: 140px; }
+#end-badges img { position: absolute; }
+
+/* Sous-titres karaoké (style de la série) */
+#subs { position: absolute; left: 60px; right: 60px; top: 1440px; text-align: center; font-family: "Manrope"; font-weight: 800; font-size: 54px; line-height: 1.25;
+  color: var(--ivory); text-shadow: 0 4px 14px rgba(0,0,0,.7), 0 0 4px rgba(0,0,0,.7); }
+#subs span { margin: 0 8px; }
+#subs span.on { color: var(--gold); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="30" data-width="1080" data-height="1920">
+
+  <!-- ============ IMAGES (contenus AFROBACK, voir assets/clips/sources.txt) ============ -->
+  <div class="vw" id="w01"><video id="v01" class="clip" src="assets/clips/c01.mp4" muted playsinline data-start="0" data-duration="2.15" data-track-index="0"></video></div>
+  <div class="vw" id="w02"><video id="v02" class="clip" src="assets/clips/c02.mp4" muted playsinline data-start="2.15" data-duration="1.55" data-track-index="0"></video></div>
+  <div class="vw" id="w03"><video id="v03" class="clip" src="assets/clips/c03.mp4" muted playsinline data-start="3.7" data-duration="1.65" data-track-index="0"></video></div>
+  <div class="vw" id="w04"><video id="v04" class="clip" src="assets/clips/c04.mp4" muted playsinline data-start="5.35" data-duration="1.95" data-track-index="0"></video></div>
+  <div class="vw" id="w05"><video id="v05" class="clip" src="assets/clips/c05.mp4" muted playsinline data-start="7.3" data-duration="2.0" data-track-index="0"></video></div>
+  <div class="vw" id="w06"><video id="v06" class="clip" src="assets/clips/c06.mp4" muted playsinline data-start="10.2" data-duration="1.8" data-track-index="0"></video></div>
+  <div class="vw" id="w07"><video id="v07" class="clip" src="assets/clips/c07.mp4" muted playsinline data-start="12.0" data-duration="1.6" data-track-index="0"></video></div>
+  <div class="vw" id="vw-bg"><video id="v08" class="clip" src="assets/clips/c01.mp4" muted playsinline data-start="13.6" data-duration="2.45" data-track-index="0"></video></div>
+  <div class="vw" id="w09"><video id="v09" class="clip" src="assets/clips/c09.mp4" muted playsinline data-start="16.05" data-duration="0.8" data-track-index="0"></video></div>
+  <div class="vw" id="w10"><video id="v10" class="clip" src="assets/clips/c10.mp4" muted playsinline data-start="16.85" data-duration="0.85" data-track-index="0"></video></div>
+  <div class="vw" id="w11"><video id="v11" class="clip" src="assets/clips/c11.mp4" muted playsinline data-start="17.7" data-duration="2.5" data-track-index="0"></video></div>
+  <div class="vw" id="w12"><video id="v12" class="clip" src="assets/clips/c12.mp4" muted playsinline data-start="20.2" data-duration="1.05" data-track-index="0"></video></div>
+  <div class="vw" id="w13"><video id="v13" class="clip" src="assets/clips/c13.mp4" muted playsinline data-start="21.25" data-duration="1.0" data-track-index="0"></video></div>
+  <div class="vw" id="w14"><video id="v14" class="clip" src="assets/clips/c14.mp4" muted playsinline data-start="22.25" data-duration="0.95" data-track-index="0"></video></div>
+  <div class="vw" id="w15"><video id="v15" class="clip" src="assets/clips/c15.mp4" muted playsinline data-start="23.2" data-duration="1.6" data-track-index="0"></video></div>
+  <div class="vw" id="vw-end"><video id="v16" class="clip" src="assets/clips/c16.mp4" muted playsinline data-start="24.2" data-duration="5.8" data-track-index="0"></video></div>
+
+  <!-- ============ HABILLAGE ============ -->
+  <div class="vig"></div>
+  <div class="shade"></div>
+  <div id="black"></div>
+  <div id="ecoute" class="title" style="top:330px;font-size:150px"></div>
+
+  <div id="phone-layer"><div id="phone" class="phone"><div class="screen">
+    <div class="player">
+      <div class="p-top"><span class="l">⌄</span><span class="c">NARRATION</span><span class="r">≡</span></div>
+      <div class="p-glow" id="p-glow"></div>
+      <div class="p-portrait"></div>
+      <div class="p-note">♪</div>
+      <div class="p-name">REINE NZINGA</div>
+      <div class="p-sub">Narration audio · Afrique centrale</div>
+      <div class="p-wave" id="wave"></div>
+      <div class="p-play"><b style="left:56px"></b><b style="left:86px"></b></div>
+      <div class="p-chap" style="top:1380px"><span>Chapitre 1</span> · Naître dans un monde qui se referme</div>
+      <div class="p-chap" style="top:1440px">Chapitre 2 · La diplomate de Luanda</div>
+    </div>
+    <div class="island"></div>
+  </div></div></div>
+
+  <div id="end">
+    <div id="end-logo"><img src="assets/img/afroback-logo.png" alt="AFROBACK" /></div>
+    <div id="end-word" class="title" style="top:760px;font-size:110px"></div>
+    <div id="tag1" class="title" style="top:960px;font-size:62px;color:#FFF4E0">LE GRIOT</div>
+    <div id="tag2" class="title" style="top:1040px;font-size:62px;color:#FFF4E0">DANS TA POCHE.</div>
+    <div id="end-badges">
+      <img src="assets/img/app-store-fr.svg" alt="Télécharger dans l'App Store" style="left:150px;top:14px;height:112px" />
+      <img src="assets/img/google-play-fr.png" alt="Disponible sur Google Play" style="left:566px;top:0;height:140px" />
+    </div>
+  </div>
+
+  <div id="subs" class="clip" data-start="0" data-duration="30" data-track-index="5"></div>
+
+  <!-- ============ SON (inchangé : voix griot, musique, bruitages Mixkit) ============ -->
+  <audio id="vo1" src="audio/vo-1.mp3" data-start="0.3" data-duration="5.02" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo2" src="audio/vo-2.mp3" data-start="5.34" data-duration="3.89" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo3" src="audio/vo-3.mp3" data-start="9.85" data-duration="0.84" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo4" src="audio/vo-4.mp3" data-start="12.15" data-duration="7.55" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo5" src="audio/vo-5.mp3" data-start="25.2" data-duration="2.74" data-track-index="10" data-volume="1"></audio>
+  <audio id="musicA" src="audio/musique-legends-by-the-fire.mp3" data-start="0" data-duration="9.35" data-media-start="8" data-track-index="11" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.6,"v":0.32},{"t":8.9,"v":0.32},{"t":9.3,"v":0}]}]}'></audio>
+  <audio id="musicB" src="audio/musique-legends-by-the-fire.mp3" data-start="10.4" data-duration="19.6" data-media-start="18.5" data-track-index="11" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":1.2,"v":0.26},{"t":9.0,"v":0.26},{"t":9.8,"v":0.9},{"t":13.6,"v":0.9},{"t":14.6,"v":0.32},{"t":17.6,"v":0.45},{"t":19.6,"v":0}]}]}'></audio>
+  <audio id="sfx-feu" src="audio/sfx/feu-crepite.wav" data-start="0" data-duration="5.8" data-media-start="0.5" data-track-index="12" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.6,"v":0.9},{"t":4.6,"v":0.7},{"t":5.8,"v":0}]}]}'></audio>
+  <audio id="sfx-etincelle" src="audio/sfx/etincelle.wav" data-start="10.08" data-duration="1.8" data-track-index="14" data-volume="0.5"></audio>
+  <audio id="sfx-souffle" src="audio/sfx/souffle-air.wav" data-start="13.05" data-duration="1.6" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx-feu2" src="audio/sfx/feu-crepite.wav" data-start="17.7" data-duration="2.5" data-media-start="4" data-track-index="12" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.4,"v":0.45},{"t":2.1,"v":0.45},{"t":2.5,"v":0}]}]}'></audio>
+  <audio id="sfx-montee" src="audio/sfx/souffle-tunnel.wav" data-start="19.6" data-duration="1.4" data-track-index="13" data-volume="0.35"></audio>
+  <audio id="sfx-tambour" src="audio/sfx/tambour-profond.wav" data-start="20.09" data-duration="3.5" data-track-index="14" data-volume="0.85"></audio>
+  <audio id="sfx-logo" src="audio/sfx/basse-courte.wav" data-start="25.09" data-duration="1.1" data-track-index="14" data-volume="0.5"></audio>
+</div>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+const q = (s) => document.querySelector(s);
+
+// ---------- titres en lettres qui tombent (signature de la série) ----------
+function letterDrop(sel, text, at, stagger = 0.04) {
+  const el = q(sel); el.innerHTML = text.split("").map(c => `<span>${c}</span>`).join("");
+  [...el.children].forEach((sp, i) => tl.fromTo(sp, { y: -140, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, ease: "back.out(1.4)" }, at + i * stagger));
+}
+
+// ---------- sous-titres karaoké (segments mesurés dans les voix) ----------
+const SEGS = [
+  [0.30, 2.01, "Autrefois, au coin du feu,"], [2.26, 3.42, "le griot racontait…"], [3.72, 4.97, "et tout le village écoutait."],
+  [5.57, 7.05, "Puis le village s'est dispersé."], [7.44, 8.72, "Et les histoires se sont tues."],
+  [12.15, 13.43, "Le griot n'est pas parti."], [13.61, 14.93, "Il est là, dans ta poche."], [15.12, 16.71, "La Reine Nzinga, nos héros,"],
+  [16.87, 17.46, "nos mythes…"], [17.74, 19.37, "racontés comme au coin du feu."],
+];
+const GROUPS = [];
+SEGS.forEach(([a, b, txt]) => {
+  const ws = txt.split(" "); const tot = ws.reduce((n, w) => n + w.length + 1, 0); let acc = 0;
+  const timed = ws.map(w => { const at = a + (b - a) * acc / tot; acc += w.length + 1; return { w, at }; });
+  for (let i = 0; i < timed.length; i += 3) { const g = timed.slice(i, i + 3); const nx = timed[i + 3]; GROUPS.push({ words: g, start: g[0].at, end: nx ? nx.at : b + 0.35 }); }
+});
+const subs = q("#subs");
+function renderSubs(t) {
+  const g = GROUPS.find(x => t >= x.start && t < x.end);
+  if (!g) { subs.innerHTML = ""; return; }
+  const cur = [...g.words].reverse().find(x => t >= x.at);
+  subs.innerHTML = g.words.map(x => `<span class="${x === cur ? "on" : ""}">${x.w}</span>`).join("");
+  subs.style.top = (t >= 13.6 && t < 16.05) ? "200px" : "1440px";
+}
+
+// ---------- onde du lecteur ----------
+const wave = q("#wave"); const bars = [];
+for (let i = 0; i < 40; i++) { const b = document.createElement("i"); b.style.left = (i * 16.4) + "px"; wave.appendChild(b); bars.push(b); }
+const voiceOn = (t) => SEGS.slice(5).some(([a, b]) => t >= a && t <= b) ? 1 : 0.15;
+function render(t) {
+  const lit = Math.max(0, Math.min(40, Math.floor((t - 13.6) * 3) + 8)); const e = voiceOn(t);
+  bars.forEach((b, i) => {
+    const base = 26 + 110 * Math.abs(Math.sin(i * 0.61) * Math.cos(i * 0.23));
+    b.style.height = Math.round(base * (0.55 + 0.45 * e * Math.abs(Math.sin(t * 9 + i * 0.9)))) + "px";
+    b.style.background = i < lit ? "#F0C36B" : "#C99A5B"; b.style.opacity = i < lit ? 1 : 0.4;
+  });
+  renderSubs(t);
+}
+const proxy = { t: 0 };
+tl.to(proxy, { t: 30, duration: 30, ease: "none", onUpdate: () => render(proxy.t) }, 0);
+
+// ---------- mouvement de caméra léger sur chaque plan (poussée lente) ----------
+const PLANS = [["#w01",0,2.15],["#w02",2.15,1.55],["#w03",3.7,1.65],["#w04",5.35,1.95],["#w05",7.3,2.0],["#w06",10.2,1.8],["#w07",12.0,1.6],
+  ["#w09",16.05,0.8],["#w10",16.85,0.85],["#w11",17.7,2.5],["#w12",20.2,1.05],["#w13",21.25,1.0],["#w14",22.25,0.95],["#w15",23.2,1.6],["#vw-end",24.2,5.8]];
+PLANS.forEach(([sel, a, d]) => tl.fromTo(sel, { scale: 1.0 }, { scale: 1.06, duration: d, ease: "none" }, a));
+
+// ---------- noir, « Écoute. », la flamme ----------
+gsap.set("#black", { opacity: 0 });
+tl.fromTo("#w01", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 0);
+tl.to("#black", { opacity: 1, duration: 0.45, ease: "power2.in" }, 8.85);          // les histoires se taisent
+letterDrop("#ecoute", "ÉCOUTE.", 9.85);
+tl.to("#black", { opacity: 0, duration: 0.6, ease: "power1.out" }, 10.2);          // la flamme renaît
+tl.to("#ecoute", { opacity: 0, duration: 0.4, ease: "power2.in" }, 11.5);
+
+// ---------- le téléphone : le griot dans ta poche ----------
+gsap.set("#phone-layer", { opacity: 0 });
+gsap.set("#phone", { transformOrigin: "50% 50%", scale: 0.78, y: 160 });
+tl.set("#phone-layer", { opacity: 1 }, 13.6);
+tl.fromTo("#phone", { y: 1300 }, { y: 160, duration: 0.5, ease: "power3.out" }, 13.6);
+tl.fromTo("#p-glow", { opacity: 0.5, scale: 0.9 }, { opacity: 1, scale: 1.08, duration: 0.6, ease: "power2.out" }, 15.12);
+tl.set("#phone-layer", { opacity: 0 }, 16.05);
+
+// ---------- fin ----------
+gsap.set("#end", { opacity: 0 });
+tl.fromTo("#vw-end", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power1.inOut" }, 24.2);
+tl.set("#end", { opacity: 1 }, 24.8);
+tl.fromTo("#end-logo", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 25.15);
+letterDrop("#end-word", "AFROBACK", 25.3, 0.035);
+tl.fromTo("#tag1", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.2, ease: "power2.out" }, 26.3);
+tl.fromTo("#tag2", { opacity: 0, scale: 1.3 }, { opacity: 1, scale: 1, duration: 0.2, ease: "power2.out" }, 26.75);
+tl.fromTo("#end-badges", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 27.3);
+
+window.__timelines["main"] = tl;
+tl.seek(0);
+</script>
+</body>
+</html>

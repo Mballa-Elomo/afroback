@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>AFROBACK · Le griot dans ta poche</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Cinzel"; src: url("assets/fonts/Cinzel_900Black.ttf") format("truetype"); font-weight: 900; }
+@font-face { font-family: "Cinzel"; src: url("assets/fonts/Cinzel_700Bold.ttf") format("truetype"); font-weight: 700; }
+@font-face { font-family: "Manrope"; src: url("assets/fonts/Manrope_600SemiBold.ttf") format("truetype"); font-weight: 600; }
+@font-face { font-family: "Manrope"; src: url("assets/fonts/Manrope_800ExtraBold.ttf") format("truetype"); font-weight: 800; }
+/* Palette de la série /afroback_video (recit-kit.tsx, theme.ts) */
+:root {
+  --night: #0A0F14; --night2: #111A24; --gold: #F0C36B; --gold-pale: #F7D98B; --gold-deep: #C98A3D; --ivory: #FFF4E0;
+  --muted: #8C7B67; --sil: #05080B; --p-from: #3a1d0a; --p-via: #1a1006; --p-to: #0c0805;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--night); }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--night); font-family: "Manrope", sans-serif; }
+.clip { position: absolute; inset: 0; overflow: hidden; }
+.layer { position: absolute; inset: 0; }
+svg.full { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+.night { position: absolute; inset: 0; background: radial-gradient(circle at 50% 55%, rgba(240,160,70,.10) 0%, var(--night2) 40%, var(--night) 80%); }
+.vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(0,0,0,.85) 100%); }
+.fog { position: absolute; width: 900px; height: 260px; border-radius: 50%; background: rgba(159,179,192,.12); filter: blur(60px); }
+.title { position: absolute; left: 0; width: 1080px; text-align: center; font-family: "Cinzel"; font-weight: 900; line-height: 1.05; color: var(--gold); }
+.title span { display: inline-block; white-space: pre; }
+.ember { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #FFC861; box-shadow: 0 0 10px #FF9A3C; }
+
+/* ---------- 1 · le griot (illustration AFROBACK) ---------- */
+#s1-cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+#s1-img { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: url("assets/img/histoires.jpg") center / cover; }
+#s1-fire { position: absolute; left: 352px; top: 1170px; width: 420px; height: 420px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,190,90,.55), rgba(255,140,40,.15) 45%, rgba(255,120,30,0) 70%); mix-blend-mode: screen; }
+#s1-black { position: absolute; inset: 0; background: var(--night); }
+
+/* ---------- 2 · la dispersion (silhouettes, nuit) ---------- */
+#s2-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #0A0F14 0%, #111A24 45%, #22303f 62%, #2d3a4a 64%, #0b1016 66%, #070a0d 100%); }
+#s2-black { position: absolute; inset: 0; background: var(--night); }
+
+/* ---------- 3 · « Écoute. » et la braise ---------- */
+#ember-big { position: absolute; left: 0; top: 0; width: 60px; height: 60px; }
+#ember-big .core { position: absolute; left: 22px; top: 22px; width: 16px; height: 16px; border-radius: 50%; background: #FFF1C4; box-shadow: 0 0 18px 6px rgba(255,200,97,.9); }
+#ember-big .halo { position: absolute; left: -90px; top: -90px; width: 240px; height: 240px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,190,90,.6), rgba(255,154,60,0) 65%); }
+
+/* téléphone partagé (3, 4, 5) */
+.phone { position: absolute; left: 140px; top: 100px; width: 800px; height: 1720px; border-radius: 104px; background: #17110c; padding: 16px;
+  box-shadow: 0 0 0 4px #2c2118, 0 0 80px rgba(240,195,107,.18), 0 50px 140px rgba(0,0,0,.7); }
+.screen { position: relative; width: 768px; height: 1688px; border-radius: 90px; overflow: hidden; background: var(--p-to); }
+.shot { position: absolute; left: 0; top: 0; width: 768px; height: 1662px; background-size: 768px auto; background-repeat: no-repeat; }
+.island { position: absolute; left: 309px; top: 26px; width: 150px; height: 42px; border-radius: 21px; background: #0a0705; }
+
+/* ---------- 4 · l'app ---------- */
+#s4-mask { position: absolute; left: 0; top: 880px; width: 768px; height: 160px; background: linear-gradient(180deg, #0f0b08, #0e0a07); }
+#s4-cap { position: absolute; left: 40px; top: 446px; width: 210px; height: 136px; border-radius: 20px; border: 5px solid var(--gold); box-shadow: 0 0 40px rgba(240,195,107,.45); }
+#tap { position: absolute; left: 38px; top: 1195px; width: 120px; height: 120px; border-radius: 50%; border: 6px solid var(--gold); }
+#bloom { position: absolute; left: 58px; top: 1215px; width: 80px; height: 80px; border-radius: 50%; background: var(--p-from); }
+#finger { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+
+/* ---------- 5 · le lecteur (reconstruit d'après audio.tsx) ---------- */
+.player { position: absolute; inset: 0; background: linear-gradient(180deg, var(--p-from), var(--p-via) 55%, var(--p-to)); }
+.p-top { position: absolute; top: 108px; left: 60px; right: 60px; height: 50px; }
+.p-top .l { position: absolute; left: 0; top: 0; font-size: 40px; color: var(--gold); }
+.p-top .c { position: absolute; left: 0; right: 0; top: 10px; text-align: center; font-size: 24px; letter-spacing: 4px; color: var(--muted); }
+.p-top .r { position: absolute; right: 0; top: 0; font-size: 40px; color: var(--gold); }
+.p-portrait { position: absolute; left: 154px; top: 230px; width: 460px; height: 460px; border-radius: 32px; background: url("assets/img/reine-nzinga.jpg") center 22% / cover; }
+.p-glow { position: absolute; left: 114px; top: 190px; width: 540px; height: 540px; border-radius: 50%; background: radial-gradient(circle, rgba(240,195,107,.35), rgba(240,195,107,0) 66%); }
+.p-note { position: absolute; left: 570px; top: 646px; width: 86px; height: 86px; border-radius: 50%; background: var(--gold); color: #1a1006; font-size: 44px; line-height: 86px; text-align: center; }
+.p-name { position: absolute; left: 0; width: 768px; top: 760px; text-align: center; font-family: "Cinzel"; font-weight: 700; font-size: 62px; color: #F7E7C8; }
+.p-sub { position: absolute; left: 0; width: 768px; top: 850px; text-align: center; font-size: 30px; color: var(--muted); }
+.p-wave { position: absolute; left: 60px; width: 648px; top: 930px; height: 170px; }
+.p-wave i { position: absolute; bottom: 0; width: 10px; border-radius: 5px; background: #C99A5B; }
+.p-play { position: absolute; left: 304px; top: 1150px; width: 160px; height: 160px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #8B5A2B); }
+.p-play b { position: absolute; top: 50px; width: 18px; height: 60px; border-radius: 4px; background: #1a1006; }
+.p-chap { position: absolute; left: 60px; right: 60px; font-size: 28px; color: var(--muted); }
+.p-chap span { color: var(--gold); }
+
+/* ---------- 6 · le village revient ---------- */
+#s6-back { position: absolute; inset: 0; background: radial-gradient(ellipse 1000px 1100px at 50% 82%, #5a3a1c 0%, #2a2620 30%, var(--night2) 60%, var(--night) 90%); }
+#s6-queen { position: absolute; left: 90px; top: 300px; width: 900px; height: 900px;
+  background: url("assets/img/reine-nzinga.jpg") center / cover;
+  -webkit-mask-image: radial-gradient(circle at 50% 46%, #000 34%, rgba(0,0,0,0) 68%); mask-image: radial-gradient(circle at 50% 46%, #000 34%, rgba(0,0,0,0) 68%); }
+#s6-glow { position: absolute; left: 140px; top: 1240px; width: 800px; height: 800px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,214,140,.7), rgba(255,170,80,.2) 38%, rgba(255,154,60,0) 66%); }
+#s6-phone { position: absolute; left: 495px; top: 1455px; width: 90px; height: 193px; border-radius: 14px; background: linear-gradient(180deg, var(--p-from), var(--p-to));
+  box-shadow: 0 0 0 3px #2c2118, 0 0 60px 18px rgba(255,200,97,.65); }
+
+/* ---------- 7 · signature ---------- */
+#s7-logo { position: absolute; left: 350px; top: 330px; width: 380px; height: 380px; }
+#s7-logo img { width: 380px; height: 380px; }
+#s7-badges { position: absolute; left: 0; top: 1250px; width: 1080px; height: 140px; }
+#s7-badges img { position: absolute; }
+
+/* ---------- sous-titres karaoké (Manrope 800, ivoire, mot courant en or) ---------- */
+#subs { position: absolute; left: 60px; right: 60px; top: 1440px; text-align: center; font-family: "Manrope"; font-weight: 800; font-size: 52px; line-height: 1.25;
+  color: var(--ivory); text-shadow: 0 4px 14px rgba(0,0,0,.6), 0 0 4px rgba(0,0,0,.6); }
+#subs span { margin: 0 8px; }
+#subs span.on { color: var(--gold); }
+#grain { position: absolute; inset: 0; width: 1080px; height: 1920px; opacity: .07; mix-blend-mode: overlay; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="30" data-width="1080" data-height="1920">
+
+  <!-- ===================== 1 · LE GRIOT (0 – 5,6) ===================== -->
+  <section id="s1" class="clip" data-start="0" data-duration="5.6" data-track-index="0">
+    <div id="s1-cam">
+      <div id="s1-img"></div>
+      <div id="s1-fire"></div>
+      <div id="s1-embers" class="layer"></div>
+    </div>
+    <div id="s1-fog" class="layer"><div class="fog" style="left:-200px;top:1300px"></div><div class="fog" style="left:500px;top:1500px"></div></div>
+    <div class="vig"></div>
+    <div style="position:absolute;left:0;top:1250px;width:1080px;height:670px;background:linear-gradient(180deg, rgba(10,15,20,0), rgba(10,15,20,.55) 40%, rgba(10,15,20,.7))"></div>
+    <div id="s1-black"></div>
+  </section>
+
+  <!-- ===================== 2 · LA DISPERSION (5,2 – 9,5) ===================== -->
+  <section id="s2" class="clip" data-start="5.2" data-duration="4.3" data-track-index="1">
+    <div id="s2-sky"></div>
+    <div id="s2-city" class="layer"><svg class="full" viewBox="0 0 1080 1920">
+      <path fill="#16202b" d="M-40 1520 L-40 1170 L80 1170 L80 1070 L180 1070 L180 1230 L250 1230 L250 960 L370 960 L370 1290 L470 1290 L470 1140 L560 1140 L560 1300 L690 1300 L690 1010 L800 1010 L800 1160 L890 1160 L890 930 L1000 930 L1000 1210 L1120 1210 L1120 1520 Z"/>
+      <g fill="#F7D98B" opacity=".55"><rect x="292" y="1000" width="16" height="24"/><rect x="322" y="1050" width="16" height="24"/><rect x="292" y="1110" width="16" height="24"/>
+        <rect x="920" y="980" width="16" height="24"/><rect x="950" y="1040" width="16" height="24"/><rect x="722" y="1060" width="16" height="24"/><rect x="110" y="1110" width="16" height="24"/></g>
+    </svg></div>
+    <div id="s2-ground" class="layer"><svg class="full" viewBox="0 0 1080 1920">
+      <defs><radialGradient id="s2fg"><stop offset="0" stop-color="#FF9A3C" stop-opacity=".5"/><stop offset="1" stop-color="#FF9A3C" stop-opacity="0"/></radialGradient></defs>
+      <path fill="#070a0d" d="M-80 1560 Q540 1515 1160 1560 L1160 1920 L-80 1920 Z"/>
+      <g id="s2-fire" transform="translate(540 1690)">
+        <circle cx="0" cy="-40" r="170" fill="url(#s2fg)"/>
+        <path d="M-26 0 Q-36 -50 -4 -92 Q4 -54 16 -66 Q40 -40 26 0 Z" fill="#FFC861"/>
+        <path d="M-12 0 Q-16 -30 2 -56 Q8 -32 14 -36 Q20 -20 12 0 Z" fill="#FFF1C4"/>
+        <path d="M-50 4 L50 -10 L52 0 L-48 14 Z" fill="#070a0d"/>
+      </g>
+    </svg></div>
+    <div id="s2-walkers" class="layer"><svg class="full" viewBox="0 0 1080 1920" fill="#05080B">
+      <g id="wk1" transform="translate(330 1640)"><g class="wa"><circle cx="0" cy="-236" r="30"/><path d="M-26 -200 L28 -200 L34 -104 L-30 -104 Z"/><path d="M-22 -108 L-56 0 L-36 0 L0 -88 Z"/><path d="M22 -108 L48 0 L28 0 L2 -88 Z"/></g><g class="wb"><circle cx="0" cy="-236" r="30"/><path d="M-26 -200 L28 -200 L34 -104 L-30 -104 Z"/><path d="M-14 -108 L-20 0 L0 0 L4 -88 Z"/><path d="M14 -108 L20 0 L0 0 L-4 -88 Z"/></g></g>
+      <g id="wk2" transform="translate(750 1650)"><g class="wa"><circle cx="0" cy="-226" r="28"/><path d="M-24 -192 L26 -192 L32 -100 L-28 -100 Z"/><path d="M-20 -104 L-52 0 L-34 0 L0 -84 Z"/><path d="M20 -104 L46 0 L26 0 L2 -84 Z"/></g><g class="wb"><circle cx="0" cy="-226" r="28"/><path d="M-24 -192 L26 -192 L32 -100 L-28 -100 Z"/><path d="M-12 -104 L-18 0 L0 0 L4 -84 Z"/><path d="M12 -104 L18 0 L0 0 L-4 -84 Z"/></g></g>
+      <g id="wk3" transform="translate(440 1700) scale(.8)"><g class="wa"><circle cx="0" cy="-236" r="30"/><path d="M-26 -200 L28 -200 L34 -104 L-30 -104 Z"/><path d="M-22 -108 L-56 0 L-36 0 L0 -88 Z"/><path d="M22 -108 L48 0 L28 0 L2 -88 Z"/></g><g class="wb"><circle cx="0" cy="-236" r="30"/><path d="M-26 -200 L28 -200 L34 -104 L-30 -104 Z"/><path d="M-14 -108 L-20 0 L0 0 L4 -88 Z"/><path d="M14 -108 L20 0 L0 0 L-4 -88 Z"/></g></g>
+      <g id="wk4" transform="translate(650 1710) scale(.78)"><g class="wa"><circle cx="0" cy="-236" r="30"/><path d="M-26 -200 L28 -200 L34 -104 L-30 -104 Z"/><path d="M-22 -108 L-56 0 L-36 0 L0 -88 Z"/><path d="M22 -108 L48 0 L28 0 L2 -88 Z"/></g><g class="wb"><circle cx="0" cy="-236" r="30"/><path d="M-26 -200 L28 -200 L34 -104 L-30 -104 Z"/><path d="M-14 -108 L-20 0 L0 0 L4 -88 Z"/><path d="M14 -108 L20 0 L0 0 L-4 -88 Z"/></g></g>
+      <g transform="translate(540 1600) scale(1.2)"><circle cx="0" cy="-236" r="32"/><path d="M-34 -200 L34 -200 L38 -100 L-38 -100 Z"/><path d="M-30 -104 L-26 0 L-6 0 L-2 -90 Z"/><path d="M30 -104 L26 0 L6 0 L2 -90 Z"/><path d="M-34 -196 L-46 -110 L-32 -108 Z"/><path d="M34 -196 L46 -110 L32 -108 Z"/></g>
+    </svg></div>
+    <div id="s2-fog" class="layer"><div class="fog" style="left:-300px;top:1250px"></div><div class="fog" style="left:600px;top:1380px"></div></div>
+    <div class="vig"></div>
+    <div id="s2-black"></div>
+  </section>
+
+  <!-- ===================== 3 · « ÉCOUTE. » ET LA BRAISE (9,3 – 12,3) ===================== -->
+  <section id="s3" class="clip" data-start="9.3" data-duration="3" data-track-index="2">
+    <div class="night"></div>
+    <svg class="full" style="opacity:.06"><defs><pattern id="dm3" width="110" height="110" patternUnits="userSpaceOnUse">
+      <path d="M55 4 L106 55 L55 106 L4 55 Z" fill="none" stroke="#F0C36B" stroke-width="3"/><path d="M55 33 L77 55 L55 77 L33 55 Z" fill="#F0C36B"/></pattern></defs>
+      <rect width="1080" height="1920" fill="url(#dm3)"/></svg>
+    <div id="s3-word" class="title" style="top:330px;font-size:150px"></div>
+    <div id="s3-hand" class="layer"><svg class="full" viewBox="0 0 1080 1920">
+      <path fill="#05080B" stroke="#C98A3D" stroke-width="4" d="M420 1990 L440 1760 Q446 1700 500 1690 L540 1688 L560 1590 Q568 1566 588 1572 Q604 1580 600 1606 L590 1688 L612 1590 Q620 1564 642 1570 Q658 1578 654 1604 L642 1690 L666 1610 Q676 1588 696 1596 Q710 1604 704 1630 L690 1700 L716 1650 Q728 1632 746 1642 Q758 1652 750 1672 L716 1760 Q700 1810 660 1830 L640 1990 Z M440 1760 L400 1720 Q380 1696 396 1680 Q414 1668 434 1690 L470 1720 Z"/>
+    </svg></div>
+    <div id="ember-big"><div class="halo"></div><div class="core"></div></div>
+    <div id="s3-phone" class="phone"><div class="screen">
+      <div class="shot" style="background-image:url('assets/img/capture-app-p60-recit-1.png')"></div>
+      <div class="island"></div>
+    </div></div>
+    <div class="vig"></div>
+  </section>
+
+  <!-- ===================== 4 · L'APP (12,1 – 14,3) ===================== -->
+  <section id="s4" class="clip" data-start="12.1" data-duration="2.2" data-track-index="3">
+    <div class="night" style="background:radial-gradient(circle at 50% 55%, rgba(240,195,107,.16) 0%, #111A24 40%, #0A0F14 80%)"></div>
+    <svg class="full" style="opacity:.05"><defs><pattern id="dm4" width="110" height="110" patternUnits="userSpaceOnUse">
+      <path d="M55 4 L106 55 L55 106 L4 55 Z" fill="none" stroke="#F0C36B" stroke-width="3"/><path d="M55 33 L77 55 L55 77 L33 55 Z" fill="#F0C36B"/></pattern></defs>
+      <rect width="1080" height="1920" fill="url(#dm4)"/></svg>
+    <div id="s4-wrap" class="layer">
+      <div class="phone"><div class="screen">
+        <div id="s4-recit" class="shot" style="background-image:url('assets/img/capture-app-p60-recit-1.png')"></div>
+        <div id="s4-cap"></div>
+        <div id="s4-fiche" class="shot" style="background-image:url('assets/img/capture-app-reine-nzinga.jpg')"><div id="s4-mask"></div></div>
+        <div id="tap"></div>
+        <div id="bloom"></div>
+        <div class="island"></div>
+      </div></div>
+    </div>
+    <svg id="finger" viewBox="0 0 1080 1920"><path fill="#05080B" stroke="#C98A3D" stroke-width="4" d="M290 2000 L300 1560 Q302 1500 340 1500 Q378 1500 380 1560 L384 1700 L470 1712 Q520 1720 520 1780 L512 2000 Z"/></svg>
+  </section>
+
+  <!-- ===================== 5 · LE LECTEUR (14,15 – 20,6) ===================== -->
+  <section id="s5" class="clip" data-start="14.15" data-duration="6.45" data-track-index="4">
+    <div id="s5-bg" class="layer">
+      <div class="night" style="background:radial-gradient(circle at 50% 58%, rgba(240,195,107,.18) 0%, #111A24 42%, #0A0F14 80%)"></div>
+      <svg class="full" style="opacity:.05"><defs><pattern id="dm5" width="110" height="110" patternUnits="userSpaceOnUse">
+        <path d="M55 4 L106 55 L55 106 L4 55 Z" fill="none" stroke="#F0C36B" stroke-width="3"/><path d="M55 33 L77 55 L55 77 L33 55 Z" fill="#F0C36B"/></pattern></defs>
+        <rect width="1080" height="1920" fill="url(#dm5)"/></svg>
+    </div>
+    <div id="s5-cam" class="layer">
+      <div id="s5-phone" class="phone"><div class="screen">
+        <div class="player">
+          <div class="p-top"><span class="l">⌄</span><span class="c">NARRATION</span><span class="r">≡</span></div>
+          <div class="p-glow" id="p-glow"></div>
+          <div class="p-portrait"></div>
+          <div class="p-note">♪</div>
+          <div class="p-name">REINE NZINGA</div>
+          <div class="p-sub">Narration audio · Afrique centrale</div>
+          <div class="p-wave" id="wave"></div>
+          <div class="p-play"><b style="left:56px"></b><b style="left:86px"></b></div>
+          <div class="p-chap" style="top:1380px"><span>Chapitre 1</span> · Naître dans un monde qui se referme</div>
+          <div class="p-chap" style="top:1440px">Chapitre 2 · La diplomate de Luanda</div>
+        </div>
+        <div class="island"></div>
+      </div></div>
+    </div>
+    <div id="s5-head" class="layer"><svg class="full" viewBox="0 0 1080 1920">
+      <g transform="translate(-90 300) scale(1.25)">
+        <path fill="#05080B" d="M-40 1320 L-40 1060 Q20 980 110 970 Q190 966 220 1040 Q236 1080 230 1110 L262 1160 L232 1172 Q236 1220 210 1230 Q214 1260 196 1272 Q150 1290 120 1340 L120 1320 Z"/>
+        <path d="M140 975 Q200 992 222 1040 Q236 1080 230 1110 L262 1160 L232 1172 Q236 1220 210 1230 Q214 1260 196 1272" stroke="#F0C36B" stroke-width="6" fill="none" opacity=".85"/>
+      </g></svg></div>
+  </section>
+
+  <!-- ===================== 6 · LE VILLAGE REVIENT (19,6 – 24,9) ===================== -->
+  <section id="s6" class="clip" data-start="19.6" data-duration="5.3" data-track-index="0">
+    <div id="s6-cam" class="layer">
+      <div id="s6-back"></div>
+      <div id="s6-queen"></div>
+      <div id="s6-shadows" class="layer"><svg class="full" viewBox="0 0 1080 1920" fill="#06090c" opacity=".75">
+        <g transform="translate(250 1500) scale(2.3)"><circle cx="0" cy="-170" r="40"/><path d="M-70 0 Q-72 -110 -6 -128 Q66 -112 74 0 Z"/></g>
+        <g transform="translate(420 1480) scale(2.6)"><circle cx="0" cy="-150" r="34"/><path d="M-58 0 Q-60 -94 -2 -110 Q56 -96 62 0 Z"/></g>
+        <g transform="translate(660 1480) scale(2.6)"><circle cx="0" cy="-150" r="34"/><path d="M-58 0 Q-60 -94 -2 -110 Q56 -96 62 0 Z"/><path d="M-30 -178 Q0 -214 34 -176 Z"/></g>
+        <g transform="translate(840 1500) scale(2.3)"><circle cx="0" cy="-170" r="40"/><path d="M-70 0 Q-72 -110 -6 -128 Q66 -112 74 0 Z"/></g>
+      </svg></div>
+      <div id="s6-name" class="title" style="top:270px;font-size:96px"></div>
+      <div id="s6-glow"></div>
+      <div id="s6-embers" class="layer"></div>
+      <div id="s6-ground" class="layer"><svg class="full" viewBox="0 0 1080 1920" fill="#05080B">
+        <path d="M-80 1640 Q540 1590 1160 1640 L1160 1920 L-80 1920 Z"/>
+        <g transform="translate(250 1700)"><circle cx="0" cy="-170" r="40"/><path d="M-70 0 Q-72 -110 -6 -128 Q66 -112 74 0 Z"/></g>
+        <g transform="translate(390 1730) scale(.85)"><circle cx="0" cy="-150" r="34"/><path d="M-58 0 Q-60 -94 -2 -110 Q56 -96 62 0 Z"/></g>
+        <g transform="translate(690 1730) scale(.85)"><circle cx="0" cy="-150" r="34"/><path d="M-58 0 Q-60 -94 -2 -110 Q56 -96 62 0 Z"/><path d="M-30 -178 Q0 -214 34 -176 Z"/></g>
+        <g transform="translate(830 1700)"><circle cx="0" cy="-170" r="40"/><path d="M-70 0 Q-72 -110 -6 -128 Q66 -112 74 0 Z"/></g>
+        <g transform="translate(100 1760) scale(.8)"><circle cx="0" cy="-130" r="30"/><path d="M-50 0 Q-52 -82 0 -96 Q50 -84 54 0 Z"/></g>
+        <g transform="translate(985 1760) scale(.8)"><circle cx="0" cy="-130" r="30"/><path d="M-50 0 Q-52 -82 0 -96 Q50 -84 54 0 Z"/></g>
+      </svg></div>
+      <div id="s6-phone"></div>
+    </div>
+    <div class="vig"></div>
+  </section>
+
+  <!-- ===================== 7 · SIGNATURE (24 – 30) ===================== -->
+  <section id="s7" class="clip" data-start="24" data-duration="6" data-track-index="1">
+    <div class="night" style="background:radial-gradient(circle at 50% 40%, rgba(240,195,107,.16) 0%, #111A24 40%, #0A0F14 80%)"></div>
+    <svg class="full" style="opacity:.05"><defs><pattern id="dm7" width="110" height="110" patternUnits="userSpaceOnUse">
+      <path d="M55 4 L106 55 L55 106 L4 55 Z" fill="none" stroke="#F0C36B" stroke-width="3"/><path d="M55 33 L77 55 L55 77 L33 55 Z" fill="#F0C36B"/></pattern></defs>
+      <rect width="1080" height="1920" fill="url(#dm7)"/></svg>
+    <div id="s7-fog" class="layer"><div class="fog" style="left:-200px;top:1400px"></div><div class="fog" style="left:450px;top:1560px"></div></div>
+    <div id="s7-logo"><img src="assets/img/afroback-logo.png" alt="AFROBACK" /></div>
+    <div id="s7-word" class="title" style="top:760px;font-size:110px"></div>
+    <div id="tag1" class="title" style="top:960px;font-size:62px;color:#FFF4E0">LE GRIOT</div>
+    <div id="tag2" class="title" style="top:1040px;font-size:62px;color:#FFF4E0">DANS TA POCHE.</div>
+    <div id="s7-badges">
+      <img id="b-apple" src="assets/img/app-store-fr.svg" alt="Télécharger dans l'App Store" style="left:150px;top:14px;height:112px" />
+      <img id="b-google" src="assets/img/google-play-fr.png" alt="Disponible sur Google Play" style="left:566px;top:0;height:140px" />
+    </div>
+    <div class="vig" style="opacity:.6"></div>
+  </section>
+
+  <!-- ===================== HABILLAGE COMMUN ===================== -->
+  <div id="subs" class="clip" data-start="0" data-duration="30" data-track-index="5"></div>
+  <svg id="grain" class="clip" data-start="0" data-duration="30" data-track-index="6" viewBox="0 0 1080 1920">
+    <filter id="gr"><feTurbulence id="grt" type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="0"/></filter>
+    <rect width="1080" height="1920" filter="url(#gr)"/>
+  </svg>
+
+  <!-- ===================== SON ===================== -->
+  <audio id="vo1" src="audio/vo-1.mp3" data-start="0.3" data-duration="5.02" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo2" src="audio/vo-2.mp3" data-start="5.34" data-duration="3.89" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo3" src="audio/vo-3.mp3" data-start="9.85" data-duration="0.84" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo4" src="audio/vo-4.mp3" data-start="12.15" data-duration="7.55" data-track-index="10" data-volume="1"></audio>
+  <audio id="vo5" src="audio/vo-5.mp3" data-start="25.2" data-duration="2.74" data-track-index="10" data-volume="1"></audio>
+  <audio id="musicA" src="audio/musique-legends-by-the-fire.mp3" data-start="0" data-duration="9.35" data-media-start="8" data-track-index="11" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.6,"v":0.32},{"t":8.9,"v":0.32},{"t":9.3,"v":0}]}]}'></audio>
+  <audio id="musicB" src="audio/musique-legends-by-the-fire.mp3" data-start="10.4" data-duration="19.6" data-media-start="18.5" data-track-index="11" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":1.2,"v":0.26},{"t":9.0,"v":0.26},{"t":9.8,"v":0.9},{"t":13.6,"v":0.9},{"t":14.6,"v":0.32},{"t":17.6,"v":0.45},{"t":19.6,"v":0}]}]}'></audio>
+  <!-- Bruitages (Mixkit, licence gratuite), calés sur leur pic mesuré -->
+  <audio id="sfx-feu" src="audio/sfx/feu-crepite.wav" data-start="0" data-duration="9.15" data-media-start="0.5" data-track-index="12" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.8,"v":0.9},{"t":8.6,"v":0.6},{"t":9.15,"v":0}]}]}'></audio>
+  <audio id="sfx-souffle1" src="audio/sfx/souffle-air.wav" data-start="4.55" data-duration="1.6" data-track-index="13" data-volume="0.35"></audio>
+  <audio id="sfx-extinction" src="audio/sfx/feu-souffle.wav" data-start="8.14" data-duration="1.16" data-track-index="13" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.4,"v":0.45},{"t":1.0,"v":0.45},{"t":1.16,"v":0}]}]}'></audio>
+  <audio id="sfx-etincelle" src="audio/sfx/etincelle.wav" data-start="11.08" data-duration="1.8" data-track-index="14" data-volume="0.7"></audio>
+  <audio id="sfx-tunnel1" src="audio/sfx/souffle-tunnel.wav" data-start="11.6" data-duration="1.6" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx-clic" src="audio/sfx/clic.wav" data-start="13.62" data-duration="0.22" data-track-index="14" data-volume="0.9"></audio>
+  <audio id="sfx-tunnel2" src="audio/sfx/souffle-tunnel.wav" data-start="19.5" data-duration="1.8" data-track-index="13" data-volume="0.35"></audio>
+  <audio id="sfx-tambour" src="audio/sfx/tambour-profond.wav" data-start="20.09" data-duration="3.5" data-track-index="14" data-volume="0.85"></audio>
+  <audio id="sfx-feu2" src="audio/sfx/feu-crepite.wav" data-start="20.2" data-duration="4.2" data-media-start="4" data-track-index="12" data-volume="1"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.6,"v":0.35},{"t":3.6,"v":0.35},{"t":4.2,"v":0}]}]}'></audio>
+  <audio id="sfx-logo" src="audio/sfx/basse-courte.wav" data-start="25.09" data-duration="1.1" data-track-index="14" data-volume="0.5"></audio>
+</div>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+const q = (s) => document.querySelector(s);
+
+// ---------- pseudo-hasard déterministe ----------
+const rnd = (k) => { const x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+// ---------- titres « LetterDrop » (lettres qui tombent, comme la série) ----------
+function letters(sel, text) { const el = q(sel); el.innerHTML = text.split("").map(c => `<span>${c}</span>`).join(""); return [...el.children]; }
+function letterDrop(sel, text, at, stagger = 0.035) {
+  letters(sel, text).forEach((sp, i) => {
+    tl.fromTo(sp, { y: -140, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, ease: "back.out(1.4)" }, at + i * stagger);
+  });
+}
+
+// ---------- braises (particules qui montent) ----------
+function embers(sel, x, y, n, spread, t0, t1) {
+  const host = q(sel);
+  for (let i = 0; i < n; i++) {
+    const e = document.createElement("div"); e.className = "ember"; host.appendChild(e);
+    const s = 0.6 + rnd(i + 3) * 0.9; gsap.set(e, { x: x + (rnd(i) - 0.5) * spread, y: y, scale: s, opacity: 0 });
+    const life = 1.3 + rnd(i + 7) * 1.1;
+    for (let k = t0 + rnd(i + 11) * life; k < t1; k += life) {
+      const dx = (rnd(i * 3 + k) - 0.5) * 120;
+      tl.fromTo(e, { x: x + (rnd(i) - 0.5) * spread, y: y, opacity: 0.95 }, { x: `+=${dx}`, y: y - 260 - rnd(i + 5) * 260, opacity: 0, duration: Math.min(life, t1 - k), ease: "power1.out" }, k);
+    }
+  }
+}
+
+// ---------- sous-titres karaoké (3 mots, mot courant en or) ----------
+// Segments mesurés dans les fichiers de voix (silences à -40 dB).
+const SEGS = [
+  [0.30, 2.01, "Autrefois, au coin du feu,"], [2.26, 3.42, "le griot racontait…"], [3.72, 4.97, "et tout le village écoutait."],
+  [5.57, 7.05, "Puis le village s'est dispersé."], [7.44, 8.72, "Et les histoires se sont tues."],
+  [12.15, 13.43, "Le griot n'est pas parti."], [13.61, 14.93, "Il est là, dans ta poche."], [15.12, 16.71, "La Reine Nzinga, nos héros,"],
+  [16.87, 17.46, "nos mythes…"], [17.74, 19.37, "racontés comme au coin du feu."],
+];
+const GROUPS = [];
+SEGS.forEach(([a, b, txt]) => {
+  const ws = txt.split(" "); const tot = ws.reduce((n, w) => n + w.length + 1, 0); let acc = 0;
+  const timed = ws.map(w => { const at = a + (b - a) * acc / tot; acc += w.length + 1; return { w, at }; });
+  for (let i = 0; i < timed.length; i += 3) {
+    const g = timed.slice(i, i + 3); const next = timed[i + 3];
+    GROUPS.push({ words: g, start: g[0].at, end: next ? next.at : b + 0.35 });
+  }
+});
+const subs = q("#subs");
+function renderSubs(t) {
+  const g = GROUPS.find(x => t >= x.start && t < x.end);
+  if (!g) { subs.innerHTML = ""; return; }
+  const cur = [...g.words].reverse().find(x => t >= x.at);
+  subs.innerHTML = g.words.map(x => `<span class="${x === cur ? "on" : ""}">${x.w}</span>`).join("");
+  subs.style.top = (t >= 12.1 && t < 19.6) ? "270px" : "1440px";
+}
+
+// ---------- onde sonore du lecteur ----------
+const wave = q("#wave"); const BARS = 40; const bars = [];
+for (let i = 0; i < BARS; i++) { const b = document.createElement("i"); b.style.left = (i * 16.4) + "px"; wave.appendChild(b); bars.push(b); }
+const voiceOn = (t) => SEGS.slice(5).some(([a, b]) => t >= a && t <= b) ? 1 : 0.15;
+
+// ---------- marcheurs, grain ----------
+const grt = q("#grt");
+function render(t) {
+  const step = Math.floor(t * 4) % 2;
+  document.querySelectorAll("#s2-walkers .wa").forEach(g => g.style.opacity = step ? 1 : 0);
+  document.querySelectorAll("#s2-walkers .wb").forEach(g => g.style.opacity = step ? 0 : 1);
+  grt.setAttribute("seed", String(Math.floor(t * 30) % 6));
+  const lit = Math.max(0, Math.min(BARS, Math.floor((t - 14.15) * 2.4) + 8)); const e = voiceOn(t);
+  bars.forEach((b, i) => {
+    const base = 26 + 110 * Math.abs(Math.sin(i * 0.61) * Math.cos(i * 0.23));
+    b.style.height = Math.round(base * (0.55 + 0.45 * e * Math.abs(Math.sin(t * 9 + i * 0.9)))) + "px";
+    b.style.background = i < lit ? "#F0C36B" : "#C99A5B"; b.style.opacity = i < lit ? 1 : 0.4;
+  });
+  renderSubs(t);
+}
+const proxy = { t: 0 };
+tl.to(proxy, { t: 30, duration: 30, ease: "none", onUpdate: () => render(proxy.t) }, 0);
+
+// ================= 1 · le griot =================
+gsap.set("#s1-cam", { transformOrigin: "454px 998px" });
+tl.fromTo("#s1-black", { opacity: 1 }, { opacity: 0, duration: 0.7, ease: "sine.inOut" }, 0);
+tl.fromTo("#s1-cam", { scale: 1.04 }, { scale: 1.22, duration: 4.9, ease: "sine.inOut" }, 0);
+tl.fromTo("#s1-fire", { opacity: 0.6, scale: 0.95 }, { opacity: 1, scale: 1.05, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 21 }, 0);
+embers("#s1-embers", 562, 1330, 18, 120, 0, 5.6);
+tl.fromTo("#s1-fog", { x: 0 }, { x: -60, duration: 4.9, ease: "none" }, 0);
+// 1 → 2 : glissement en parallaxe
+tl.to("#s1-cam", { x: -700, duration: 0.7, ease: "sine.inOut" }, 4.9);
+tl.to("#s1-fog", { x: -1300, duration: 0.7, ease: "sine.inOut" }, 4.9);
+
+// ================= 2 · la dispersion =================
+tl.fromTo("#s2-city", { x: 420 }, { x: 0, duration: 0.8, ease: "power2.inOut" }, 5.2);
+tl.fromTo("#s2-ground", { x: 900 }, { x: 0, duration: 0.7, ease: "power2.inOut" }, 5.2);
+tl.fromTo("#s2-walkers", { x: 1100 }, { x: 0, duration: 0.7, ease: "power2.inOut" }, 5.2);
+tl.fromTo("#s2-fog", { x: 1300 }, { x: 0, duration: 0.7, ease: "power2.inOut" }, 5.2);
+tl.to("#s2-city", { x: -30, duration: 3.3, ease: "none" }, 6.0);
+tl.to("#s2-fog", { x: -120, duration: 3.3, ease: "none" }, 6.0);
+tl.to("#wk1", { x: -520, duration: 3.2, ease: "power2.inOut" }, 6.0);
+tl.to("#wk3", { x: -560, duration: 3.0, ease: "power2.inOut" }, 6.2);
+tl.to("#wk2", { x: 520, duration: 3.2, ease: "power2.inOut" }, 6.0);
+tl.to("#wk4", { x: 560, duration: 3.0, ease: "power2.inOut" }, 6.2);
+tl.fromTo("#s2-fire", { scale: 1, transformOrigin: "50% 100%" }, { scale: 0.35, duration: 3.1, ease: "power2.inOut" }, 6.0);
+tl.set("#s2-fire", { opacity: 0 }, 9.15);
+tl.fromTo("#s2-black", { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "none" }, 9.3);
+
+// ================= 3 · « Écoute. » et la braise =================
+letterDrop("#s3-word", "ÉCOUTE.", 9.85, 0.04);
+tl.to("#s3-word", { opacity: 0, duration: 0.4, ease: "power2.in" }, 11.25);
+tl.fromTo("#ember-big", { x: 510, y: 1640, opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" }, 10.1);
+tl.to("#ember-big", { keyframes: [ { x: 470, y: 1250, duration: 0.45, ease: "sine.out" }, { x: 600, y: 980, duration: 0.4, ease: "sine.inOut" }, { x: 600, y: 1640, duration: 0.5, ease: "power2.in" } ] }, 10.25);
+tl.fromTo("#s3-hand", { y: 420 }, { y: 0, duration: 0.6, ease: "power2.out" }, 10.6);
+tl.to("#ember-big", { scale: 3, opacity: 0, duration: 0.3, ease: "power2.in" }, 11.6);
+gsap.set("#s3-phone", { transformOrigin: "50% 50%" });
+tl.fromTo("#s3-phone", { x: 70, y: 600, scale: 0.08, opacity: 0 }, { opacity: 1, scale: 0.16, duration: 0.25, ease: "power2.out" }, 11.55);
+tl.to("#s3-phone", { x: 0, y: 128, scale: 0.8, duration: 0.5, ease: "power2.in" }, 11.8);
+tl.to("#s3-hand", { y: 500, opacity: 0, duration: 0.5, ease: "power2.in" }, 11.75);
+
+// ================= 4 · l'app =================
+gsap.set("#s4-wrap", { transformOrigin: "540px 100px", scale: 0.8, y: 300 });
+tl.fromTo("#s4-recit", { y: 0 }, { y: -30, duration: 0.9, ease: "power2.out" }, 12.1);
+tl.fromTo("#s4-cap", { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" }, 12.2);
+tl.to("#s4-cap", { opacity: 0, duration: 0.25, ease: "power2.in" }, 12.75);
+tl.fromTo("#s4-fiche", { x: 768 }, { x: 0, duration: 0.35, ease: "power2.out" }, 12.95);
+tl.fromTo("#finger", { x: 120, y: 420 }, { x: -29, y: -83, duration: 0.35, ease: "power2.out" }, 13.35);
+tl.fromTo("#tap", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1.25, duration: 0.2, ease: "power2.out" }, 13.72);
+tl.to("#tap", { opacity: 0, duration: 0.15, ease: "power2.in" }, 13.95);
+tl.fromTo("#bloom", { scale: 0 }, { scale: 48, duration: 0.35, ease: "power2.in" }, 13.82);
+tl.to("#finger", { y: 600, duration: 0.3, ease: "power2.in" }, 13.85);
+
+// ================= 5 · le lecteur =================
+gsap.set("#s5-cam", { transformOrigin: "540px 960px" });
+tl.fromTo("#s5-phone", { y: 128, scale: 0.84 }, { y: 128, scale: 0.8, duration: 5.2, ease: "power3.inOut" }, 14.15);
+tl.fromTo("#s5-head", { x: -120, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "power2.out" }, 14.6);
+tl.fromTo("#p-glow", { opacity: 0.5, scale: 0.9 }, { opacity: 1, scale: 1.08, duration: 0.6, ease: "power2.out" }, 15.12);
+tl.to("#p-glow", { opacity: 0.6, scale: 1, duration: 0.8, ease: "power2.inOut" }, 15.8);
+tl.to("#s5-head", { opacity: 0, duration: 0.4, ease: "power2.in" }, 19.5);
+tl.to("#s5-bg", { opacity: 0, duration: 0.7, ease: "power3.inOut" }, 19.65);
+tl.to("#s5-cam", { scale: 0.14, y: 573, duration: 0.95, ease: "power3.inOut" }, 19.6);
+tl.to("#s5-cam", { opacity: 0, duration: 0.15, ease: "none" }, 20.45);
+
+// ================= 6 · le village revient =================
+gsap.set("#s6-shadows", { transformOrigin: "540px 1560px" });
+tl.fromTo("#s6-cam", { y: 40 }, { y: -40, duration: 5.3, ease: "none" }, 19.6);
+tl.fromTo("#s6-glow", { opacity: 0.6, scale: 0.9 }, { opacity: 1, scale: 1.06, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 9 }, 19.6);
+embers("#s6-embers", 540, 1500, 16, 90, 20.2, 24.9);
+tl.fromTo("#s6-shadows", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 1.1, ease: "steps(12)" }, 20.3);
+tl.to("#s6-shadows", { opacity: 0, scale: 1.15, duration: 0.9, ease: "steps(12)" }, 21.5);
+tl.fromTo("#s6-queen", { opacity: 0, scale: 1.12 }, { opacity: 0.95, scale: 1.0, duration: 1.2, ease: "power2.out" }, 21.5);
+tl.to("#s6-queen", { scale: 0.96, duration: 2.2, ease: "sine.inOut" }, 22.7);
+letterDrop("#s6-name", "REINE NZINGA", 22.1, 0.035);
+
+// ================= 7 · signature =================
+tl.fromTo("#s7", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, 24);
+tl.fromTo("#s7-fog", { x: 0 }, { x: -80, duration: 6, ease: "none" }, 24);
+tl.fromTo("#s7-logo", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 25.15);
+letterDrop("#s7-word", "AFROBACK", 25.3, 0.035);
+tl.fromTo("#tag1", { opacity: 0, scale: 1.4, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.15, ease: "power2.out" }, 26.3);
+tl.fromTo("#tag2", { opacity: 0, scale: 1.4, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.15, ease: "power2.out" }, 26.75);
+tl.fromTo("#s7-badges", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" }, 27.3);
+
+window.__timelines["main"] = tl;
+tl.seek(0);
+</script>
+</body>
+</html>

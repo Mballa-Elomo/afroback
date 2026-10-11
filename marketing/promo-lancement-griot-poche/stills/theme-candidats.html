@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>AFROBACK · candidats de thème (image de preuve)</title>
+<style>
+@font-face { font-family: Cinzel; src: url(../assets/fonts/Cinzel_700Bold.ttf); font-weight: 700; }
+@font-face { font-family: Manrope; src: url(../assets/fonts/Manrope_600SemiBold.ttf); font-weight: 600; }
+@font-face { font-family: Manrope; src: url(../assets/fonts/Manrope_800ExtraBold.ttf); font-weight: 800; }
+:root {
+  --bg: #0F0B08; --p-from: #3a1d0a; --p-via: #1a1006; --p-to: #0c0805;
+  --gold: #E9BE77; --gold-b: #F0C36B; --gold-p: #F7D98B; --gold-s: #C99A5B;
+  --txt: #EDE3D4; --head: #F7E7C8; --muted: #8C7B67; --ink: #0B0806;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+.frame { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Manrope, sans-serif; color: var(--txt); }
+
+/* ---------- Téléphone + lecteur réel (audio.tsx) ---------- */
+.phone { position: absolute; width: 560px; height: 1150px; border-radius: 76px; background: #15100c;
+  padding: 16px; box-shadow: 0 0 0 3px #2a2018, 0 40px 120px rgba(0,0,0,.6); }
+.screen { width: 100%; height: 100%; border-radius: 62px; overflow: hidden; position: relative;
+  background: linear-gradient(180deg, var(--p-from), var(--p-via) 55%, var(--p-to)); }
+.island { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); width: 150px; height: 40px; border-radius: 20px; background: #0a0705; }
+.top { position: absolute; top: 92px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 44px; color: var(--gold); font-size: 30px; }
+.top span.l { font-size: 18px; letter-spacing: 3px; color: var(--muted); align-self: center; }
+.portrait { position: absolute; top: 170px; left: 50%; transform: translateX(-50%); width: 330px; height: 330px; border-radius: 24px;
+  background: url(../assets/img/reine-nzinga.jpg) center 22%/cover; box-shadow: 0 0 90px 10px rgba(240,195,107,.28); }
+.badge { position: absolute; right: -16px; bottom: -16px; width: 66px; height: 66px; border-radius: 50%; background: var(--gold-b); color: var(--ink);
+  display: grid; place-items: center; font-size: 32px; }
+.name { position: absolute; top: 540px; width: 100%; text-align: center; font-family: Cinzel; font-size: 46px; color: var(--head); }
+.sub { position: absolute; top: 604px; width: 100%; text-align: center; font-size: 22px; color: var(--muted); }
+.wave { position: absolute; top: 676px; left: 50px; right: 50px; height: 110px; display: flex; align-items: center; justify-content: space-between; }
+.wave i { display: block; width: 7px; border-radius: 4px; background: var(--gold-s); opacity: .45; }
+.wave i.on { background: var(--gold-b); opacity: 1; }
+.play { position: absolute; top: 820px; left: 50%; transform: translateX(-50%); width: 120px; height: 120px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-b), #8B5A2B); display: grid; place-items: center; color: var(--ink); font-size: 46px; }
+.chap { position: absolute; top: 980px; left: 50px; right: 50px; font-size: 21px; color: var(--muted); }
+.chap b { color: var(--gold); font-weight: 600; }
+
+/* ---------- Titrage ---------- */
+.kicker { position: absolute; left: 0; right: 0; text-align: center; font-family: Cinzel; color: var(--head); }
+
+/* ================= 079 Théâtre d'ombres ================= */
+.v079 { background: radial-gradient(ellipse 900px 1000px at 50% 62%, #d98a3a 0%, #8a3f14 38%, #2a1206 72%, #120804 100%); }
+.v079 .phone { left: 260px; top: 640px; transform: rotate(-4deg) scale(.82); transform-origin: 50% 100%; }
+.v079 .glow { position: absolute; left: 540px; top: 1180px; width: 1200px; height: 1200px; transform: translate(-50%,-50%); border-radius: 50%; background: radial-gradient(circle, rgba(255,196,110,.65), rgba(255,160,70,.25) 35%, rgba(255,140,60,0) 65%); }
+.v079 svg.shadows { position: absolute; inset: 0; }
+.v079 .kicker { top: 250px; font-size: 92px; line-height: 1.05; color: #FBE9C8; text-shadow: 0 4px 30px rgba(0,0,0,.35); }
+
+/* ================= 101 Noise Cancelling (version sombre chaude) ================= */
+.v101 { background: radial-gradient(ellipse at 50% 55%, #1c140d, var(--bg) 70%); }
+.v101 .noise { position: absolute; inset: 0; }
+.v101 .quiet { position: absolute; left: 50%; top: 1050px; width: 1500px; height: 1500px; transform: translate(-50%,-50%); border-radius: 50%;
+  background: radial-gradient(circle, var(--bg) 42%, rgba(15,11,8,0) 62%); }
+.v101 .phone { left: 260px; top: 470px; }
+.v101 .kicker { top: 180px; font-size: 120px; color: var(--gold-b); }
+.v101 .kicker small { display: block; font-family: Manrope; font-weight: 600; font-size: 34px; color: var(--muted); letter-spacing: 1px; margin-top: 18px; }
+
+/* ================= 061 Dark Keynote ================= */
+.v061 { background: radial-gradient(ellipse 700px 1300px at 50% 0%, rgba(240,195,107,.20), rgba(15,11,8,0) 70%), var(--bg); }
+.v061 .cone { position: absolute; left: 50%; top: -100px; width: 900px; height: 1900px; transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(247,217,139,.16), rgba(247,217,139,0) 80%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); filter: blur(10px); }
+.v061 .floor { position: absolute; left: 50%; top: 1660px; width: 760px; height: 120px; transform: translateX(-50%); border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(240,195,107,.30), rgba(240,195,107,0) 70%); }
+.v061 .card { position: absolute; width: 230px; height: 300px; border-radius: 22px; background-size: cover; background-position: center 20%; filter: blur(7px) brightness(.55); }
+.v061 .phone { left: 260px; top: 470px; box-shadow: 0 0 0 3px #3a2c1e, 0 0 60px rgba(240,195,107,.35), 0 40px 120px rgba(0,0,0,.7); }
+.v061 .kicker { top: 190px; font-size: 76px; line-height: 1.12; }
+.v061 .kicker em { font-style: normal; color: var(--gold-b); }
+
+.label { position: absolute; bottom: 40px; left: 40px; font-size: 22px; color: rgba(237,227,212,.5); letter-spacing: 2px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const v = new URLSearchParams(location.search).get('v') || '079';
+
+// Onde sonore déterministe (pas de hasard : même image à chaque rendu)
+function waveBars(n, lit) {
+  let s = '';
+  for (let i = 0; i < n; i++) {
+    const h = 18 + Math.round(80 * Math.abs(Math.sin(i * 0.61) * Math.cos(i * 0.23)));
+    s += `<i class="${i < lit ? 'on' : ''}" style="height:${h}px"></i>`;
+  }
+  return s;
+}
+
+const player = `
+<div class="phone"><div class="screen">
+  <div class="island"></div>
+  <div class="top"><span>⌄</span><span class="l">NARRATION</span><span>≡</span></div>
+  <div class="portrait"><div class="badge">♪</div></div>
+  <div class="name">REINE NZINGA</div>
+  <div class="sub">Narration audio · Afrique centrale</div>
+  <div class="wave">${waveBars(34, 13)}</div>
+  <div class="play">❚❚</div>
+  <div class="chap"><b>Chapitre 1</b> · Naître dans un monde qui se referme</div>
+</div></div>`;
+
+const frames = {
+  '079': `
+  <div class="frame v079">
+    <div class="glow"></div>
+    <div class="kicker">LE GRIOT<br>DANS TA POCHE</div>
+    <svg class="shadows" viewBox="0 0 1080 1920">
+      <g fill="#120804">
+        <!-- acacia -->
+        <path d="M120 1500 L132 1180 Q60 1150 20 1170 Q90 1120 150 1140 Q170 1080 260 1090 Q200 1130 175 1170 L160 1500 Z"/>
+        <ellipse cx="150" cy="1120" rx="190" ry="34"/>
+        <!-- sol -->
+        <path d="M0 1610 Q540 1560 1080 1610 L1080 1920 L0 1920 Z"/>
+        <!-- auditeurs assis autour du téléphone, à la place du feu -->
+        <circle cx="150" cy="1400" r="44"/><path d="M90 1620 Q95 1460 150 1450 Q215 1460 230 1620 Z"/>
+        <circle cx="905" cy="1380" r="48"/><path d="M835 1620 Q845 1440 905 1432 Q975 1445 990 1620 Z"/>
+        <circle cx="1000" cy="1470" r="34"/><path d="M955 1625 Q960 1505 1000 1500 Q1045 1508 1060 1625 Z"/>
+        <circle cx="62" cy="1490" r="30"/><path d="M22 1625 Q28 1520 62 1515 Q100 1522 110 1625 Z"/>
+      </g>
+    </svg>
+    ${player}
+    <div class="label">079 · THÉÂTRE D'OMBRES</div>
+  </div>`,
+  '101': `
+  <div class="frame v101">
+    <svg class="noise" viewBox="0 0 1080 1920">${(() => {
+      let s = '';
+      for (let r = 0; r < 46; r++) {
+        const y = 60 + r * 40; let d = `M0 ${y}`;
+        for (let x = 0; x <= 1080; x += 12) d += ` L${x} ${(y + Math.sin(x * 0.05 + r) * (6 + (r % 5) * 3)).toFixed(1)}`;
+        s += `<path d="${d}" stroke="#4a3a2b" stroke-width="2" fill="none" opacity=".7"/>`;
+      }
+      return s;
+    })()}</svg>
+    <div class="quiet"></div>
+    <div class="kicker">ÉCOUTE.<small>Un seul son compte : celui du griot.</small></div>
+    ${player}
+    <div class="label">101 · NOISE CANCELLING</div>
+  </div>`,
+  '061': `
+  <div class="frame v061">
+    <div class="cone"></div>
+    <div class="card" style="left:-40px;top:760px;background-image:url(../assets/img/ruben-um-nyobe.jpg)"></div>
+    <div class="card" style="left:880px;top:700px;background-image:url(../assets/img/sultan-njoya.jpg)"></div>
+    <div class="card" style="left:860px;top:1180px;background-image:url(../assets/img/martin-paul-samba.jpg)"></div>
+    <div class="floor"></div>
+    <div class="kicker">LE GRIOT.<br><em>DANS TA POCHE.</em></div>
+    ${player}
+    <div class="label">061 · DARK KEYNOTE</div>
+  </div>`
+};
+document.getElementById('root').innerHTML = frames[v];
+</script>
+</body>
+</html>

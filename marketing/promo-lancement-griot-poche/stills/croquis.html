@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>AFROBACK · croquis des 7 plans</title>
+<style>
+@font-face { font-family: Cinzel; src: url(../assets/fonts/Cinzel_700Bold.ttf); font-weight: 700; }
+@font-face { font-family: Manrope; src: url(../assets/fonts/Manrope_600SemiBold.ttf); font-weight: 600; }
+:root { --bg:#0F0B08; --gold:#F0C36B; --gold-p:#F7D98B; --head:#F7E7C8; --muted:#8C7B67; --ink:#120804;
+  --p-from:#3a1d0a; --p-via:#1a1006; --p-to:#0c0805; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { width:1080px; height:1920px; overflow:hidden; background:var(--bg); }
+.f { position:relative; width:1080px; height:1920px; overflow:hidden; font-family:Manrope,sans-serif; color:var(--head); }
+svg.l { position:absolute; inset:0; }
+.t { position:absolute; left:0; right:0; text-align:center; font-family:Cinzel; }
+.cap { position:absolute; left:40px; bottom:40px; font-size:26px; letter-spacing:2px; color:rgba(247,231,200,.55); }
+/* téléphone */
+.phone { position:absolute; width:560px; height:1150px; border-radius:76px; background:#15100c; padding:16px; box-shadow:0 0 0 3px #2a2018; }
+.screen { width:100%; height:100%; border-radius:62px; overflow:hidden; position:relative; background:linear-gradient(180deg,var(--p-from),var(--p-via) 55%,var(--p-to)); }
+.shot { width:100%; height:100%; background-size:cover; background-position:top center; }
+.portrait { position:absolute; top:170px; left:50%; transform:translateX(-50%); width:330px; height:330px; border-radius:24px; background:url(../assets/img/reine-nzinga.jpg) center 22%/cover; box-shadow:0 0 90px 10px rgba(240,195,107,.28); }
+.name { position:absolute; top:540px; width:100%; text-align:center; font-family:Cinzel; font-size:46px; }
+.sub { position:absolute; top:604px; width:100%; text-align:center; font-size:22px; color:var(--muted); }
+.wave { position:absolute; top:676px; left:50px; right:50px; height:110px; display:flex; align-items:center; justify-content:space-between; }
+.wave i { display:block; width:7px; border-radius:4px; background:#C99A5B; opacity:.45; } .wave i.on { background:var(--gold); opacity:1; }
+.play { position:absolute; top:820px; left:50%; transform:translateX(-50%); width:120px; height:120px; border-radius:50%; background:linear-gradient(135deg,var(--gold),#8B5A2B); display:grid; place-items:center; color:#0B0806; font-size:46px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const s = new URLSearchParams(location.search).get('s') || '1';
+const bars = (n, lit) => Array.from({length:n}, (_, i) => `<i class="${i<lit?'on':''}" style="height:${18+Math.round(80*Math.abs(Math.sin(i*.61)*Math.cos(i*.23)))}px"></i>`).join('');
+
+// Silhouettes découpées (encre #120804)
+const person = (x, y, k=1, armUp=false) => `
+  <g transform="translate(${x} ${y}) scale(${k})">
+    <circle cx="0" cy="-150" r="40"/>
+    <path d="M-62 0 Q-58 -95 0 -108 Q58 -95 66 0 Z"/>
+    ${armUp ? '<path d="M30 -92 L96 -190 L112 -180 L52 -78 Z"/>' : ''}
+  </g>`;
+const walker = (x, y, k=1, dir=1) => `
+  <g transform="translate(${x} ${y}) scale(${k*dir} ${k})">
+    <circle cx="0" cy="-232" r="30"/>
+    <path d="M-26 -196 L28 -196 L36 -100 L-30 -100 Z"/>
+    <path d="M-24 -104 L-60 0 L-40 0 L0 -86 Z"/><path d="M24 -104 L52 0 L32 0 L4 -86 Z"/>
+    <path d="M24 -190 L62 -120 L50 -112 L18 -168 Z"/>
+  </g>`;
+const acacia = (x, y, k=1) => `<g transform="translate(${x} ${y}) scale(${k})"><path d="M-14 0 L-6 -300 L6 -300 L14 0 Z"/><path d="M-6 -290 Q-80 -330 -150 -300 L-150 -318 Q-70 -350 0 -320 Q70 -350 150 -318 L150 -300 Q80 -330 6 -290 Z"/><ellipse cx="0" cy="-330" rx="230" ry="42"/></g>`;
+const fire = (x, y, k=1, glow='rgba(255,190,100,.9)') => `
+  <g transform="translate(${x} ${y}) scale(${k})">
+    <circle cx="0" cy="-60" r="160" fill="url(#fg)"/>
+    <path d="M-40 0 Q-60 -80 -10 -150 Q0 -90 20 -120 Q60 -70 40 0 Z" fill="#ffcf7a"/>
+    <path d="M-18 0 Q-24 -50 4 -90 Q10 -50 22 -60 Q30 -30 18 0 Z" fill="#fff0c8"/>
+    <path d="M-70 4 L70 -14 L74 0 L-66 18 Z"/><path d="M-70 -14 L70 4 L66 18 L-74 0 Z"/>
+  </g>`;
+const defs = `<defs><radialGradient id="fg"><stop offset="0" stop-color="#ffd27f" stop-opacity=".9"/><stop offset="1" stop-color="#ff9a40" stop-opacity="0"/></radialGradient></defs>`;
+
+const player = (style) => `<div class="phone" style="${style}"><div class="screen">
+  <div class="portrait"></div><div class="name">REINE NZINGA</div><div class="sub">Narration audio · Afrique centrale</div>
+  <div class="wave">${bars(34,16)}</div><div class="play">❚❚</div></div></div>`;
+
+const F = {
+'1': `<div class="f" style="background:radial-gradient(ellipse 1000px 1100px at 50% 66%,#e3994a,#9a4a18 40%,#2a1206 78%)">
+  <svg class="l" viewBox="0 0 1080 1920">${defs}<g fill="#120804">
+    ${acacia(860, 1480, 1.1)}
+    <path d="M0 1560 Q540 1500 1080 1560 L1080 1920 L0 1920 Z"/>
+    ${person(280, 1560, 1.25, true)}
+    ${person(760, 1560, .95)} ${person(900, 1580, .8)} ${person(640, 1600, .7)} ${person(110, 1600, .75)}
+  </g>${fire(470, 1580, 1.1)}</svg>
+  <div class="cap">1 · 0:00 · « Autrefois, au coin du feu, le griot racontait… »</div></div>`,
+'2': `<div class="f" style="background:linear-gradient(180deg,#2b3140,#1a1820 60%,#120f12)">
+  <svg class="l" viewBox="0 0 1080 1920">${defs}<g fill="#0c0a0c">
+    <path d="M0 1500 L0 1180 L90 1180 L90 1080 L180 1080 L180 1240 L260 1240 L260 980 L370 980 L370 1300 L700 1300 L700 1020 L800 1020 L800 1160 L900 1160 L900 940 L1000 940 L1000 1220 L1080 1220 L1080 1500 Z"/>
+    <path d="M0 1560 Q540 1520 1080 1560 L1080 1920 L0 1920 Z"/>
+    ${walker(120, 1600, .9, -1)} ${walker(960, 1610, .85, 1)} ${walker(240, 1640, .7, -1)} ${walker(830, 1650, .7, 1)}
+    ${walker(540, 1560, 1.15, 1)}
+  </g>${fire(540, 1700, .35)}
+  <g fill="#F7D98B" opacity=".55">${[[300,1010],[320,1060],[920,990],[940,1040],[730,1060],[110,1220]].map(([x,y])=>`<rect x="${x}" y="${y}" width="16" height="22"/>`).join('')}</g></svg>
+  <div class="cap">2 · 0:05,5 · « Puis le village s'est dispersé… »</div></div>`,
+'3': `<div class="f" style="background:#0B0806">
+  <svg class="l" viewBox="0 0 1080 1920">${defs}
+    <path d="M540 1500 Q470 1200 600 1000 Q700 860 560 720" stroke="#F0C36B" stroke-width="3" stroke-dasharray="4 18" fill="none" opacity=".6"/>
+    <circle cx="560" cy="720" r="110" fill="url(#fg)"/><circle cx="560" cy="720" r="16" fill="#fff0c8"/>
+    <g fill="#120804" stroke="#2a1a0e" stroke-width="2"><path d="M300 1920 L330 1640 Q380 1560 470 1580 L700 1600 Q760 1610 740 1650 L560 1660 L780 1700 Q810 1730 770 1745 L520 1740 L470 1920 Z"/></g>
+  </svg>
+  <div class="t" style="top:380px;font-size:150px;color:var(--gold)">ÉCOUTE.</div>
+  <div class="cap">3 · 0:09 · silence 0,5 s… « Écoute. »</div></div>`,
+'4': `<div class="f" style="background:#0B0806">
+  <div class="phone" style="left:130px;top:250px;transform:scale(1.45);transform-origin:50% 0"><div class="screen"><div class="shot" style="background-image:url(../assets/img/capture-app-p60-recit-1.png)"></div></div></div>
+  <div class="phone" style="left:600px;top:1060px;transform:scale(.62) rotate(6deg);transform-origin:0 0"><div class="screen"><div class="shot" style="background-image:url(../assets/img/capture-app-reine-nzinga.jpg)"></div></div></div>
+  <svg class="l" viewBox="0 0 1080 1920"><path fill="#120804" d="M760 1920 L790 1720 L830 1640 Q850 1610 870 1640 L870 1700 L960 1720 Q1000 1740 990 1800 L980 1920 Z"/></svg>
+  <div class="cap">4 · 0:11,5 · la lettrine, puis la fiche : « Écouter »</div></div>`,
+'5': `<div class="f" style="background:radial-gradient(ellipse at 50% 45%,#2a160a,#0B0806 70%)">
+  ${player('left:260px;top:330px;transform:scale(1.12);box-shadow:0 0 0 3px #2a2018,0 0 160px 30px rgba(240,195,107,.25)')}
+  <svg class="l" viewBox="0 0 1080 1920"><g fill="#120804"><circle cx="90" cy="1650" r="120"/><path d="M-60 1920 Q-40 1760 90 1750 Q230 1760 260 1920 Z"/></g>
+  <path d="M190 1610 Q200 1650 180 1700" stroke="#F0C36B" stroke-width="6" fill="none" opacity=".7"/></svg>
+  <div class="cap">5 · 0:15 · « Le griot n'est pas parti. Il est là, dans ta poche. »</div></div>`,
+'6': `<div class="f" style="background:radial-gradient(ellipse 1000px 1100px at 50% 75%,#e3994a,#9a4a18 40%,#2a1206 80%)">
+  <svg class="l" viewBox="0 0 1080 1920">${defs}
+    <g fill="#5a2a0e" opacity=".75" transform="translate(540 980)">
+      <path d="M-120 -520 L-90 -620 L-50 -560 L0 -660 L50 -560 L90 -620 L120 -520 Z"/>
+      <ellipse cx="0" cy="-420" rx="130" ry="150"/>
+      <path d="M-260 300 Q-250 -120 0 -250 Q250 -120 260 300 Z"/>
+    </g>
+    <g fill="#120804"><path d="M0 1620 Q540 1570 1080 1620 L1080 1920 L0 1920 Z"/>
+      ${person(200, 1650, 1)} ${person(360, 1690, .8)} ${person(720, 1690, .85)} ${person(880, 1650, 1)}
+    </g>
+    <circle cx="540" cy="1640" r="220" fill="url(#fg)"/>
+    <rect x="490" y="1600" width="100" height="56" rx="12" fill="#1a120c" stroke="#F0C36B" stroke-width="3"/>
+  </svg>
+  <div class="cap">6 · 0:20 · le village revient ; les ombres jouent Nzinga</div></div>`,
+'7': `<div class="f" style="background:linear-gradient(180deg,#F7D98B 0%,#E9A866 35%,#7a3a16 75%,#2a1206)">
+  <img src="../assets/img/afroback-logo.png" style="position:absolute;left:290px;top:520px;width:500px">
+  <div class="t" style="top:1120px;font-size:70px;color:#2a1206">LE GRIOT<br>DANS TA POCHE.</div>
+  <img src="../assets/img/app-store-fr.svg" style="position:absolute;left:150px;top:1480px;height:110px">
+  <img src="../assets/img/google-play-fr.png" style="position:absolute;left:560px;top:1468px;height:134px">
+  <div class="cap" style="color:rgba(247,231,200,.75)">7 · 0:24 · « AFROBACK. Le griot, dans ta poche. »</div></div>`
+};
+document.getElementById('root').innerHTML = F[s];
+</script>
+</body>
+</html>

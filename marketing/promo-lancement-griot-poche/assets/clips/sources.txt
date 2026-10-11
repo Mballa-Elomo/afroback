@@ -1,0 +1,16 @@
+# id | source | début (s) | durée (s) | centre de cadrage horizontal (0-1)
+c01|Vidéos/HEROS/01. REINE NZINGA/Reine NZINGA 4k/Reine NZINGA Chap 2.mp4|68.5|2.4|0.48
+c02|Audio Afroback/Mythologie/Ngan Medza/ngan medza.mp4|36.0|1.8|0.55
+c03|Vidéos/HEROS/01. REINE NZINGA/Reine NZINGA 4k/Reine NZINGA Chap 1.mp4|112.5|1.9|0.58
+c04|Audio Afroback/Mythologie/Ngan Medza/ngan medza.mp4|121.0|2.2|0.45
+c05|Audio Afroback/Mythologie/Ngan Medza/ngan medza.mp4|151.7|2.2|0.50
+c06|Audio Afroback/Mythologie/Ngan Medza/ngan medza.mp4|212.0|1.9|0.50
+c07|Audio Afroback/Mythologie/Ngan Medza/ngan medza.mp4|96.0|1.8|0.48
+c09|Vidéos/HEROS/02. RUBEN UM NYOBE/Ruben Um Nyobe P1 FR.mp4|185.5|1.0|0.50
+c10|Audio Afroback/Mythologie/Ngan Medza/ngan medza.mp4|290.5|1.0|0.42
+c11|Vidéos/HEROS/01. REINE NZINGA/Reine NZINGA 4k/Reine NZINGA Chap 2.mp4|65.35|2.6|0.48
+c12|Vidéos/HEROS/01. REINE NZINGA/Reine NZINGA 4k/Reine NZINGA Chap 2.mp4|139.9|1.1|0.47
+c13|Audio Afroback/Mythologie/Ngan Medza/ngan medza.mp4|144.5|1.1|0.36
+c14|Vidéos/HEROS/02. RUBEN UM NYOBE/Ruben Um Nyobe P1 FR.mp4|175.5|1.0|0.50
+c15|Vidéos/HEROS/01. REINE NZINGA/Reine NZINGA 4k/Reine NZINGA Chap 1.mp4|191.5|1.6|0.52
+c16|Audio Afroback/Mythologie/Ngan Medza/ngan medza.mp4|53.5|2.15 (ralenti x2,75 = 5,9 s)|0.50

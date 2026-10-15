@@ -33,6 +33,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: 'discover', icon: '🧭', label: 'Découverte', href: '/decouverte', enabled: true },
       { id: 'mythology', icon: '🌙', label: 'Mythologie', href: '/mythologie', enabled: true },
       { id: 'ecole', icon: '🏅', label: 'École des Héros', href: '/ecole-heros', enabled: true },
+      { id: 'quiz', icon: '❓', label: 'Quiz', href: '/quiz', enabled: true },
       { id: 'media', icon: '🖼', label: 'Bibliothèque médias', href: '/media', enabled: true },
       { id: 'translation', icon: '🌐', label: 'Traduction', href: '/traduction', enabled: true },
     ],
@@ -42,10 +43,10 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: 'community', icon: '💬', label: 'Communauté', href: '/communaute', enabled: true },
       { id: 'comments', icon: '🗨', label: 'Commentaires', href: '/commentaires', enabled: true },
-      { id: 'market', icon: '🛍', label: 'Marketplace', enabled: false, lot: 3 },
+      { id: 'market', icon: '🛍', label: 'Marketplace', href: '/marketplace', enabled: true },
       { id: 'dons', icon: '🤲', label: 'Dons', href: '/paiements?onglet=dons', enabled: true },
       { id: 'revenue', icon: '◈', label: 'Paiements & revenus', href: '/paiements', enabled: true },
-      { id: 'sponsors', icon: '🤝', label: 'Sponsors', enabled: false, lot: 3 },
+      { id: 'sponsors', icon: '🤝', label: 'Sponsors', href: '/sponsors', enabled: true },
     ],
   },
   {

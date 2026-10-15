@@ -19,6 +19,7 @@ import { useRequireAccount } from '../../../../../src/auth/AccountWall';
 import { LockedContent } from '../../../../../src/access/Access';
 import { useI18n } from '../../../../../src/i18n';
 import { QuizTile } from '../../../../../src/quiz/QuizUI';
+import { PresenteParSponsor } from '../../../../../src/sponsors/Sponsor';
 
 export default function FicheHerosScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -64,6 +65,7 @@ export default function FicheHerosScreen() {
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
           {heros.avertissement_lecture && <WarningBanner text={heros.avertissement_lecture} />}
+          <PresenteParSponsor type="heros" slug={heros.slug} style={{ marginTop: 12 }} />
 
           {heros.acces?.verrouille ? (
             <>

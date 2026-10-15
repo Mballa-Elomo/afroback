@@ -94,7 +94,7 @@ export default async function CommentairesPage() {
     <div>
       <h1 style={{ fontFamily: fonts.display, fontSize: 26, fontWeight: 700, margin: '0 0 4px' }}>Commentaires</h1>
       <p style={{ color: colors.textMuted, fontSize: 13, margin: '0 0 22px' }}>
-        Commentaires laissés sous les héros, mythes et fiches Découverte de l&apos;app. Un commentaire est masqué
+        Commentaires laissés sous les héros, mythes et fiches Découverte, dans l&apos;app et sur le site. Les publications de la Communauté se modèrent dans le module Communauté. Un commentaire est masqué
         automatiquement s&apos;il contient un terme interdit ou reçoit 3 signalements. Masquer le retire de l&apos;app ;
         rétablir le republie et remet ses signalements à zéro.
       </p>

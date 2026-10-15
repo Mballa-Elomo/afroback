@@ -102,7 +102,7 @@ export default function LeconPage({ params }: { params: Promise<{ id: string }> 
                 <figure key={p.ordre} className="overflow-hidden rounded-[24px] bg-white/8">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.image_url} alt="" className="w-full" />
-                  {p.texte && <figcaption className="p-4 text-lg font-semibold text-white/90">{p.texte}</figcaption>}
+                  {((lang === 'en' && p.texte_en) || p.texte) && <figcaption className="p-4 text-lg font-semibold text-white/90">{(lang === 'en' && p.texte_en) || p.texte}</figcaption>}
                 </figure>
               ))}
             </div>

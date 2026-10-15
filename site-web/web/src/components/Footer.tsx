@@ -27,6 +27,7 @@ export function Footer({ lang = 'fr' }: { lang?: Lang }) {
             <Link href="/mythes" className="text-body hover:text-gold">{t('Mythologie', 'Mythology')}</Link>
             <Link href="/decouverte" className="text-body hover:text-gold">{t('Découverte', 'Discovery')}</Link>
             <Link href="/recherche" className="text-body hover:text-gold">{t('Recherche', 'Search')}</Link>
+            <Link href="/partenaires" className="text-body hover:text-gold">{t('Partenaires', 'Partners')}</Link>
             <Link href="/legal/cgu" className="text-body hover:text-gold">{t("Conditions d'utilisation", 'Terms of use')}</Link>
             <Link href="/legal/confidentialite" className="text-body hover:text-gold">{t('Confidentialité', 'Privacy')}</Link>
           </div>

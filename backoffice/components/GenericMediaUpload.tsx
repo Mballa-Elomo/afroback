@@ -9,7 +9,7 @@ const SLOTS: { id: MediaSlot; label: string }[] = [
   { id: 'photo', label: 'Photo catalogue' },
   { id: 'audioFr', label: 'Audio FR' },
   { id: 'audioEn', label: 'Audio EN' },
-  { id: 'video', label: 'Vidéo' },
+  // Plus d'envoi de vidéo ici : les vidéos sont des liens YouTube / Vimeo (fiches des contenus).
 ];
 
 export function GenericMediaUpload({ heroes }: { heroes: { slug: string; nom_affiche: string }[] }) {

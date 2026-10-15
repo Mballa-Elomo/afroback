@@ -153,7 +153,7 @@ export interface Lecon {
   /** Narration anglaise (prévue) ; repli sur le français. */
   narration_audio_url_en?: string | null;
   video_url: string | null;
-  bd_planches: { image_url: string; texte: string; ordre: number }[];
+  bd_planches: { image_url: string; texte: string; texte_en?: string; ordre: number }[];
 }
 export interface Resultat {
   lecon_id: string;

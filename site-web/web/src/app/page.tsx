@@ -7,6 +7,7 @@ import type { Tile } from '@/lib/types';
 import { getLang } from '@/lib/lang-server';
 import { pick } from '@/lib/lang';
 import { RenewBanner } from '@/components/SubscriptionControls';
+import { BanniereSponsor } from '@/components/Sponsor';
 
 export const revalidate = 120;
 
@@ -50,6 +51,7 @@ export default async function Home() {
       <div className="relative z-10 -mt-16 md:-mt-24">
         <RenewBanner className="relative mx-5 mb-6 md:mx-14" />
         <Row title={t('Gratuit sur AFROBACK', 'Free on AFROBACK')} subtitle={t('Commence ici : à lire, écouter et regarder sans abonnement', 'Start here: read, listen and watch without a subscription')} tiles={all.filter((x) => x.free)} variant="wide" />
+        <BanniereSponsor className="relative mx-5 my-8 md:mx-14" />
         <Row title={t('Les résistants', 'The resisters')} subtitle={t('Ceux et celles qui ont dit non', 'The men and women who said no')} tiles={byTheme('Résistance')} href="/heros" />
         <TopRanked tiles={top} />
         <Row title={t('Mythes fondateurs', 'Founding myths')} subtitle={t('Les récits que les peuples se transmettent depuis des siècles', 'The stories peoples have handed down for centuries')} tiles={mytheTiles} href="/mythes" />

@@ -26,6 +26,7 @@ import { LockedDetailScreen } from '../../../src/access/Access';
 import { currentLanguage, useI18n } from '../../../src/i18n';
 import { CommentsSection } from '../../../src/comments/CommentsSection';
 import { ContentActions } from '../../../src/stats/ContentActions';
+import { FinVideoSponsor, PresenteParSponsor } from '../../../src/sponsors/Sponsor';
 
 /**
  * Fiche détail Découverte — fidèle à design-reference-decouverte.dc.excerpt.html,
@@ -170,6 +171,7 @@ export default function DecouverteDetailScreen() {
             description={item.resume_liste}
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
+          <PresenteParSponsor type="decouverte" slug={item.slug} style={{ marginBottom: 14 }} />
           <Text style={styles.subtitle}>{item.sous_titre}</Text>
 
           <View style={styles.sectionHeaderRow}>
@@ -197,7 +199,10 @@ export default function DecouverteDetailScreen() {
               {isGuest ? (
                 <LockedActionCard label="video" reason={'video'} />
               ) : (
-                <DecouverteVideoPlayer itemId={item.id} videos={item.videos} />
+                <>
+                  <DecouverteVideoPlayer itemId={item.id} videos={item.videos} />
+                  <FinVideoSponsor type="decouverte" slug={item.slug} style={{ marginTop: 12 }} />
+                </>
               )}
             </View>
           )}

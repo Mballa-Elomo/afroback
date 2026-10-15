@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { coverageByLanguage, getTranslationEntriesAdmin, LANGUES_TRADUCTION } from '@/lib/data/translation';
 import { StatusBadge } from '@/components/StatusBadge';
+import { couvertureAnglais } from '@/lib/data/couvertureAnglais';
 import { colors, fonts } from '@/lib/theme';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,9 @@ export default async function TraductionPage({ searchParams }: { searchParams: P
   const sp = await searchParams;
   const langue = LANGUES_TRADUCTION.some((l) => l.code === sp.langue) ? sp.langue! : 'ewo';
 
-  const entries = await getTranslationEntriesAdmin();
+  const [entries, anglais] = await Promise.all([getTranslationEntriesAdmin(), couvertureAnglais()]);
+  const totalEn = anglais.reduce((a, x) => ({ requis: a.requis + x.requis, traduits: a.traduits + x.traduits }), { requis: 0, traduits: 0 });
+  const incomplets = anglais.filter((x) => x.manquants.length > 0);
   const coverage = coverageByLanguage(entries);
   const rows = entries.filter((e) => e.langue === langue);
   const langueNom = LANGUES_TRADUCTION.find((l) => l.code === langue)!.nom;
@@ -21,6 +24,40 @@ export default async function TraductionPage({ searchParams }: { searchParams: P
   return (
     <div>
       <h1 style={{ fontFamily: fonts.display, fontSize: 26, fontWeight: 700, margin: '0 0 4px' }}>Traduction</h1>
+
+      {/* Anglais : deuxième langue de l'app et du site (finitions du 2026-10-15). */}
+      <section style={{ background: colors.panel, border: `1px solid ${colors.border}`, borderRadius: 16, padding: 20, margin: '18px 0 26px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+          <h2 style={{ fontFamily: fonts.display, fontSize: 17, color: colors.textHeading, margin: 0 }}>Anglais (app et site)</h2>
+          <span style={{ fontFamily: fonts.display, fontSize: 22, color: colors.accentGold }}>
+            {totalEn.requis ? Math.round((totalEn.traduits / totalEn.requis) * 100) : 100} %
+            <span style={{ fontFamily: fonts.body, fontSize: 12.5, color: colors.textMuted }}> · {totalEn.traduits}/{totalEn.requis} champs</span>
+          </span>
+        </div>
+        <div style={{ height: 8, borderRadius: 8, background: '#241910', margin: '12px 0 14px', overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${totalEn.requis ? (totalEn.traduits / totalEn.requis) * 100 : 100}%`, background: 'linear-gradient(90deg, #a0522d, #f0c36b)' }} />
+        </div>
+        {incomplets.length === 0 ? (
+          <p style={{ color: colors.positive, fontSize: 13, margin: 0 }}>Tous les contenus remplis en français existent aussi en anglais.</p>
+        ) : (
+          <>
+            <p style={{ color: colors.textMuted, fontSize: 13, margin: '0 0 10px' }}>
+              Champs à traduire (lancer /afroback_traduction_FR_EN, puis exécuter son SQL dans Supabase) :
+            </p>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {incomplets.map((x) => (
+                <li key={x.type + x.titre} style={{ fontSize: 13, color: colors.textBody }}>
+                  <span style={{ fontFamily: fonts.mono, fontSize: 10, color: colors.accentGold, marginRight: 8 }}>{x.type.toUpperCase()}</span>
+                  {x.lien ? <Link href={x.lien}>{x.titre}</Link> : x.titre}
+                  <span style={{ color: colors.textMuted }}> · manque : {x.manquants.join(', ')}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+
+      <h2 style={{ fontFamily: fonts.display, fontSize: 17, color: colors.textHeading, margin: '0 0 4px' }}>Langues camerounaises</h2>
       <p style={{ color: colors.textMuted, fontSize: 13, margin: '0 0 20px' }}>
         4 langues camerounaises. Statut à 3 états : vide / brouillon (non relu) / validé par un locuteur natif —
         jamais une coche « traduit » avant validation humaine. Ce tableau reflète le code du site (

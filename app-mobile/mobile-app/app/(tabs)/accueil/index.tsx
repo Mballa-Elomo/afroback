@@ -22,6 +22,7 @@ import { RenewBanner } from '../../../src/payments/RenewBanner';
 import { Bone, PressableScale, RailSection, SkeletonScreen } from '../../../src/ui/modern';
 import i18n, { useI18n } from '../../../src/i18n';
 import { useModules, usePaymentPolicy } from '../../../src/settings/SettingsProvider';
+import { BanniereSponsor } from '../../../src/sponsors/Sponsor';
 
 const GOLD = colors.accentGoldBright;
 
@@ -142,6 +143,7 @@ export default function AccueilScreen() {
         <GuestBanner />
         <UpgradeBanner />
         <RenewBanner style={{ marginHorizontal: 16, marginTop: 8 }} />
+        <BanniereSponsor style={{ marginHorizontal: 16, marginTop: 12 }} />
 
         {/* Recherche */}
         <Pressable style={styles.search} onPress={() => router.push('/recherche')} accessibilityRole="search">

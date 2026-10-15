@@ -19,6 +19,7 @@ import { Icon, type IconName } from '../../../../src/components/Icons';
 import { BackButton } from '../../../../src/ui/modern';
 import { CommentsSection } from '../../../../src/comments/CommentsSection';
 import { ContentActions } from '../../../../src/stats/ContentActions';
+import { FinVideoSponsor, PresenteParSponsor } from '../../../../src/sponsors/Sponsor';
 
 type Onglet = 'lire' | 'ecouter' | 'regarder';
 type Langue = 'fr' | 'en';
@@ -140,6 +141,7 @@ export default function MytheDetailScreen() {
             description={mythe.sous_titre}
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
+          <PresenteParSponsor type="mythe" slug={mythe.slug} style={{ marginBottom: 14 }} />
           <QuizTile type="mythe" slug={mythe.slug} style={{ marginBottom: 14 }} />
           <View style={styles.tabs}>
             <Tab icon="book" label={t('content.read')} active={onglet === 'lire'} onPress={() => setOnglet('lire')} />
@@ -343,6 +345,7 @@ function RegarderTab({ mythe }: { mythe: Mythe }) {
       {uri ? (
         <>
           <LecteurVideo key={uri} uri={uri} style={styles.mytheVideoArea} />
+          <FinVideoSponsor type="mythe" slug={mythe.slug} style={{ marginTop: 12 }} />
           {codes.length > 1 && (
             <View style={[styles.langToggle, { justifyContent: 'center', marginTop: 10 }]}>
               {codes.map((code) => (

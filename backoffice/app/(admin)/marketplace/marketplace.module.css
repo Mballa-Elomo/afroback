@@ -1,0 +1,182 @@
+/* Module Marketplace : compléments au style du module Utilisateurs. */
+
+.bandeau {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(230, 168, 92, 0.42);
+  background: rgba(230, 168, 92, 0.09);
+  color: #f3d3a8;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.bandeau > svg {
+  color: #e6a85c;
+  margin-top: 2px;
+  flex: none;
+}
+.bandeau strong {
+  color: #f7e7c8;
+}
+.bandeau code {
+  color: #f0c36b;
+}
+.badge {
+  background: #e6a85c;
+  color: #1a1109;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 7px;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(240, 195, 107, 0.12);
+  background: radial-gradient(260px 120px at 100% 0%, rgba(240, 195, 107, 0.12), transparent 70%), linear-gradient(160deg, #1b130c, #120c07);
+}
+.kpiLabel {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #c9b8a4;
+}
+.kpiValeur {
+  font-family: 'Cinzel', serif;
+  font-size: 30px;
+  font-weight: 800;
+  color: #f7e7c8;
+}
+.kpiDetail {
+  font-size: 12px;
+  color: #f0c36b;
+}
+
+.bio {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: #c9b8a4;
+  max-width: 420px;
+}
+.actions {
+  text-align: right;
+  white-space: nowrap;
+}
+.actions button + button {
+  margin-left: 6px;
+}
+
+.produits {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+}
+.produit {
+  border-radius: 16px;
+  border: 1px solid rgba(240, 195, 107, 0.12);
+  background: rgba(255, 240, 210, 0.02);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.produitMasque {
+  opacity: 0.55;
+  border-style: dashed;
+}
+.image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: linear-gradient(135deg, #241910, #120c07);
+  display: block;
+}
+.produitCorps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px 14px;
+  font-size: 13px;
+}
+.produitCorps strong {
+  color: #f7e7c8;
+  font-size: 14px;
+}
+.produitCorps button {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+.prix {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  color: #f0c36b;
+}
+
+.avis {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.avis li {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(240, 195, 107, 0.12);
+}
+.avis p {
+  margin-top: 8px;
+  font-size: 13.5px;
+  color: #ede3d4;
+  line-height: 1.55;
+}
+.avisTete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.avisTete button {
+  margin-left: auto;
+}
+.etoiles {
+  color: #f0c36b;
+  letter-spacing: 1px;
+}
+.reponse {
+  padding-left: 12px;
+  border-left: 2px solid rgba(240, 195, 107, 0.3);
+  color: #c9b8a4 !important;
+}
+
+.articles {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  font-size: 13.5px;
+}
+.articles li {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(240, 195, 107, 0.1);
+}
+.total {
+  font-weight: 800;
+  color: #f0c36b;
+}
+
+@media (max-width: 1100px) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

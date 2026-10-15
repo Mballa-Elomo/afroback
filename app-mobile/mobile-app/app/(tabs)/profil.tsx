@@ -150,6 +150,7 @@ function ProfilScreen() {
           {/* Toujours visible pour un compte déjà protégé (il doit pouvoir gérer sa 2FA). */}
           {(mfa.disponible || mfaStatus !== 'not_enrolled') && <SettingRow icon="shield" label={t('profileTab.twoStep')} onPress={() => router.push('/profil/mfa')} />}
           <SettingRow icon="key" label={t('profileTab.password')} onPress={() => router.push('/profil/mot-de-passe')} />
+          <SettingRow icon="heart" label={lang === 'en' ? 'Our partners' : 'Nos partenaires'} onPress={() => router.push('/partenaires' as never)} />
           <SettingRow icon="trash" label={t('deleteAccount.row')} onPress={() => router.push('/profil/supprimer-compte')} last />
         </Section>
 

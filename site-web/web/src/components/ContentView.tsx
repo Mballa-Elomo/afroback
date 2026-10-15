@@ -1,5 +1,6 @@
 'use client';
 
+import { PresenteParSponsor } from './Sponsor';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
@@ -124,6 +125,8 @@ export function ContentView({ tile, detail: initial, loading, compact }: { tile:
         <div className="mt-6">
           <ContentActions type={tile.type} tile={tile} onComments={() => setTab('commentaires')} />
         </div>
+        {/* Sponsor « Présenté par » (cdc-module-sponsors.md), juste sous les actions. */}
+        <PresenteParSponsor type={tile.type} slug={tile.slug} className="mt-5 max-w-xl bg-ink/60 backdrop-blur" />
       </Header>
 
       {/* Onglets */}

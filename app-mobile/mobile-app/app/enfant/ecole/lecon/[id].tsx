@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getLeconById } from '../../../../src/data/ecoleRepository';
@@ -12,6 +12,7 @@ import { colors, typography } from '../../../../src/theme/tokens';
 import { Icon } from '../../../../src/components/Icons';
 import { useI18n } from '../../../../src/i18n';
 import { LessonAudio } from '../../../../src/ecole/LessonAudio';
+import { LecteurVideo } from '../../../../src/video/LecteurVideo';
 
 const FORMATS: { id: EcoleFormat; icon: string; label: string }[] = [
   { id: 'lire', icon: '📖', label: 'lesson.read' },
@@ -136,8 +137,8 @@ export default function EcoleLeconScreen() {
               <SoonState icon="🎧" />
             )
           )}
-          {format === 'regarder' && (hasVideo ? <SoonState icon="🎬" /> : <SoonState icon="🎬" />)}
-          {format === 'bd' && (hasBd ? <SoonState icon="💬" /> : <SoonState icon="💬" />)}
+          {format === 'regarder' && (hasVideo ? <LecteurVideo key={lecon.video_url!} uri={lecon.video_url!} style={styles.video} /> : <SoonState icon="🎬" />)}
+          {format === 'bd' && (hasBd ? <BandeDessinee planches={lecon.bd_planches} lang={lang} /> : <SoonState icon="💬" />)}
         </View>
       </ScrollView>
 
@@ -152,6 +153,21 @@ export default function EcoleLeconScreen() {
   );
 }
 
+/** BD de la leçon : planches dans l'ordre, image puis texte de la bulle (FR ou EN). */
+function BandeDessinee({ planches, lang }: { planches: EcoleLecon['bd_planches']; lang: string }) {
+  const triees = [...planches].sort((a, b) => a.ordre - b.ordre);
+  return (
+    <View style={{ gap: 18 }}>
+      {triees.map((p, i) => (
+        <View key={`${p.image_url}-${i}`} style={styles.planche}>
+          <Image source={{ uri: p.image_url }} style={styles.plancheImage} resizeMode="cover" />
+          {!!((lang === 'en' && p.texte_en) || p.texte) && <Text style={styles.plancheTexte}>{(lang === 'en' && p.texte_en) || p.texte}</Text>}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 function SoonState({ icon }: { icon: string }) {
   const { t } = useI18n();
   return (
@@ -163,6 +179,10 @@ function SoonState({ icon }: { icon: string }) {
 }
 
 const styles = StyleSheet.create({
+  video: { width: '100%', aspectRatio: 16 / 9, borderRadius: 18, overflow: 'hidden', backgroundColor: '#000' },
+  planche: { borderRadius: 18, overflow: 'hidden', backgroundColor: 'rgba(255,240,210,0.04)' },
+  plancheImage: { width: '100%', aspectRatio: 1 },
+  plancheTexte: { padding: 14, fontSize: 17, lineHeight: 25, color: colors.textHeading, fontWeight: '600' },
   safe: {
     flex: 1,
     backgroundColor: colors.background,

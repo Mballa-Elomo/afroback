@@ -20,6 +20,8 @@ export interface EcoleNiveau {
 export interface BdPlanche {
   image_url: string;
   texte: string;
+  /** Texte anglais de la bulle (facultatif, saisi dans le back-office). */
+  texte_en?: string;
   ordre: number;
 }
 

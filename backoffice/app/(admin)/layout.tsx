@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { requireAdmin } from '@/lib/auth';
 import { AdminShell } from '@/components/AdminShell';
 import { nbSignalementsEnAttente } from '@/lib/communaute';
+import { nbBoutiquesEnAttente } from '@/lib/marketplace';
 import { Sankofa } from '@/components/Sankofa';
 import { colors, fonts } from '@/lib/theme';
 
@@ -50,7 +51,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <AdminShell admin={admin} replieInitial={jar.get('afa-sb')?.value === '1'} badges={{ community: await nbSignalementsEnAttente() }}>
+    <AdminShell admin={admin} replieInitial={jar.get('afa-sb')?.value === '1'} badges={{ community: await nbSignalementsEnAttente(), market: await nbBoutiquesEnAttente() }}>
       {children}
     </AdminShell>
   );

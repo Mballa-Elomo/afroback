@@ -147,6 +147,7 @@ function RootNavigator() {
       <Stack.Screen name="index" />
       {/* Conditions et confidentialité : lisibles dans tous les états (inscription, invité, connecté). */}
       <Stack.Screen name="legal/[doc]" />
+      <Stack.Screen name="partenaires" />
       {/* Reste accessible en mode invité : la fenêtre "Crée ton compte"
           (AccountWall) y renvoie vers l'inscription ou la connexion. */}
       <Stack.Protected guard={!session}>

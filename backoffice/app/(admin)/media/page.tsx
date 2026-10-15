@@ -12,7 +12,7 @@ export default async function MediaLibraryPage() {
     <div>
       <h1 style={{ fontFamily: fonts.display, fontSize: 26, fontWeight: 700, margin: '0 0 4px' }}>Bibliothèque médias</h1>
       <p style={{ color: colors.textMuted, fontSize: 13, margin: '0 0 20px' }}>
-        Dépose un fichier, il se rattache directement à une fiche héros — sans passer par le code.
+        Photos et narrations audio des héros : déposez un fichier, il se rattache directement à la fiche. Les vidéos se gèrent par lien YouTube ou Vimeo dans chaque fiche (Héros, Mythologie, Découverte, École des Héros).
       </p>
 
       <GenericMediaUpload heroes={heroes.map((h) => ({ slug: h.slug, nom_affiche: h.nom_affiche }))} />

@@ -2,6 +2,7 @@
 
 import { analyserLienVideo, miniature } from '@/lib/lienVideo';
 import { pageLecteur } from '@/lib/pageLecteur';
+import { FinVideoSponsor } from '@/components/Sponsor';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ContentType, Detail, Tile } from '@/lib/types';
@@ -343,6 +344,8 @@ export function WatchPlayer({
                 )}
               </div>
             </details>
+
+            {(ended || countdown !== null) && <FinVideoSponsor type={type} slug={tile.slug} />}
 
             {withQuiz && (ended && !next ? <QuizEndCard type={type} slug={tile.slug} /> : <QuizTile type={type} slug={tile.slug} />)}
 

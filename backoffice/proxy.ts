@@ -12,7 +12,8 @@ export const config = {
      * les Route Handlers d'upload de fichier (api/heros/.../media,
      * .../chapter-video ; api/decouverte/.../media, .../video ;
      * api/mythologie/.../media, .../chapter-video — mêmes routes ajoutées le
-     * 2026-08-12 pour Découverte/Mythologie, même raison). Ces routes ne
+     * 2026-08-12 pour Découverte/Mythologie, et api/sponsors/.../logo le
+     * 2026-10-15, même raison). Ces routes ne
      * sont pas des pages naviguées (pas besoin du rafraîchissement de
      * session / redirect vers /login géré ici) et font déjà leur propre
      * vérification complète via `requireAdmin()` dans lib/uploadMedia.ts
@@ -24,6 +25,6 @@ export const config = {
      * flux avant que `request.formData()` ne puisse le lire ("Requête
      * invalide (formulaire illisible)").
      */
-    '/((?!_next/static|_next/image|favicon.ico|api/heros|api/decouverte|api/mythologie|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/heros|api/decouverte|api/mythologie|api/sponsors|api/ecole|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

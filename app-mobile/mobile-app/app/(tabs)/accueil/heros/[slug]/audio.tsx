@@ -15,6 +15,7 @@ import { withAccount } from '../../../../../src/auth/AccountWall';
 import { LockedDetailScreen } from '../../../../../src/access/Access';
 import { currentLanguage, useI18n } from '../../../../../src/i18n';
 import { QuizEndCard } from '../../../../../src/quiz/QuizUI';
+import { PresenteParSponsor } from '../../../../../src/sponsors/Sponsor';
 
 /**
  * Lecteur audio plein écran. Quand aucune narration n'est disponible pour
@@ -104,6 +105,7 @@ function LecteurAudioScreen() {
           <Text style={styles.name}>{heros.nom_affiche}</Text>
           <Text style={styles.subtitle}>Narration audio · {heros.region}</Text>
 
+          <PresenteParSponsor type="heros" slug={heros.slug} format="ecoute" style={{ marginTop: 14, alignSelf: 'stretch' }} />
           {hasAudio ? (
             <AudioPlayerBlock heros={heros} />
           ) : (

@@ -1,5 +1,6 @@
 'use client';
 
+import { PresenteParSponsor } from './Sponsor';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { ContentType, Detail, Tile } from '@/lib/types';
@@ -93,6 +94,7 @@ export function ListenPlayer({ type, tile, detail: initial }: { type: ContentTyp
         </div>
         <p className="mt-8 text-xs font-bold tracking-[0.18em] text-gold">{tr('NARRATION · CONTÉE PAR LE GRIOT', 'NARRATION · TOLD BY THE GRIOT')}</p>
         <h1 className="mt-2 font-display text-3xl font-bold text-ivory md:text-4xl">{tile.title}</h1>
+        <PresenteParSponsor type={type} slug={tile.slug} format="ecoute" className="mx-auto mt-5 max-w-xl text-left" />
 
         <audio
           ref={audio}

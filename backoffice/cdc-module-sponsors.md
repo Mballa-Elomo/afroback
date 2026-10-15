@@ -74,3 +74,20 @@ Règles d'affichage :
 - Étape 2 (affichage dans l'app et le site, mesure des affichages et des clics) : à faire.
 - Étape 2 faite (2026-10-15) : site et app web en ligne (bannière d'accueil sous la rangée « Gratuit sur AFROBACK », « Présenté par » sous les actions de la fiche, carte de fin de vidéo, page `/partenaires` liée dans le pied de page du site et le profil de l'app). Mesure des affichages et clics vérifiée en ligne. App téléphone : dans la prochaine version.
 - Sponsor de test « Partenaire Test AFROBACK » (ex « Orange Cameroun (TEST) », renommé pour ne pas afficher de faux partenariat) actif pour les tests : à suspendre puis supprimer (ses statistiques de test empêchent la suppression depuis le back-office ; Jarvis peut le supprimer en base).
+
+## 9. Ciblage par format et par chapitre (2026-10-15)
+
+Demande de Yannick : pouvoir sponsoriser un format (lecture, écoute, vidéo) ou une vidéo précise.
+
+| Emplacement | Ciblage possible | Où il s'affiche |
+|---|---|---|
+| « Présenté par » | Fiche (tous formats) — comportement d'origine | Fiche du contenu |
+| « Présenté par » | Lecture, + chapitre facultatif | En tête du lecteur de récit (site, app) ; fiche Découverte |
+| « Présenté par » | Écoute | Lecteur audio (site, app) |
+| « Présenté par » | Vidéo, + chapitre facultatif | Sous la vidéo (site, app) ; seulement quand le chapitre ciblé est à l'écran |
+| Fin de vidéo | Contenu + chapitre facultatif | À la fin de ce chapitre (le plus précis l'emporte) |
+
+- Pas de chapitre pour un mythe (une seule vidéo) ni pour un lieu Découverte.
+- Statistiques séparées par emplacement : chaque format ou chapitre vendu a son propre bilan.
+- Script : `schema-sponsors-ciblage.sql` (colonnes `cible_format`, `cible_chapitre`, lecture publique mise à jour). Sans lui, tout fonctionne comme avant ; seul le ciblage fin est refusé, avec un message.
+- En ligne : back-office, site, app web. App téléphone : prochaine version.

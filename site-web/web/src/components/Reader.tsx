@@ -1,5 +1,6 @@
 'use client';
 
+import { PresenteParSponsor } from './Sponsor';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ContentType, Detail, Tile } from '@/lib/types';
@@ -122,6 +123,7 @@ export function Reader({ type, tile, detail: initial, initialChapter }: { type: 
             {tr('CHAPITRE', 'CHAPTER')} {index + 1} / {chapters.length}
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold leading-tight text-heading md:text-4xl">{chap.titre}</h1>
+          <PresenteParSponsor type={type} slug={tile.slug} format="lecture" chapitre={index + 1} className="mt-6" />
           <div className="mt-8 whitespace-pre-line text-[19px] leading-[1.85] text-text">{chap.texte}</div>
           {index === chapters.length - 1 && <QuizEndCard type={type} slug={tile.slug} className="mt-12" />}
 

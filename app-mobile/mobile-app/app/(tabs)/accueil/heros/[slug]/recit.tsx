@@ -20,6 +20,7 @@ import { colors, spacing, typography } from '../../../../../src/theme/tokens';
 import { LockedDetailScreen } from '../../../../../src/access/Access';
 import { currentLanguage, useI18n } from '../../../../../src/i18n';
 import { QuizEndCard } from '../../../../../src/quiz/QuizUI';
+import { PresenteParSponsor } from '../../../../../src/sponsors/Sponsor';
 
 type Langue = 'fr' | 'en';
 type TailleTexte = 'S' | 'M' | 'L';
@@ -206,6 +207,7 @@ export default function LecteurDeRecitScreen() {
         <Text style={styles.chapitreTitre}>
           {t('reader.chapterTitle', { n: chapitreActuel.numero, total: NB_CHAPITRES, titre: chapitreActuel.titre })}
         </Text>
+        <PresenteParSponsor type="heros" slug={heros.slug} format="lecture" chapitre={chapitreActuel.numero} style={{ marginBottom: 16 }} />
 
         <Text style={[styles.body, { fontSize: bodySize, lineHeight: bodyLineHeight }]}>
           <Text style={styles.dropCap}>{dropCap}</Text>

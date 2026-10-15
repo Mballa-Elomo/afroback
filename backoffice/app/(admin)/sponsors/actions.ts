@@ -29,6 +29,10 @@ export interface SaisieEmplacement {
   cible: string; // « heros:slug », « mythe:slug », « decouverte:slug » ou '' (tous)
   accroche_fr: string;
   accroche_en: string;
+  /** « Présenté par » : '' = fiche, ou lecture / ecoute / video. */
+  cible_format?: string;
+  /** '' = tous les chapitres, sinon le numéro. */
+  cible_chapitre?: string;
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -149,10 +153,38 @@ export async function enregistrerEmplacement(sponsorId: string, id: string | nul
     cible_slug = slug;
   }
   if (regle === 'obligatoire' && !cible_slug) return { ok: false, message: 'Choisissez le contenu présenté par ce sponsor.' };
-  const valeurs = { sponsor_id: sponsorId, format, cible_type, cible_slug, accroche_fr: t(saisie.accroche_fr, 160) || null, accroche_en: t(saisie.accroche_en, 160) || null };
+  // Ciblage fin (schema-sponsors-ciblage.sql) : format pour « Présenté par », chapitre pour la lecture, la vidéo et la fin de vidéo.
+  const cibleFormat = format === 'presente_par' && ['lecture', 'ecoute', 'video'].includes(String(saisie.cible_format)) ? String(saisie.cible_format) : null;
+  const chapitreBrut = String(saisie.cible_chapitre ?? '').trim();
+  const chapitreAutorise = cible_slug && ((format === 'presente_par' && (cibleFormat === 'lecture' || cibleFormat === 'video')) || format === 'fin_video');
+  let cibleChapitre: number | null = null;
+  if (chapitreBrut && chapitreAutorise) {
+    cibleChapitre = Number(chapitreBrut);
+    if (!Number.isInteger(cibleChapitre) || cibleChapitre < 1 || cibleChapitre > 20) return { ok: false, message: 'Chapitre invalide.' };
+  }
+  const valeurs: Record<string, unknown> = { sponsor_id: sponsorId, format, cible_type, cible_slug, accroche_fr: t(saisie.accroche_fr, 160) || null, accroche_en: t(saisie.accroche_en, 160) || null };
+  // N'écrire ces colonnes que si elles servent (le module reste utilisable avant le script SQL).
+  if (cibleFormat || cibleChapitre || id) {
+    valeurs.cible_format = cibleFormat;
+    valeurs.cible_chapitre = cibleChapitre;
+  }
   const supabase = getSupabaseAdmin();
   const { error } = id ? await supabase.from('sponsor_emplacements').update(valeurs).eq('id', id).eq('sponsor_id', sponsorId) : await supabase.from('sponsor_emplacements').insert(valeurs);
-  if (error) return { ok: false, message: `Échec : ${error.message}` };
+  if (error) {
+    if (/cible_format|cible_chapitre/.test(error.message)) {
+      if (!cibleFormat && !cibleChapitre && id) {
+        // Script de ciblage pas encore exécuté : on réessaie sans ces colonnes.
+        delete valeurs.cible_format;
+        delete valeurs.cible_chapitre;
+        const r = await supabase.from('sponsor_emplacements').update(valeurs).eq('id', id).eq('sponsor_id', sponsorId);
+        if (r.error) return { ok: false, message: `Échec : ${r.error.message}` };
+      } else {
+        return { ok: false, message: 'Exécutez d’abord schema-sponsors-ciblage.sql dans Supabase pour cibler un format ou un chapitre.' };
+      }
+    } else {
+      return { ok: false, message: `Échec : ${error.message}` };
+    }
+  }
   await logActivity(admin.email, `Sponsors : emplacement ${FORMATS[format].label} ${id ? 'modifié' : 'ajouté'}${cible_slug ? ` (${cible_type}/${cible_slug})` : ''}`);
   fini(`/sponsors/${sponsorId}`);
   return { ok: true, message: id ? 'Emplacement modifié.' : 'Emplacement ajouté.' };

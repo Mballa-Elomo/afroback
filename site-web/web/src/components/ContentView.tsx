@@ -127,6 +127,8 @@ export function ContentView({ tile, detail: initial, loading, compact }: { tile:
         </div>
         {/* Sponsor « Présenté par » (cdc-module-sponsors.md), juste sous les actions. */}
         <PresenteParSponsor type={tile.type} slug={tile.slug} className="mt-5 max-w-xl bg-ink/60 backdrop-blur" />
+        {/* Découverte : la fiche est aussi la lecture ; sponsor ciblé « lecture ». */}
+        {tile.type === 'decouverte' && <PresenteParSponsor type="decouverte" slug={tile.slug} format="lecture" className="mt-3 max-w-xl bg-ink/60 backdrop-blur" />}
       </Header>
 
       {/* Onglets */}

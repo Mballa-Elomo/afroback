@@ -78,11 +78,35 @@ export function BanniereSponsor({ className = '' }: { className?: string }) {
   );
 }
 
-/** « Présenté par » sur la fiche d'un contenu. */
-export function PresenteParSponsor({ type, slug, className = '' }: { type: ContentType; slug: string; className?: string }) {
+/**
+ * « Présenté par » : sur la fiche (`format` absent, emplacements sans format
+ * ciblé), ou dans la lecture, l'écoute ou la vidéo d'un contenu, éventuellement
+ * pour un seul chapitre (schema-sponsors-ciblage.sql). Le ciblage le plus
+ * précis (chapitre) l'emporte.
+ */
+export function PresenteParSponsor({
+  type,
+  slug,
+  format,
+  chapitre,
+  className = '',
+}: {
+  type: ContentType;
+  slug: string;
+  format?: 'lecture' | 'ecoute' | 'video';
+  chapitre?: number;
+  className?: string;
+}) {
   const { lang, tr } = useLang();
   const liste = useSponsors();
-  const e = liste.find((x) => x.format === 'presente_par' && x.cible_type === type && x.cible_slug === slug);
+  const candidats = liste.filter(
+    (x) =>
+      x.format === 'presente_par' &&
+      x.cible_type === type &&
+      x.cible_slug === slug &&
+      (format ? x.cible_format === format && (!x.cible_chapitre || x.cible_chapitre === chapitre) : !x.cible_format)
+  );
+  const e = candidats.find((x) => x.cible_chapitre) ?? candidats[0];
   const ref = useVisible(e?.emplacement_id);
   if (!e) return null;
   const accroche = (lang === 'en' ? e.accroche_en || e.accroche_fr : e.accroche_fr || e.accroche_en) || tr('Cette histoire vous est offerte par', 'This story is brought to you by');
@@ -101,12 +125,13 @@ export function PresenteParSponsor({ type, slug, className = '' }: { type: Conte
   );
 }
 
-/** Carte de fin de vidéo : sponsor du contenu, sinon sponsor de toutes les vidéos. */
-export function FinVideoSponsor({ type, slug, className = '' }: { type: ContentType; slug: string; className?: string }) {
+/** Carte de fin de vidéo : sponsor du chapitre, sinon du contenu, sinon de toutes les vidéos. */
+export function FinVideoSponsor({ type, slug, chapitre, className = '' }: { type: ContentType; slug: string; chapitre?: number; className?: string }) {
   const { lang, tr } = useLang();
   const liste = useSponsors();
   const fins = liste.filter((x) => x.format === 'fin_video');
-  const e = fins.find((x) => x.cible_type === type && x.cible_slug === slug) ?? fins.find((x) => !x.cible_slug);
+  const duContenu = fins.filter((x) => x.cible_type === type && x.cible_slug === slug && (!x.cible_chapitre || x.cible_chapitre === chapitre));
+  const e = duContenu.find((x) => x.cible_chapitre) ?? duContenu[0] ?? fins.find((x) => !x.cible_slug);
   const ref = useVisible(e?.emplacement_id);
   if (!e) return null;
   const accroche = (lang === 'en' ? e.accroche_en || e.accroche_fr : e.accroche_fr || e.accroche_en) || tr('Avec le soutien de', 'With the support of');

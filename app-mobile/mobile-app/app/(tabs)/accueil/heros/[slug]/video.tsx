@@ -17,7 +17,7 @@ import { useI18n } from '../../../../../src/i18n';
 import { QuizTile } from '../../../../../src/quiz/QuizUI';
 import { CommentsSection } from '../../../../../src/comments/CommentsSection';
 import { Icon } from '../../../../../src/components/Icons';
-import { FinVideoSponsor } from '../../../../../src/sponsors/Sponsor';
+import { FinVideoSponsor, PresenteParSponsor } from '../../../../../src/sponsors/Sponsor';
 
 /**
  * Lecteur vidéo plein écran. Dès qu'une URL de documentaire existe
@@ -135,7 +135,8 @@ function LecteurVideoScreen() {
         ) : selectedVideoChapitre ? (
           <>
             <VideoChapitrePlayerArea heroId={heros.id} chapitre={selectedVideoChapitre} />
-            <FinVideoSponsor type="heros" slug={heros.slug} style={{ marginHorizontal: 16, marginTop: 12 }} />
+            <PresenteParSponsor type="heros" slug={heros.slug} format="video" chapitre={selectedVideoChapitre.numero} style={{ marginHorizontal: 16, marginTop: 12 }} />
+            <FinVideoSponsor type="heros" slug={heros.slug} chapitre={selectedVideoChapitre.numero} style={{ marginHorizontal: 16, marginTop: 12 }} />
           </>
         ) : selectedStoryboard && selectedStoryboard.planches.length > 0 ? (
           <>

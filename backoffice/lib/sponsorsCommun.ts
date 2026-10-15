@@ -33,10 +33,22 @@ export interface Emplacement {
   format: Format;
   cible_type: 'heros' | 'mythe' | 'decouverte' | null;
   cible_slug: string | null;
+  /** « Présenté par » : null = fiche (tous formats), sinon lecture / écoute / vidéo (schema-sponsors-ciblage.sql). */
+  cible_format?: CibleFormat | null;
+  /** Chapitre visé (lecture, vidéo, fin de vidéo) ; null = tous les chapitres. */
+  cible_chapitre?: number | null;
   accroche_fr: string | null;
   accroche_en: string | null;
   actif: boolean;
 }
+
+export type CibleFormat = 'lecture' | 'ecoute' | 'video';
+
+export const FORMATS_CIBLES: Record<CibleFormat, string> = {
+  lecture: 'Lecture du récit',
+  ecoute: 'Écoute (audio)',
+  video: 'Vidéo',
+};
 
 export interface Stat {
   emplacement_id: string;

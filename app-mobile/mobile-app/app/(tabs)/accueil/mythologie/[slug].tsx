@@ -151,6 +151,7 @@ export default function MytheDetailScreen() {
 
           {onglet === 'lire' && chapitreActuel && (
             <>
+              <PresenteParSponsor type="mythe" slug={mythe.slug} format="lecture" chapitre={chapitreActuel.numero} style={{ marginBottom: 14 }} />
               <View style={styles.readerHeader}>
                 <Text style={styles.readerPageNum}>{t('myth.chapter', { n: chapitreActuel.numero, total: chapitres.length })}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -222,7 +223,12 @@ export default function MytheDetailScreen() {
             </>
           )}
 
-          {onglet === 'ecouter' && <EcouterTab mythe={mythe} />}
+          {onglet === 'ecouter' && (
+            <>
+              <PresenteParSponsor type="mythe" slug={mythe.slug} format="ecoute" style={{ marginBottom: 14 }} />
+              <EcouterTab mythe={mythe} />
+            </>
+          )}
           {onglet === 'regarder' && <RegarderTab mythe={mythe} />}
           <View onLayout={(e) => (commentsY.current = e.nativeEvent.layout.y)}>
             <CommentsSection type="mythe" slug={mythe.slug} />
@@ -345,6 +351,7 @@ function RegarderTab({ mythe }: { mythe: Mythe }) {
       {uri ? (
         <>
           <LecteurVideo key={uri} uri={uri} style={styles.mytheVideoArea} />
+          <PresenteParSponsor type="mythe" slug={mythe.slug} format="video" style={{ marginTop: 12 }} />
           <FinVideoSponsor type="mythe" slug={mythe.slug} style={{ marginTop: 12 }} />
           {codes.length > 1 && (
             <View style={[styles.langToggle, { justifyContent: 'center', marginTop: 10 }]}>

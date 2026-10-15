@@ -17,6 +17,10 @@ export interface EmplacementSponsor {
   format: FormatSponsor;
   cible_type: 'heros' | 'mythe' | 'decouverte' | null;
   cible_slug: string | null;
+  /** « Présenté par » : null = fiche ; sinon lecture / écoute / vidéo uniquement. */
+  cible_format?: 'lecture' | 'ecoute' | 'video' | null;
+  /** Chapitre visé ; null = tous. */
+  cible_chapitre?: number | null;
   accroche_fr: string | null;
   accroche_en: string | null;
   sponsor: {

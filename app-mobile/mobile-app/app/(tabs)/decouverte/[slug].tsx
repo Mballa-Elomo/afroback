@@ -174,6 +174,7 @@ export default function DecouverteDetailScreen() {
           <PresenteParSponsor type="decouverte" slug={item.slug} style={{ marginBottom: 14 }} />
           <Text style={styles.subtitle}>{item.sous_titre}</Text>
 
+          <PresenteParSponsor type="decouverte" slug={item.slug} format="lecture" style={{ marginBottom: 12 }} />
           <View style={styles.sectionHeaderRow}>
             <SectionTitle title={t('discoveryItem.detail')} />
             {hasEnglish && (
@@ -201,6 +202,7 @@ export default function DecouverteDetailScreen() {
               ) : (
                 <>
                   <DecouverteVideoPlayer itemId={item.id} videos={item.videos} />
+                  <PresenteParSponsor type="decouverte" slug={item.slug} format="video" style={{ marginTop: 12 }} />
                   <FinVideoSponsor type="decouverte" slug={item.slug} style={{ marginTop: 12 }} />
                 </>
               )}

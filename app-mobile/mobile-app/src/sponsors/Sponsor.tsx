@@ -19,6 +19,10 @@ export interface EmplacementSponsor {
   format: Format;
   cible_type: TypeContenu | null;
   cible_slug: string | null;
+  /** « Présenté par » : null = fiche ; sinon lecture / écoute / vidéo uniquement (schema-sponsors-ciblage.sql). */
+  cible_format?: 'lecture' | 'ecoute' | 'video' | null;
+  /** Chapitre visé ; null = tous. */
+  cible_chapitre?: number | null;
   accroche_fr: string | null;
   accroche_en: string | null;
   sponsor: { id: string; nom: string; logo_url: string | null; site_url: string | null; description_fr: string | null; description_en: string | null };
@@ -105,11 +109,34 @@ export function BanniereSponsor({ style }: { style?: StyleProp<ViewStyle> }) {
   );
 }
 
-/** « Présenté par » sur la fiche d'un contenu. */
-export function PresenteParSponsor({ type, slug, style }: { type: TypeContenu; slug: string; style?: StyleProp<ViewStyle> }) {
+/**
+ * « Présenté par » : sur la fiche (`format` absent), ou dans la lecture,
+ * l'écoute ou la vidéo d'un contenu, éventuellement pour un seul chapitre.
+ * Le ciblage le plus précis (chapitre) l'emporte.
+ */
+export function PresenteParSponsor({
+  type,
+  slug,
+  format,
+  chapitre,
+  style,
+}: {
+  type: TypeContenu;
+  slug: string;
+  format?: 'lecture' | 'ecoute' | 'video';
+  chapitre?: number;
+  style?: StyleProp<ViewStyle>;
+}) {
   const { lang } = useI18n();
   const liste = useSponsors();
-  const e = liste.find((x) => x.format === 'presente_par' && x.cible_type === type && x.cible_slug === slug);
+  const candidats = liste.filter(
+    (x) =>
+      x.format === 'presente_par' &&
+      x.cible_type === type &&
+      x.cible_slug === slug &&
+      (format ? x.cible_format === format && (!x.cible_chapitre || x.cible_chapitre === chapitre) : !x.cible_format)
+  );
+  const e = candidats.find((x) => x.cible_chapitre) ?? candidats[0];
   useAffichage(e);
   if (!e) return null;
   return (
@@ -125,11 +152,12 @@ export function PresenteParSponsor({ type, slug, style }: { type: TypeContenu; s
 }
 
 /** Carte « Avec le soutien de », sous le lecteur vidéo (sponsor du contenu, sinon de toutes les vidéos). */
-export function FinVideoSponsor({ type, slug, style }: { type: TypeContenu; slug: string; style?: StyleProp<ViewStyle> }) {
+export function FinVideoSponsor({ type, slug, chapitre, style }: { type: TypeContenu; slug: string; chapitre?: number; style?: StyleProp<ViewStyle> }) {
   const { lang } = useI18n();
   const liste = useSponsors();
   const fins = liste.filter((x) => x.format === 'fin_video');
-  const e = fins.find((x) => x.cible_type === type && x.cible_slug === slug) ?? fins.find((x) => !x.cible_slug);
+  const duContenu = fins.filter((x) => x.cible_type === type && x.cible_slug === slug && (!x.cible_chapitre || x.cible_chapitre === chapitre));
+  const e = duContenu.find((x) => x.cible_chapitre) ?? duContenu[0] ?? fins.find((x) => !x.cible_slug);
   useAffichage(e);
   if (!e) return null;
   return (

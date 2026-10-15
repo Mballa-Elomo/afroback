@@ -2,7 +2,7 @@
 
 import { analyserLienVideo, miniature } from '@/lib/lienVideo';
 import { pageLecteur } from '@/lib/pageLecteur';
-import { FinVideoSponsor } from '@/components/Sponsor';
+import { FinVideoSponsor, PresenteParSponsor } from '@/components/Sponsor';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ContentType, Detail, Tile } from '@/lib/types';
@@ -313,6 +313,7 @@ export function WatchPlayer({
               {tile.title}
               {playlist.length > 1 ? ` · ${tr('Chapitre', 'Chapter')} ${chap.numero} : ${chap.titre}` : ''}
             </h1>
+            <PresenteParSponsor type={type} slug={tile.slug} format="video" chapitre={chap.numero} />
 
             {/* Ligne « chaîne », comme sous une vidéo YouTube */}
             <Link href={base} className="flex w-fit items-center gap-3">
@@ -345,7 +346,7 @@ export function WatchPlayer({
               </div>
             </details>
 
-            {(ended || countdown !== null) && <FinVideoSponsor type={type} slug={tile.slug} />}
+            {(ended || countdown !== null) && <FinVideoSponsor type={type} slug={tile.slug} chapitre={chap.numero} />}
 
             {withQuiz && (ended && !next ? <QuizEndCard type={type} slug={tile.slug} /> : <QuizTile type={type} slug={tile.slug} />)}
 

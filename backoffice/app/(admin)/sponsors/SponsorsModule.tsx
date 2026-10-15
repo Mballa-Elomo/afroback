@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { FORMATS, statutSponsor, type CibleContenu, type Emplacement, type Format, type Sponsor, type Stat, type StatutSponsor } from '@/lib/sponsorsCommun';
+import { FORMATS, FORMATS_CIBLES, statutSponsor, type CibleContenu, type CibleFormat, type Emplacement, type Format, type Sponsor, type Stat, type StatutSponsor } from '@/lib/sponsorsCommun';
 import { dateCourte, fcfa } from '@/lib/utilisateursFormat';
 import { Icone } from '@/components/Icone';
 import * as A from './actions';
@@ -372,7 +372,10 @@ function Logo({ sponsor, enAttente, choisirEnAttente }: { sponsor: Sponsor | nul
 function libelleCible(e: Emplacement, cibles: CibleContenu[]) {
   if (!e.cible_slug) return FORMATS[e.format].cible === 'facultative' ? 'Tous les contenus' : '';
   const c = cibles.find((x) => x.type === e.cible_type && x.slug === e.cible_slug);
-  return `${e.cible_type === 'heros' ? 'Héros' : e.cible_type === 'mythe' ? 'Mythe' : 'Découverte'} · ${c?.titre ?? e.cible_slug}`;
+  const morceaux = [`${e.cible_type === 'heros' ? 'Héros' : e.cible_type === 'mythe' ? 'Mythe' : 'Découverte'} · ${c?.titre ?? e.cible_slug}`];
+  if (e.format === 'presente_par') morceaux.push(e.cible_format ? FORMATS_CIBLES[e.cible_format] : 'fiche (tous formats)');
+  if (e.cible_chapitre) morceaux.push(`chapitre ${e.cible_chapitre}`);
+  return morceaux.join(' · ');
 }
 
 function Emplacements({
@@ -443,8 +446,14 @@ function FormEmplacement({ e, cibles, enCours, annuler, valider }: { e?: Emplace
     cible: e?.cible_slug ? `${e.cible_type}:${e.cible_slug}` : '',
     accroche_fr: e?.accroche_fr ?? '',
     accroche_en: e?.accroche_en ?? '',
+    cible_format: e?.cible_format ?? '',
+    cible_chapitre: e?.cible_chapitre ? String(e.cible_chapitre) : '',
   });
   const regle = FORMATS[v.format].cible;
+  // Chapitre : pour la lecture ou la vidéo d'un contenu, et pour la fin de vidéo d'un contenu choisi (pas pour un mythe, qui n'a qu'une vidéo).
+  const estMythe = v.cible.startsWith('mythe:');
+  const avecChapitre =
+    !!v.cible && !v.cible.startsWith('decouverte:') && ((v.format === 'presente_par' && (v.cible_format === 'lecture' || (v.cible_format === 'video' && !estMythe))) || (v.format === 'fin_video' && !estMythe));
   return (
     <form
       className={`${s.emplacementForm} ${u.formulaire}`}
@@ -476,6 +485,32 @@ function FormEmplacement({ e, cibles, enCours, annuler, valider }: { e?: Emplace
                     </option>
                   ))}
               </optgroup>
+            ))}
+          </select>
+        </label>
+      )}
+      {v.format === 'presente_par' && (
+        <label>
+          Où s’affiche le sponsor
+          <select value={v.cible_format} onChange={(ev) => setV({ ...v, cible_format: ev.target.value, cible_chapitre: '' })}>
+            <option value="">Fiche du contenu (tous formats)</option>
+            {(Object.keys(FORMATS_CIBLES) as CibleFormat[]).map((k) => (
+              <option key={k} value={k}>
+                {FORMATS_CIBLES[k]} uniquement
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {avecChapitre && (
+        <label>
+          Chapitre
+          <select value={v.cible_chapitre} onChange={(ev) => setV({ ...v, cible_chapitre: ev.target.value })}>
+            <option value="">Tous les chapitres</option>
+            {[1, 2, 3, 4].map((n) => (
+              <option key={n} value={String(n)}>
+                Chapitre {n}
+              </option>
             ))}
           </select>
         </label>

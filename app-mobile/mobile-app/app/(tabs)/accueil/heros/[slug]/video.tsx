@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LecteurVideo } from '@/src/video/LecteurVideo';
+import { LecteurVideo } from '../../../../../src/video/LecteurVideo';
 import { ErrorState, LoadingState } from '../../../../../src/components/LoadingState';
 import { GhostButton, OutlineButton } from '../../../../../src/components/Buttons';
 import { HeroPlaceholder } from '../../../../../src/components/HeroVisual';

@@ -1,0 +1,233 @@
+/* Module Communauté : compléments au style du module Utilisateurs. */
+
+.bandeau {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(230, 168, 92, 0.45);
+  background: rgba(230, 168, 92, 0.1);
+  color: #f3d3a8;
+  font-size: 13.5px;
+}
+.bandeau code {
+  color: #f0c36b;
+}
+.badgeRouge {
+  background: #e07a5f;
+  color: #1a1109;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 7px;
+}
+
+.file {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.signalement {
+  margin-bottom: 0;
+  border-color: rgba(224, 122, 95, 0.3);
+}
+.signalementTete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.typeCible {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f0c36b;
+}
+.signaleurs {
+  font-weight: 800;
+  font-size: 12.5px;
+  color: #f0b4a3;
+  background: rgba(224, 122, 95, 0.15);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.motif {
+  font-size: 12px;
+  color: #c9b8a4;
+  border: 1px solid rgba(240, 195, 107, 0.18);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+.date {
+  margin-left: auto;
+  font-size: 12px;
+  color: #8c7b67;
+}
+.citation {
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-left: 3px solid #f0c36b;
+  border-radius: 0 12px 12px 0;
+  background: rgba(255, 240, 210, 0.03);
+}
+.citation p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #f7e7c8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.image {
+  display: block;
+  max-width: 260px;
+  max-height: 200px;
+  margin-top: 10px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(240, 195, 107, 0.15);
+}
+.auteur {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+.auteur strong {
+  color: #f7e7c8;
+  margin-right: 6px;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5d38a, #a0522d);
+  color: #1a1109;
+  font-weight: 800;
+  font-size: 12px;
+}
+.descriptions {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: #c9b8a4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.post {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(240, 195, 107, 0.12);
+  background: rgba(255, 240, 210, 0.02);
+}
+.postTete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.postTexte {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #ede3d4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.postPied {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.commentaires {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0 0 0 16px;
+  border-left: 2px solid rgba(240, 195, 107, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.alerte {
+  color: #e07a5f;
+  font-weight: 800;
+}
+
+.grille2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.grille2 > * {
+  margin-bottom: 0;
+}
+.ajout {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.ajout input {
+  flex: 1;
+  min-width: 0;
+  background: #1b130c;
+  border: 1px solid rgba(240, 195, 107, 0.28);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #ede3d4;
+  font: inherit;
+  font-size: 13.5px;
+}
+.termes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.terme {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(224, 122, 95, 0.35);
+  background: rgba(224, 122, 95, 0.08);
+  font-size: 12.5px;
+  color: #f0b4a3;
+}
+.terme button {
+  border: none;
+  background: none;
+  color: #e07a5f;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .grille2 {
+    grid-template-columns: 1fr;
+  }
+}

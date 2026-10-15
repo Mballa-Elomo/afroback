@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { colors, fonts } from '@/lib/theme';
 import { LANGUES_VIDEO } from '@/lib/langues';
 import { MythologieMediaSlot } from './MythologieMediaSlot';
-import { MythologieChapterVideoGrid } from './MythologieChapterVideoGrid';
+import { LienVideoCellule } from './LienVideoCellule';
+import { definirLienVideoChapitre } from '@/lib/actionsLienVideo';
+import { removeMytheChapterVideo } from '@/app/(admin)/mythologie/[slug]/actions';
 import { MytheChapitreDrawer } from './MytheChapitreDrawer';
 import { StatusBadge } from './StatusBadge';
 import type { MytheChapitre } from '@/lib/data/mythologie';
@@ -79,15 +81,15 @@ export function MythologieLanguageContent({
         </div>
 
         <div>
-          <div style={sectionTitleStyle}>VIDÉO PAR CHAPITRE</div>
-          <MythologieChapterVideoGrid
-            slug={slug}
-            videoChapitres={videoChapitres}
-            engagementRows={videoEngagementRows}
-            chapitresTitresFr={chapitresTitresFr}
-            chapitresTitresEn={chapitresTitresEn}
-            lang={active}
+          {/* Un mythe a UNE seule vidéo par langue, sans chapitres (décision du 2026-10-12).
+              En base : premier élément de video_chapitres (numéro 1), comme pour les héros. */}
+          <div style={sectionTitleStyle}>VIDÉO DU MYTHE</div>
+          <LienVideoCellule
             label={activeLabel}
+            url={(videoChapitres.find((c) => c.videos?.[active]) ?? videoChapitres[0])?.videos?.[active]}
+            visionnages={videoEngagementRows.filter((r) => r.langue === active).reduce((n, r) => n + r.visionnages, 0)}
+            enregistrer={(lien) => definirLienVideoChapitre('mythe', slug, videoChapitres.find((c) => c.videos?.[active])?.numero ?? 1, active, lien)}
+            retirer={() => removeMytheChapterVideo(slug, videoChapitres.find((c) => c.videos?.[active])?.numero ?? 1, active)}
           />
         </div>
 

@@ -1,5 +1,7 @@
 'use client';
 
+import { analyserLienVideo, miniature } from '@/lib/lienVideo';
+import { pageLecteur } from '@/lib/pageLecteur';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ContentType, Detail, Tile } from '@/lib/types';
@@ -76,6 +78,21 @@ export function WatchPlayer({
     return () => clearTimeout(t);
   }, [countdown]);
 
+  // Lecteur AFROBACK des vidéos YouTube / Vimeo (src/lib/pageLecteur.ts) : il prévient
+  // de la fin de la vidéo, ce qui enchaîne le chapitre suivant comme avec un fichier.
+  const cadreRef = useRef<HTMLIFrameElement>(null);
+  useEffect(() => {
+    const onMessage = (ev: MessageEvent) => {
+      if (!cadreRef.current || ev.source !== cadreRef.current.contentWindow) return;
+      const m = ev.data as { afroback?: string; type?: string } | null;
+      if (m?.afroback !== 'lecteur' || m.type !== 'fin') return;
+      if (index + 1 < chapters.length) setCountdown(5);
+      else setEnded(true);
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [index, chapters.length]);
+
   if (detail?.verrouille) return <Locked tile={tile} apercu={(lang === 'en' && detail.apercu_en) || detail.apercu_fr} base={base} />;
   if (chapters.length === 0) return <p className="px-4 pt-32 text-center text-body">{tr("La vidéo de ce récit n'est pas encore disponible.", 'The video of this story is not available yet.')}</p>;
 
@@ -87,7 +104,8 @@ export function WatchPlayer({
   const withQuiz = type === 'heros' || type === 'mythe';
 
   // Playlist : tous les chapitres du récit (pas seulement ceux déjà tournés), comme une playlist YouTube.
-  const source = recit.length > 0 ? recit.map((c) => ({ numero: c.numero, titre: c.titre })) : chapters.map((c) => ({ numero: c.numero, titre: c.titre }));
+  // Un mythe n'a qu'une vidéo : pas de playlist de chapitres.
+  const source = recit.length > 0 && type !== 'mythe' ? recit.map((c) => ({ numero: c.numero, titre: c.titre })) : chapters.map((c) => ({ numero: c.numero, titre: c.titre }));
   const playlist = source.map((c) => ({
     numero: c.numero,
     titre: chapters.find((v) => v.numero === c.numero)?.titre || c.titre || `${tr('Chapitre', 'Chapter')} ${c.numero}`,
@@ -100,6 +118,11 @@ export function WatchPlayer({
     setIndex(i);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Vidéo par lien YouTube / Vimeo (2026-10-11) : lecteur intégré, lancé au clic.
+  const lienChap = analyserLienVideo(chap.src);
+  const integration = lienChap && lienChap.type !== 'fichier' ? lienChap : null;
+  const vignette = lienChap ? miniature(lienChap) : null;
 
   const onPlay = () => {
     setStartedSrc(chap.src);
@@ -205,6 +228,37 @@ export function WatchPlayer({
         {/* Colonne principale : lecteur, titre, actions, description, commentaires */}
         <div className="min-w-0">
           <div className="relative aspect-video w-full overflow-hidden bg-black md:rounded-xl">
+            {integration ? (
+              startedSrc === chap.src ? (
+                <iframe
+                  ref={cadreRef}
+                  key={chap.src}
+                  srcDoc={pageLecteur(integration, { origine: window.location.origin, titre: chap.titre, autoplay: true }) ?? ''}
+                  title={chap.titre}
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  className="h-full w-full border-0"
+                />
+              ) : (
+                <>
+                  {(tile.image || vignette) && <img src={tile.image ?? vignette!} alt="" className="h-full w-full object-cover opacity-80" />}
+                  <button
+                    type="button"
+                    onClick={onPlay}
+                    className="group absolute inset-0 grid place-items-center bg-ink/40 focus-visible:outline-2 focus-visible:outline-gold"
+                    aria-label={tr(`Lire la vidéo : ${chap.titre}`, `Play the video: ${chap.titre}`)}
+                  >
+                    <span className="grid h-20 w-20 place-items-center rounded-full bg-gold text-ink shadow-[0_10px_40px_rgba(240,195,107,0.45)] transition group-hover:scale-105 group-active:scale-95">
+                      <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+                      </svg>
+                    </span>
+                  </button>
+                </>
+              )
+            ) : (
+            <>
             <video
               ref={video}
               key={chap.src}
@@ -234,6 +288,8 @@ export function WatchPlayer({
                   </svg>
                 </span>
               </button>
+            )}
+            </>
             )}
             {countdown !== null && next && (
               <div className="absolute bottom-4 right-4 max-w-xs rounded-lg bg-ink/90 p-4 ring-1 ring-gold/30">

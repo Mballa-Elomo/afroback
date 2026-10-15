@@ -5,7 +5,7 @@ import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
-import { LecteurVideo } from '@/src/video/LecteurVideo';
+import { LecteurVideo } from '../../../../src/video/LecteurVideo';
 import { ErrorState, LoadingState } from '../../../../src/components/LoadingState';
 import { useMythe } from '../../../../src/data/useMythologieData';
 import { recordMytheAudioEngagement, recordMytheEngagement, recordMytheVideoChapterEngagement } from '../../../../src/data/engagementRepository';
@@ -221,7 +221,7 @@ export default function MytheDetailScreen() {
           )}
 
           {onglet === 'ecouter' && <EcouterTab mythe={mythe} />}
-          {onglet === 'regarder' && <RegarderTab mythe={mythe} chapitres={chapitres} />}
+          {onglet === 'regarder' && <RegarderTab mythe={mythe} />}
           <View onLayout={(e) => (commentsY.current = e.nativeEvent.layout.y)}>
             <CommentsSection type="mythe" slug={mythe.slug} />
           </View>
@@ -316,53 +316,30 @@ function RealAudioPlayer({ mythe }: { mythe: Mythe }) {
 }
 
 /**
- * Onglet Regarder : vidéo par chapitre × langue, même principe que le
- * lecteur vidéo héros (video.tsx) mais sans repli storyboard (un mythe n'a
- * pas de `chapitres_storyboard`) — un chapitre sans vidéo produite affiche
- * honnêtement "à produire" plutôt qu'un contenu de remplacement inventé.
+ * Onglet Regarder : un mythe a UNE seule vidéo (décision de Yannick le
+ * 2026-10-12), en français et/ou en anglais, sans découpage en chapitres.
+ * En base, elle reste rangée comme premier élément de `video_chapitres`
+ * (même format que les héros, statistiques de visionnage inchangées).
  */
-function RegarderTab({ mythe, chapitres }: { mythe: Mythe; chapitres: { numero: number; titre: string }[] }) {
-  const { t } = useI18n();
-  const [chapIdx, setChapIdx] = useState(0);
-  const chapitreActuel = chapitres[chapIdx];
-  const videoChapitre = chapitreActuel ? mythe.video_chapitres.find((c) => c.numero === chapitreActuel.numero) : undefined;
-  const videos = videoChapitre?.videos ?? {};
-  const codes = Object.keys(videos);
+function RegarderTab({ mythe }: { mythe: Mythe }) {
+  const { t, lang: langueApp } = useI18n();
+  const entree = mythe.video_chapitres.find((c) => Object.keys(c.videos ?? {}).length > 0);
+  const videos = entree?.videos ?? {};
+  const codes = Object.keys(videos).sort((a, b) => (a === langueApp ? -1 : b === langueApp ? 1 : 0));
   const [lang, setLang] = useState<string>(codes[0] ?? '');
   const actualLang = videos[lang] ? lang : (codes[0] ?? '');
   const uri = videos[actualLang] ?? '';
   const loggedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    setLang(codes[0] ?? '');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chapIdx]);
-
-  useEffect(() => {
-    if (!actualLang || !chapitreActuel) return;
-    const key = `${chapitreActuel.numero}-${actualLang}`;
-    if (loggedRef.current.has(key)) return;
-    loggedRef.current.add(key);
-    recordMytheVideoChapterEngagement(mythe.id, chapitreActuel.numero, actualLang);
-  }, [mythe.id, chapitreActuel, actualLang]);
+    if (!actualLang || !entree) return;
+    if (loggedRef.current.has(actualLang)) return;
+    loggedRef.current.add(actualLang);
+    recordMytheVideoChapterEngagement(mythe.id, entree.numero, actualLang);
+  }, [mythe.id, entree, actualLang]);
 
   return (
     <View>
-      {chapitres.length > 1 && (
-        <View style={styles.videoChapterTabs}>
-          {chapitres.map((c, i) => {
-            const tourne = mythe.video_chapitres.some((vc) => vc.numero === c.numero && Object.keys(vc.videos ?? {}).length > 0);
-            return (
-              <Pressable key={c.numero} onPress={() => setChapIdx(i)} style={[styles.videoChapterTab, i === chapIdx && styles.videoChapterTabActive]}>
-                <Text style={[styles.videoChapterTabLabel, i === chapIdx && styles.videoChapterTabLabelActive]}>
-                  {tourne ? '▶' : '○'} {c.numero}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      )}
-
       {uri ? (
         <>
           <LecteurVideo key={uri} uri={uri} style={styles.mytheVideoArea} />
@@ -382,7 +359,7 @@ function RegarderTab({ mythe, chapitres }: { mythe: Mythe; chapitres: { numero: 
             <Icon name="sparkle" size={34} color={colors.accentGoldSoft} />
           </View>
           <Text style={styles.audioMissingText}>
-            {chapitreActuel ? t('myth.chapterNotShot', { n: chapitreActuel.numero }) : t('myth.noVideo')} {t('myth.meanwhile')}
+            {t('myth.noVideo')} {t('myth.meanwhile')}
           </Text>
         </View>
       )}

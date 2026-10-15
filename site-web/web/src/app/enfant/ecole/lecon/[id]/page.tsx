@@ -1,6 +1,8 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { analyserLienVideo } from '@/lib/lienVideo';
+import { pageLecteur } from '@/lib/pageLecteur';
+import { use, useEffect, useState, useSyncExternalStore } from 'react';
 import { KidButton, KidShell, Soon } from '@/components/kids';
 import { heroesList, lecon as getLecon, shortEra, type Lecon } from '@/lib/kids';
 import { loc } from '@/lib/lang';
@@ -92,7 +94,7 @@ export default function LeconPage({ params }: { params: Promise<{ id: string }> 
           ) : (
             <Soon icon="🎧" />
           ))}
-        {format === 'regarder' && (has.regarder ? <video controls controlsList="nodownload noremoteplayback" disablePictureInPicture src={l.video_url!} className="w-full rounded-[28px] bg-black" /> : <Soon icon="🎬" />)}
+        {format === 'regarder' && (has.regarder ? <LeconVideo src={l.video_url!} /> : <Soon icon="🎬" />)}
         {format === 'bd' &&
           (has.bd ? (
             <div className="grid gap-5 md:grid-cols-2">
@@ -116,4 +118,31 @@ export default function LeconPage({ params }: { params: Promise<{ id: string }> 
       </div>
     </KidShell>
   );
+}
+
+/** Vidéo de leçon : lien YouTube / Vimeo (lecteur intégré) ou ancien fichier. */
+function LeconVideo({ src }: { src: string }) {
+  const lien = analyserLienVideo(src);
+  // Origine du site, connue seulement dans le navigateur (vide au rendu serveur).
+  const origine = useSyncExternalStore(
+    () => () => {},
+    () => window.location.origin,
+    () => ''
+  );
+  const integration = lien && lien.type !== 'fichier' && origine ? pageLecteur(lien, { origine, titre: 'Leçon' }) : null;
+  if (lien && lien.type !== 'fichier') {
+    return (
+      <div className="aspect-video w-full overflow-hidden rounded-[28px] bg-black">
+        <iframe
+          srcDoc={integration ?? ''}
+          title="Vidéo de la leçon"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+          className="h-full w-full border-0"
+        />
+      </div>
+    );
+  }
+  return <video controls controlsList="nodownload noremoteplayback" disablePictureInPicture src={src} className="w-full rounded-[28px] bg-black" />;
 }

@@ -38,7 +38,7 @@ function initiales(nom: string) {
   );
 }
 
-export function AdminShell({ admin, replieInitial, children }: { admin: AdminUser; replieInitial: boolean; children: ReactNode }) {
+export function AdminShell({ admin, replieInitial, badges = {}, children }: { admin: AdminUser; replieInitial: boolean; badges?: Record<string, number>; children: ReactNode }) {
   const pathname = usePathname();
   const [replie, setReplie] = useState(replieInitial);
   const [tiroir, setTiroir] = useState(false);
@@ -72,7 +72,7 @@ export function AdminShell({ admin, replieInitial, children }: { admin: AdminUse
       <Suspense fallback={null}>
         <Ambiance />
       </Suspense>
-      <Sidebar admin={admin} pathname={pathname} replie={replie} basculer={basculer} ouvrirPalette={() => setPalette(true)} />
+      <Sidebar admin={admin} pathname={pathname} replie={replie} basculer={basculer} ouvrirPalette={() => setPalette(true)} badges={badges} />
       <div className={s.voileTiroir} onClick={() => setTiroir(false)} />
       <div id="afa-scroll-container" className={s.contenu}>
         <Topbar admin={admin} pathname={pathname} ouvrirTiroir={() => setTiroir(true)} ouvrirPalette={() => setPalette(true)} />
@@ -97,12 +97,14 @@ function Sidebar({
   replie,
   basculer,
   ouvrirPalette,
+  badges,
 }: {
   admin: AdminUser;
   pathname: string;
   replie: boolean;
   basculer: () => void;
   ouvrirPalette: () => void;
+  badges: Record<string, number>;
 }) {
   const actif = itemActif(pathname);
   const navRef = useRef<HTMLElement>(null);
@@ -223,6 +225,11 @@ function Sidebar({
                 >
                   <Icone nom={n.id} />
                   <span className={s.libelle}>{n.label}</span>
+                  {!!badges[n.id] && (
+                    <span className={s.badge} title={`${badges[n.id]} en attente`}>
+                      {badges[n.id]}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -322,7 +329,8 @@ interface Entree {
 }
 
 const ACTIONS: { titre: string; detail: string; icone: string; href: string; mots: string }[] = [
-  { titre: 'Offrir un abonnement', detail: 'Abonnements', icone: 'gift', href: '/abonnements', mots: 'offrir cadeau forfait racines heritage' },
+  { titre: 'Offrir un abonnement', detail: 'Abonnements', icone: 'gift', href: '/paiements?onglet=abonnements', mots: 'offrir cadeau forfait racines heritage abonnement' },
+  { titre: 'Transactions Mobile Money', detail: 'Paiements & revenus', icone: 'revenue', href: '/paiements?onglet=transactions', mots: 'paiement transaction campay echec litige revenus argent' },
   { titre: 'Mode maintenance', detail: 'Paramètres · Général', icone: 'settings', href: '/parametres?section=general', mots: 'maintenance fermer site inscriptions' },
   { titre: 'Moyens de paiement', detail: 'Paramètres · Paiements', icone: 'revenue', href: '/parametres?section=paiements', mots: 'paiement mtn orange prix dons' },
   { titre: 'Sécurité et double authentification', detail: 'Paramètres · Sécurité', icone: 'shield', href: '/parametres?section=securite', mots: 'securite 2fa capture appareil' },

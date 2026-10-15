@@ -56,11 +56,20 @@ export function videosOf(d: Detail | null, type: ContentType, lang: Lang, fallba
     const p = pick((o.videos as Record<string, string>) ?? {});
     return p ? [{ numero: 1, titre: fallbackTitle, ...p }] : [];
   }
+  // Un mythe a UNE seule vidéo (FR et/ou EN), sans chapitres (décision du 2026-10-12) :
+  // en base, c'est le premier élément de video_chapitres qui porte une vidéo.
+  if (type === 'mythe') {
+    const entree = arr<VideoChapitre>(o.video_chapitres).find((c) => Object.keys(c.videos ?? {}).length > 0 || c.video_url_fr || c.video_url_en);
+    const p = entree ? pick(entree.videos ?? {}, entree.video_url_fr, entree.video_url_en) : null;
+    return entree && p ? [{ numero: entree.numero, titre: fallbackTitle, ...p }] : [];
+  }
   const enTitles = lang === 'en' ? arr<RecitChapitre>(o.recit_chapitres_en) : [];
+  // Sans titre vidéo saisi, on reprend le titre du chapitre du récit (FR).
+  const frTitles = arr<RecitChapitre>(o.recit_chapitres_fr);
   return arr<VideoChapitre>(o.video_chapitres)
     .map((c) => {
       const p = pick(c.videos ?? {}, c.video_url_fr, c.video_url_en);
-      const titre = enTitles.find((e) => e.numero === c.numero)?.titre || c.titre_chapitre || `${lang === 'en' ? 'Chapter' : 'Chapitre'} ${c.numero}`;
+      const titre = enTitles.find((e) => e.numero === c.numero)?.titre || c.titre_chapitre || frTitles.find((e) => e.numero === c.numero)?.titre || `${lang === 'en' ? 'Chapter' : 'Chapitre'} ${c.numero}`;
       return p ? { numero: c.numero, titre, ...p } : null;
     })
     .filter((c): c is VideoChapter => c !== null)

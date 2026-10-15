@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { supabase } from './supabaseClient';
 
 export type EngagementEvent = 'recit' | 'video';
@@ -74,7 +75,27 @@ export async function recordAudioEngagement(heroId: string, langue: EngagementLa
  * chapitre × langue est un signal complémentaire, pas un remplacement (voir
  * le commentaire en tête de `schema-engagement-detail.sql`).
  */
+/**
+ * Journal des visionnages par compte (schema-visionnages-comptes.sql,
+ * 2026-10-11) : sert au back-office à repérer un usage anormal (lien
+ * partagé, compte prêté). Sans compte connecté, la fonction ne fait rien.
+ */
+async function journaliserVisionnage(type: 'heros' | 'mythe' | 'decouverte', contenuId: string, chapitre: number | null, langue: string): Promise<void> {
+  try {
+    await supabase.rpc('journaliser_visionnage', {
+      p_type: type,
+      p_contenu_id: contenuId,
+      p_chapitre: chapitre,
+      p_langue: langue,
+      p_plateforme: Platform.OS === 'web' ? 'web' : 'app',
+    });
+  } catch {
+    // Best-effort : un échec ne bloque jamais la lecture.
+  }
+}
+
 export async function recordVideoChapterEngagement(heroId: string, chapitreNumero: number, langue: EngagementLangue): Promise<void> {
+  void journaliserVisionnage('heros', heroId, chapitreNumero, langue);
   try {
     await supabase.rpc('increment_video_chapter_engagement', { p_hero_id: heroId, p_chapitre: chapitreNumero, p_langue: langue });
   } catch {
@@ -97,6 +118,7 @@ export async function recordDecouverteConsultation(itemId: string): Promise<void
 }
 
 export async function recordDecouverteVideoEngagement(itemId: string, langue: EngagementLangue): Promise<void> {
+  void journaliserVisionnage('decouverte', itemId, null, langue);
   try {
     await supabase.rpc('increment_decouverte_video', { p_item_id: itemId, p_langue: langue });
   } catch {
@@ -127,6 +149,7 @@ export async function recordMytheAudioEngagement(mytheId: string, langue: Engage
 }
 
 export async function recordMytheVideoChapterEngagement(mytheId: string, chapitreNumero: number, langue: EngagementLangue): Promise<void> {
+  void journaliserVisionnage('mythe', mytheId, chapitreNumero, langue);
   try {
     await supabase.rpc('increment_mythe_video_chapter_engagement', { p_mythe_id: mytheId, p_chapitre: chapitreNumero, p_langue: langue });
   } catch {

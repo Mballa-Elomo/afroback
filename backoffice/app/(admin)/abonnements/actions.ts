@@ -49,6 +49,7 @@ export async function offrirAbonnement(_prev: ActionState, formData: FormData): 
   }
   await logActivity(admin.email, `Abonnement ${plan} offert à ${email} (${jours === null ? 'sans fin' : `${jours} jours`})`);
   revalidatePath('/abonnements');
+  revalidatePath('/paiements');
   return { ok: true, message: `Abonnement ${plan === 'heritage' ? 'Héritage' : 'Racines'} offert à ${email}.` };
 }
 
@@ -60,6 +61,7 @@ export async function retirerAbonnement(id: string): Promise<void> {
   await supabase.from('subscriptions').update({ status: 'cancelled', ends_at: new Date().toISOString() }).eq('id', id);
   await logActivity(admin.email, `Abonnement ${data?.plan ?? ''} retiré (id ${id})`);
   revalidatePath('/abonnements');
+  revalidatePath('/paiements');
 }
 
 export async function ajouterContenuGratuit(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -78,6 +80,7 @@ export async function ajouterContenuGratuit(_prev: ActionState, formData: FormDa
   if (error) return { ok: false, message: `Échec : ${error.message}` };
   await logActivity(admin.email, `Contenu rendu gratuit : ${type}/${slug}`);
   revalidatePath('/abonnements');
+  revalidatePath('/paiements');
   return { ok: true, message: `"${slug}" est maintenant gratuit.` };
 }
 
@@ -87,4 +90,5 @@ export async function retirerContenuGratuit(type: string, slug: string): Promise
   await getSupabaseAdmin().from('contenus_gratuits').delete().eq('type', type).eq('slug', slug);
   await logActivity(admin.email, `Contenu retiré de la liste gratuite : ${type}/${slug}`);
   revalidatePath('/abonnements');
+  revalidatePath('/paiements');
 }

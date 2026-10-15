@@ -1,29 +1,27 @@
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { urlIntegration, type LienVideo } from './lienVideo';
+import type { LienVideo } from './lienVideo';
+import { pageLecteur } from './pageLecteur';
 
 /**
- * Lecteur YouTube / Vimeo intégré (téléphone). La vidéo est chargée dans une
- * page minimale dont l'origine est le site AFROBACK : YouTube refuse de lire
- * une vidéo intégrée sans origine identifiable. Toute tentative de quitter
- * le lecteur (logo YouTube, vidéos suggérées) est bloquée : on reste dans
- * l'app. Version navigateur : LecteurIntegre.web.tsx.
+ * Lecteur YouTube / Vimeo (téléphone) : le lecteur AFROBACK (pageLecteur.ts)
+ * dans une WebView. L'abonné ne touche jamais l'interface de YouTube/Vimeo
+ * (ni logo, ni « Partager »), donc ne peut pas en récupérer le lien. La page
+ * a pour origine le site AFROBACK : YouTube refuse une vidéo intégrée sans
+ * origine identifiable. Toute navigation hors du lecteur est bloquée.
+ * Version navigateur : LecteurIntegre.web.tsx.
  */
 const ORIGINE = 'https://afroback-web.vercel.app/';
 
-function page(src: string) {
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="referrer" content="strict-origin-when-cross-origin"><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}iframe{position:absolute;inset:0;width:100%;height:100%;border:0}</style></head><body><iframe src="${src}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></body></html>`;
-}
-
-export function LecteurIntegre({ lien, style }: { lien: LienVideo; style?: StyleProp<ViewStyle> }) {
+export function LecteurIntegre({ lien, style, titre }: { lien: LienVideo; style?: StyleProp<ViewStyle>; titre?: string }) {
   const [charge, setCharge] = useState(false);
-  const src = urlIntegration(lien);
-  if (!src) return null;
+  const html = pageLecteur(lien, { origine: ORIGINE, titre });
+  if (!html) return null;
   return (
     <View style={[style, styles.cadre]}>
       <WebView
-        source={{ html: page(src), baseUrl: ORIGINE }}
+        source={{ html, baseUrl: ORIGINE }}
         style={styles.web}
         originWhitelist={['*']}
         allowsFullscreenVideo
@@ -33,6 +31,7 @@ export function LecteurIntegre({ lien, style }: { lien: LienVideo; style?: Style
         domStorageEnabled
         scrollEnabled={false}
         bounces={false}
+        allowsLinkPreview={false}
         setSupportMultipleWindows={false}
         onLoadEnd={() => setCharge(true)}
         onShouldStartLoadWithRequest={(r) => r.isTopFrame === false || r.url.startsWith(ORIGINE) || r.url.startsWith('about:')}

@@ -207,6 +207,9 @@
 .grille2 > .carte {
   margin-bottom: 0;
 }
+.carteLarge {
+  grid-column: 1 / -1;
+}
 
 /* ---------- Chiffres clés ---------- */
 .stats {

@@ -721,6 +721,43 @@ function OngletCommunaute({ fiche, ouvrirBan, enCours, lancer }: { fiche: Fiche;
           <Info label="Score moyen">{fiche.quiz.moyenne === null ? '—' : `${fiche.quiz.moyenne} %`}</Info>
         </div>
       </section>
+
+      <section className={`${styles.carte} ${styles.carteLarge}`}>
+        <div className={styles.carteTete}>
+          <h2 className={styles.carteTitre}>Visionnages vidéo</h2>
+          {fiche.visionnages?.inhabituel && <span className={`${styles.etiquette} ${styles.etiquetteRouge}`}>Activité inhabituelle</span>}
+        </div>
+        {!fiche.visionnages ? (
+          <p className={styles.attention}>Exécutez schema-visionnages-comptes.sql dans Supabase pour suivre les visionnages par compte.</p>
+        ) : fiche.visionnages.total === 0 ? (
+          <p className={styles.discret}>Aucune vidéo regardée depuis la mise en place du suivi.</p>
+        ) : (
+          <>
+            <p className={styles.aide}>
+              {fiche.visionnages.jour} vidéo{fiche.visionnages.jour > 1 ? 's' : ''} sur 24 h · {fiche.visionnages.semaine} sur 7 jours ·{' '}
+              {fiche.visionnages.contenus} contenu{fiche.visionnages.contenus > 1 ? 's' : ''} différent{fiche.visionnages.contenus > 1 ? 's' : ''} ·{' '}
+              {Object.entries(fiche.visionnages.plateformes)
+                .map(([p, n]) => `${n} ${p === 'site' ? 'sur le site' : p === 'web' ? 'sur l’app web' : 'dans l’app'}`)
+                .join(', ')}
+              {fiche.visionnages.inhabituel && ' · Beaucoup de vidéos en peu de temps : compte peut-être partagé.'}
+            </p>
+            <ul className={styles.chrono}>
+              {fiche.visionnages.derniers.map((v, i) => (
+                <li key={i}>
+                  <span>
+                    {v.titre}
+                    {v.chapitre ? ` · chapitre ${v.chapitre}` : ''}
+                    {v.langue ? ` · ${v.langue.toUpperCase()}` : ''}
+                  </span>
+                  <span className={styles.discret}>
+                    {v.plateforme === 'site' ? 'Site' : v.plateforme === 'web' ? 'App web' : 'App'} · {dateHeure(v.le)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
     </div>
   );
 }

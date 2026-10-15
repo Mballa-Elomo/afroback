@@ -39,6 +39,8 @@ export function recordWatchOpen(type: ContentType, id: string) {
 
 /** Lecture d'un chapitre vidéo. */
 export function recordWatchChapter(type: ContentType, id: string, chapitre: number, lang: string) {
+  // Journal par compte (schema-visionnages-comptes.sql), lu dans la fiche utilisateur du back-office.
+  void safe('journaliser_visionnage', { p_type: type, p_contenu_id: id, p_chapitre: type === 'decouverte' ? null : chapitre, p_langue: lang, p_plateforme: 'site' });
   if (type === 'heros') return safe('increment_video_chapter_engagement', { p_hero_id: id, p_chapitre: chapitre, p_langue: lang });
   if (type === 'mythe') return safe('increment_mythe_video_chapter_engagement', { p_mythe_id: id, p_chapitre: chapitre, p_langue: lang });
   return safe('increment_decouverte_video', { p_item_id: id, p_langue: lang });

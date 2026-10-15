@@ -18,6 +18,8 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
+  // Vidéos par lien YouTube / Vimeo (2026-10-11).
+  "frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com",
   `media-src 'self' blob: ${SUPABASE}`,
   `connect-src 'self' ${SUPABASE} ${SUPABASE_WS}`,
   "worker-src 'self' blob:",

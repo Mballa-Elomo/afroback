@@ -6,7 +6,7 @@ import { BackButton, Collapsible } from '../../../src/ui/modern';
 import { Icon } from '../../../src/components/Icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { LecteurVideo } from '@/src/video/LecteurVideo';
+import { LecteurVideo } from '../../../src/video/LecteurVideo';
 import { DecouverteItemRow } from '../../../src/components/DecouverteItemRow';
 import { FaitsList } from '../../../src/components/FaitsList';
 import { SourcesList } from '../../../src/components/SourcesList';

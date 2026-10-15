@@ -188,6 +188,16 @@ export interface FicheUtilisateur {
   boutique: { nom_boutique: string; region: string; artisanat: string; is_active: boolean } | null;
   quiz: { tentatives: number; moyenne: number | null };
   journal: { id: string; admin_email: string; action: string; created_at: string }[];
+  /** Journal des visionnages vidéo (schema-visionnages-comptes.sql). `null` si le script n'est pas exécuté. */
+  visionnages: {
+    total: number;
+    jour: number;
+    semaine: number;
+    contenus: number;
+    plateformes: Record<string, number>;
+    inhabituel: boolean;
+    derniers: { titre: string; type: string; chapitre: number | null; langue: string | null; plateforme: string; le: string }[];
+  } | null;
 }
 
 export async function chargerFiche(id: string): Promise<FicheUtilisateur | null> {
@@ -272,6 +282,7 @@ export async function chargerFiche(id: string): Promise<FicheUtilisateur | null>
     demo_store: demo.length > 0,
   };
 
+  const visionnages = await chargerVisionnages(id);
   const notes = quiz.length ? Math.round((quiz.reduce((s, q) => s + q.score / q.total, 0) / quiz.length) * 100) : null;
 
   return {
@@ -299,6 +310,60 @@ export async function chargerFiche(id: string): Promise<FicheUtilisateur | null>
       : null,
     boutique: boutique[0] ?? null,
     quiz: { tentatives: quiz.length, moyenne: notes },
+    visionnages,
     journal,
   };
+}
+
+// ---------------------------------------------------------------------
+// Visionnages vidéo d'un compte
+// ---------------------------------------------------------------------
+
+/** Au-delà de ce nombre de vidéos lancées en 24 h, la fiche signale une activité inhabituelle. */
+const SEUIL_VISIONNAGES_JOUR = 40;
+
+async function chargerVisionnages(id: string): Promise<FicheUtilisateur['visionnages']> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from('visionnages_comptes')
+    .select('type_contenu, contenu_id, chapitre, langue, plateforme, created_at')
+    .eq('user_id', id)
+    .order('created_at', { ascending: false })
+    .limit(500);
+  if (error) return null;
+  const lignes = (data ?? []) as { type_contenu: string; contenu_id: string; chapitre: number | null; langue: string | null; plateforme: string; created_at: string }[];
+
+  const ids = (type: string) => [...new Set(lignes.filter((l) => l.type_contenu === type).map((l) => l.contenu_id))];
+  const [heros, mythes, lieux] = await Promise.all([
+    ids('heros').length ? lignesTitres(supabase.from('heros').select('id, titre:nom_affiche').in('id', ids('heros'))) : Promise.resolve([]),
+    ids('mythe').length ? lignesTitres(supabase.from('mythes').select('id, titre').in('id', ids('mythe'))) : Promise.resolve([]),
+    ids('decouverte').length ? lignesTitres(supabase.from('decouverte_items').select('id, titre').in('id', ids('decouverte'))) : Promise.resolve([]),
+  ]);
+  const titres = new Map<string, string>([...heros, ...mythes, ...lieux].map((t) => [String(t.id), t.titre]));
+
+  const now = Date.now();
+  const jour = lignes.filter((l) => now - new Date(l.created_at).getTime() < 86400000).length;
+  const plateformes: Record<string, number> = {};
+  for (const l of lignes) plateformes[l.plateforme] = (plateformes[l.plateforme] ?? 0) + 1;
+
+  return {
+    total: lignes.length,
+    jour,
+    semaine: lignes.filter((l) => now - new Date(l.created_at).getTime() < 7 * 86400000).length,
+    contenus: new Set(lignes.map((l) => `${l.type_contenu}:${l.contenu_id}`)).size,
+    plateformes,
+    inhabituel: jour > SEUIL_VISIONNAGES_JOUR,
+    derniers: lignes.slice(0, 15).map((l) => ({
+      titre: titres.get(l.contenu_id) ?? 'Contenu supprimé',
+      type: l.type_contenu,
+      chapitre: l.chapitre,
+      langue: l.langue,
+      plateforme: l.plateforme,
+      le: l.created_at,
+    })),
+  };
+}
+
+async function lignesTitres(requete: PromiseLike<{ data: unknown; error: unknown }>): Promise<{ id: string; titre: string }[]> {
+  return lignes<{ id: string; titre: string }>(requete);
 }

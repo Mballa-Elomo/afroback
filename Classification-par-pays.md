@@ -25,11 +25,11 @@
 
 | Mythe | Région / peuple |
 |---|---|
-| [Nchare Yen](Mythologie/Cameroun/mythe-nchare-yen-bamoun/fr.md) — légende fondatrice du royaume Bamoun | Ouest (Foumban) |
-| [Ngan Medza](Mythologie/Cameroun/mythe-ngan-medza-beti/fr.md) — légende migratoire des Beti-Fang | Centre (fleuve Sanaga) |
-| [Miengu](Mythologie/Cameroun/mythe-miengu-esprits-eau-sawa/fr.md) — esprits de l'eau des peuples Sawa | Littoral (côte, Wouri) |
-| [Ngog Lituba](Mythologie/Cameroun/mythe-ngog-lituba-bassa/fr.md) — mythe fondateur Bassa/Bakoko/Bati | Littoral (Sanaga-Maritime) |
-| [Sao, les géants](Mythologie/Cameroun/mythe-sao-geants-kotoko/fr.md) — légende fondatrice du peuple Kotoko | Extrême-Nord (lac Tchad) |
+| [Nchare Yen](Mythologie/Cameroun/Ouest/mythe-nchare-yen-bamoun/fr.md) — légende fondatrice du royaume Bamoun | Ouest (Foumban) |
+| [Ngan Medza](Mythologie/Cameroun/Centre/mythe-ngan-medza-beti/fr.md) — légende migratoire des Beti-Fang | Centre (fleuve Sanaga) |
+| [Miengu](Mythologie/Cameroun/Littoral/mythe-miengu-esprits-eau-sawa/fr.md) — esprits de l'eau des peuples Sawa | Littoral (côte, Wouri) |
+| [Ngog Lituba](Mythologie/Cameroun/Littoral/mythe-ngog-lituba-bassa/fr.md) — mythe fondateur Bassa/Bakoko/Bati | Littoral (Sanaga-Maritime) |
+| [Sao, les géants](Mythologie/Cameroun/Extrême-Nord/mythe-sao-geants-kotoko/fr.md) — légende fondatrice du peuple Kotoko | Extrême-Nord (lac Tchad) |
 
 ## 🇦🇴 Angola — 1 élément
 

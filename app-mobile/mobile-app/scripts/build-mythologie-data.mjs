@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// OBSOLÈTE depuis le 2026-10-15 : les mythes v2 (7-8 chapitres, dossiers Mythologie/{Pays}/{Région}/{slug}/)
+// sont mis en base par supabase/mythes-v2_2026-10-15.sql. Ne pas relancer ce script (il écraserait
+// mythologie.generated.json avec un découpage de la v1).
 /**
  * Génère src/data/mythologie.generated.json à partir des 5 récits mythologiques
  * déjà écrits par l'agent griot (livrables/sites-web/afroback/Mythologie/[pays]/[slug]/fr.md)

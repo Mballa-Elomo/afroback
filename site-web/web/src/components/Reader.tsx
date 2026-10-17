@@ -10,6 +10,8 @@ import { TYPE_PATH } from '@/lib/catalogue';
 import { useLiveDetail } from '@/lib/useLiveDetail';
 import { useLang } from '@/lib/lang-client';
 import { QuizEndCard } from './quiz';
+import { Galerie } from './Galerie';
+import { useGalerie } from '@/lib/galerie';
 
 /**
  * Lecteur du récit : colonne de lecture confortable, chapitres dans une
@@ -27,6 +29,7 @@ export function Reader({ type, tile, detail: initial, initialChapter }: { type: 
   const [index, setIndex] = useState(Math.min(Math.max(initialChapter - 1, 0), Math.max(chapters.length - 1, 0)));
   const [progress, setProgress] = useState(0);
   const counted = useRef(false);
+  const galerie = useGalerie(type, tile.slug);
   const storeKey = `afroback-lecture:${type}:${tile.slug}`;
   const base = `/${TYPE_PATH[type]}/${tile.slug}`;
 
@@ -82,7 +85,11 @@ export function Reader({ type, tile, detail: initial, initialChapter }: { type: 
         <div className="h-full bg-gold transition-[width] duration-150" style={{ width: `${progress * 100}%` }} />
       </div>
 
-      <div className="mx-auto grid max-w-[1200px] gap-10 px-4 pb-16 pt-10 md:px-10 lg:grid-cols-[260px_1fr]">
+      <div
+        className={`mx-auto grid gap-10 px-4 pb-16 pt-10 md:px-10 lg:grid-cols-[260px_1fr] ${
+          galerie.length > 0 ? 'max-w-[1480px] xl:grid-cols-[240px_minmax(0,720px)_minmax(220px,300px)] xl:justify-between' : 'max-w-[1200px]'
+        }`}
+      >
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <Link href={base} className="text-sm font-semibold text-gold hover:underline">
             ‹ {tile.title}
@@ -118,12 +125,17 @@ export function Reader({ type, tile, detail: initial, initialChapter }: { type: 
           )}
         </aside>
 
-        <article className="max-w-[720px]">
+        <article className="min-w-0 max-w-[720px]">
           <p className="text-xs font-bold tracking-[0.16em] text-gold">
             {tr('CHAPITRE', 'CHAPTER')} {index + 1} / {chapters.length}
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold leading-tight text-heading md:text-4xl">{chap.titre}</h1>
           <PresenteParSponsor type={type} slug={tile.slug} format="lecture" chapitre={index + 1} className="mt-6" />
+          {galerie.length > 0 && (
+            <div className="mt-6 xl:hidden">
+              <Galerie images={galerie} lang={lang} variante="bande" />
+            </div>
+          )}
           <div className="mt-8 whitespace-pre-line text-[19px] leading-[1.85] text-text">{chap.texte}</div>
           {index === chapters.length - 1 && <QuizEndCard type={type} slug={tile.slug} className="mt-12" />}
 
@@ -146,6 +158,13 @@ export function Reader({ type, tile, detail: initial, initialChapter }: { type: 
             )}
           </div>
         </article>
+
+        {galerie.length > 0 && (
+          <aside aria-label={tr('Galerie du récit', 'Story gallery')} className="hidden xl:sticky xl:top-28 xl:block xl:self-start">
+            <p className="mb-3 text-xs font-bold tracking-[0.16em] text-muted">{tr('GALERIE', 'GALLERY')}</p>
+            <Galerie images={galerie} lang={lang} variante="colonne" />
+          </aside>
+        )}
       </div>
     </div>
   );

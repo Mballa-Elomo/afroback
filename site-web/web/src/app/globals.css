@@ -162,9 +162,27 @@ body {
   animation: marquee 40s linear infinite;
 }
 
+/* Galerie du récit (Galerie.tsx) : la piste doublée descend lentement et reboucle. */
+@keyframes galerie-descend {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.animate-galerie {
+  animation: galerie-descend 60s linear infinite;
+}
+.galerie-masque {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .film-grain,
   .animate-marquee,
+  .animate-galerie,
   .text-gold-gradient.is-animated {
     animation: none;
   }

@@ -127,7 +127,9 @@ function OpenShop({ onCreated }: { onCreated: (v: Vendor) => void }) {
 }
 
 type Draft = { id?: string; nom: string; description: string; categorie: Categorie; prix: string; stock: string; image_url: string | null };
-const EMPTY: Draft = { nom: '', description: '', categorie: 'sculpture', prix: '', stock: '1', image_url: null };
+const NOM_MAX = 80;
+const DESCRIPTION_MAX = 2000;
+const EMPTY: Draft ={ nom: '', description: '', categorie: 'sculpture', prix: '', stock: '1', image_url: null };
 
 function Dashboard({ vendor }: { vendor: Vendor }) {
   const [tab, setTab] = useState<'articles' | 'commandes' | 'avis'>('articles');
@@ -270,6 +272,11 @@ function ProductForm({ vendorId, draft, onCancel, onSaved }: { vendorId: string;
         const prix = parseInt(d.prix, 10);
         const stock = parseInt(d.stock, 10);
         if (!d.nom.trim() || !(prix > 0) || !(stock >= 0)) return setError(tr('Nom, prix (> 0) et stock sont obligatoires.', 'Name, price (> 0) and stock are required.'));
+        // Mêmes limites que la base (schema-marketplace.sql), dites avant l'envoi plutôt qu'une erreur vague.
+        const nom = d.nom.trim().length;
+        if (nom < 2 || nom > NOM_MAX) return setError(tr(`Le nom doit faire entre 2 et ${NOM_MAX} caractères (actuellement ${nom}).`, `The name must be 2 to ${NOM_MAX} characters long (currently ${nom}).`));
+        const desc = d.description.trim().length;
+        if (desc > DESCRIPTION_MAX) return setError(tr(`La description est trop longue : ${desc} caractères pour ${DESCRIPTION_MAX} au maximum. Raccourcis-la de ${desc - DESCRIPTION_MAX} caractères.`, `The description is too long: ${desc} characters, ${DESCRIPTION_MAX} at most. Cut ${desc - DESCRIPTION_MAX} characters.`));
         setBusy(true);
         const r = await saveProduct(vendorId, { id: d.id, nom: d.nom.trim(), description: d.description.trim(), categorie: d.categorie, prix_fcfa: prix, stock, image_url: d.image_url });
         setBusy(false);
@@ -298,6 +305,9 @@ function ProductForm({ vendorId, draft, onCancel, onSaved }: { vendorId: string;
       <label className="block">
         <span className="text-sm font-semibold text-text">Description</span>
         <textarea value={d.description} onChange={(e) => set('description')(e.target.value)} rows={4} className="mt-2 w-full rounded-2xl bg-ink px-4 py-3 text-ivory ring-1 ring-ivory/10 focus:outline-none focus:ring-gold/40" />
+        <span className={`mt-1 block text-right text-xs ${d.description.trim().length > DESCRIPTION_MAX ? 'font-bold text-terra' : 'text-muted'}`}>
+          {d.description.trim().length} / {DESCRIPTION_MAX}
+        </span>
       </label>
       {error && <Notice>{error}</Notice>}
       <div className="flex gap-3">

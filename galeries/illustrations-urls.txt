@@ -1,0 +1,11 @@
+mythe-miengu-esprits-eau-sawa	3	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-miengu-esprits-eau-sawa/03.jpg
+mythe-ngog-lituba-bassa	3	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-ngog-lituba-bassa/03.jpg
+mythe-ngog-lituba-bassa	5	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-ngog-lituba-bassa/05.jpg
+mythe-ngog-lituba-bassa	7	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-ngog-lituba-bassa/07.jpg
+mythe-nchare-yen-bamoun	2	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-nchare-yen-bamoun/02.jpg
+mythe-nchare-yen-bamoun	5	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-nchare-yen-bamoun/05.jpg
+mythe-ngan-medza-beti	2	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-ngan-medza-beti/02.jpg
+mythe-ngan-medza-beti	5	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-ngan-medza-beti/05.jpg
+mythe-ngan-medza-beti	7	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-ngan-medza-beti/07.jpg
+mythe-sao-geants-kotoko	2	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-sao-geants-kotoko/02.jpg
+mythe-sao-geants-kotoko	5	https://ygkyapryramhaskfbrrt.supabase.co/storage/v1/object/public/heroes-media/images/galerie/mythologie/mythe-sao-geants-kotoko/05.jpg

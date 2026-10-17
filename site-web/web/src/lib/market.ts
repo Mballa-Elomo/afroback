@@ -69,7 +69,9 @@ const err = (m: string) =>
     ? tc('Action non autorisée pour ce compte.', 'This account is not allowed to do that.')
     : /duplicate|unique/i.test(m)
       ? tc('Cet élément existe déjà.', 'This already exists.')
-      : tc("Ça n'a pas marché. Réessaie.", "That didn't work. Try again.");
+      : /check constraint/i.test(m)
+        ? tc('Un champ dépasse la longueur permise ou contient une valeur refusée. Vérifie le nom, la description, le prix et le stock.', 'A field is too long or holds a value that is not allowed. Check the name, description, price and stock.')
+        : tc("Ça n'a pas marché. Réessaie.", "That didn't work. Try again.");
 
 async function vendorsByIds(ids: string[]) {
   const map = new Map<string, Vendor>();
@@ -153,6 +155,7 @@ export async function vendorProducts(vendorId: string): Promise<Product[]> {
 export async function saveProduct(vendorId: string, p: { id?: string; nom: string; description: string; categorie: Categorie; prix_fcfa: number; stock: number; image_url: string | null }) {
   const row = { nom: p.nom, description: p.description || null, categorie: p.categorie, prix_fcfa: p.prix_fcfa, stock: p.stock, image_url: p.image_url };
   const { error } = p.id ? await supabase.from('marketplace_products').update(row).eq('id', p.id) : await supabase.from('marketplace_products').insert({ vendor_id: vendorId, ...row });
+  if (error) console.error('saveProduct', error.code, error.message);
   return { error: error ? err(error.message) : null };
 }
 export async function vendorOrders(vendorId: string): Promise<Order[]> {

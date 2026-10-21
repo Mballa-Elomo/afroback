@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
 import { logActivity } from '@/lib/activityLog';
+import { retirerLesAutresUnes } from '@/lib/aLaUne';
 import { getHeroToggleFields } from '@/lib/data/heros';
 
 /**
@@ -38,13 +39,9 @@ export async function toggleFeatured(slug: string): Promise<void> {
 
   let ancienNom: string | null = null;
   if (next) {
-    const { data: autresAlaUne, error: lookupError } = await db.from('heros').select('nom_affiche').eq('a_la_une', true).neq('slug', slug);
-    if (lookupError) throw new Error(lookupError.message);
-    if (autresAlaUne && autresAlaUne.length > 0) {
-      ancienNom = autresAlaUne.map((h) => h.nom_affiche).join(', ');
-      const { error: unsetError } = await db.from('heros').update({ a_la_une: false }).eq('a_la_une', true).neq('slug', slug);
-      if (unsetError) throw new Error(unsetError.message);
-    }
+    // Une seule une sur tout AFROBACK : on la retire aussi des autres catégories.
+    const retires = await retirerLesAutresUnes('heros', slug);
+    if (retires.length > 0) ancienNom = retires.join(', ');
   }
 
   const { error } = await db.from('heros').update({ a_la_une: next }).eq('slug', slug);

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { BackButton } from '../src/ui/modern';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -112,9 +113,7 @@ export default function RechercheScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('search.back')}>
-          <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
-        </Pressable>
+        <BackButton />
         <View style={styles.searchBox}>
           <Icon name="search" size={18} color={colors.textMuted} />
           <TextInput

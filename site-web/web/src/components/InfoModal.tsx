@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ContentType, Detail, Tile } from '@/lib/types';
@@ -23,20 +24,38 @@ export const useInfo = () => useContext(Ctx);
 
 export function InfoProvider({ children }: { children: React.ReactNode }) {
   const { tr } = useLang();
-  const [tile, setTile] = useState<Tile | null>(null);
+  const pathname = usePathname();
+  const [ouverte, setOuverte] = useState<{ tile: Tile; chemin: string } | null>(null);
+  // Toute navigation (chapitre, vidéo, abonnement, bouton retour) ferme la fenêtre :
+  // elle n'est affichée que sur la page où elle a été ouverte.
+  const tile = ouverte && ouverte.chemin === pathname ? ouverte.tile : null;
+  // Après un changement de page, on oublie la fenêtre (elle ne réapparaît pas au retour).
+  if (ouverte && ouverte.chemin !== pathname) setOuverte(null);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [loading, setLoading] = useState(false);
 
   const open = useCallback((t: Tile) => {
-    setTile(t);
+    setOuverte({ tile: t, chemin: pathname });
     setDetail(null);
     setLoading(true);
     supabase.rpc(RPC[t.type], { p_slug: t.slug }).then(({ data }) => {
       setDetail((data as Detail) ?? null);
       setLoading(false);
     });
-  }, []);
-  const close = useCallback(() => setTile(null), []);
+  }, [pathname]);
+  const close = useCallback(() => setOuverte(null), []);
+
+  // Fermeture immédiate au clic sur un lien interne, sans attendre le chargement
+  // de la page suivante (les liens externes, ex. sources, laissent la fenêtre ouverte).
+  const fermerSurLien = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      const a = (e.target as HTMLElement).closest('a');
+      const href = a?.getAttribute('href') ?? '';
+      if (a && href.startsWith('/') && a.target !== '_blank') close();
+    },
+    [close]
+  );
 
   useEffect(() => {
     if (!tile) return;
@@ -73,6 +92,7 @@ export function InfoProvider({ children }: { children: React.ReactNode }) {
               transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
               className="relative mx-auto max-w-[1100px] overflow-hidden rounded-3xl bg-ink shadow-[0_40px_120px_rgba(0,0,0,0.8)] ring-1 ring-gold/25"
               onClick={(e) => e.stopPropagation()}
+              onClickCapture={fermerSurLien}
             >
               <button
                 onClick={close}

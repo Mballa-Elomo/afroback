@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useRetour } from '../../../../../src/navigation/retour';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,10 +21,12 @@ import { LockedContent } from '../../../../../src/access/Access';
 import { useI18n } from '../../../../../src/i18n';
 import { QuizTile } from '../../../../../src/quiz/QuizUI';
 import { PresenteParSponsor } from '../../../../../src/sponsors/Sponsor';
+import { TeaserCarte, libelleCtaTeaser } from '../../../../../src/video/TeaserCarte';
 
 export default function FicheHerosScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const retour = useRetour();
   const { lang, t } = useI18n();
   const requireAccount = useRequireAccount();
   const herosState = useHero(slug);
@@ -54,7 +57,7 @@ export default function FicheHerosScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <ScrollView ref={scrollRef} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <HeroHeader heros={heros} onBack={() => router.back()} />
+        <HeroHeader heros={heros} onBack={retour} />
 
         <View style={styles.body} onLayout={(e) => (bodyY.current = e.nativeEvent.layout.y)}>
           <ContentActions
@@ -65,6 +68,20 @@ export default function FicheHerosScreen() {
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
           {heros.avertissement_lecture && <WarningBanner text={heros.avertissement_lecture} />}
+          <TeaserCarte
+            type="heros"
+            slug={heros.slug}
+            imageUrl={heros.image_carte_catalogue}
+            style={{ marginTop: 14 }}
+            cta={{
+              label: libelleCtaTeaser('heros', heros.nom_affiche, heros.statut_video === 'pret', lang === 'en'),
+              icon: heros.statut_video === 'pret' ? 'play' : 'book',
+              onPress: () =>
+                heros.statut_video === 'pret'
+                  ? requireAccount(() => router.push(`/accueil/heros/${heros.slug}/video`), 'video')
+                  : router.push(`/accueil/heros/${heros.slug}/recit`),
+            }}
+          />
           <PresenteParSponsor type="heros" slug={heros.slug} style={{ marginTop: 12 }} />
 
           {heros.acces?.verrouille ? (

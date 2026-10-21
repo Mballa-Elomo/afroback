@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { useRetour } from '../../../../../src/navigation/retour';
+import { BackButton } from '../../../../../src/ui/modern';
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -41,6 +43,7 @@ const NB_CHAPITRES = 4;
 export default function LecteurDeRecitScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const retour = useRetour();
   const herosState = useHero(slug);
   const { lang, t } = useI18n();
   const heros = herosState.status === 'ready' ? herosState.data : undefined;
@@ -142,9 +145,7 @@ export default function LecteurDeRecitScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <Pressable onPress={() => router.back()} hitSlop={10} style={styles.headerBtn}>
-            <Text style={styles.headerIcon}>✕</Text>
-          </Pressable>
+          <BackButton />
           <View style={styles.headerCenter}>
             <Text style={styles.headerTitle} numberOfLines={1}>
               {heros.nom_affiche}
@@ -224,7 +225,7 @@ export default function LecteurDeRecitScreen() {
           <>
             <Text style={styles.endLabel}>{t('reader.end')}</Text>
             <QuizEndCard type="heros" slug={heros.slug} style={{ marginBottom: 14 }} />
-            <GhostButton label={t('reader.backToSheet')} onPress={() => router.back()} />
+            <GhostButton label={t('reader.backToSheet')} onPress={retour} />
           </>
         ) : (
           <Text style={styles.endLabel}>{t('reader.endChapter', { n: chapitreActuel.numero })}</Text>
@@ -245,7 +246,7 @@ export default function LecteurDeRecitScreen() {
           ))}
         </View>
         {estDernierChapitre ? (
-          <Pressable onPress={() => router.back()} style={styles.pagerBtn}>
+          <Pressable onPress={retour} style={styles.pagerBtn}>
             <Text style={styles.pagerBtnLabel}>{t('reader.finish')}</Text>
           </Pressable>
         ) : (

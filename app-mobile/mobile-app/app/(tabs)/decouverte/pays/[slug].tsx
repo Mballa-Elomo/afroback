@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useRetour } from '../../../../src/navigation/retour';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +28,7 @@ export default function CountryHubScreen() {
   const { t } = useI18n();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const retour = useRetour();
   const paysState = useDecouvertePays();
   const itemsState = useDecouverteItems();
 
@@ -60,7 +62,7 @@ export default function CountryHubScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={{ marginHorizontal: -(spacing.md + 2) }}>
-          <ScreenHeader title={pays?.nom ?? ''} subtitle={t('country.sub')} onBack={() => router.back()} />
+          <ScreenHeader title={pays?.nom ?? ''} subtitle={t('country.sub')} onBack={retour} />
         </View>
         {pays?.resume && <Text style={styles.intro}>{pays.resume}</Text>}
 

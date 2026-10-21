@@ -8,6 +8,7 @@ import { DecouverteMetadataForm } from '@/components/DecouverteMetadataForm';
 import { DecouverteLanguageContent } from '@/components/DecouverteLanguageContent';
 import { DecouverteTopActions } from '@/components/DecouverteTopActions';
 import { IntegrityPanel } from '@/components/IntegrityPanel';
+import { TeaserPanel } from '@/components/TeaserPanel';
 import { colors, fonts } from '@/lib/theme';
 
 export const dynamic = 'force-dynamic';
@@ -85,6 +86,8 @@ export default async function DecouverteDetailPage({ params }: { params: Promise
           />
         </div>
       </div>
+
+      <TeaserPanel type="decouverte" slug={slug} />
 
       <div style={{ ...panelStyle, marginBottom: 16 }}>
         <div style={panelTitleStyle}>CONTENU PAR LANGUE</div>

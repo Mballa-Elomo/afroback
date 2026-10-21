@@ -8,6 +8,7 @@ import { HeroLanguageContent } from '@/components/HeroLanguageContent';
 import { MetadataForm } from '@/components/MetadataForm';
 import { HeroTopActions, ArchiveHeroButton } from '@/components/HeroDetailActions';
 import { IntegrityPanel } from '@/components/IntegrityPanel';
+import { TeaserPanel } from '@/components/TeaserPanel';
 import { colors, fonts } from '@/lib/theme';
 
 export const dynamic = 'force-dynamic';
@@ -90,6 +91,8 @@ export default async function HeroDetailPage({ params }: { params: Promise<{ slu
           <MetadataForm slug={hero.slug} theme={hero.theme} region={hero.region} ordreAffichage={hero.ordre_affichage} avertissement={hero.avertissement_lecture} />
         </div>
       </div>
+
+      <TeaserPanel type="heros" slug={slug} />
 
       <div style={{ ...panelStyle, marginBottom: 16 }}>
         <div style={panelTitleStyle}>CONTENU PAR LANGUE</div>

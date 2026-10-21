@@ -160,7 +160,7 @@ export function FicheUtilisateur({ fiche, soiMeme, ongletInitial }: { fiche: Fic
 
       {onglet === 'profil' && <OngletProfil fiche={fiche} enCours={enCours} lancer={lancer} confirmer={confirmer} />}
       {onglet === 'abonnement' && <OngletAbonnement fiche={fiche} ouvrirOffre={() => setModale({ type: 'offrir' })} confirmer={confirmer} />}
-      {onglet === 'securite' && <OngletSecurite fiche={fiche} intouchable={intouchable} enCours={enCours} lancer={lancer} confirmer={confirmer} />}
+      {onglet === 'securite' && <OngletSecurite fiche={fiche} intouchable={intouchable} soiMeme={soiMeme} enCours={enCours} lancer={lancer} confirmer={confirmer} />}
       {onglet === 'famille' && <OngletFamille fiche={fiche} />}
       {onglet === 'communaute' && <OngletCommunaute fiche={fiche} ouvrirBan={() => setModale({ type: 'bannir' })} enCours={enCours} lancer={lancer} />}
       {onglet === 'journal' && <OngletJournal fiche={fiche} />}
@@ -487,7 +487,7 @@ function OngletAbonnement({ fiche, ouvrirOffre, confirmer }: { fiche: Fiche; ouv
   );
 }
 
-function OngletSecurite({ fiche, intouchable, enCours, lancer, confirmer }: { fiche: Fiche; intouchable: boolean; enCours: boolean; lancer: Lancer; confirmer: Confirmer }) {
+function OngletSecurite({ fiche, intouchable, soiMeme, enCours, lancer, confirmer }: { fiche: Fiche; intouchable: boolean; soiMeme: boolean; enCours: boolean; lancer: Lancer; confirmer: Confirmer }) {
   const u = fiche.ligne;
   const bloque = fiche.blocage || fiche.blocage2fa;
   return (
@@ -547,6 +547,34 @@ function OngletSecurite({ fiche, intouchable, enCours, lancer, confirmer }: { fi
               danger
               disabled={enCours}
               onClick={() => confirmer('Déconnecter de partout ?', 'La personne devra se reconnecter sur tous ses appareils.', 'Déconnecter', () => A.deconnecterPartout(u.id), true)}
+            />
+            <Action
+              titre="Administrateur du back-office"
+              etat={u.admin ? <span className={styles.ok}>Oui (accès complet)</span> : <span className={styles.discret}>Non</span>}
+              aide={
+                soiMeme
+                  ? 'C’est votre propre compte : vos droits ne peuvent pas être modifiés ici.'
+                  : 'Donne accès à tout le back-office : contenus, utilisateurs, paiements, paramètres. Connexion avec l’e-mail et le mot de passe du compte.'
+              }
+              bouton={soiMeme ? undefined : u.admin ? 'Retirer les droits' : 'Nommer administrateur'}
+              danger={u.admin}
+              disabled={enCours}
+              onClick={() =>
+                u.admin
+                  ? confirmer(
+                      'Retirer les droits d’administrateur ?',
+                      `${u.email || 'Ce compte'} perdra immédiatement l’accès au back-office. Son compte AFROBACK, lui, reste intact.`,
+                      'Retirer les droits',
+                      () => A.retirerAdministrateur(u.id),
+                      true
+                    )
+                  : confirmer(
+                      'Nommer administrateur ?',
+                      `${u.email || 'Ce compte'} pourra tout voir et tout modifier dans le back-office, y compris les paiements, les utilisateurs et les paramètres. Ne nommez qu’une personne de confiance, et demandez-lui d’activer la vérification en 2 étapes.`,
+                      'Nommer administrateur',
+                      () => A.nommerAdministrateur(u.id)
+                    )
+              }
             />
             <Action
               titre="Compte de démonstration store"

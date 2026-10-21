@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { NAVIGATION_FLUIDE } from '../src/navigation/fluide';
 import { Platform, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -143,7 +144,7 @@ function RootNavigator() {
   return (
     // Chaque écran construit son propre en-tête (retour, titre) pour coller
     // à la maquette — pas d'en-tête natif générique.
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background }, ...NAVIGATION_FLUIDE }}>
       <Stack.Screen name="index" />
       {/* Conditions et confidentialité : lisibles dans tous les états (inscription, invité, connecté). */}
       <Stack.Screen name="legal/[doc]" />

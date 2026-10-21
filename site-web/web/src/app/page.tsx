@@ -19,15 +19,24 @@ export const revalidate = 120;
 export default async function Home() {
   const lang = await getLang();
   const t = (fr: string, en: string) => pick(lang, fr, en);
-  const { heroes, decouverte, heroTiles, mytheTiles, decouverteTiles } = await getAllTiles(lang);
+  const { heroes, mythes, decouverte, heroTiles, mytheTiles, decouverteTiles } = await getAllTiles(lang);
   const all: Tile[] = [...heroTiles, ...mytheTiles, ...decouverteTiles];
 
-  // Carrousel : le récit à la une, puis les récits avec image les plus suivis (un mythe inclus).
-  const featured = pickFeatured(heroes);
+  // Carrousel : le contenu à la une (un seul sur tout le catalogue : héros, mythe
+  // OU Découverte, choisi dans le back-office ; sinon héros du jour), puis les
+  // récits avec image les plus suivis (un mythe inclus).
+  const uneMythe = mythes.find((m) => m.a_la_une);
+  const uneDecouverte = decouverte.find((d) => d.a_la_une);
+  const uneHeros = heroes.find((h) => h.a_la_une);
+  const featuredTile =
+    (uneHeros && heroTiles.find((t) => t.slug === uneHeros.slug)) ||
+    (uneMythe && mytheTiles.find((t) => t.slug === uneMythe.slug)) ||
+    (uneDecouverte && decouverteTiles.find((t) => t.slug === uneDecouverte.slug)) ||
+    heroTiles.find((t) => t.slug === pickFeatured(heroes)?.slug);
   const pool = [
-    heroTiles.find((t) => t.slug === featured?.slug),
-    ...[...heroTiles].filter((t) => t.image && t.slug !== featured?.slug).sort((a, b) => b.score - a.score).slice(0, 3),
-    [...mytheTiles].filter((t) => t.image).sort((a, b) => b.score - a.score)[0],
+    featuredTile,
+    ...[...heroTiles].filter((t) => t.image && t.slug !== featuredTile?.slug).sort((a, b) => b.score - a.score).slice(0, 3),
+    [...mytheTiles].filter((t) => t.image && t.slug !== featuredTile?.slug).sort((a, b) => b.score - a.score)[0],
   ].filter((t): t is Tile => !!t);
   const slides: Slide[] = await Promise.all(
     pool.map(async (tile, i) => {

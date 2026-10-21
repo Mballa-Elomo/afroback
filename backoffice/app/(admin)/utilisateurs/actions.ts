@@ -230,6 +230,44 @@ export async function basculerDemoStore(id: string, actif: boolean): Promise<Res
 }
 
 // ---------------------------------------------------------------------
+// Droits d'administration (rôle unique : admin_complet)
+// ---------------------------------------------------------------------
+
+export async function nommerAdministrateur(id: string): Promise<Resultat> {
+  const c = await contexte(id);
+  if ('ok' in c) return c;
+  if (c.estAdmin) return { ok: true, message: 'Ce compte est déjà administrateur.' };
+  const email = (c.cible.email ?? '').trim().toLowerCase();
+  if (!email) return { ok: false, message: 'Ce compte n’a pas d’e-mail : la connexion au back-office se fait par e-mail.' };
+  if (!c.cible.email_confirmed_at) return { ok: false, message: 'Confirmez d’abord l’e-mail de ce compte.' };
+  if (c.cible.banned_until && new Date(c.cible.banned_until) > new Date()) return { ok: false, message: 'Ce compte est suspendu : réactivez-le d’abord.' };
+  const meta = (c.cible.user_metadata ?? {}) as Record<string, unknown>;
+  const nom = String(meta.prenom ?? '').trim() || email.split('@')[0];
+  const { error } = await getSupabaseAdmin().from('admin_users').insert({ email, nom, role: 'admin_complet' });
+  if (error) return erreur(error, 'Nomination');
+  revalidatePath('/parametres');
+  return fini(c, 'nommé administrateur (accès complet au back-office)', `${email} est maintenant administrateur.`);
+}
+
+export async function retirerAdministrateur(id: string): Promise<Resultat> {
+  const c = await contexte(id);
+  if ('ok' in c) return c;
+  if ((c.cible.email ?? '').toLowerCase() === c.admin.email.toLowerCase()) {
+    return { ok: false, message: 'Vous ne pouvez pas retirer vos propres droits.' };
+  }
+  if (!c.estAdmin) return { ok: true, message: 'Ce compte n’est pas administrateur.' };
+  const supabase = getSupabaseAdmin();
+  const { count } = await supabase.from('admin_users').select('id', { count: 'exact', head: true });
+  if ((count ?? 0) <= 1) return { ok: false, message: 'Impossible : il doit rester au moins un administrateur.' };
+  // ilike pour ignorer la casse ; % et _ échappés pour viser cette adresse exacte.
+  const motif = (c.cible.email ?? '').toLowerCase().replace(/[\\%_]/g, (m) => `\\${m}`);
+  const { error } = await supabase.from('admin_users').delete().ilike('email', motif);
+  if (error) return erreur(error, 'Retrait');
+  revalidatePath('/parametres');
+  return fini(c, 'droits d’administrateur retirés', 'Droits d’administrateur retirés. L’accès au back-office est coupé immédiatement.');
+}
+
+// ---------------------------------------------------------------------
 // Abonnements
 // ---------------------------------------------------------------------
 

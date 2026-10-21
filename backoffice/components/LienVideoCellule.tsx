@@ -21,7 +21,8 @@ export function LienVideoCellule({
 }: {
   label: string;
   url?: string;
-  visionnages: number;
+  /** Absent : ligne des visionnages masquée (ex. teaser, non compté). */
+  visionnages?: number;
   enregistrer: (lien: string) => Promise<{ error: string | null }>;
   retirer: () => Promise<void>;
 }) {
@@ -94,9 +95,11 @@ export function LienVideoCellule({
               Vidéo {label} · <span style={{ color: colors.accentGold }}>{source}</span>
             </div>
             <div style={{ fontSize: 10.5, color: colors.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{url}</div>
-            <div style={{ fontSize: 10.5, color: colors.textMuted, marginTop: 2 }}>
-              👁 {visionnages.toLocaleString('fr-FR')} visionnage{visionnages === 1 ? '' : 's'}
-            </div>
+            {visionnages !== undefined && (
+              <div style={{ fontSize: 10.5, color: colors.textMuted, marginTop: 2 }}>
+                👁 {visionnages.toLocaleString('fr-FR')} visionnage{visionnages === 1 ? '' : 's'}
+              </div>
+            )}
           </div>
           <span style={{ fontFamily: fonts.mono, fontSize: 9, color: colors.positive, flex: 'none' }}>EN LIGNE</span>
         </div>

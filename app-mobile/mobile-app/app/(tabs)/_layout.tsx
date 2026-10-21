@@ -15,6 +15,8 @@ export default function TabsLayout() {
   return (
     <Tabs
       tabBar={(props) => <BottomTabBar {...props} />}
+      // Le bouton retour d'Android revient à l'onglet précédent au lieu de quitter l'app.
+      backBehavior="history"
       screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.background } }}
     >
       <Tabs.Screen name="accueil" />

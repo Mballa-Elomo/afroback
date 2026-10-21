@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { LecteurVideo } from '../../../../src/video/LecteurVideo';
+import { TeaserCarte, libelleCtaTeaser } from '../../../../src/video/TeaserCarte';
 import { ErrorState, LoadingState } from '../../../../src/components/LoadingState';
 import { useMythe } from '../../../../src/data/useMythologieData';
 import { recordMytheAudioEngagement, recordMytheEngagement, recordMytheVideoChapterEngagement } from '../../../../src/data/engagementRepository';
@@ -52,6 +53,7 @@ export default function MytheDetailScreen() {
   const recitLoggedRef = useRef<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const bodyY = useRef(0);
+  const tabsY = useRef(0);
   const commentsY = useRef(0);
 
   // Engagement réel (lecture du récit) : une fois par ouverture de ce mythe
@@ -89,11 +91,13 @@ export default function MytheDetailScreen() {
         imageUrl={mythe.image_url}
         apercu={(lang === 'en' && mythe.acces.apercu_en ? mythe.acces.apercu_en : mythe.acces.apercu_fr)}
         reason="mythe"
+        teaser={<TeaserCarte type="mythe" slug={mythe.slug} imageUrl={mythe.image_url} />}
         footer={<CommentsSection type="mythe" slug={mythe.slug} />}
       />
     );
   }
 
+  const aVideo = mythe.video_chapitres.some((c) => Object.keys(c.videos ?? {}).length > 0);
   const hasEnglishRecit = mythe.recit_chapitres_en.length > 0;
   const chapitres = langue === 'en' && hasEnglishRecit ? mythe.recit_chapitres_en : mythe.recit_chapitres_fr;
   const chapitreActuel = chapitres[chapitreIdx];
@@ -123,7 +127,7 @@ export default function MytheDetailScreen() {
             style={StyleSheet.absoluteFill}
           />
           <View style={styles.backButton}>
-            <BackButton onPress={() => router.back()} floating />
+            <BackButton floating />
           </View>
           <View style={styles.coverContent}>
             <View style={styles.tag}>
@@ -141,9 +145,27 @@ export default function MytheDetailScreen() {
             description={mythe.sous_titre}
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
           />
+          <TeaserCarte
+            type="mythe"
+            slug={mythe.slug}
+            imageUrl={mythe.image_url}
+            style={{ marginBottom: 14 }}
+            cta={{
+              label: libelleCtaTeaser('mythe', mythe.titre, aVideo, lang === 'en'),
+              icon: aVideo ? 'play' : 'book',
+              onPress: () => {
+                const aller = (o: Onglet) => {
+                  setOnglet(o);
+                  setTimeout(() => scrollRef.current?.scrollTo({ y: bodyY.current + tabsY.current - 12, animated: true }), 50);
+                };
+                if (aVideo) requireAccount(() => aller('regarder'), 'video');
+                else aller('lire');
+              },
+            }}
+          />
           <PresenteParSponsor type="mythe" slug={mythe.slug} style={{ marginBottom: 14 }} />
           <QuizTile type="mythe" slug={mythe.slug} style={{ marginBottom: 14 }} />
-          <View style={styles.tabs}>
+          <View style={styles.tabs} onLayout={(e) => (tabsY.current = e.nativeEvent.layout.y)}>
             <Tab icon="book" label={t('content.read')} active={onglet === 'lire'} onPress={() => setOnglet('lire')} />
             <Tab icon="play" label={t('content.listen')} active={onglet === 'ecouter'} onPress={() => requireAccount(() => setOnglet('ecouter'), 'audio')} />
             <Tab icon="sparkle" label={t('content.watch')} active={onglet === 'regarder'} onPress={() => requireAccount(() => setOnglet('regarder'), 'video')} />

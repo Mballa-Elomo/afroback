@@ -108,8 +108,8 @@ export async function getMytheBySlug(slug: string): Promise<Mythe | undefined> {
 }
 
 /** Mythes groupés par zone, dans l'ordre où chaque zone apparaît en base (ordre_affichage). */
-export async function getMythesGroupedByZone(): Promise<{ zone: string; items: Mythe[] }[]> {
-  const mythes = await getMythes();
+export async function getMythesGroupedByZone(frais = false): Promise<{ zone: string; items: Mythe[] }[]> {
+  const mythes = frais ? await refreshMythes() : await getMythes();
   const order: string[] = [];
   const map = new Map<string, Mythe[]>();
   for (const m of mythes) {

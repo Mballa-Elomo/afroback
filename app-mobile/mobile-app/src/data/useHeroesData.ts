@@ -34,7 +34,8 @@ type AsyncState<T> =
  * affichées avec succès — seul un tout premier chargement raté affiche un
  * état d'erreur.
  */
-export function useHeroesList(): AsyncState<Heros[]> {
+/** `cle` : changer sa valeur force un rechargement (tirer pour actualiser, appui sur l'onglet Accueil). */
+export function useHeroesList(cle = 0): AsyncState<Heros[]> {
   const [state, setState] = useState<AsyncState<Heros[]>>({ status: 'loading' });
   const hasData = useRef(false);
 
@@ -59,7 +60,7 @@ export function useHeroesList(): AsyncState<Heros[]> {
       return () => {
         alive = false;
       };
-    }, [])
+    }, [cle])
   );
 
   return state;

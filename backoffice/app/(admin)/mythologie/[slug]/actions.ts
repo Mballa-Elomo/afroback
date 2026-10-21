@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
 import { logActivity } from '@/lib/activityLog';
+import { retirerLesAutresUnes } from '@/lib/aLaUne';
 import { getMytheBySlugAdmin, getMytheToggleFields } from '@/lib/data/mythologie';
 import { SLOT_COLUMN, type MythologieMediaSlot } from '@/lib/uploadMythologieMedia';
 import { upsertChapterEntry, type VideoLang } from '@/lib/uploadMedia';
@@ -166,13 +167,9 @@ export async function toggleMytheFeatured(slug: string): Promise<void> {
 
   let ancienTitre: string | null = null;
   if (next) {
-    const { data: autresAlaUne, error: lookupError } = await db.from('mythes').select('titre').eq('a_la_une', true).neq('slug', slug);
-    if (lookupError) throw new Error(lookupError.message);
-    if (autresAlaUne && autresAlaUne.length > 0) {
-      ancienTitre = autresAlaUne.map((m) => m.titre).join(', ');
-      const { error: unsetError } = await db.from('mythes').update({ a_la_une: false }).eq('a_la_une', true).neq('slug', slug);
-      if (unsetError) throw new Error(unsetError.message);
-    }
+    // Une seule une sur tout AFROBACK : on la retire aussi des autres catégories.
+    const retires = await retirerLesAutresUnes('mythes', slug);
+    if (retires.length > 0) ancienTitre = retires.join(', ');
   }
 
   const { error } = await db.from('mythes').update({ a_la_une: next }).eq('slug', slug);

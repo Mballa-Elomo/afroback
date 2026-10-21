@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { getMytheBySlug, getMythesGroupedByZone } from './mythologieRepository';
 import type { Mythe } from './mythologieTypes';
 
@@ -7,19 +8,32 @@ type AsyncState<T> =
   | { status: 'error'; error: Error }
   | { status: 'ready'; data: T };
 
-export function useMythesGroupedByZone(): AsyncState<{ zone: string; items: Mythe[] }[]> {
+/**
+ * Mythes par zone : rechargés à chaque retour sur l'écran (même principe que
+ * le catalogue héros), pour qu'un mythe ajouté ou mis à la une dans le
+ * back-office apparaisse sans redémarrer l'app. `cle` force un rechargement.
+ */
+export function useMythesGroupedByZone(cle = 0): AsyncState<{ zone: string; items: Mythe[] }[]> {
   const [state, setState] = useState<AsyncState<{ zone: string; items: Mythe[] }[]>>({ status: 'loading' });
+  const hasData = useRef(false);
 
-  useEffect(() => {
-    let alive = true;
-    setState({ status: 'loading' });
-    getMythesGroupedByZone()
-      .then((data) => alive && setState({ status: 'ready', data }))
-      .catch((error) => alive && setState({ status: 'error', error }));
-    return () => {
-      alive = false;
-    };
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      let alive = true;
+      getMythesGroupedByZone(hasData.current)
+        .then((data) => {
+          if (!alive) return;
+          hasData.current = true;
+          setState({ status: 'ready', data });
+        })
+        .catch((error) => {
+          if (alive && !hasData.current) setState({ status: 'error', error });
+        });
+      return () => {
+        alive = false;
+      };
+    }, [cle])
+  );
 
   return state;
 }

@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
   getDecouverteItemBySlug,
   getDecouverteItems,
+  refreshDecouverteItems,
   getDecouvertePays,
   getRelatedDecouverteItems,
 } from './decouverteRepository';
@@ -9,19 +11,28 @@ import type { DecouverteItem, DecouvertePays } from './decouverteTypes';
 
 type AsyncState<T> = { status: 'loading' } | { status: 'error'; error: Error } | { status: 'ready'; data: T };
 
-export function useDecouverteItems(): AsyncState<DecouverteItem[]> {
+/** Fiches Découverte : rechargées à chaque retour sur l'écran ; `cle` force un rechargement. */
+export function useDecouverteItems(cle = 0): AsyncState<DecouverteItem[]> {
   const [state, setState] = useState<AsyncState<DecouverteItem[]>>({ status: 'loading' });
+  const hasData = useRef(false);
 
-  useEffect(() => {
-    let alive = true;
-    setState({ status: 'loading' });
-    getDecouverteItems()
-      .then((data) => alive && setState({ status: 'ready', data }))
-      .catch((error) => alive && setState({ status: 'error', error }));
-    return () => {
-      alive = false;
-    };
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      let alive = true;
+      (hasData.current ? refreshDecouverteItems : getDecouverteItems)()
+        .then((data) => {
+          if (!alive) return;
+          hasData.current = true;
+          setState({ status: 'ready', data });
+        })
+        .catch((error) => {
+          if (alive && !hasData.current) setState({ status: 'error', error });
+        });
+      return () => {
+        alive = false;
+      };
+    }, [cle])
+  );
 
   return state;
 }

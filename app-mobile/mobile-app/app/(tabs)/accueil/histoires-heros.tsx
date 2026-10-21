@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useRetour } from '../../../src/navigation/retour';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +23,7 @@ import { useI18n } from '../../../src/i18n';
 export default function HistoiresHerosScreen() {
   const { t } = useI18n();
   const router = useRouter();
+  const retour = useRetour();
   const heroesState = useHeroesList();
   const heroes = heroesState.status === 'ready' ? heroesState.data : [];
   const [eraFilter, setEraFilter] = useState<EraCategory | 'tous'>('tous');
@@ -45,7 +47,7 @@ export default function HistoiresHerosScreen() {
       <ScreenHeader
         title={t('heroesList.title')}
         subtitle={heroesState.status === 'ready' ? t('heroesList.count', { n: heroes.length }) : undefined}
-        onBack={() => router.back()}
+        onBack={retour}
       />
       <View style={styles.pad}>
         <PressableScale onPress={() => router.push('/accueil/mythologie')} accessibilityLabel={t('heroesList.myths')}>

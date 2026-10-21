@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { BackButton } from '../../../../../src/ui/modern';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
@@ -83,9 +84,7 @@ function LecteurAudioScreen() {
       />
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.topBar}>
-          <Pressable onPress={() => router.back()} hitSlop={10} style={styles.topBtn}>
-            <Text style={styles.chevronDown}>⌄</Text>
-          </Pressable>
+          <BackButton />
           <Text style={styles.topLabel}>{t('heroAudio.top')}</Text>
           <Pressable onPress={() => router.push(`/accueil/heros/${heros.slug}/recit`)} hitSlop={10} style={styles.topBtn}>
             <Text style={styles.readIcon}>≡</Text>

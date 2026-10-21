@@ -2,6 +2,7 @@
 
 import { PresenteParSponsor } from './Sponsor';
 import Link from 'next/link';
+import { Teaser, libelleCtaTeaser } from './Teaser';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 import type { Detail, RecitChapitre, Tile } from '@/lib/types';
@@ -130,6 +131,20 @@ export function ContentView({ tile, detail: initial, loading, compact }: { tile:
         {/* Découverte : la fiche est aussi la lecture ; sponsor ciblé « lecture ». */}
         {tile.type === 'decouverte' && <PresenteParSponsor type="decouverte" slug={tile.slug} format="lecture" className="mt-3 max-w-xl bg-ink/60 backdrop-blur" />}
       </Header>
+
+      {/* Teaser : vidéo d'introduction de 30 s, visible par tous (rien si absent). */}
+      <Teaser
+        type={tile.type}
+        slug={tile.slug}
+        poster={tile.image}
+        cta={
+          videos.length > 0
+            ? { href: `${base}/regarder`, label: libelleCtaTeaser(tile.type, tile.title, true, lang === 'en'), video: true }
+            : tile.type !== 'decouverte'
+              ? { href: `${base}/lire`, label: libelleCtaTeaser(tile.type, tile.title, false, lang === 'en'), video: false }
+              : undefined
+        }
+      />
 
       {/* Onglets */}
       <div className={`sticky z-30 border-b border-ivory/10 bg-ink/85 backdrop-blur-xl ${compact ? 'top-0' : 'top-0 md:top-[88px]'}`}>

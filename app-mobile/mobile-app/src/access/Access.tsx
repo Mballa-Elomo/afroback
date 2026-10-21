@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react';
+import { BackButton } from '../ui/modern';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -258,6 +259,7 @@ export function LockedDetailScreen({
   reason,
   child = false,
   footer,
+  teaser,
 }: {
   title: string;
   subtitle?: string;
@@ -267,6 +269,8 @@ export function LockedDetailScreen({
   child?: boolean;
   /** Contenu affiché sous la présentation de l'abonnement (ex. commentaires en lecture). */
   footer?: ReactNode;
+  /** Bande-annonce (teaser), visible même sans abonnement. */
+  teaser?: ReactNode;
 }) {
   const router = useRouter();
   const { t } = useI18n();
@@ -276,9 +280,9 @@ export function LockedDetailScreen({
         <View style={styles.detailCover}>
           {imageUrl ? <Image source={{ uri: imageUrl }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="memory-disk" /> : null}
           <View style={styles.detailCoverShade} />
-          <Pressable onPress={() => router.back()} hitSlop={12} style={styles.detailBack} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-            <Icon name="chevronLeft" size={22} color={colors.accentGold} strokeWidth={2.4} />
-          </Pressable>
+          <View style={styles.detailBack}>
+            <BackButton floating />
+          </View>
           <View style={styles.detailLock}>
             <Icon name="lock" size={15} color={colors.ctaTextOnGold} strokeWidth={2.4} />
           </View>
@@ -288,6 +292,7 @@ export function LockedDetailScreen({
             {title}
           </Text>
           {!!subtitle && <Text style={styles.detailSubtitle}>{subtitle}</Text>}
+          {teaser ? <View style={{ marginTop: 16 }}>{teaser}</View> : null}
           <LockedContent apercu={apercu} reason={reason} child={child} style={{ marginTop: 16 }} />
           {footer ? <View style={{ marginTop: 20 }}>{footer}</View> : null}
         </View>
@@ -473,12 +478,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 14,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(11,9,6,.6)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   detailBackIcon: { fontSize: 26, color: colors.accentGold, marginTop: -2 },
   detailLock: {

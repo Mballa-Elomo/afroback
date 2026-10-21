@@ -8,6 +8,7 @@ import { MytheMetadataForm } from '@/components/MytheMetadataForm';
 import { MythologieLanguageContent } from '@/components/MythologieLanguageContent';
 import { MytheTopActions } from '@/components/MytheTopActions';
 import { IntegrityPanel } from '@/components/IntegrityPanel';
+import { TeaserPanel } from '@/components/TeaserPanel';
 import { colors, fonts } from '@/lib/theme';
 
 export const dynamic = 'force-dynamic';
@@ -84,6 +85,8 @@ export default async function MytheDetailPage({ params }: { params: Promise<{ sl
           />
         </div>
       </div>
+
+      <TeaserPanel type="mythe" slug={slug} />
 
       <div style={{ ...panelStyle, marginBottom: 16 }}>
         <div style={panelTitleStyle}>CONTENU PAR LANGUE</div>

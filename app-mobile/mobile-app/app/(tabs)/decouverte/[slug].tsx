@@ -27,6 +27,7 @@ import { currentLanguage, useI18n } from '../../../src/i18n';
 import { CommentsSection } from '../../../src/comments/CommentsSection';
 import { ContentActions } from '../../../src/stats/ContentActions';
 import { FinVideoSponsor, PresenteParSponsor } from '../../../src/sponsors/Sponsor';
+import { TeaserCarte, libelleCtaTeaser } from '../../../src/video/TeaserCarte';
 
 /**
  * Fiche détail Découverte — fidèle à design-reference-decouverte.dc.excerpt.html,
@@ -52,6 +53,7 @@ export default function DecouverteDetailScreen() {
   const consultationLoggedRef = useRef<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const bodyY = useRef(0);
+  const videoY = useRef(0);
   const commentsY = useRef(0);
 
   // Engagement réel (consultation de la fiche) : une fois par ouverture d'un
@@ -100,6 +102,7 @@ export default function DecouverteDetailScreen() {
         imageUrl={item.image_url}
         apercu={(lang === 'en' && item.acces.apercu_en ? item.acces.apercu_en : item.acces.apercu_fr)}
         reason="decouverte"
+        teaser={<TeaserCarte type="decouverte" slug={item.slug} imageUrl={item.image_url} />}
         footer={<CommentsSection type="decouverte" slug={item.slug} />}
       />
     );
@@ -138,7 +141,7 @@ export default function DecouverteDetailScreen() {
               style={StyleSheet.absoluteFill}
             />
             <View style={[styles.backBtn, { top: insets.top + 8 }]}>
-              <BackButton onPress={() => router.back()} floating />
+              <BackButton floating />
             </View>
             <View style={styles.immersiveBottom}>
               <View style={styles.typePill}>
@@ -154,7 +157,7 @@ export default function DecouverteDetailScreen() {
         ) : (
           <View style={styles.flatHeader}>
             <View style={styles.flatBack}>
-              <BackButton onPress={() => router.back()} />
+              <BackButton />
             </View>
             <Text style={styles.flatMeta}>
               {t(`decouverteType.${item.type}`).toUpperCase()} · {item.region_ethnie}
@@ -170,6 +173,20 @@ export default function DecouverteDetailScreen() {
             title={item.titre}
             description={item.resume_liste}
             onOpenComments={() => scrollRef.current?.scrollTo({ y: bodyY.current + commentsY.current - 12, animated: true })}
+          />
+          <TeaserCarte
+            type="decouverte"
+            slug={item.slug}
+            imageUrl={item.image_url}
+            style={{ marginBottom: 14 }}
+            cta={
+              videoCodes.length > 0
+                ? {
+                    label: libelleCtaTeaser('decouverte', item.titre, true, lang === 'en'),
+                    onPress: () => scrollRef.current?.scrollTo({ y: bodyY.current + videoY.current - 12, animated: true }),
+                  }
+                : undefined
+            }
           />
           <PresenteParSponsor type="decouverte" slug={item.slug} style={{ marginBottom: 14 }} />
           <Text style={styles.subtitle}>{item.sous_titre}</Text>
@@ -195,7 +212,7 @@ export default function DecouverteDetailScreen() {
           ))}
 
           {videoCodes.length > 0 && (
-            <View style={styles.videoSection}>
+            <View style={styles.videoSection} onLayout={(e) => (videoY.current = e.nativeEvent.layout.y)}>
               <SectionTitle title={t('content.watch')} />
               {isGuest ? (
                 <LockedActionCard label="video" reason={'video'} />

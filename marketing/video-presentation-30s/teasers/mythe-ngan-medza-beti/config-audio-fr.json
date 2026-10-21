@@ -1,0 +1,21 @@
+{
+  "voice_dir": "C:/Users/Yannico/Desktop/jarvis-starter-kit/livrables/sites-web/afroback/marketing/video-presentation-30s/teasers/mythe-ngan-medza-beti/voix-fr",
+  "lines": [
+    {"start": 0.30, "text": "Écoute, enfant de la forêt."},
+    {"start": 2.85, "text": "Devant eux, le Yom. Sans pont. Sans gué."},
+    {"start": 7.15, "text": "Avec eux, les vieillards, les enfants, tout un peuple."},
+    {"start": 11.50, "text": "Alors ils appelèrent. Et quelque chose répondit."},
+    {"start": 15.70, "text": "Un tronc surgit de l'eau, d'une rive à l'autre. Ce n'était pas un tronc."},
+    {"start": 20.95, "text": "Une loi : rien qui pique, rien qui blesse."},
+    {"start": 24.85, "text": "Famille après famille, ils passèrent. Puis vint la nuit…"},
+    {"start": 30.10, "text": "Cette nuit-là, un peuple fut changé à jamais."},
+    {"start": 34.20, "text": "Ngan Medza, la légende que les anciens refusent d'oublier, écoute-la attentivement."}
+  ],
+  "music": "C:/Users/Yannico/Music/Afroback Stories Audio/BG Music/Legends by the Fire.mp3",
+  "music_offset": 0.0,
+  "music_volume": 0.12,
+  "sfx": [],
+  "duration": 41.5,
+  "out": "public/audio/teaser-mythe-ngan-medza-beti-fr.wav",
+  "timing_out": "teasers/mythe-ngan-medza-beti/timing-fr.json"
+}

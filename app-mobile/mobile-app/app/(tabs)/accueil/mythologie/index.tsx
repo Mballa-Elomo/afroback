@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useRetour } from '../../../../src/navigation/retour';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +23,7 @@ import { useI18n } from '../../../../src/i18n';
 export default function MythologieListScreen() {
   const { t } = useI18n();
   const router = useRouter();
+  const retour = useRetour();
   const groupsState = useMythesGroupedByZone();
   const [query, setQuery] = useState('');
   const groups = groupsState.status === 'ready' ? groupsState.data : [];
@@ -55,7 +57,7 @@ export default function MythologieListScreen() {
         <ScreenHeader
           title={t('myths.title')}
           subtitle={total > 0 ? t('myths.count', { n: total }) : undefined}
-          onBack={() => router.back()}
+          onBack={retour}
         />
 
         <View style={styles.pad}>

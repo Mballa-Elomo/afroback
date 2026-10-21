@@ -15,6 +15,7 @@ import { colors, typography } from '../theme/tokens';
 import { Icon, type IconName } from '../components/Icons';
 import { useMotionAllowed } from '../onboarding/useReduceMotion';
 import { useI18n } from '../i18n';
+import { useRetour } from '../navigation/retour';
 
 /**
  * Briques du design "moderne" (refonte du 2026-09-30, demande de Yannick :
@@ -56,19 +57,25 @@ export function PressableScale({
 }
 
 /** Bouton retour rond (en-têtes d'écran et en surimpression sur une photo). */
-export function BackButton({ onPress, floating = false }: { onPress: () => void; floating?: boolean }) {
+/**
+ * Bouton retour (refonte du 2026-10-17, retour de test Yannick : « trop petit
+ * et pas moderne ») : pastille ronde de 46 px, verre sombre, liseré doré,
+ * ombre portée, léger enfoncement au toucher. Sans `onPress`, il fait un
+ * retour qui ne bloque jamais (voir `useRetour`). `floating` : posé sur une
+ * image (verre plus transparent, ombre plus marquée).
+ */
+export function BackButton({ onPress, floating = false }: { onPress?: () => void; floating?: boolean }) {
   const { t } = useI18n();
+  const retour = useRetour();
   return (
     <Pressable
-      onPress={onPress}
-      hitSlop={10}
-      style={[styles.back, floating && styles.backFloating]}
+      onPress={onPress ?? retour}
+      hitSlop={12}
+      style={({ pressed }) => [styles.back, floating && styles.backFloating, pressed && styles.backPressed]}
       accessibilityRole="button"
       accessibilityLabel={t('ui.back')}
     >
-      <View style={{ transform: [{ rotate: '180deg' }] }}>
-        <Icon name="chevronRight" size={18} color={colors.accentGoldPale} strokeWidth={2.4} />
-      </View>
+      <Icon name="chevronLeft" size={24} color={colors.accentGoldPale} strokeWidth={2.6} />
     </Pressable>
   );
 }
@@ -373,16 +380,23 @@ const styles = StyleSheet.create({
   tileLabel: { fontFamily: typography.bodyBold, fontSize: 14, color: colors.textPrimary },
   tileHint: { fontFamily: typography.body, fontSize: 11.5, color: colors.textMuted, marginTop: 1 },
   back: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(26,19,13,.95)',
-    borderWidth: 1,
-    borderColor: 'rgba(240,195,107,.28)',
+    paddingRight: 2,
+    backgroundColor: 'rgba(22,16,11,.92)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(240,195,107,.45)',
+    shadowColor: '#000',
+    shadowOpacity: 0.45,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
-  backFloating: { backgroundColor: 'rgba(8,6,4,.55)', borderColor: 'rgba(240,195,107,.4)' },
+  backFloating: { backgroundColor: 'rgba(8,6,4,.6)', borderColor: 'rgba(247,217,139,.6)', shadowOpacity: 0.6 },
+  backPressed: { transform: [{ scale: 0.92 }], backgroundColor: 'rgba(240,195,107,.22)' },
   screenHeader: { paddingHorizontal: 18, paddingTop: 8, paddingBottom: 14 },
   screenHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   screenTitle: { fontFamily: typography.display, fontSize: 24, color: colors.textHeading },

@@ -1,0 +1,394 @@
+[
+ {
+  "n": 1,
+  "start": 0.3,
+  "dur": 1.831,
+  "text": "Écoute, enfant de la forêt.",
+  "words": [
+   [
+    "Écoute,",
+    0.3
+   ],
+   [
+    "enfant",
+    0.88
+   ],
+   [
+    "de",
+    1.24
+   ],
+   [
+    "la",
+    1.42
+   ],
+   [
+    "forêt.",
+    1.6
+   ]
+  ]
+ },
+ {
+  "n": 2,
+  "start": 2.85,
+  "dur": 3.63,
+  "text": "Devant eux, le Yom. Sans pont. Sans gué.",
+  "words": [
+   [
+    "Devant",
+    2.85
+   ],
+   [
+    "eux,",
+    3.3
+   ],
+   [
+    "le",
+    3.86
+   ],
+   [
+    "Yom.",
+    4.08
+   ],
+   [
+    "Sans",
+    4.64
+   ],
+   [
+    "pont.",
+    4.97
+   ],
+   [
+    "Sans",
+    5.59
+   ],
+   [
+    "gué.",
+    5.92
+   ]
+  ]
+ },
+ {
+  "n": 3,
+  "start": 7.15,
+  "dur": 3.626,
+  "text": "Avec eux, les vieillards, les enfants, tout un peuple.",
+  "words": [
+   [
+    "Avec",
+    7.15
+   ],
+   [
+    "eux,",
+    7.42
+   ],
+   [
+    "les",
+    7.88
+   ],
+   [
+    "vieillards,",
+    8.1
+   ],
+   [
+    "les",
+    8.87
+   ],
+   [
+    "enfants,",
+    9.1
+   ],
+   [
+    "tout",
+    9.73
+   ],
+   [
+    "un",
+    10.01
+   ],
+   [
+    "peuple.",
+    10.19
+   ]
+  ]
+ },
+ {
+  "n": 4,
+  "start": 11.5,
+  "dur": 3.345,
+  "text": "Alors ils appelèrent. Et quelque chose répondit.",
+  "words": [
+   [
+    "Alors",
+    11.5
+   ],
+   [
+    "ils",
+    11.87
+   ],
+   [
+    "appelèrent.",
+    12.13
+   ],
+   [
+    "Et",
+    13.02
+   ],
+   [
+    "quelque",
+    13.22
+   ],
+   [
+    "chose",
+    13.7
+   ],
+   [
+    "répondit.",
+    14.06
+   ]
+  ]
+ },
+ {
+  "n": 5,
+  "start": 15.7,
+  "dur": 4.496,
+  "text": "Un tronc surgit de l'eau, d'une rive à l'autre. Ce n'était pas un tronc.",
+  "words": [
+   [
+    "Un",
+    15.7
+   ],
+   [
+    "tronc",
+    15.88
+   ],
+   [
+    "surgit",
+    16.2
+   ],
+   [
+    "de",
+    16.56
+   ],
+   [
+    "l'eau,",
+    16.74
+   ],
+   [
+    "d'une",
+    17.29
+   ],
+   [
+    "rive",
+    17.61
+   ],
+   [
+    "à",
+    17.88
+   ],
+   [
+    "l'autre.",
+    18.02
+   ],
+   [
+    "Ce",
+    18.65
+   ],
+   [
+    "n'était",
+    18.83
+   ],
+   [
+    "pas",
+    19.24
+   ],
+   [
+    "un",
+    19.47
+   ],
+   [
+    "tronc.",
+    19.65
+   ]
+  ]
+ },
+ {
+  "n": 6,
+  "start": 20.95,
+  "dur": 3.098,
+  "text": "Une loi : rien qui pique, rien qui blesse.",
+  "words": [
+   [
+    "Une",
+    20.95
+   ],
+   [
+    "loi",
+    21.19
+   ],
+   [
+    ":",
+    21.43
+   ],
+   [
+    "rien",
+    21.77
+   ],
+   [
+    "qui",
+    22.06
+   ],
+   [
+    "pique,",
+    22.31
+   ],
+   [
+    "rien",
+    22.89
+   ],
+   [
+    "qui",
+    23.18
+   ],
+   [
+    "blesse.",
+    23.42
+   ]
+  ]
+ },
+ {
+  "n": 7,
+  "start": 24.85,
+  "dur": 4.215,
+  "text": "Famille après famille, ils passèrent. Puis vint la nuit…",
+  "words": [
+   [
+    "Famille",
+    24.85
+   ],
+   [
+    "après",
+    25.34
+   ],
+   [
+    "famille,",
+    25.71
+   ],
+   [
+    "ils",
+    26.47
+   ],
+   [
+    "passèrent.",
+    26.74
+   ],
+   [
+    "Puis",
+    27.61
+   ],
+   [
+    "vint",
+    27.93
+   ],
+   [
+    "la",
+    28.25
+   ],
+   [
+    "nuit…",
+    28.47
+   ]
+  ]
+ },
+ {
+  "n": 8,
+  "start": 30.1,
+  "dur": 3.1,
+  "text": "Cette nuit-là, un peuple fut changé à jamais.",
+  "words": [
+   [
+    "Cette",
+    30.1
+   ],
+   [
+    "nuit-là,",
+    30.45
+   ],
+   [
+    "un",
+    31.15
+   ],
+   [
+    "peuple",
+    31.35
+   ],
+   [
+    "fut",
+    31.75
+   ],
+   [
+    "changé",
+    32.0
+   ],
+   [
+    "à",
+    32.4
+   ],
+   [
+    "jamais.",
+    32.55
+   ]
+  ]
+ },
+ {
+  "n": 9,
+  "start": 34.2,
+  "dur": 5.919,
+  "text": "Ngan Medza, la légende que les anciens refusent d'oublier, écoute-la attentivement.",
+  "words": [
+   [
+    "Ngan",
+    34.2
+   ],
+   [
+    "Medza,",
+    34.53
+   ],
+   [
+    "la",
+    35.2
+   ],
+   [
+    "légende",
+    35.42
+   ],
+   [
+    "que",
+    35.91
+   ],
+   [
+    "les",
+    36.19
+   ],
+   [
+    "anciens",
+    36.47
+   ],
+   [
+    "refusent",
+    36.97
+   ],
+   [
+    "d'oublier,",
+    37.52
+   ],
+   [
+    "écoute-la",
+    38.4
+   ],
+   [
+    "attentivement.",
+    39.01
+   ]
+  ]
+ }
+]

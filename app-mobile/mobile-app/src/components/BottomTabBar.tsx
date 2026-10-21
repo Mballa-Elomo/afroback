@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { getFocusedRouteNameFromRoute, StackActions } from '@react-navigation/native';
+import { signalerOngletReappuye } from '../navigation/ongletEvents';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, typography } from '../theme/tokens';
 import { Icon, type IconName } from './Icons';
@@ -48,8 +49,18 @@ export function BottomTabBar(props: BottomTabBarProps) {
 
           const onPress = () => {
             const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-            if (!focused && !event.defaultPrevented) {
+            if (event.defaultPrevented) return;
+            if (!focused) {
               navigation.navigate(route.name);
+              return;
+            }
+            // Onglet déjà actif : on revient à son écran principal, ou, si on y
+            // est déjà, on lui demande de remonter en haut et de se recharger.
+            const pile = route.state as { key?: string; index?: number } | undefined;
+            if (pile?.key && (pile.index ?? 0) > 0) {
+              navigation.dispatch({ ...StackActions.popToTop(), target: pile.key });
+            } else {
+              signalerOngletReappuye(route.name);
             }
           };
 

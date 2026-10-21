@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { surOngletReappuye } from '../../../src/navigation/ongletEvents';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -38,6 +39,21 @@ function greeting(): string {
 function firstSentence(text: string, maxLen = 110): string {
   const period = text.indexOf('.');
   return period > 0 && period < maxLen ? text.slice(0, period + 1) : text.slice(0, maxLen).trim() + '…';
+}
+
+/** Contenu de la carte « Histoire du jour » (héros, mythe ou fiche Découverte). */
+type Une = { type: 'heros' | 'mythe' | 'decouverte'; slug: string; titre: string; blurb: string; image: string | null; chip: string; href: string };
+
+function uneHeros(h: Heros, t: (k: string, o?: Record<string, unknown>) => string): Une {
+  return {
+    type: 'heros',
+    slug: h.slug,
+    titre: h.nom_affiche,
+    blurb: h.sous_titre,
+    image: h.image_carte_catalogue ?? null,
+    chip: h.theme[0] ? t(`heroTheme.${h.theme[0]}`, { defaultValue: h.theme[0] }) : '',
+    href: `/accueil/heros/${h.slug}`,
+  };
 }
 
 /**
@@ -79,9 +95,27 @@ export default function AccueilScreen() {
   const router = useRouter();
   const { session } = useAuth();
   const requireAccount = useRequireAccount();
-  const heroesState = useHeroesList();
-  const mythesState = useMythesGroupedByZone();
-  const decouverteState = useDecouverteItems();
+  // Rechargement : à chaque retour sur l'accueil (focus), en tirant l'écran
+  // vers le bas, ou en appuyant de nouveau sur l'onglet Accueil.
+  const [cle, setCle] = useState(0);
+  const [actualisation, setActualisation] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+  const heroesState = useHeroesList(cle);
+  const mythesState = useMythesGroupedByZone(cle);
+  const decouverteState = useDecouverteItems(cle);
+  const recharger = useCallback(() => {
+    setActualisation(true);
+    setCle((c) => c + 1);
+    setTimeout(() => setActualisation(false), 900);
+  }, []);
+  useEffect(
+    () =>
+      surOngletReappuye('accueil', () => {
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+        recharger();
+      }),
+    [recharger]
+  );
   const heroes = heroesState.status === 'ready' ? heroesState.data : [];
   const [reading, setReading] = useState<ReadingProgress | null>(null);
   const ownProfile = useOwnProfile();
@@ -94,7 +128,24 @@ export default function AccueilScreen() {
     }, [])
   );
 
-  const featured = useMemo(() => pickFeatured(heroes), [heroes]);
+  // « À la une » unique (héros, mythe OU Découverte) choisi dans le back-office ;
+  // sinon rotation quotidienne des héros. On attend les 3 catalogues pour ne
+  // pas afficher un héros puis basculer sur le mythe à la une.
+  const catalogPret = heroesState.status === 'ready' && mythesState.status !== 'loading' && decouverteState.status !== 'loading';
+  const une = useMemo<Une | undefined>(() => {
+    if (!catalogPret) return undefined;
+    const tousMythes = mythesState.status === 'ready' ? mythesState.data.flatMap((g) => g.items) : [];
+    const toutesDecouvertes = decouverteState.status === 'ready' ? decouverteState.data : [];
+    const h = heroes.find((x) => x.a_la_une);
+    if (h) return uneHeros(h, t);
+    const m = tousMythes.find((x) => x.a_la_une);
+    if (m) return { type: 'mythe', slug: m.slug, titre: m.titre, blurb: m.sous_titre, image: m.image_url ?? null, chip: m.zone ? `${t('home.myths')} · ${m.zone}` : t('home.myths'), href: `/accueil/mythologie/${m.slug}` };
+    const d = toutesDecouvertes.find((x) => x.a_la_une);
+    if (d) return { type: 'decouverte', slug: d.slug, titre: d.titre, blurb: d.sous_titre || d.resume_liste, image: d.image_url ?? null, chip: `${t('home.discovery')} · ${DECOUVERTE_TYPE_LABEL[d.type] ?? d.type}`, href: `/decouverte/${d.slug}` };
+    const r = pickFeatured(heroes);
+    return r ? uneHeros(r, t) : undefined;
+  }, [catalogPret, heroes, mythesState, decouverteState, t]);
+  const featured = une;
   const reprendreHero = useMemo(() => (reading ? heroes.find((h) => h.slug === reading.slug) : undefined), [heroes, reading]);
   const pourToi = useMemo(() => {
     const rest = heroes.filter((h) => h.slug !== featured?.slug);
@@ -113,7 +164,12 @@ export default function AccueilScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={actualisation} onRefresh={recharger} tintColor={colors.accentGold} colors={[colors.accentGold]} />}
+      >
         {/* En-tête (salutation + photo), tout en haut, au-dessus des bandeaux (demande de Yannick). */}
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
@@ -168,7 +224,7 @@ export default function AccueilScreen() {
         ) : (
           <>
             {/* Histoire du jour */}
-            {featured && (
+            {une && (
               <View>
                 <View style={styles.dayHeader}>
                   <Text style={styles.sectionTitle}>{t('home.storyOfDay')}</Text>
@@ -176,23 +232,23 @@ export default function AccueilScreen() {
                     {new Date().toLocaleDateString(i18n.language === 'en' ? 'en-GB' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </Text>
                 </View>
-                <PressableScale onPress={() => router.push(`/accueil/heros/${featured.slug}`)} accessibilityLabel={featured.nom_affiche}>
-                  <HeroPlaceholder style={styles.featured} radius={26} imageUrl={featured.image_carte_catalogue}>
+                <PressableScale onPress={() => router.push(une.href as never, { withAnchor: true })} accessibilityLabel={une.titre}>
+                  <HeroPlaceholder style={styles.featured} radius={26} imageUrl={une.image}>
                     <LinearGradient
                       colors={['rgba(8,6,4,0)', 'rgba(8,6,4,0.35)', 'rgba(8,6,4,0.95)']}
                       locations={[0.25, 0.55, 1]}
                       style={StyleSheet.absoluteFill}
                     />
-                    <AccessBadge type="heros" slug={featured.slug} style={{ top: 14, right: 14 }} />
+                    <AccessBadge type={une.type} slug={une.slug} style={{ top: 14, right: 14 }} />
                     <View style={styles.featuredContent}>
-                      {!!featured.theme[0] && (
+                      {!!une.chip && (
                         <View style={styles.chip}>
-                          <Text style={styles.chipText}>{t(`heroTheme.${featured.theme[0]}`, { defaultValue: featured.theme[0] })}</Text>
+                          <Text style={styles.chipText}>{une.chip}</Text>
                         </View>
                       )}
-                      <Text style={styles.featuredTitle}>{featured.nom_affiche}</Text>
+                      <Text style={styles.featuredTitle}>{une.titre}</Text>
                       <Text style={styles.featuredBlurb} numberOfLines={2}>
-                        {firstSentence(featured.sous_titre)}
+                        {firstSentence(une.blurb)}
                       </Text>
                       <View style={styles.readBtn}>
                         <Text style={styles.readBtnText}>{t('content.readStory')}</Text>

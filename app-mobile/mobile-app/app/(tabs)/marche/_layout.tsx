@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { NAVIGATION_FLUIDE } from '../../../src/navigation/fluide';
 import { CartProvider } from '../../../src/marketplace/CartProvider';
 import { colors } from '../../../src/theme/tokens';
 import { ModuleGate } from '../../../src/settings/ModuleOff';
@@ -11,11 +12,14 @@ import { ModuleGate } from '../../../src/settings/ModuleOff';
  * toucher aux fichiers partagés par les autres piliers déjà en test sur
  * téléphone (Découverte, Communauté).
  */
+/** Le premier écran de la pile reste toujours dessous (retour possible même après un lien direct). */
+export const unstable_settings = { initialRouteName: 'index' };
+
 export default function MarcheStackLayout() {
   return (
     <ModuleGate module="marche">
     <CartProvider>
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background }, ...NAVIGATION_FLUIDE }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="[id]" />
         <Stack.Screen name="artisan/[id]" />

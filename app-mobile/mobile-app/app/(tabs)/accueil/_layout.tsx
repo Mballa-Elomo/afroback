@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { NAVIGATION_FLUIDE } from '../../../src/navigation/fluide';
 import { colors } from '../../../src/theme/tokens';
 
 /**
@@ -11,9 +12,12 @@ import { colors } from '../../../src/theme/tokens';
  * audio (`heros/[slug]/audio`) sont des lecteurs plein écran immersifs — la
  * barre y est masquée par `BottomTabBar` (voir `src/components/BottomTabBar.tsx`).
  */
+/** Le premier écran de la pile reste toujours dessous (retour possible même après un lien direct). */
+export const unstable_settings = { initialRouteName: 'index' };
+
 export default function AccueilStackLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background }, ...NAVIGATION_FLUIDE }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="histoires-heros" />
       <Stack.Screen name="heros/[slug]/index" />

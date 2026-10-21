@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { BackButton } from '../../../../../src/ui/modern';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -112,9 +113,7 @@ function LecteurVideoScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={10} style={styles.topBtn}>
-          <Text style={styles.closeIcon}>✕</Text>
-        </Pressable>
+        <BackButton />
         <View style={styles.topCenter}>
           <Text style={styles.topTitle} numberOfLines={1}>
             {heros.nom_affiche}

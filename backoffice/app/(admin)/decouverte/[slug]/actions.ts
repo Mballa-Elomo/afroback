@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
 import { logActivity } from '@/lib/activityLog';
+import { retirerLesAutresUnes } from '@/lib/aLaUne';
 import { getDecouverteItemBySlugAdmin, getDecouverteToggleFields } from '@/lib/data/decouverte';
 
 /**
@@ -128,13 +129,9 @@ export async function toggleDecouverteFeatured(slug: string): Promise<void> {
 
   let ancienTitre: string | null = null;
   if (next) {
-    const { data: autresAlaUne, error: lookupError } = await db.from('decouverte_items').select('titre').eq('a_la_une', true).neq('slug', slug);
-    if (lookupError) throw new Error(lookupError.message);
-    if (autresAlaUne && autresAlaUne.length > 0) {
-      ancienTitre = autresAlaUne.map((it) => it.titre).join(', ');
-      const { error: unsetError } = await db.from('decouverte_items').update({ a_la_une: false }).eq('a_la_une', true).neq('slug', slug);
-      if (unsetError) throw new Error(unsetError.message);
-    }
+    // Une seule une sur tout AFROBACK : on la retire aussi des autres catégories.
+    const retires = await retirerLesAutresUnes('decouverte_items', slug);
+    if (retires.length > 0) ancienTitre = retires.join(', ');
   }
 
   const { error } = await db.from('decouverte_items').update({ a_la_une: next }).eq('slug', slug);

@@ -22,6 +22,7 @@ import { LeParrainReel } from "./prospects/LeParrainReel";
 import { AurionKiroo, AurionKiroo30 } from "./prospects/AurionKiroo";
 import { ComeupCouverture, ComeupInclus, ComeupMethode, ComeupOffres, ComeupProcess, CW, CH } from "./comeup/ComeupVisuels";
 import { AppCouverture, AppInclus, AppOffres, AppProcess } from "./comeup/ComeupAppVisuels";
+import { NganMedzaTeaser, NGAN_TEASER_FR_DUREE } from "./teasers/NganMedza";
 import { FPS, H, W } from "./theme";
 
 export const RemotionRoot: React.FC = () => (
@@ -38,6 +39,9 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="AfrobackPresentation60s" component={Presentation60s} durationInFrames={FPS * 60} fps={FPS} width={W} height={H} defaultProps={{ withAudio: true }} />
     <Composition id="AfrobackTutorielInscription30s" component={TutorielInscription30s} durationInFrames={FPS * 30} fps={FPS} width={W} height={H} defaultProps={{ withAudio: true }} />
     <Composition id="AfrobackPoemeBonneNuit59s" component={BonneNuit} durationInFrames={FPS * BONNE_NUIT_DUREE} fps={FPS} width={W} height={H} defaultProps={{ withAudio: true }} />
+    {/* Teasers (mode teaser) : FR paysage d'abord ; FR vertical et EN après validation de Yannick */}
+    <Composition id="AfrobackTeaserNganMedzaFrPaysage" component={NganMedzaTeaser} durationInFrames={NGAN_TEASER_FR_DUREE} fps={FPS} width={1920} height={1080} defaultProps={{ lang: "fr" as const, format: "paysage" as const, withAudio: true }} />
+    <Composition id="AfrobackTeaserNganMedzaFrVertical" component={NganMedzaTeaser} durationInFrames={NGAN_TEASER_FR_DUREE} fps={FPS} width={1080} height={1920} defaultProps={{ lang: "fr" as const, format: "vertical" as const, withAudio: true }} />
     {/* Prospection Madou Consulting (hors AFROBACK) */}
     <Composition id="ProspectMonsterQuadVillain30s" component={MonsterQuadVillain} durationInFrames={FPS * 30} fps={FPS} width={W} height={H} defaultProps={{ withAudio: true }} />
     <Composition id="ClientMonsterQuadCforceC5Reel40s" component={MonsterQuadCforceC5} durationInFrames={FPS * 40} fps={FPS} width={W} height={H} defaultProps={{ withAudio: true }} />
